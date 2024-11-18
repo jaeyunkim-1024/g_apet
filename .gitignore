@@ -291,15 +291,19 @@ gs-apet-00-platform/lib
 # business
 /gs-apet-11-business/profiles/dev/resources/config/properties/business_backup.xml
 /gs-apet-11-business/resources/config/properties/business_backup.xml
+/gs-apet-11-business/resources/config/messages/column_ko_backup.properties
 
 # batch
 /gs-apet-21-batch/src/main/resources/config/properties/context_backup.properties
 /gs-apet-21-batch/src/main/resources/sql-backup/
+/gs-apet-21-batch/batch.iml
 
 # front
 gs-apet-31-front/resources/config/properties/context_backup.properties
 gs-apet-31-front/resources/NHNAPIGatewayKey.properties
+/gs-apet-31-front/front.iml
+/gs-apet-31-front/profiles/dev/resources/NHNAPIGatewayKey.properties
 
 # admin
 gs-apet-41-admin/src/main/resources/config/properties/datasource_backup.properties
-
+/gs-apet-41-admin/admin.iml
