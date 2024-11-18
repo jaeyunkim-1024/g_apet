@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<style>
+		.txt {transition: all ease-in 0.4s; width: 200px; height: 100px; position: absolute; left:0px; }
+		.txt.active {position: absolute; left:110px}
+	</style>
+</head>
+<body class="body">
+	<div style="position: relative; border:1px solid red; height: 200px;">
+		<p class="txt" onclick="aClick()">click</p>
+	</div>
+	<style>
+	
+	
+	</style>
+	<script>
+		let boolean = ( 1 ? true : false ) ;
+		let btn = document.querySelector('.txt');
+		
+		btn.style.backgroundColor = randomColor();
+
+		function aClick(){
+			// e.target;
+			if(boolean){
+				boolean = 0;
+				btn.style.color = "white"; 
+				btn.style.backgroundColor = randomColor(); 
+				btn.classList.add('active')
+			}else {
+				boolean = 1;
+				btn.style.color = "white"; 
+				btn.style.backgroundColor = randomColor(); 
+				btn.classList.remove('active')
+			}
+		}
+		function randomColor() {
+			var letters = '0123456789ABCDEF';
+			var color = '#';
+			for (var i = 0; i < 6; i++) {
+				color += letters[Math.floor(Math.random() * 16)];
+			}
+			return color;
+		}
+
+
+	</script>
+</body>
+</html>

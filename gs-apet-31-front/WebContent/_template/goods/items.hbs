@@ -1,0 +1,86 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=utf-8" %>
+
+<script id="chooseGoodsOrderBoxTemplate" type="text/x-handlebars-template">
+{{#items}}
+	<input type="hidden" id="selected_attrNo_{{goodsId}}_{{attrNo}}" name="selected_attrNo" value="{{attrNo}}">
+	<input type="hidden" id="selected_attrVal_{{goodsId}}_{{attrNo}}" name="selected_attrVal" value="">
+<!-- inputHtml end-->
+<!-- optHtml start -->
+<dl class="option_list">
+    <dt>{{attrNm}}</dt>
+    <dd>
+        <select class="select" title="옵션선택" name="select_{{attrNo}}" onchange="goodsSelect.chooseOption('{{goodsId}}', '{{attrNo}}', this.value);" style="width:590px;">
+            <option value="">{{attrNm}} 선택</option>
+            {{#goodsAttrValueList}}
+            <option value="{{attrValNo}}">{{attrVal}}</option>
+            {{/goodsAttrValueList}}
+        </select>
+    </dd>
+</dl>
+<!-- optHtml end -->
+{{/items}}
+<!-- qtyHtml start -->
+<span style="display:none" class="qty" id="qty">1</span>
+{{#goods}}
+<input type="hidden" id="saleAmt_{{goodsId}}" value="{{saleAmt}}">
+{{/goods}}
+
+</script>
+
+<script id="chooseGoodsOptionWrapTemplate" type="text/x-handlebars-template">
+{{#items}}	
+<!-- optHtml start -->
+<dl class="option_list">
+    <dt>{{attrNm}}</dt>
+    <dd>
+        <select class="select" title="옵션선택" name="select_{{attrNo}}" onchange="goodsSelect.chooseOption('{{goodsId}}', '{{attrNo}}', this.value);" style="width:590px;">
+            <option value="">{{attrNm}} 선택</option>
+            {{#goodsAttrValueList}}
+            <option value="{{attrValNo}}">{{attrVal}}</option>
+            {{/goodsAttrValueList}}
+        </select>
+    </dd>
+</dl>
+<!-- optHtml end -->
+{{/items}}
+</script>
+
+<script id="goodsSelectAddTemplate" type="text/x-handlebars-template">
+<div class="option_list_gray">
+    <ul>
+        <li name="item_into_{{itemNo}}">
+            <input type="hidden" name="goodsIds" value="{{goodsId}}">
+            <input type="hidden" name="itemNos" value="{{itemNo}}">
+            <div class="option_name">{{itemNm}}
+                {{#ifAddSaleAmtYn}}
+                    {{#ifAddSaleAmtPlus}}
+                        (옵션추가 : +<span name="addSaleAmt">{{formatAddSaleAmt}}</span> 원)
+                    {{else}}
+                        (옵션추가 : <span name="addSaleAmt">{{formatAddSaleAmt}}</span> 원)
+                    {{/ifAddSaleAmtPlus}}
+                {{/ifAddSaleAmtYn}}
+            </div>
+            <div class="ui_qty_box" name="select_opt_{{itemNo}}">
+                <a href="#" class="btn_down" onclick="goodsSelect.qtyDown({{itemNo}});return false;">
+                    <span>감소</span>
+                </a>
+                <input type="hidden" class="amt" value="{{saleAmt}}">
+                <input type="hidden" id="buy_qty_{{itemNo}}" name="buyQtys" value="1">
+                <input type="hidden" class="addSaleAmt" value="0">
+                <span class="qty">1</span>
+                <a href="#" class="btn_up" onclick="goodsSelect.qtyUp({{itemNo}});return false;">
+                    <span>증가</span>
+                </a>
+            </div>
+            <input type="hidden" name="price" value="{{price}}">
+            <input type="hidden" name="asbSvcYns" value="{{assemYn}}">
+            <div class="price">{{formatPrice}} 원</div>
+            <a id="del_btn_{{itemNo}}" href="#" class="btn_delete" onclick="goodsSelect.del(this);return false;">삭제</a>
+        </li>
+    </ul>
+</div>
+</script>
+
+<script id="formHtmlTemplate" type="text/x-handlebars-template">
+<form action="/order/indexOrderPayment" method="post"><input type="hidden" name"orderType" value="{{CONSTANTS_CART_ORDER_TYPE_ONCE}}"></form>
+</script>

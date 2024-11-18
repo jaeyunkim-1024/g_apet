@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	
+	<style>
+		html, body{overflow:hidden;}
+	</style>
+</head>
+<body class="body">
+
+	<!-- 팝업윈도우 A .popLayer.win-->
+	<!-- 21.08.10 APET-1258 lcm01 -->
+	<!-- <article class="popLayer win a fixWin popWoozooPass "> -->
+	<article class="popLayer a on popWoozooPass" id="popSample1">
+	<!-- //21.08.10 APET-1258 lcm01 -->
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">비밀번호 확인</h1>
+					<button type="button" class="btnPopClose">닫기</button><!-- 21.08.10 APET-1258 lcm01 -->
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+					<div class="result mt15"><!-- 21.08.05 APET-1258 lcm01 클래스수정-->
+						<p class="sub">우주코인 조회를 위해</p>
+						<p class="sub">우주멤버십 비밀번호를 입력해주세요.</p>
+					</div>
+					
+					<div class="woozooPass">
+						<ul class="list">
+							<li>
+								<div class="input del">
+									<input type="password" placeholder="비밀번호를 입력하세요">
+								</div>
+								<p class="validation-check">error message</p>
+							</li>
+						</ul> 
+					</div>
+					<!-- 21.08.05 APET-1258 lcm01 -->
+					<div class="btnSet mt30">
+						<a href="javascript:;" class="btn lg d">취소</a>
+						<a href="javascript:;" class="btn lg a">확인</a>
+						
+					</div>
+					<!-- //21.08.05 APET-1258 lcm01 -->
+					<a class="lnk-pw center" href="javascript:;">비밀번호 재설정</a>
+				</main>
+			</div>
+			
+		</div>
+	</article>
+</body>
+</html>

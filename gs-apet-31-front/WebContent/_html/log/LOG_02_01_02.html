@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			ui.commentBox.open('.logCommentBox')
+		});
+	</script>
+</head>
+<body style="background:rgba(0,0,0,0.5)">
+	<!-- dop pop -->
+	<div class="commentBoxAp logCommentBox" data-priceh="80%">
+		<div class="head">
+			<div class="con">
+				<div class="tit cen"></div>
+				<a href="javascript:;" class="btn_left" onClick="ui.commentBox.close(this)">완료</a>
+				<a href="javascript:;" class="btn_right logColorBlue" onClick="ui.commentBox.close(this)" disabled>취소</a><!-- 'logColorBlue' 클래스 추가 시 파란색 글씨 //  'disabled' 제거 시 검정색 글씨 // 'disabled' attribute 있을 시 회식 글씨  -->
+			</div>
+		</div>
+		<div class="con">
+			<div class="box full">
+				<!-- content -->
+
+				<!-- // content -->
+			</div>
+		</div>
+	</div>
+	<!-- //dop pop -->
+</body>
+</html>

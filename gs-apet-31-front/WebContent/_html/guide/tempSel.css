@@ -1,0 +1,8 @@
+ul, li{list-style:none;}
+
+
+/* both box */
+
+
+#baseSel{}
+#baseSel > input{height:36px; font-size:20rem; color:#000; border:none; background:transparent;}

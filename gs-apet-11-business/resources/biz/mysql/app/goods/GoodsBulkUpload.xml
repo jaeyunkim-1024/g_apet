@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 일괄등록
+	작성자  	valueFactory
+	작성일자  2016.03.03
+-->
+
+<mapper namespace="goodsBulkUpload" >
+
+	<select id="selectStStdInfo" parameterType="biz.app.goods.model.GoodsBulkUploadPO" resultType="biz.app.st.model.StStdInfoVO" >
+		<!--
+			Query Name : goodsBulkUpload.selectStStdInfo
+			Description : 사이트명으로 사이트 조회
+		-->
+		SELECT /* queryid(goodsBulkUpload.selectStStdInfo) */
+			A.ST_ID		/* 사이트 ID */
+			, A.ST_NM	/* 사이트 명 */
+			, B.COMP_NO	/* 업체번호 */
+			, B.COMP_NM	/* 업체명 */
+		FROM ST_STD_INFO  A
+		LEFT OUTER JOIN (
+			SELECT M.ST_ID
+				, B.COMP_NO
+				, B.COMP_NM
+			FROM ST_COMP_MAP M
+			JOIN COMPANY_BASE B
+			ON B.COMP_NO = M.COMP_NO
+			AND B.COMP_NM = TRIM(#{compNm})
+		    LIMIT 1
+		) B
+		ON A.ST_ID = B.ST_ID
+		WHERE A.ST_NM = TRIM(#{stNm})
+	</select>
+
+	<select id="selectAttributeByNm" resultType="java.lang.Long">
+		<!--
+			Query Name : goodsBulkUpload.selectAttributeByNm
+			Description : 옵션 조회
+		-->
+		SELECT /* queryid(goodsBulkUpload.selectAttributeByNm ) */
+		ATTR_NO	/* 속성 번호 */
+		FROM ATTRIBUTE
+		WHERE ATTR_NM = TRIM(#{attrNm})
+		AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+	<select id="checkGoodsCompNo" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsBulkUpload.checkGoodsCompNo
+			Description : 상품 업체 번호 검사
+		-->
+		SELECT COUNT(*)
+		FROM COMPANY_BASE
+		WHERE 1 = 1
+		AND COMP_NO = #{compNo }
+		AND COMP_STAT_CD = '${@framework.common.constants.CommonConstants@COMP_STAT_20 }' /* 정상인것만 */
+	</select>
+
+	<select id="checkGoodsCompNm" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsBulkUpload.checkGoodsCompNm
+			Description : 상품 업체명 검사
+		-->
+		SELECT COUNT(*)
+		FROM COMPANY_BASE
+		WHERE 1 = 1
+		AND COMP_NM = TRIM(#{compNm })
+		AND COMP_STAT_CD = '${@framework.common.constants.CommonConstants@COMP_STAT_20 }' /* 정상인것만 */
+		
+	</select>
+
+
+	<select id="checkCompGoodsId" resultType="java.lang.String" >
+		<!--
+			Query Name : goodsBulkUpload.checkCompGoodsId
+			Description : 업체/사이트 별 업체상품번호 체크
+		-->
+		SELECT 
+            GB.GOODS_ID
+        FROM GOODS_BASE GB
+        JOIN (
+            SELECT C.COMP_NO
+        	FROM COMPANY_BASE C
+        	JOIN ST_COMP_MAP M
+            ON (C.COMP_NO = M.COMP_NO)
+            WHERE M.ST_ID = #{stId}) CB
+            ON (GB.COMP_NO = CB.COMP_NO)
+        WHERE CB.COMP_NO = #{compNo}
+        AND GB.COMP_GOODS_ID = #{compGoodsId }
+        LIMIT 1
+	</select>
+
+
+	<select id="checkBndNo" resultType="java.lang.Integer" >
+		<!--
+			Query Name : goodsBulkUpload.checkBndNo
+			Description : 브랜드 번호 검사
+		-->
+		SELECT COUNT(1)
+		FROM BRAND_BASE B
+	    JOIN COMPANY_BRAND C
+        ON (B.BND_NO = C.BND_NO)
+		JOIN ST_COMP_MAP M
+		ON (C.COMP_NO = M.COMP_NO)
+	    JOIN ST_STD_INFO S
+        ON (S.ST_ID = M.ST_ID)
+		WHERE B.BND_NO = #{bndNo }
+	    AND C.COMP_NO = #{compNo}
+	    AND B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND M.ST_ID #{stId}
+        AND S.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+	<select id="checkBndNm" parameterType="biz.app.goods.model.GoodsBulkUploadPO" resultType="java.lang.Long" >
+		<!--
+			Query Name : goodsBulkUpload.checkBndNm
+			Description : 브랜드 명 검사
+		-->
+		SELECT B.BND_NO
+		FROM BRAND_BASE B
+		JOIN COMPANY_BRAND C
+		ON (B.BND_NO = C.BND_NO)
+		JOIN ST_COMP_MAP M
+		ON (C.COMP_NO = M.COMP_NO)
+		JOIN ST_STD_INFO S
+		ON (S.ST_ID = M.ST_ID)
+		WHERE B.BND_NM_KO = TRIM(#{bndNm })
+		AND B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND C.COMP_NO = #{compNo}
+		AND S.ST_ID  = #{stId}
+		LIMIT 1
+	</select>
+
+	<select id="checkTaxGbNm" resultType="java.lang.Integer" >
+		select COUNT(1)
+		from code_detail cd
+		where GRP_CD  = '${@framework.common.constants.CommonConstants@TAX_GB}'
+		  and USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		  and DTL_NM = TRIM(#{taxGbNm})
+	</select>
+
+	<select id="checkDlvrcPlcNo" resultType="java.lang.Integer" >
+		<!--
+			Query Name : goodsBulkUpload.checkDlvrcPlcNo
+			Description : 배송정책 번호 검사
+		-->
+		SELECT COUNT(*)
+		FROM DELIVERY_CHARGE_POLICY
+		WHERE COMP_NO = #{compNo} 
+		AND DLVRC_PLC_NO = #{dlvrcPlcNo} 
+	</select>
+
+
+
+	<select id="checkNtfId" resultType="biz.app.goods.model.NotifyItemVO" >
+		<!--
+			Query Name : goodsBulkUpload.checkNtfId
+			Description : 고시정보 조회
+		-->
+		SELECT B.NTF_ID
+			 , B.NTF_ITEM_ID
+			 , B.ITEM_NM
+			 , B.DSCRT
+			 , B.INPUT_MTD_CD
+			 , B.BIGO
+		  FROM NOTIFY_INFO A, NOTIFY_ITEM B
+		 WHERE 1 = 1
+		   AND A.NTF_ID = #{ntfId }
+		   AND A.NTF_ID = B.NTF_ID
+		 ORDER BY B.NTF_ITEM_ID
+	</select>
+
+
+	<update id="updateBulkGoods" parameterType="biz.app.goods.model.GoodsBulkUploadPO" >
+		<!--
+			Query Name : goodsBulkUpload.updateBulkGoods
+			Description : 상품 정보 일괄 수정..
+		-->
+		UPDATE	GOODS_BASE SET
+				SYS_UPDR_NO			= #{sysUpdrNo }				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+				, GOODS_NM				= #{goodsNm }			/* 상품 명 */
+				, MDL_NM				= #{mdlNm }				/* 모델 명 */
+				, KWD					= #{kwd }				/* 키워드 */
+				, CTR_ORG				= #{ctrOrg }			/* 원산지 */
+				<if test="importer != null and importer != ''">
+				, IMPORTER				= #{importer }			/* 수입사 */
+				</if>
+				, MMFT					= #{mmft }				/* 제조사 */
+				, SHOW_YN				= #{showYn }			/* 노출 여부 */
+				<if test="bigo != null and bigo != ''">
+				, BIGO					= #{bigo }				/* 비고 */
+				</if>
+		WHERE	1 = 1
+		AND		GOODS_ID				= #{goodsId }
+	</update>
+
+
+	<select id="listNotifyItem" resultType="biz.app.goods.model.NotifyItemVO" >
+		<!--
+			Query Name : goodsBulkUpload.listNotifyItem
+			Description : 공정위 품목군
+		-->
+		SELECT B.NTF_ID
+			 , B.NTF_ITEM_ID
+			 , B.ITEM_NM
+		  FROM NOTIFY_INFO A
+		  JOIN NOTIFY_ITEM B ON (A.NTF_ID = B.NTF_ID)
+		 WHERE 1 = 1
+		<if test="ntfId != null and ntfId != ''">
+		  AND A.NTF_ID = #{ntfId }
+		</if>
+		  ORDER BY B.NTF_ID, B.NTF_ITEM_ID
+	</select>
+
+
+	<select id="checkGoodsId" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsBulkUpload.checkGoodsId
+			Description : 상품 ID 검사
+		-->
+		SELECT COUNT(*)
+		FROM GOODS_BASE
+		WHERE 1 = 1
+		AND GOODS_ID =  #{goodsId }
+	</select>
+
+
+	<update id="updateBulkNtfId" parameterType="biz.app.goods.model.GoodsBulkUploadPO" >
+		<!--
+			Query Name : goodsBulkUpload.updateBulkNtfId
+			Description : 상품 정보 일괄 수정..
+		-->
+		UPDATE	GOODS_BASE SET
+				SYS_UPDR_NO			= #{sysUpdrNo }				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+				, NTF_ID				= #{ntfId }				/* 공정위 품목군 */
+		WHERE	1 = 1
+		AND		GOODS_ID				= #{goodsId }
+	</update>
+
+
+	<select id="checkGoodsBase" resultType="biz.app.goods.model.GoodsBaseVO" >
+		<!--
+			Query Name : goodsBulkUpload.checkGoodsBase
+			Description : 상품 재고 정보 조회
+		-->
+		SELECT GOODS_NM, STK_MNG_YN
+		FROM GOODS_BASE
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId }
+	</select>
+
+	<select id="checkGoodsDisplayByNm" resultType="hashmap">
+		SELECT UP_DISP_CLSF_NO AS upDispClsfNo
+			, DISP_CLSF_NO AS dispClsfNo
+			, DISP_CLSF_NM as dispClsfNm
+		FROM DISPLAY_CATEGORY
+		WHERE DISP_CLSF_NM = TRIM(#{dispClsfNm})
+		AND DISP_LVL = #{dispLvl}
+		<if test="upDispClsfNo != null">
+			AND UP_DISP_CLSF_NO = #{upDispClsfNo}
+		</if>
+		AND DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+	</select>
+
+	<update id="updateBulkStock" parameterType="biz.app.goods.model.GoodsBulkUploadPO" >
+		<!--
+			Query Name : goodsBulkUpload.updateBulkStock
+			Description : 단품 재고정보 수정
+		-->
+		UPDATE ITEM SET
+			SYS_UPDR_NO			= #{sysUpdrNo }				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+			, WEB_STK_QTY		= #{webStkQty }
+			, ITEM_STAT_CD		= #{itemStatCd }
+		WHERE 1 = 1
+		AND ITEM_NO = #{itemNo }
+		AND GOODS_ID = #{goodsId }
+	</update>
+	
+	<insert id="insertGoodsImgPrcsList" parameterType="biz.app.goods.model.GoodsBulkUploadPO" >
+		<!--
+			Query Name : goodsBulkUpload.insertGoodsImgPrcsList
+			Description : 상품 이미지 처리 내역 등록
+		-->
+		<selectKey keyProperty="prcsSeq" resultType="java.lang.Integer" order="BEFORE">
+			SELECT IFNULL(MAX(PRCS_SEQ)+1, 1) FROM GOODS_IMG_PRCS_LIST WHERE GOODS_ID = #{goodsId }
+		</selectKey>
+		INSERT INTO GOODS_IMG_PRCS_LIST (
+			GOODS_ID			/* 상품 아이디 */
+			, PRCS_SEQ			/* 처리 순번 */
+			, IMG1_URL			/* 이미지1 URL */
+			, RVS_IMG1_URL		/* 반전 이미지1 URL */
+			, IMG2_URL			/* 이미지2 URL */
+			, RVS_IMG2_URL		/* 반전 이미지2 URL */
+			, IMG3_URL			/* 이미지3 URL */
+			, RVS_IMG3_URL		/* 반전 이미지3 URL */
+			, IMG4_URL			/* 이미지4 URL */
+			, RVS_IMG4_URL		/* 반전 이미지4 URL */
+			, IMG5_URL			/* 이미지5 URL */
+			, RVS_IMG5_URL		/* 반전 이미지5 URL */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsId }			/* 상품 아이디 */
+			, #{prcsSeq }				/* 처리 순번 */
+			, #{img1Url }				/* 이미지1 URL */
+			, #{rvsImg1Url }			/* 반전 이미지1 URL */
+			, #{img2Url }				/* 이미지2 URL */
+			, #{rvsImg2Url }			/* 반전 이미지2 URL */
+			, #{img3Url }				/* 이미지3 URL */
+			, #{rvsImg3Url }			/* 반전 이미지3 URL */
+			, #{img4Url }				/* 이미지4 URL */
+			, #{rvsImg4Url }			/* 반전 이미지4 URL */
+			, #{img5Url }				/* 이미지5 URL */
+			, #{rvsImg5Url }			/* 반전 이미지5 URL */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<select id="getGoodsImgPrcsList" resultType="biz.app.goods.model.GoodsImgPrcsListVO">
+		<!--
+			Query Name : goodsBulkUpload.getGoodsImgPrcsList
+			Description : 상품 이미지 처리 내역 조회
+		-->
+		SELECT GOODS_ID			/* 상품 아이디 */
+			, PRCS_SEQ			/* 처리 순번 */
+			, IMG1_URL			/* 이미지1 URL */
+			, RVS_IMG1_URL		/* 반전 이미지1 URL */
+			, IMG2_URL			/* 이미지2 URL */
+			, RVS_IMG2_URL		/* 반전 이미지2 URL */
+			, IMG3_URL			/* 이미지3 URL */
+			, RVS_IMG3_URL		/* 반전 이미지3 URL */
+			, IMG4_URL			/* 이미지4 URL */
+			, RVS_IMG4_URL		/* 반전 이미지4 URL */
+			, IMG5_URL			/* 이미지5 URL */
+			, RVS_IMG5_URL		/* 반전 이미지5 URL */
+			, CONCAT(IFNULL(IMG1_URL, "NULL"), CONCAT(':SPLIT:', CONCAT(IFNULL(RVS_IMG1_URL, "NULL")
+		      	, CONCAT(':IMG_URL:', CONCAT(IFNULL(IMG2_URL, "NULL"), CONCAT(':SPLIT:',  CONCAT(IFNULL(RVS_IMG2_URL, "NULL")
+		        	, CONCAT(':IMG_URL:', CONCAT(IFNULL(IMG3_URL, "NULL"), CONCAT(':SPLIT:', CONCAT(IFNULL(RVS_IMG3_URL, "NULL")
+						, CONCAT(':IMG_URL:', CONCAT(IFNULL(IMG4_URL, "NULL"), CONCAT(':SPLIT:', CONCAT(IFNULL(RVS_IMG4_URL, "NULL")
+		     				, CONCAT(':IMG_URL:', CONCAT(IFNULL(IMG5_URL, "NULL"), CONCAT(':SPLIT:', IFNULL(RVS_IMG5_URL, "NULL"))))
+	    				))))
+	   				))))
+	  			))))
+			))) AS URL_ARRAY
+		FROM GOODS_IMG_PRCS_LIST
+		WHERE  1 = 1
+		AND IMG_PRCS_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND (MEMO IS NULL OR TRIM(MEMO) = '')
+		LIMIT 3500
+	</select>
+
+	<update id="updateGoodsImgPrcsList" parameterType="biz.app.goods.model.GoodsImgPrcsListPO" >
+		<!--
+			Query Name : goodsBulkUpload.updateGoodsImgPrcsList
+			Description : 상품 이미지 처리 내역 수정
+		-->
+		UPDATE GOODS_IMG_PRCS_LIST SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				<if test="imgPrcsYn != null and imgPrcsYn != ''">
+				, IMG_PRCS_YN			= #{imgPrcsYn }		/* 이미지 처리 여부 */
+				</if>
+				<if test="memo != null and memo != ''">
+				, MEMO		= #{memo }	/* 메모 */
+				</if>
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+		AND		PRCS_SEQ		= #{prcsSeq }
+	</update>
+	
+
+	<select id="checkGoodsPhsCompNm" resultType="java.lang.Integer">
+		<!-- 
+			Query Name : goodsBulkUpload.checkGoodsCompNm
+			Description : 매입업체명 검사
+		 -->
+		SELECT COUNT(*)
+		FROM COMPANY_BASE
+		WHERE 1 = 1
+		AND COMP_NM = TRIM(#{phsCompNm })
+		AND COMP_STAT_CD = '${@framework.common.constants.CommonConstants@COMP_STAT_20 }' /* 정상인것만 */
+		
+	</select>
+	<select id="checkGoodsCompTpCd" resultType="java.lang.Integer">
+		<!-- 
+			Query Name : goodsBulkUpload.checkGoodsCompNm
+			Description : 업체유형코드 조회
+		 -->
+		SELECT COMP_TP_CD
+		FROM COMPANY_BASE
+		WHERE 1 = 1
+		AND COMP_NO =#{CompNo}
+		AND COMP_STAT_CD = '${@framework.common.constants.CommonConstants@COMP_STAT_20 }' /* 정상인것만 */
+		
+	</select>
+	<select id="getGoodsPhsCompNo" resultType="java.lang.Long">
+		<!-- 
+			Query Name : goodsBulkUpload.getGoodsPhsCompNo
+			Description : 매입업체 번호 조회
+		 -->
+		SELECT COMP_NO
+		FROM COMPANY_BASE
+		WHERE 1 = 1
+		AND COMP_NM =#{phsCompNm}
+		AND COMP_STAT_CD = '${@framework.common.constants.CommonConstants@COMP_STAT_20 }' /* 정상인것만 */
+		
+	</select>
+
+
+</mapper>

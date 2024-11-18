@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"주문결제"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page shop od order" id="container">
+		
+			<div class="pageHeadPc">
+				<div class="inr">
+					<div class="hdt">
+						<h3 class="tit">주문결제</h3>
+					</div>
+				</div>
+			</div>
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="ordersets">
+						
+						<section class="sect usrs">
+							<div class="hdts"><span class="tit">주문 고객 정보</span></div>
+							<div class="cdts">
+								<div class="box">
+									<div class="usr"><em class="nm">박이슬,</em><i class="tel">010-1234-1234</i></div>
+									<!-- <div class="bts"><a href="javascript:;" class="btn c sm btMyMod">개인정보수정</a></div> -->
+								</div>
+							</div>
+						</section>
+
+						<section class="sect addr">
+							<div class="hdts"><span class="tit">배송지</span></div>
+							<div class="cdts">
+								<div class="adrset">
+									<div class="name tx"><!-- 2021.04.28 tx 클래스 추가-->
+										<em class="t">우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집 우리집</em> <em class="bdg">기본배송지</em>
+									</div>
+									<div class="adrs">
+										[01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우
+									</div>
+									<div class="tels">박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234 박이슬/010-1234-1234</div>
+									<label class="safenm checkbox"><input type="checkbox"><span class="txt"><em class="t">안심번호 사용</em></span></label>
+
+									<div class="bts"><a href="javascript:;" class="btn c sm btnDeMod">배송지 변경</a></div>
+								</div>
+								<div class="adrreq">
+									<div class="tit">배송 요청사항</div>
+									<div class="pwf">
+										<em class="t">문앞</em> <em class="p">공동현관 비밀번호 입력제목을붙여서썼을때변경버튼을넘어갑니다.테스트제목을붙여서썼을때변경버튼을넘어갑니다.테스트제목을붙여서썼을때변경버튼을넘어갑니다.테스트제목을붙여서썼을때변경버튼을넘어갑니다.테스트제목을붙여서썼을때변경버튼을넘어갑니다.테스트</em>
+										<div class="txt">벨 누르지말고 문 앞에 놔주세요~~~~</div>
+										<div class="btt"><a href="javascript:;" class="btn sm btMod">변경</a></div>
+									</div>
+									<div class="pss">
+										<a href="javascript:;" class="btn btPdPl ">상품 수령 장소를 선택해주세요.</a>
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<section class="sect addr">
+							<div class="hdts"><span class="tit">배송지</span></div>
+							<div class="cdts">
+								<ul class="adrlist">
+									<li class="name">
+										<div class="dt">배송지 명칭</div>
+										<div class="dd"><span class="input"><input type="text" placeholder="배송지 명칭을 입력해주세요."></span></div>
+									</li>
+									<li class="usr">
+										<div class="dt">받는 사람</div>
+										<div class="dd"><span class="input"><input type="text" placeholder="이름을 입력해주세요."></span></div>
+									</li>
+									<li class="tel">
+										<div class="dt">휴대폰번호</div>
+										<div class="dd"><span class="input"><input type="text" placeholder="'-'빼고 숫자만 입력해주세요."></span></div>
+									</li>
+									<li class="arr">
+										<div class="dt">주소</div>
+										<div class="dd">
+											<div class="adrbox a1">
+												<div class="adr">주소를 검색해주세요.</div>
+												<a href="javascript:;" class="btAdr">주소검색</a>
+											</div>
+											<div class="adrbox a1">
+												<div class="adr on">[06141] 서울특별시 강남구 논현로 508 (역삼동, GS강남타워)</div>
+												<a href="javascript:;" class="btAdr">주소검색</a>
+											</div>
+											<div class="adrbox a2">
+												<span class="input"><input type="text" placeholder="상세주소를 입력하세요."></span>
+											</div>
+										</div>
+									</li>
+								</ul>
+								<div class="adrreq">
+									<div class="tit">배송 요청사항</div>
+									<div class="pwf">
+										<div class="btt"><a href="javascript:;" class="btn sm btMod">변경</a></div>
+									</div>
+									<div class="pss">
+										<a href="javascript:;" class="btn btPdPl ">상품 수령 장소를 선택해주세요.</a>
+									</div>
+								</div>
+								<div class="saves">
+									<div class="pp"><label class="checkbox"><input type="checkbox"><span class="txt"><em class="tt">등록한 정보를 회원정보에 반영합니다. (휴대폰번호/주소)</em></span></label></div>
+									<div class="pp"><label class="checkbox"><input type="checkbox"><span class="txt"><em class="tt">기본 배송지로 등록</em></span></label></div>
+								</div>
+							</div>
+						</section>
+						
+						<section class="sect deli">
+							<div class="hdts"><span class="tit">상품배송</span></div>
+							<div class="cdts">
+								<ui class="drlist">
+									<li>
+										<label class="radio">
+											<input type="radio" name="rdb_deli_a" disabled>
+											<div class="txt">
+												<div class="hdd">
+													<span class="tts">새벽배송</span>
+													<span class="msg">새벽배송이 마감되었습니다.</span>
+												</div>
+											</div>
+										</label>
+									</li>
+									<li>
+										<label class="radio">
+											<input type="radio" name="rdb_deli_a">
+											<div class="txt">
+												<div class="hdd">
+													<span class="tts">새벽배송</span>
+													<span class="msg">내일(금) 아침 도착 예정</span>
+												</div>
+												<div class="cdd pd_tog_box"><!-- 여러개 일때 -->
+													<button type="button" class="btTog">버튼</button>
+													<div class="htt"><span class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 </span> <i class="aa">외 99개</i></div>
+													<ul class="lst">
+														<li>
+															<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+															<div class="ts">00개 / 00000원</div>
+														</li>
+														<li>
+															<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+															<div class="ts">00개 / 00000원</div>
+														</li>
+														<li>
+															<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+															<div class="ts">00개 / 00000원</div>
+														</li>
+													</ul>												
+												</div>
+											</div>
+										</label>
+										<!-- <ul class="gdlist">
+											<li>새벽배송 안내문구가 노출됩니다.새벽배송 안내문구가 노출됩니다.</li>
+											<li>새벽배송 안내문구가 노출됩니다.</li>
+										</ul> -->
+									</li>
+									<li>
+										<label class="radio">
+											<input type="radio" name="rdb_deli_a">
+											<div class="txt">
+												<em class="itsfast">현재 이 배송이 가장 빨라요!</em><!-- 추가 02.10 -->
+												<div class="hdd">
+													<span class="tts">새벽배송</span>
+													<span class="msg">내일(금) 아침 도착 예정</span>
+												</div>
+												<div class="cdd pd_tog_box open"><!-- 1개 일때 -->
+													<ul class="lst">
+														<li>
+															<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+															<div class="ts">각인문구1 / 귀여운 빵꾸</div>
+															<div class="ts">00개 / 00000원</div>
+														</li>
+													</ul>												
+												</div>
+											</div>
+										</label>
+										<!-- <ul class="gdlist">
+											<li>새벽배송 안내문구가 노출됩니다.새벽배송 안내문구가 노출됩니다.</li>
+											<li>새벽배송 안내문구가 노출됩니다.</li>
+										</ul> -->
+									</li>
+									<li>
+										<label class="radio">
+											<input type="radio" name="rdb_deli_a">
+											<!-- 21.05.25 icon_10은 기존 stg에서 들어가는 클래스이므로 따로 추가 안해도 무방 -->
+											<div class="txt icon_10">
+												<div class="hdd">
+													<span class="tts">택배배송</span>
+													<!-- 21.05.25 주문결제>상품배송>택배배송 텍스트 추가 -->
+													<span class="msg">
+														<span>1~2일 소요 예정</span>
+														<span>(16시 전 결제 완료 시 당일 출고)</span>
+													</span>
+													<!-- //21.05.25 주문결제>상품배송>택배배송 텍스트 추가 -->
+												</div>
+											</div>
+										</label>
+									</li>
+									<li>
+										<label class="radio">
+											<input type="radio" name="rdb_deli_a">
+											<div class="txt icon_20">
+												<div class="hdd">
+													<span class="tts">당일배송</span>
+													<span class="msg">mm/dd(요일) 저녁 도착 예정</span>
+												</div>
+											</div>
+										</label>
+									</li>
+									<li>
+										<div class="denor"><!-- 여러개 일때 -->
+											<div class="hdd">
+												<span class="tts">업체 택배배송</span>
+												<span class="msg">결재완료 후 2일 이내 출고예정</span>
+											</div>
+											<div class="cdd pd_tog_box">
+												<button type="button" class="btTog">버튼</button>
+												<div class="htt"><span class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 </span> <i class="aa">외 99개</i></div>
+												<ul class="lst">
+													<li>
+														<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+														<div class="ts">각인문구1 / 귀여운 빵꾸</div>
+														<div class="ts">각인문구1 / 귀여운 빵꾸</div>
+														<div class="ts">00개 / 00000원</div>
+													</li>
+													<li>
+														<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+														<div class="ts">00개 / 00000원</div>
+													</li>
+													<li>
+														<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+														<div class="ts">00개 / 00000원</div>
+													</li>
+												</ul>												
+											</div>
+										</div>
+										<div class="denor"><!-- 1개 일때 -->
+											<div class="hdd">
+												<span class="tts">업체 택배배송</span>
+												<span class="msg">결재완료 후 2일 이내 출고예정</span>
+											</div>
+											<div class="cdd pd_tog_box open">
+												<ul class="lst">
+													<li>
+														<div class="tt">상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명 상품명</div>
+														<div class="ts">00개 / 00000원</div>
+													</li>
+												</ul>												
+											</div>
+										</div>
+										<!-- <ul class="gdlist">
+											<li>택배배송 안내문구가 노출됩니다.</li>
+										</ul> -->
+									</li>
+								</ui>
+							</div>
+						</section>
+						<section class="sect disc">
+							<div class="hdts"><span class="tit">할인 혜택</span></div>
+							<div class="cdts">
+								<div class="nodata"><p class="p">사용 가능한 할인 쿠폰이 없습니다.</p></div>
+							</div>
+						</section>
+						
+						<section class="sect disc">
+							<div class="hdts"><span class="tit">할인 혜택</span></div>
+							<div class="cdts">
+								<div class="cpset"><!-- @@ 02.22 변경 -->
+									<div class="ht">상품/배송비 쿠폰</div>
+									<div class="dt">
+										<em class="prc"><b class="p">-10,000</b><i class="w">원</i></em>
+										<span class="txt">할인적용</span>
+										<a href="javascript:;" class="btn sm btCpnMod">쿠폰 변경</a>
+									</div>
+								</div>
+								<div class="cpset">
+									<div class="ht">장바구니 쿠폰</div>
+									<div class="dt">
+										<em class="prc"><b class="p">-2,500</b><i class="w">원</i></em>
+										<span class="txt">할인적용</span>
+										<a href="javascript:;" class="btn sm btCpnMod">쿠폰 변경</a>
+									</div>
+								</div>
+								<!-- <div class="nodata"><p class="p">사용 가능한 할인 쿠폰이 없습니다.</p></div> -->
+							</div>
+						</section>
+						
+						<!-- 21.08.03 APET-1258 lcm01 : 우주코인 -->
+					
+						<section class="sect pont">
+							<div class="hdts"><span class="tit">포인트</span></div>
+							<div class="cdts">
+								<div class="cpset gs">
+									<div class="tit">GS&POINT <span>000P</span></div>
+									<div class="ptset">
+										<span class="input amt"><input type="text" value="" placeholder="10P 단위로 입력해주세요."></span>
+										<a href="javascript:;" class="btn md d btnAll">모두 사용</a>
+									</div>
+								</div>
+								<div class="cpset wooju">
+									<div class="tit">우주코인 <span>000C</span>
+										<!-- alert -->
+										<div class="alert_pop" data-pop="GSpoint"><!-- 21.08.10 APET-1258 lcm01 -->
+											<div class="bubble_txtBox wooju"> 
+												<div class="tit">우주코인 안내</div>
+												<div class="info-txt">
+													<!-- 21.08.26 APETQA-6823 lcm01 -->
+													<ul class="tplist">
+														<li>우주코인은 최종 결제금액에 대해 10% 적립되며, 최대 20,000C까지 적립됩니다.</li>
+														<li>적립 포인트 산정 시 쿠폰 할인 금액, 배송비, 취소/반품 상품 금액, 포인트 사용금액은 제외됩니다.</li> 
+														<li>포인트는 구매확정 시 적립되며, 1일 1회만 적립됩니다.</li>
+														<li>여러개의 상품을 구매한 경우, 같이 구매한상품이 모두 구매확정 되어야 포인트가 적립됩니다.</li>
+														<li>우주코인 적립은 SK텔레콤 주 서비스 정책에 따르며, 별도의 서비스 이용 수수료는 발생하지 않습니다.</li>
+													</ul>
+													<!-- 21.08.26 APETQA-6823 lcm01 -->
+												</div>
+											</div>
+										</div>
+										<!-- // alert -->
+										<span class="tog_wjm">우주멤버십</span><!-- 21.08.12 APET-1258 lcm01 -->
+									</div>
+									<!-- 21.08.12 APET-1258 lcm01 -->
+									<div class="ptset">
+										<div class="ptt wjmemNo"><!-- .on --><b class="t"><em>우주멤버십</em> 1234-5678-****-****</b>
+											<a href="javascript:;" class="lk mod btn">변경</a>
+										</div>
+										<span class="input amt"><input type="text" value="" placeholder="1C 단위로 입력해주세요."></span>
+										<a href="javascript:;" class="btn md d btnAll">모두 사용</a>
+										<div class="notiP">
+											<div>
+												<p><span>부스트업으로 <em class="fc_blue">3000원</em> 추가할인이 적용돼요!</span></p>
+												<!-- <p><span>부스트업으로 추가할인이 적용돼요!</span></p> -->
+											</div>
+										</div>
+									</div>
+									
+									<script>
+									// 우주멤버십 토글
+									$('.tog_wjm').click(function(){
+										$('.ptt.wjmemNo, .cpset.wooju .ptset .input.amt, .cpset.wooju .ptset a.btnAll, .cpset.wooju .ptset .notiP').toggleClass('on');
+										$(this).toggleClass('on');
+									});
+									</script>
+									<!-- //21.08.12 APET-1258 lcm01 -->
+								</div>
+								
+							</div>
+						</section>
+						
+						<!-- disable version -->
+						<section class="sect pont">
+							<div class="hdts"><span class="tit">포인트</span></div>
+							<div class="cdts">
+								<div class="cpset gs disabled"><!-- gs&point가 없을 때 .disabled 추가 -->
+									<div class="tit">GS&POINT <span>000P</span></div>
+									<div class="ptset">
+										<span class="input amt"><input type="text" value="" disabled></span>
+										<a href="javascript:;" class="btn md d btnAll">포인트 조회</a>
+										<div class="ptt">GS&POINT 사용을 위해서는 본인인증이 필요합니다.</div>
+									</div>
+								</div>
+								<div class="cpset wooju disabled"><!-- 우주코인이 없을 때 .disabled 추가 -->
+									<div class="tit">우주코인 <span>000C</span>
+										<!-- alert --><!-- 21.08.26 APETQA-6823 lcm01 -->
+										<div class="alert_pop" data-pop="GSpoint"><!-- 21.08.10 APET-1258 lcm01 -->
+											<div class="bubble_txtBox wooju"> 
+												<div class="tit">우주코인 안내</div>
+												<div class="info-txt">
+													<ul class="tplist">
+														<li>우주코인은 최종 결제금액에 대해 10% 적립되며, 최대 20,000C까지 적립됩니다.</li>
+														<li>적립 포인트 산정 시 쿠폰 할인 금액, 배송비, 취소/반품 상품 금액, 포인트 사용금액은 제외됩니다.</li> 
+														<li>포인트는 구매확정 시 적립되며, 1일 1회만 적립됩니다.</li>
+														<li>여러개의 상품을 구매한 경우, 같이 구매한상품이 모두 구매확정 되어야 포인트가 적립됩니다.</li>
+														<li>우주코인 적립은 SK텔레콤 주 서비스 정책에 따르며, 별도의 서비스 이용 수수료는 발생하지 않습니다.</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<!-- // alert --><!-- //21.08.26 APETQA-6823 lcm01 -->
+									</div>
+									<div class="ptset">
+										<span class="input amt"><input type="text" value="" disabled></span>
+										<a href="javascript:;" class="btn md d btnAll">멤버십 등록</a>
+										<!-- 21.08.26 APETQA-6812 lcm01 -->
+										<div class="notiP">
+											<div>
+												<p><span>부스트업으로 <em class="fc_blue">3000원</em> 추가할인이 적용돼요!</span></p>
+												<!-- <p><span>부스트업으로 추가할인이 적용돼요!</span></p> -->
+											</div>
+										</div>
+										<!-- //21.08.26 APETQA-6812 lcm01 -->
+										<!-- <div class="ptt"><b class="t">우주멤버십 1234-5678-****-****</b> <a href="javascript:;" class="lk mod">변경</a></div> -->
+									</div>
+									
+								</div>
+							</div>
+						</section>
+						<!-- //21.08.03 APET-1258 lcm01 : 우주코인 -->
+						
+						<section class="sect gift">
+							<div class="hdts"><span class="tit">사은품</span></div>
+							<div class="cdts">
+								<ul class="gplist">
+									<li>
+										<div class="dt">ABC사료 구매 사은품 10종 중 택1 증정</div>
+										<div class="dd"><a href="javascript:;" class="lk">사은품 선택</a></div>
+									</li>
+									<li>
+										<div class="dt">맛좋은 닭갈비 맛 사료 1kg</div>
+										<div class="dd"><a href="javascript:;" class="lk mod">사은품 변경</a></div>
+									</li>
+								</ul>
+							</div>
+						</section>
+						
+						<section class="sect binf">
+							<div class="hdts"><span class="tit">결제 수단</span></div>
+							<div class="cdts">
+								<ul class="bilist">
+									<li class="open">
+										<div class="hht">
+											<label class="radio">
+												<input type="radio" name="rd_bill_set" checked>
+												<div class="txt"><em class="tt">간편 카드결제</em></div>
+											</label>
+											<!-- <div class="bts"><a href="javascript:;" class="btn btCdMg">카드관리</a></div> -->
+										</div>
+										<div class="ddt">
+											<div class="cardsel_slide payM_slide"><!-- ui.order.cardsld.using(); -->	<!-- payM_slide클래스 추가 2021.04.29 수정 --> <!-- payM_slide 클래스  cardsel_slide 클래스 옆에 붙어야함 2021.05.11 수정함 -->
+												<div class="swiper-container slide" data-ind="0">
+													<ul class="swiper-wrapper list">
+														<li class="swiper-slide payM_choiceCard" onclick="clickEv(this)"><!-- 04.30 -->	<!-- payM_choiceCard 클래스 추가 2021.05.11 수정함 --> <!-- payM_choiceCard 클래스는 클릭시 결제카드가 되는 카드입니다. 2021.05.11 수정함 -->
+															<div class="untcard cd_color_1"><!--  카드별 칼라 -->
+																<div class="inf">
+																	<div class="name">BC카드</div>
+																	<div class="nums">123456*********111*</div>
+																</div>
+																<div class="mont">
+																	<span class="selmon select"><select class="sList" name="select_mont_1" onchange="selChange(this)"><option>일시불</option><option>3개월</option><option>6개월</option></select><!-- 04.30 --></span>
+																</div>
+															</div>
+														</li>
+														<li class="swiper-slide" onclick="clickEv(this)"><!-- 04.30 -->
+															<div class="untcard cd_color_2"><!--  카드별 칼라 -->
+																<div class="inf">
+																	<div class="name">BC카드</div>
+																	<div class="nums">123456*********111*</div>
+																</div>
+																<div class="mont">
+																	<span class="selmon select"><select class="sList" name="select_mont_1" onchange="selChange(this)"><option>일시불</option><option>3개월</option><option>6개월</option></select><!-- 04.30 --></span>
+																</div>
+															</div>
+														</li>
+														<li class="swiper-slide" onclick="clickEv(this)"><!-- 04.30 -->
+															<div class="untcard cd_color_3"><!--  카드별 칼라 -->
+																<div class="inf">
+																	<div class="name">BC카드</div>
+																	<div class="nums">123456*********111*</div>
+																</div>
+																<div class="mont">
+																	<span class="selmon select"><select class="sList" name="select_mont_1" onchange="selChange(this)"><option>일시불</option><option>3개월</option><option>6개월</option></select><!-- 04.30 --></span>
+																</div>
+															</div>
+														</li>
+														<li class="swiper-slide" onclick="clickEv(this)"><!-- 04.30 -->
+															<div class="untcard cd_color_4"><!--  카드별 칼라 -->
+																<div class="inf">
+																	<div class="name">BC카드</div>
+																	<div class="nums">123456*********111*</div>
+																</div>
+																<div class="mont">
+																	<span class="selmon select"><select class="sList" name="select_mont_1" onchange="selChange(this)"><option>일시불</option><option>3개월</option><option>6개월</option></select><!-- 04.30 --></span>
+																</div>
+															</div>
+														</li>
+														<li class="swiper-slide" onclick="clickEv(this)"><!-- 04.30 -->
+															<div class="untcard cd_color_5"><!--  카드별 칼라 -->
+																<div class="inf">
+																	<div class="name">BC카드</div>
+																	<div class="nums">123456*********111*</div>
+																</div>
+																<div class="mont">
+																	<span class="selmon select"><select class="sList" name="select_mont_1" onchange="selChange(this)"><option>일시불</option><option>3개월</option><option>6개월</option></select><!-- 04.30 --></span>
+																</div>
+															</div>
+														</li>
+														
+														<!--  카드 추가 입력 완료 후 여기에 새 슬라이드 코드 추가해 주세요. 2021.05.31 수정함 -->
+														<!--  //카드 추가 입력 완료 후 여기에 새 슬라이드 코드 추가해 주세요. 2021.05.31 수정함 -->
+														
+														<!-- 무조건 마지막에 위치할 카드 등록 버튼 기능 슬라이드 입니다. 2021.05.31 수정함 -->
+														<li class="swiper-slide cardRegibox"> <!-- cardRegibox 클래스는 카드등록버튼 박스에만 적용하는 클래스입니다. 2021.05.27 수정함 -->
+															<div class="untcard def">
+																<div class="txt">자주 사용하는 카드를 등록하세요 <br>최초 1회 등록 후, 바로 사용 가능합니다.</div>
+																<div class="bts">
+																	<!-- btCdReg 클릭시 "카드 정보 입력" 페이지로 이동해야합니다. 2021.05.27 수정함 -->
+																	<button type="button" class="btCdReg" onclick="location.href = 'https://dev.aboutpet.co.kr/_publ/_html/shop/Shop_05_05_01.html?ui=mo' ">카드 등록하기</button>
+																</div>
+															</div>
+														</li>
+														<!-- //무조건 마지막에 위치할 카드 등록 버튼 기능 슬라이드 입니다. 2021.05.31 수정함 -->
+													</ul>
+												</div>
+												<div class="sld-nav">
+													<button type="button" class="dummy_btn" onclick="btnClickEv(this)">이전</button><!-- 04.30 -->
+													<button type="button" class="bt prev" onclick="btnClickEv(this)">이전</button><!-- 04.30 -->
+													<button type="button" class="bt next" onclick="btnClickEv(this)">다음</button><!-- 04.30 -->
+												</div>
+											</div>
+											<!-- 04.30 -->
+											<script>
+												var els =  ".cardsel_slide  .swiper-container";
+												var opt =  {
+													slideToClickedSlide: true,	//2021.06.03 수정함
+													observer: true,
+													observeParents: true,
+													watchOverflow:true,
+													//freeMode: true,
+													centeredSlides: false,		//false로 변경함 2021.04.29 수정
+													slidesPerView: "auto",
+													slidesPerGroup:1,
+													simulateTouch:false,
+													navigation: {
+														nextEl: '.cardsel_slide .sld-nav .bt.next',
+														prevEl: '.cardsel_slide .sld-nav .bt.prev',
+													},
+													
+													// 추가 2021.06.02 수정함 start
+													pagination: {
+														el: ".swiper-pagination",
+														type: "fraction",
+													},
+													on: { 		// 2021.06.07 수정함!
+														slideChange: function () {
+															if($("link[href*='style.mo.css']").length > 0 == true){
+																$(".payM_slide .swiper-slide").removeClass("payM_choiceCard");
+																	
+																setTimeout(function() {
+																	$(".payM_slide .swiper-slide-active").addClass("payM_choiceCard");
+																}, 10);		
+															}														
+														}
+													},
+													breakpoints: {
+														850: {
+															centeredSlides: true,
+															slidesPerView: "auto",
+															slidesPerGroup:1,
+															spaceBetween: 10,
+														}
+													}
+													// 추가 2021.06.02 수정함 start
+												}
+												var cardsld;
+												let ind = ($(els).attr("data-ind") !== undefined)?$(this.els).attr("data-ind"):1;
+												/*
+												setTimeout(function(){
+													if(ui.check_brw.pc()) cardsld.slideTo(ind);
+												},500);
+												*/
+												var len = $(".cardsel_slide.payM_slide .swiper-slide").length;
+												if(len > 1){ //숫자 변경 2021.06.02 수정함
+													cardsld = new Swiper(els, opt);
+												}else{
+													$(".cardsel_slide.payM_slide .sld-nav").addClass("none")
+												}
+												function clickEv(el){
+													ac(el,true);
+												}
+												function btnClickEv(el){
+													let check = $(el).hasClass("next");
+													let len = $(".cardsel_slide.payM_slide .swiper-slide").length - 2;
+													let ind = (check)?$(".cardsel_slide.payM_slide .swiper-slide-active").index() + 1:(($(".cardsel_slide.payM_slide .swiper-slide-active").index() - 1) < 0)?0:$(".cardsel_slide.payM_slide .swiper-slide-active").index() - 1;
+													if(ind >= len) ind = len;
+													let max = $(".cardsel_slide.payM_slide .swiper-slide").length - 4;
+													if(ind > max){
+														ac($(".cardsel_slide.payM_slide .swiper-slide").eq(ind),false);
+													}
+												}
+												$(".sList").click(function(e){
+													e.stopPropagation();
+												});
+												function selChange(el){
+													let $el = $(el).closest(".swiper-slide");
+													ac($el,true)
+												}
+												function ac(el,sw){
+													if(ui.check_brw.pc()){
+														setTimeout(function(){
+															let ind = $(el).index();
+															let max = $(".cardsel_slide.payM_slide .swiper-slide").length - 2;
+															if(sw && (ind == max)){
+																cardsld.slideTo(ind-1);
+															}else if(sw && (ind < max)){
+																cardsld.slideTo(ind);
+															}
+															$(".swiper-slide-next").removeClass("swiper-slide-next");
+															$(".swiper-slide-prev").removeClass("swiper-slide-prev");
+															$(".swiper-slide-active").removeClass("swiper-slide-active");
+															$(el).addClass("swiper-slide-active");
+															$(el).next().addClass("swiper-slide-next");
+															$(el).prev().addClass("swiper-slide-prev");
+															if(ind >= max){
+																$(".dummy_btn").addClass("b");
+															}else{
+																$(".dummy_btn").removeClass("b");
+															}
+															if(ind == max){
+																$(".cardsel_slide.payM_slide .sld-nav .bt.next").addClass("none");
+															}else{
+																$(".cardsel_slide.payM_slide .sld-nav .bt.next").removeClass("none");
+															}
+														},10)
+													}
+													
+												}
+												
+												// 2021.06.07 수정함! start
+												$(".cardsel_slide.payM_slide .swiper-slide .untcard .inf").on("click",function(){
+													$(".cardsel_slide.payM_slide .swiper-slide.payM_choiceCard").removeClass("payM_choiceCard");
+
+													if($("link[href*='style.pc.css']").length > 0 == true){
+														$(this).parent().parent().addClass("payM_choiceCard");
+													}									
+												});	
+
+												$(".cardsel_slide .swiper-slide").on("click",function(){											
+													if($("link[href*='style.mo.css']").length > 0 == true){
+														$(".payM_slide .swiper-slide").removeClass("payM_choiceCard");
+														setTimeout(function() {
+															$(".payM_slide .swiper-slide-active").addClass("payM_choiceCard");
+														}, 10);							
+													}												
+												});
+												// 2021.06.07 수정함! end
+											</script>
+											<!-- // 04.09 : 추가 -->
+										</div>
+									</li>
+									<li>
+										<div class="hht">
+											<label class="radio">
+												<input type="radio" name="rd_bill_set">
+												<div class="txt"><em class="tt">일반 결제</em></div>
+											</label>
+										</div>
+										<div class="ddt">
+											<ul class="biltab">
+												<li class="card active"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_1" class="btn"><span class="txt">신용카드</span></button></li>
+												<li class="vert"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_2" class="btn"><span class="txt">가상계좌</span></button></li>
+												<li class="card"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_3" class="btn"><span class="txt">계좌이체</span></button></li>
+												<li class="payc"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_4" class="btn"><span class="txt">페이코</span></button></li>
+												<li class="npay"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_5" class="btn"><span class="txt">N페이</span></button></li>
+												<li class="kpay"><button type="button" data-ui-tab-btn="tab_bils" data-ui-tab-val="tab_bils_6" class="btn"><span class="txt">카카오페이</span></button></li>
+											</ul>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_1" class="active">
+												<div class="cardinfo"><!--@@ 02.17 추가 -->
+													<div class="select cd"><select><option>신한카드</option></select></div>
+													<div class="select nm"><select><option>일시불</option></select></div>
+												</div>
+											</div>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_2">
+												
+												<div class="receipt a">
+													<div class="tit">현금영수증 신청</div>
+													<div class="rset">
+														<div class="num"><em class="t">개인소득공제용</em> <i class="n">010-****-1234</i></div>
+														<div class="bts"><a href="javascript:;" class="btn d sm mod">변경</a></div>
+													</div>
+												</div>
+												
+												<div class="receipt b">
+													<div class="tit">현금영수증 신청</div>
+													<div class="rdos">
+														<label class="radio"><input type="radio" name="rd_receipt"><span class="txt"><em class="tt">개인소득공제용</em></span></label>
+														<label class="radio"><input type="radio" name="rd_receipt"><span class="txt"><em class="tt">사업자증빙용</em></span></label>
+													</div>
+													<div class="rbox">
+														<span class="select"><select><option>현금영수증카드번호</option></select></span>
+														<span class="input"><input type="number" placeholder="-없이 번호만 입력하세요" title="현금영수증번호"></span>
+													</div>
+													<div class="saves">
+														<label class="checkbox"><input type="checkbox">
+															<span class="txt"><em class="tt">현금 영수증 신청정보 저장</em></span>
+														</label>
+													</div>
+												</div>
+											</div>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_3"></div>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_4"></div>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_5"></div>
+											<div data-ui-tab-ctn="tab_bils" data-ui-tab-val="tab_bils_6"></div>
+										</div>
+									</li>
+								</ul>
+								<div class="defbilchk"><label class="checkbox"><input type="checkbox"><span class="txt">기본 결제수단으로 저장</span></label></div>
+								 <div class="info-t2  mt24">
+                                   	 팝업 차단한 경우 결제창 연결이 되지 않습니다. 핸드폰 설정에서 팝업차단 해제 후 이용해주세요.
+                                </div>
+							</div>
+						</section>
+
+						<section class="sect bprc">
+							<div class="hdts"><span class="tit">결제 금액</span></div>
+							<div class="cdts">
+								<ul class="prcset">
+									<li>
+										<div class="dt">총 상품금액</div>
+										<div class="dd">
+											<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<li>
+										<div class="dt">쿠폰 할인</div>
+										<div class="dd">
+											<span class="prc dis"><em class="p">-10,000</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<!-- 21.08.10 APET-1258 lcm01 -->
+									<li>
+										<div class="dt">우주코인 추가할인</div>
+										<div class="dd">
+											<span class="prc dis"><em class="p">-2,500</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<!-- //21.08.10 APET-1258 lcm01 -->
+									<li>
+										<div class="dt">배송비</div>
+										<div class="dd">
+											<span class="prc"><em class="p">+2,500</em><i class="w">원</i></span>
+										</div>
+									</li>
+								</ul>
+								<div class="tot">
+									<div class="dt">총 결제금액</div>
+									<div class="dd">
+										<span class="prc"><em class="p">32,500</em><i class="w">원</i></span>
+									</div>
+								</div>
+								<!-- 21.08.03 APET-1258 lcm01 : 우주코인추가 -->
+								<!-- 01 주문서-리테일멤버십 가입 안한 경우 -->
+								<div class="gdpnt onlywooju">
+									<ul class="">
+										<li><div class="tit">GS&POINT</div> <div>GS리테일멤버십 회원가입시 <em class="p">123P</em></div></li>
+										<li><div class="tit">우주코인</div> <div><em class="blt max">최대</em> <em class="p">20,000C</em><span>적립예정</span></div></li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 02 주문서-우주멤버십 등록 안한 경우 -->
+								<div class="gdpnt onlygs">
+									<ul class="">
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li><!-- 21.08.05 APET-1258 lcm01 수정 -->
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 03 주문서-멤버십 둘다 등록 한 경우 -->
+								<div class="gdpnt member">
+									<ul class="">
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li>
+										<li><div class="tit">우주코인</div> <div><!-- <em class="blt max">최대</em> --> <em class="p">20,000C</em><span>적립예정</span></div></li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								<!-- 03 주문서-멤버십 둘다 등록 한 경우 -->
+								<div class="gdpnt member">
+									<ul class="">
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li>
+										<li><div class="tit">우주코인</div> <div><em class="blt max">최대</em><em class="p">20,000C</em><span>적립예정</span></div></li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 04 우주코인 추가적립 진행하는 경우 : 21.08.10 // 21.08.12 개발팀 요청에 의한 클래스 변경 -->
+								<div class="gdpnt member"><!-- wooju_ -->
+									<ul>
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li>
+										<li class="wj_addp">
+											<div class="tit">우주코인</div> 
+											<div class="wj_point_box">	<!-- APETQA-6980 210903 lju02 -->
+												<div><em class="blt max">최대</em><em class="p">10,000C</em></div> 
+												<div><em class="fc_blue">+ 추가 </em><em class="p">10,000C</em><span>적립예정</span></div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								<!-- //21.08.03 APET-1258 lcm01 : 우주코인 -->
+								
+								<!-- 04 우주코인 추가적립 진행하는 경우 : 21.08.10 // 21.08.12 개발팀 요청에 의한 클래스 변경 -->
+								<div class="gdpnt member"><!-- wooju_ -->
+									<ul>
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li>
+										<li class="wj_addp">
+											<div class="tit">우주코인</div>
+											<div class="wj_point_box">	<!-- APETQA-6980 210903 lju02 -->
+												<div><em class="p">10,000C</em></div> 
+												<div><em class="fc_blue">+ 추가 </em><em class="p">1,000C</em><span>적립예정</span></div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								<!-- //21.08.03 APET-1258 lcm01 : 우주코인 -->
+								
+							</div>
+						</section>
+						
+						<section class="sect agre">
+							<div class="hdts"></div>
+							<div class="cdts">
+								<ul class="agreeset">
+									<li class="all">
+										<span class="checkbox">
+											<input type="checkbox">
+											<span class="txt"><em class="tt st">주문상품 및 결제대행 이용약관에 모두 동의합니다.</em></span>
+										</span>
+									</li>
+									<li>
+										<span class="checkbox">
+											<input type="checkbox">
+											<span class="txt"><em class="tt">주문할 상품의 상품명, 상품가격, 배송정보를 확인하였으며, 구매에 동의하시겠습니까?(전자상거래법 제8조 제2항)</em></span>
+										</span>
+									</li>
+									<li>
+										<span class="checkbox">
+											<input type="checkbox">
+											<span class="txt"><a href="javascript:;" class="tt lk">개인정보 수집 및 이용 동의</a></span>
+										</span>
+									</li>
+									<li>
+										<span class="checkbox">
+											<input type="checkbox">
+											<span class="txt"><a href="javascript:;" class="tt lk">개인정보 제3자 제공동의</a></span>
+										</span>
+									</li>
+								</ul>
+								<div class="bts">
+									<a href="../../_html/shop/Shop_05_06.html" class="btn a lg btnBill">
+										<span class="prc"><em class="p">23,000</em><i class="w">원</i></span> <span class="txt">결제하기</span>
+									</a>
+								</div>
+							</div>
+						</section>
+						
+
+					</div>
+					<div class="banners">
+						<include class="uibanners" data-include-html="../inc/banner.html"></include>
+					</div>
+				</div>
+
+			</div>
+		</main>
+		<!-- 21.08.03 APET-1258 lcm01 -->
+		<div class="layers">
+			<article class="popBot popCpnGud k0427" id="GSpoint"><!-- 04.27 -->
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit">우주코인 안내</h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							<!-- 21.08.26 APETQA-6823 lcm01 -->
+							<ul class="tplist">
+								<li>우주코인은 최종 결제금액에 대해 10% 적립되며, 최대 20,000C까지 적립됩니다.</li>
+								<li>적립 포인트 산정 시 쿠폰 할인 금액, 배송비, 취소/반품 상품 금액, 포인트 사용금액은 제외됩니다.</li> 
+								<li>포인트는 구매확정 시 적립되며, 1일 1회만 적립됩니다.</li>
+								<li>여러개의 상품을 구매한 경우, 같이 구매한상품이 모두 구매확정 되어야 포인트가 적립됩니다.</li>
+								<li>우주코인 적립은 SK텔레콤 주 서비스 정책에 따르며, 별도의 서비스 이용 수수료는 발생하지 않습니다.</li>
+							</ul>
+							<!-- 21.08.26 APETQA-6823 lcm01 -->
+						</main>
+					</div>
+				</div>
+			</article>
+		</div>
+		<!-- //21.08.03 APET-1258 lcm01 -->
+
+		<script>
+			
+		</script>
+
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+
+	</div>
+</body>
+</html>

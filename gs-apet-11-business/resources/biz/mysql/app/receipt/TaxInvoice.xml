@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="taxInvoice">
+
+	<insert id="insertTaxInvoice">
+		<!--
+			Query Name : orderCommon.insertTaxInvoice
+			Description : 세금계산서 등록
+		-->
+		<selectKey keyProperty="taxIvcNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_TAX_IVC_NO_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO TAX_INVOICE (
+			TAX_IVC_NO			/* 세금 계산서 번호 */
+			, ORG_TAX_IVC_NO	/* 원 세금 계산서 번호 */
+			, ORD_CLM_GB_CD		/* 주문 클레임 구분 코드 */
+			, ORD_NO			/* 주문 번호 */
+			, ORD_DTL_SEQ		/* 주문 상세 순번 */
+			, CLM_NO			/* 클레임 번호 */
+			, CLM_DTL_SEQ		/* 클레임 상세 순번 */
+			, TAX_IVC_STAT_CD	/* 세금 계산서 상태 코드 */
+			, APCT_GB_CD		/* 신청자 구분 코드 */
+			, MBR_NO			/* 회원 번호 */
+			, USE_GB_CD			/* 사용 구분 코드 */
+			, ISU_MEANS_CD		/* 발급 수단 코드 */
+			, COMP_NM			/* 업체 명 */
+			, BIZ_TP			/* 종목 */
+			, CEO_NM			/* 대표자 명 */
+			, BIZ_CDTS			/* 업태 */
+			, BIZ_NO			/* 사업자 번호 */
+			, POST_NO_OLD		/* 우편 번호 구 */
+			, POST_NO_NEW		/* 우편 번호 신 */
+			, ROAD_ADDR			/* 도로 주소 */
+			, ROAD_DTL_ADDR		/* 도로 상세 주소 */
+			, PRCL_ADDR			/* 지번 주소 */
+			, PRCL_DTL_ADDR		/* 지번 상세 주소 */
+			, SPL_AMT			/* 공급 금액 */
+			, STAX_AMT			/* 부가세 금액 */
+			, TOT_AMT			/* 총 금액 */
+			, ACPT_DTM			/* 접수 일시 */
+			, PRCSR_NO			/* 처리자 번호 */
+			, LNK_DTM			/* 연동 일시 */
+			, LNK_DEAL_NO		/* 연동 거래 번호 */
+			, LNK_RST_CD		/* 연동 결과 코드 */
+			, LNK_RST_MSG		/* 연동 결과 메세지 */
+			, MEMO				/* 메모 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{taxIvcNo}			/* 세금 계산서 번호 */
+			, #{orgTaxIvcNo}	/* 원 세금 계산서 번호 */
+			, #{ordClmGbCd}		/* 주문 클레임 구분 코드 */
+			, #{ordNo}			/* 주문 번호 */
+			, #{ordDtlSeq}		/* 주문 상세 순번 */
+			, #{clmNo}			/* 클레임 번호 */
+			, #{clmDtlSeq}		/* 클레임 상세 순번 */
+			, #{taxIvcStatCd}	/* 세금 계산서 상태 코드 */
+			, #{apctGbCd}		/* 신청자 구분 코드 */
+			, #{mbrNo}			/* 회원 번호 */
+			, #{useGbCd}		/* 사용 구분 코드 */
+			, #{isuMeansCd}		/* 발급 수단 코드 */
+			, #{compNm}			/* 업체 명 */
+			, #{bizTp}			/* 종목 */
+			, #{ceoNm}			/* 대표자 명 */
+			, #{bizCdts}		/* 업태 */
+			, #{bizNo}			/* 사업자 번호 */
+			, #{postNoOld}		/* 우편 번호 구 */
+			, #{postNoNew}		/* 우편 번호 신 */
+			, #{roadAddr}		/* 도로 주소 */
+			, #{roadDtlAddr}	/* 도로 상세 주소 */
+			, #{prclAddr}		/* 지번 주소 */
+			, #{prclDtlAddr}	/* 지번 상세 주소 */
+			, #{splAmt}			/* 공급 금액 */
+			, #{staxAmt}		/* 부가세 금액 */
+			, #{totAmt}			/* 총 금액 */
+			, #{acptDtm}		/* 접수 일시 */
+			, #{prcsrNo}		/* 처리자 번호 */
+			, #{lnkDtm}			/* 연동 일시 */
+			, #{lnkDealNo}		/* 연동 거래 번호 */
+			, #{lnkRstCd}		/* 연동 결과 코드 */
+			, #{lnkRstMsg}		/* 연동 결과 메세지 */
+			, #{memo}			/* 메모 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+
+	<update id="updateTaxInvoice">
+		<!--
+			Query Name : orderCommon.updateTaxInvoice
+			Description : 세금계산서 변경
+		-->
+		UPDATE	TAX_INVOICE
+		SET		SYS_UPDR_NO				= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+			<if test="ordClmGbCd != null and ordClmGbCd != ''">
+				, ORD_CLM_GB_CD			= #{ordClmGbCd}			/* 주문 클레임 구분 코드 */
+			</if>
+			<if test="clmNo != null and clmNo != ''">
+				, CLM_NO				= #{clmNo}				/* 클레임 번호 */
+			</if>
+			<if test="clmDtlSeq != null">
+				, CLM_DTL_SEQ			= #{clmDtlSeq}			/* 클레임 상세 순번 */
+			</if>
+			<if test="taxIvcStatCd != null and taxIvcStatCd != ''">
+				, TAX_IVC_STAT_CD		= #{taxIvcStatCd}		/* 세금 계산서 상태 코드 */
+			</if>
+			<if test="apctGbCd != null and apctGbCd != ''">
+				, APCT_GB_CD			= #{apctGbCd}			/* 신청자 구분 코드 */
+			</if>
+			<if test="mbrNo != null">
+				, MBR_NO				= #{mbrNo}				/* 회원 번호 */
+			</if>
+			<if test="useGbCd != null and useGbCd != ''">
+				, USE_GB_CD				= #{useGbCd}			/* 사용 구분 코드 */
+			</if>
+			<if test="isuMeansCd != null and isuMeansCd != ''">
+				, ISU_MEANS_CD			= #{isuMeansCd}			/* 발급 수단 코드 */
+			</if>
+			<if test="compNm != null and compNm != ''">
+				, COMP_NM				= #{compNm}				/* 업체 명 */
+			</if>
+			<if test="bizTp != null and bizTp != ''">
+				, BIZ_TP				= #{bizTp}				/* 종목 */
+			</if>
+			<if test="ceoNm != null and ceoNm != ''">
+				, CEO_NM				= #{ceoNm}				/* 대표자 명 */
+			</if>
+			<if test="bizCdts != null and bizCdts != ''">
+				, BIZ_CDTS				= #{bizCdts}			/* 업태 */
+			</if>
+			<if test="bizNo != null and bizNo != ''">
+				, BIZ_NO				= #{bizNo}				/* 사업자 번호 */
+			</if>
+			<if test="postNoOld != null and postNoOld != ''">
+				, POST_NO_OLD			= #{postNoOld}			/* 우편 번호 구 */
+			</if>
+			<if test="postNoNew != null and postNoNew != ''">
+				, POST_NO_NEW			= #{postNoNew}			/* 우편 번호 신 */
+			</if>
+			<if test="roadAddr != null and roadAddr != ''">
+				, ROAD_ADDR				= #{roadAddr}			/* 도로 주소 */
+			</if>
+			<if test="roadDtlAddr != null and roadDtlAddr != ''">
+				, ROAD_DTL_ADDR			= #{roadDtlAddr}		/* 도로 상세 주소 */
+			</if>
+			<if test="prclAddr != null and prclAddr != ''">
+				, PRCL_ADDR				= #{prclAddr}			/* 지번 주소 */
+			</if>
+			<if test="prclDtlAddr != null and prclDtlAddr != ''">
+				, PRCL_DTL_ADDR			= #{prclDtlAddr}		/* 지번 상세 주소 */
+			</if>
+			<if test="splAmt != null">
+				, SPL_AMT				= #{splAmt}				/* 공급 금액 */
+			</if>
+			<if test="staxAmt != null">
+				, STAX_AMT				= #{staxAmt}			/* 부가세 금액 */
+			</if>
+			<if test="totAmt != null">
+				, TOT_AMT				= #{totAmt}				/* 총 금액 */
+			</if>
+			<if test="acptDtm != null">
+				, ACPT_DTM				= #{acptDtm}			/* 접수 일시 */
+			</if>
+			<if test="prcsrNo != null">
+				, PRCSR_NO				= #{prcsrNo}			/* 처리자 번호 */
+			</if>
+			<if test="lnkDtm != null">
+				, LNK_DTM				= #{lnkDtm}				/* 연동 일시 */
+			</if>
+			<if test="lnkDealNo != null and lnkDealNo != ''">
+				, LNK_DEAL_NO			= #{lnkDealNo}			/* 연동 거래 번호 */
+			</if>
+			<if test="lnkRstCd != null and lnkRstCd != ''">
+				, LNK_RST_CD			= #{lnkRstCd}			/* 연동 결과 코드 */
+			</if>
+			<if test="lnkRstMsg != null and lnkRstMsg != ''">
+				, LNK_RST_MSG			= #{lnkRstMsg}			/* 연동 결과 메세지 */
+			</if>
+			<if test="memo != null and memo != ''">
+				, MEMO					= #{memo}				/* 메모 */
+			</if>
+			<if test="addr != null and addr != ''">
+				, ADDR					= #{addr}				/* 주소 */
+			</if>
+		WHERE	1 = 1
+		AND		ORD_NO	= #{ordNo}
+		<if test="ordDtlSeq != null">
+		AND		ORD_DTL_SEQ	= #{ordDtlSeq}
+		</if>
+		<if test="taxIvcNo != null">
+		AND		TAX_IVC_NO	= #{taxIvcNo}
+		</if>
+	</update>
+	
+	
+	<select id="listTaxInvoice" resultType="biz.app.receipt.model.TaxInvoiceVO" >
+		<!--
+			Query Name : orderCommon.listTaxInvoice
+			Description : 세금계산서 리스트 추출
+		-->
+		SELECT	/* QUERYID(orderCommon.listTaxInvoice) */
+				TAX_IVC_NO			/* 세금 계산서 번호 */
+				, ORG_TAX_IVC_NO	/* 원 세금 계산서 번호 */
+				, ORD_CLM_GB_CD		/* 주문 클레임 구분 코드 */
+				, ORD_NO			/* 주문 번호 */
+				, ORD_DTL_SEQ		/* 주문 상세 순번 */
+				, CLM_NO			/* 클레임 번호 */
+				, CLM_DTL_SEQ		/* 클레임 상세 순번 */
+				, TAX_IVC_STAT_CD	/* 세금 계산서 상태 코드 */
+				, APCT_GB_CD		/* 신청자 구분 코드 */
+				, MBR_NO			/* 회원 번호 */
+				, USE_GB_CD			/* 사용 구분 코드 */
+				, ISU_MEANS_CD		/* 발급 수단 코드 */
+				, COMP_NM			/* 업체 명 */
+				, BIZ_TP			/* 종목 */
+				, CEO_NM			/* 대표자 명 */
+				, BIZ_CDTS			/* 업태 */
+				, BIZ_NO			/* 사업자 번호 */
+				, POST_NO_OLD		/* 우편 번호 구 */
+				, POST_NO_NEW		/* 우편 번호 신 */
+				, ROAD_ADDR			/* 도로 주소 */
+				, ROAD_DTL_ADDR		/* 도로 상세 주소 */
+				, PRCL_ADDR			/* 지번 주소 */
+				, PRCL_DTL_ADDR		/* 지번 상세 주소 */
+				, SPL_AMT			/* 공급 금액 */
+				, STAX_AMT			/* 부가세 금액 */
+				, TOT_AMT			/* 총 금액 */
+				, ACPT_DTM			/* 접수 일시 */
+				, PRCSR_NO			/* 처리자 번호 */
+				, LNK_DTM			/* 연동 일시 */
+				, LNK_DEAL_NO		/* 연동 거래 번호 */
+				, LNK_RST_CD		/* 연동 결과 코드 */
+				, LNK_RST_MSG		/* 연동 결과 메세지 */
+				, MEMO				/* 메모 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	TAX_INVOICE
+		WHERE	1 = 1
+		AND		ORD_NO				= #{ordNo}
+		<if test="ordDtlSeq != null">
+		AND		ORD_DTL_SEQ			= #{ordDtlSeq}
+		</if>
+		<if test="taxIvcStatCd != null">
+		AND		TAX_IVC_STAT_CD		= #{taxIvcStatCd}
+		</if>
+	</select>
+	
+		
+	
+
+
+
+
+	<sql id="searchCashReceiptSql">
+		CR.CASH_RCT_NO				/* 현금 영수증 번호 */
+		, CR.ORG_CASH_RCT_NO		/* 원 현금 영수증 번호 */
+		, CR.CLM_NO					/* 클레임 번호 */
+		, CR.CR_TP_CD			/* 발행 유형 코드 */
+		, CR.CASH_RCT_STAT_CD		/* 현금 영수증 상태 코드 */
+		, CR.USE_GB_CD				/* 사용 구분 코드 */
+		, CR.ISU_MEANS_CD			/* 발급 수단 코드 */
+		, CR.ISU_MEANS_NO			/* 발급 수단 번호 */
+		, CR.ISU_GB_CD				/* 발행 구분 코드 */
+		, CR.SPL_AMT AS TAX_SPL_AMT	/* 공급 금액 */
+		, CR.STAX_AMT				/* 부가세 금액 */
+		, CR.SRVC_AMT				/* 봉사료 금액 */
+		, CR.LNK_DTM				/* 연동 일시 */
+		, CR.LNK_DEAL_NO			/* 연동 거래 번호 */
+		, CR.LNK_RST_MSG			/* 연동 결과 메세지 */
+		, FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+	</sql>
+
+	<sql id="searchTaxInvoiceSql">
+		TI.TAX_IVC_NO				/* 세금 계산서 번호 */
+		, TI.ORG_TAX_IVC_NO			/* 원 세금 계산서 번호 */
+		, TI.ORD_CLM_GB_CD			/* 주문 클레임 구분 코드 */
+		, TI.CLM_NO					/* 클레임 번호 */
+		, TI.CLM_DTL_SEQ			/* 클레임 상세 순번 */
+		, TI.TAX_IVC_STAT_CD		/* 세금 계산서 상태 코드 */
+		, TI.APCT_GB_CD				/* 신청자 구분 코드 */
+		, TI.USE_GB_CD				/* 사용 구분 코드 */
+		, TI.ISU_MEANS_CD			/* 발급 수단 코드 */
+		, TI.COMP_NM				/* 업체 명 */
+		, TI.BIZ_TP					/* 종목 */
+		, TI.CEO_NM					/* 대표자 명 */
+		, TI.BIZ_CDTS				/* 업태 */
+		, TI.BIZ_NO					/* 사업자 번호 */
+		, TI.POST_NO_OLD			/* 우편 번호 구 */
+		, TI.POST_NO_NEW			/* 우편 번호 신 */
+		, TI.ROAD_ADDR				/* 도로 주소 */
+		, TI.ROAD_DTL_ADDR			/* 도로 상세 주소 */
+		, TI.PRCL_ADDR				/* 지번 주소 */
+		, TI.PRCL_DTL_ADDR			/* 지번 상세 주소 */
+		, TI.SPL_AMT AS TAX_SPL_AMT	/* 공급 금액 */
+		, TI.STAX_AMT				/* 부가세 금액 */
+		, TI.TOT_AMT				/* 총 금액 */
+		, TI.ACPT_DTM				/* 접수 일시 */
+		, TI.PRCSR_NO				/* 처리자 번호 */
+		, TI.LNK_DTM				/* 연동 일시 */
+		, TI.LNK_DEAL_NO			/* 연동 거래 번호 */
+		, TI.LNK_RST_CD				/* 연동 결과 코드 */
+		, TI.LNK_RST_MSG			/* 연동 결과 메세지 */
+		, TI.MEMO					/* 메모 */
+		, FN_GET_USER_NAME(TI.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(TI.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+	</sql>
+
+
+	<resultMap type="biz.app.order.model.OrderDeliveryVO" id="orderListMap">
+		<id     property="ordNo"			column="ORD_NO"/>			<!-- 주문 번호 -->
+		<result property="ordStatCd"		column="ORD_STAT_CD"/>		<!-- 주문 상태 코드 -->
+		<result property="ordMdaCd"			column="ORD_MDA_CD"/>		<!-- 주문 매체 코드 -->
+		<result property="pageGbCd"			column="PAGE_GB_CD"/>		<!-- 페이지 구분 코드 -->
+		<result property="mbrNo"			column="MBR_NO"/>			<!-- 회원 번호 -->
+		<result property="mbrNm"			column="MBR_NM"/>			<!-- 회원 명 -->
+		<result property="mbrGrdCd"			column="MBR_GRD_CD"/>		<!-- 회원 등급 코드 -->
+		<result property="ordNm"			column="ORD_NM"/>			<!-- 주문자 명 -->
+		<result property="ordrId"			column="ORDR_ID"/>			<!-- 주문자 ID -->
+		<result property="ordrEmail"		column="ORDR_EMAIL"/>		<!-- 주문자 이메일 -->
+		<result property="ordrTel"			column="ORDR_TEL"/>			<!-- 주문자 전화 -->
+		<result property="ordrMobile"		column="ORDR_MOBILE"/>		<!-- 주문자 휴대폰 -->
+		<result property="ordrIp"			column="ORDR_IP"/>			<!-- 주문자 IP -->
+		<result property="ordAcptDtm"		column="ORD_ACPT_DTM"/>		<!-- 주문 접수 일시 -->
+		<result property="ordCpltDtm"		column="ORD_CPLT_DTM"/>		<!-- 주문 완료 일시 -->
+		<result property="ordCncDtm"		column="ORD_CNC_DTM"/>		<!-- 주문 취소 일시 -->
+		<result property="payMeansCd"		column="PAY_MEANS_CD"/>		<!-- 결제 수단 코드 -->
+		<result property="ordDtlCnt"		column="ORD_DTL_CNT"/>		<!-- 주문 상세 카운트 -->
+		<result property="payAmtTotal"		column="PAY_AMT_TOTAL"/>	<!-- 결제 금액 합계 -->
+		<collection property="orderDetailTaxListVO" ofType="biz.app.order.model.OrderDetailTaxVO">
+			<id		property="ordDtlSeq"		column="ORD_DTL_SEQ"/>			<!-- 주문 상세 순번 -->
+			<result property="ordDtlStatCd"		column="ORD_DTL_STAT_CD"/>		<!-- 주문 상세 상태 코드 -->
+			<result property="goodsId"			column="GOODS_ID"/>				<!-- 상품 아이디 -->
+			<result property="goodsNm"			column="GOODS_NM"/>				<!-- 상품 명 -->
+			<result property="itemNo"			column="ITEM_NO"/>				<!-- 단품 번호 -->
+			<result property="itemNm"			column="ITEM_NM"/>				<!-- 단품 명 -->
+			<result property="dealGoodsId"		column="DEAL_GOODS_ID"/>		<!-- 딜 상품 아이디 -->
+			<result property="dispClsfNo"		column="DISP_CLSF_NO"/>			<!-- 전시 분류 번호 -->
+			<result property="compGoodsNo"		column="COMP_GOODS_NO"/>		<!-- 업체 상품 번호 -->
+			<result property="compItemNo"		column="COMP_ITEM_NO"/>			<!-- 업체 단품 번호 -->
+			<result property="saleAmt"			column="SALE_AMT"/>				<!-- 판매 금액 -->
+			<result property="ordQty"			column="ORD_QTY"/>				<!-- 주문 수량 -->
+			<result property="payAmt"			column="PAY_AMT"/>				<!-- 결제 금액 -->
+			<result property="splAmt"			column="SPL_AMT"/>				<!-- 공급 금액 -->
+			<result property="goodsCmsnRt"		column="GOODS_CMSN_RT"/>		<!-- 상품수수료율 -->
+			<result property="goodsCpDcAmt"		column="GOODS_CP_DC_AMT"/>		<!-- 상품 쿠폰 할인 금액 -->
+			<result property="dlvrcCpDcAmt"		column="DLVRC_CP_DC_AMT"/>		<!-- 배송비 쿠폰 할인 금액 -->
+			<result property="asbcCpDcAmt"		column="ASBC_CP_DC_AMT"/>		<!-- 조립비 쿠폰 할인 금액 -->
+			<result property="cartCpDcAmt"		column="CART_CP_DC_AMT"/>		<!-- 장바구니 쿠폰 할인 금액 -->
+			<result property="svmnDcAmt"		column="SVMN_DC_AMT"/>			<!-- 적립금 할인 금액 -->
+			<result property="payNo"			column="PAY_NO"/>				<!-- 결제 번호 -->
+			<result property="dlvrcNo"			column="DLVRC_NO"/>				<!-- 배송비 번호 -->
+			<result property="asbcNo"			column="ASBC_NO"/>				<!-- 조립비 번호 -->
+			<result property="compNo"			column="COMP_NO"/>				<!-- 업체 번호 -->
+			<result property="compNm"			column="COMP_NM"/>				<!-- 업체 명 -->
+			<result property="compContrNo"		column="COMP_CONTR_NO"/>		<!-- 업체 계약 번호 -->
+			<result property="dlvrHopeDt"		column="DLVR_HOPE_DT"/>			<!-- 배송 희망 일자 -->
+			<result property="goodsPrpDtm"		column="GOODS_PRP_DTM"/>		<!-- 상품 준비 일시 -->
+			<result property="ooCmdDtm"			column="OO_CMD_DTM"/>			<!-- 출고 지시 일시 -->
+			<result property="ooCpltDtm"		column="OO_CPLT_DTM"/>			<!-- 출고 완료 일시 -->
+			<result property="dlvrCpltDtm"		column="DLVR_CPLT_DTM"/>		<!-- 배송 완료 일시 -->
+			<result property="goodsEstmRegYn"	column="GOODS_ESTM_REG_YN"/>	<!-- 상품 평가 등록 여부 -->
+			<result property="sysRegrNo"		column="SYS_REGR_NO"/>			<!-- 시스템 등록자 번호 -->
+			<result property="sysRegDtm"		column="SYS_REG_DTM"/>			<!-- 시스템 등록 일시 -->
+			<result property="sysUpdrNo"		column="SYS_UPDR_NO"/>			<!-- 시스템 수정자 번호 -->
+			<result property="sysUpdDtm"		column="SYS_UPD_DTM"/>			<!-- 시스템 수정 일시 -->
+			<result property="sysRegrNm"		column="SYS_REGR_NM"/>			<!-- 시스템 등록자 -->
+			<result property="sysUpdrNm"		column="SYS_UPDR_NM"/>			<!-- 시스템 수정자 -->
+
+			<!-- CASH_RECEIPT -->
+			<result property="cashRctNo"		column="CASH_RCT_NO"/>			<!-- 현금 영수증 번호 -->
+			<result property="orgCashRctNo"		column="ORG_CASH_RCT_NO"/>		<!-- 원 현금 영수증 번호 -->
+			<result property="clmNo"			column="CLM_NO"/>				<!-- 클레임 번호 -->
+			<result property="crTpCd"		column="CR_TP_CD"/>			<!-- 발행 유형 코드 -->
+			<result property="cashRctStatCd"	column="CASH_RCT_STAT_CD"/>		<!-- 현금 영수증 상태 코드 -->
+			<result property="useGbCd"			column="USE_GB_CD"/>			<!-- 사용 구분 코드 -->
+			<result property="isuMeansCd"		column="ISU_MEANS_CD"/>			<!-- 발급 수단 코드 -->
+			<result property="isuMeansNo"		column="ISU_MEANS_NO"/>			<!-- 발급 수단 번호 -->
+			<result property="isuGbCd"			column="ISU_GB_CD"/>			<!-- 발행 구분 코드 -->
+			<result property="taxSplAmt"		column="TAX_SPL_AMT"/>			<!-- 공급 금액 -->
+			<result property="staxAmt"			column="STAX_AMT"/>				<!-- 부가세 금액 -->
+			<result property="srvcAmt"			column="SRVC_AMT"/>				<!-- 봉사료 금액 -->
+			<result property="lnkDtm"			column="LNK_DTM"/>				<!-- 연동 일시 -->
+			<result property="lnkDealNo"		column="LNK_DEAL_NO"/>			<!-- 연동 거래 번호 -->
+			<result property="lnkRstMsg"		column="LNK_RST_MSG"/>			<!-- 연동 결과 메세지 -->
+
+			<!-- TAX_INVOICE -->
+			<result property="ordClmGbCd"		column="ORD_CLM_GB_CD"/>		<!-- 주문 클레임 구분 코드 -->
+			<result property="clmDtlSeq"		column="CLM_DTL_SEQ"/>			<!-- 클레임 상세 순번 -->
+			<result property="apctGbCd"			column="APCT_GB_CD"/>			<!-- 신청자 구분 코드 -->
+			<result property="totAmt"			column="TOT_AMT"/>				<!-- 총 금액 -->
+			<result property="acptDtm"			column="ACPT_DTM"/>				<!-- 접수 일시 -->
+			<result property="prcsrNo"			column="PRCSR_NO"/>				<!-- 처리자 번호 -->
+			<result property="lnkRstCd"			column="LNK_RST_CD"/>			<!-- 연동 결과 코드 -->
+			<result property="memo"				column="MEMO"/>					<!-- 메모 -->
+			<result property="taxIvcNo"			column="TAX_IVC_NO"/>			<!-- 세금 계산서 번호 -->
+			<result property="orgTaxIvcNo"		column="ORG_TAX_IVC_NO"/>		<!-- 원 세금 계산서 번호 -->
+			<result property="taxIvcStatCd"		column="TAX_IVC_STAT_CD"/>		<!-- 세금 계산서 상태 코드 -->
+			<result property="taxCompNm"		column="COMP_NM"/>				<!-- 업체 명 -->
+			<result property="bizTp"			column="BIZ_TP"/>				<!-- 종목 -->
+			<result property="ceoNm"			column="CEO_NM"/>				<!-- 대표자 명 -->
+			<result property="bizCdts"			column="BIZ_CDTS"/>				<!-- 업태 -->
+			<result property="bizNo"			column="BIZ_NO"/>				<!-- 사업자 번호 -->
+			<result property="postNoOld"		column="POST_NO_OLD"/>			<!-- 우편 번호 구 -->
+			<result property="postNoNew"		column="POST_NO_NEW"/>			<!-- 우편 번호 신 -->
+			<result property="roadAddr"			column="ROAD_ADDR"/>			<!-- 도로 주소 -->
+			<result property="roadDtlAddr"		column="ROAD_DTL_ADDR"/>		<!-- 도로 상세 주소 -->
+			<result property="prclAddr"			column="PRCL_ADDR"/>			<!-- 지번 주소 -->
+			<result property="prclDtlAddr"		column="PRCL_DTL_ADDR"/>		<!-- 지번 상세 주소 -->
+
+		</collection>
+	</resultMap>
+
+	<select id="pageTaxList" resultMap="orderListMap">
+		<!--
+			Query Name : taxInvoice.pageTaxList
+			Description : 현금영수증/세금계산서 리스트(페이지)
+		-->
+		SELECT	/* QUERYID(taxInvoice.pageTaxList) */
+					OD.ORD_DTL_SEQ				/* 주문 상세 순번 */
+					, OD.ORD_DTL_STAT_CD		/* 주문 상세 상태 코드 */
+					,(SELECT CD.DTL_NM AS ORD_DTL_STAT_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'ORD_DTL_STAT' AND CD.DTL_CD = OD.ORD_DTL_STAT_CD)  ORD_DTL_STAT_NM /* 주문 상태 코드명 */
+					, OD.GOODS_ID				/* 상품 아이디 */
+					, OD.GOODS_NM				/* 상품 명 */
+					, OD.ITEM_NO				/* 단품 번호 */
+					, OD.ITEM_NM				/* 단품 명 */
+			
+					, OD.DISP_CLSF_NO			/* 전시 분류 번호 */
+			
+					, OD.SALE_AMT				/* 판매 금액 */
+					, OD.ORD_QTY				/* 주문 수량 */
+					, OD.PAY_AMT				/* 결제 금액 */
+					, OD.GOODS_CMSN_RT			/* 상품수수료율 */
+					, OD.DLVRC_NO				/* 배송비 번호 */
+					, OD.DLVR_NO				/* 배송 번호 */
+					, OD.COMP_NO				/* 업체 번호 */
+					, ( SELECT FN_GET_COMPANY_NAME(OD.COMP_NO) ) AS COMP_NM				/* 업체 명 */
+					, OD.GOODS_ESTM_REG_YN		/* 상품 평가 등록 여부 */
+					, OD.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, OD.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, OD.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, OD.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, OD.RMN_ORD_QTY	        /* 주문 잔여수량 */
+					, FN_GET_USER_NAME(OD.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(OD.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID)) AS BND_NM_KO	/* 브랜드명 국문 */
+					, OD.CMS					/* 수수료 */
+					, (SELECT COMP_GB_CD FROM COMPANY_BASE WHERE COMP_NO = OD.COMP_NO) AS COMP_GB_CD  /* 업체 구분 코드 */
+					, IFNULL( (SELECT DC.REAL_DLVR_AMT
+						FROM DELIVERY_CHARGE DC
+						WHERE DC.DLVRC_NO = OD.DLVRC_NO  ),0) AS REAL_DLVR_AMT  /*실 배송비*/		
+			<if test="viewGb != null and viewGb eq 'CASH'">
+				, <include refid="searchCashReceiptSql" />
+			</if>
+			<if test="viewGb != null and viewGb eq 'TAX'">
+				, <include refid="searchTaxInvoiceSql" />
+			</if>
+				, OB_PB.*
+		<include refid="pageTaxListFrom" />
+		ORDER BY OD.ORD_NO DESC, OD.ORD_DTL_SEQ ASC
+		<include refid="bizCommon.pageSql" />
+
+	</select>
+
+	<select id="pageTaxListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : taxInvoice.pageTaxListCount
+			Description : 현금영수증/세금계산서 리스트 count
+		-->
+		SELECT	COUNT(*)
+		<include refid="pageTaxListFrom" />
+	</select>
+	
+	<sql id="pageTaxListFrom">		
+		FROM	(
+				SELECT	
+						OB.ORD_NO			/* 주문 번호 */
+						, OB.ORD_STAT_CD	/* 주문 상태 코드 */
+						, OB.ORD_MDA_CD		/* 주문 매체 코드 */
+						, OB.MBR_NO			/* 회원 번호 */
+						, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = OB.MBR_NO) AS MBR_NM /* 회원 이름 */
+						, ( SELECT LOGIN_ID FROM MEMBER_BASE WHERE OB.MBR_NO = MBR_NO ) AS LOGIN_ID
+						, OB.MBR_GRD_CD		/* 회원 등급 코드 */
+						, OB.ORD_DTL_CNT    /* 주문상세 갯수 */
+						, OB.ORD_NM			/* 주문자 명 */
+						, OB.ORDR_EMAIL		/* 주문자 이메일 */
+						, OB.ORDR_TEL		/* 주문자 전화 */
+						, OB.ORDR_MOBILE	/* 주문자 휴대폰 */
+						, OB.ORDR_IP		/* 주문자 IP */
+						, OB.ORD_ACPT_DTM	/* 주문 접수 일시 */
+						, OB.ORD_CPLT_DTM	/* 주문 완료 일시 */
+						, OB.ORDR_ID		/* 주문자 ID */			
+						, PB.PAY_MEANS_CD		/* 결제 수단 코드 */
+						, PB.PAY_AMT AS PAY_AMT_TOTAL		/* 결제 금액 */
+				FROM	ORDER_BASE OB		/* 주문기본 */
+						, PAY_BASE PB
+				WHERE	1 = 1
+				AND 		OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+
+				AND		OB.ORD_NO = PB.ORD_NO
+
+				/* 결제 상태 코드 */
+				AND		PB.PAY_STAT_CD IN (
+							'${@framework.common.constants.CommonConstants@PAY_STAT_00}'
+							, '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+				)
+
+				/* 결제 수단 코드 */
+				AND		PB.PAY_MEANS_CD IN (
+							'${@framework.common.constants.CommonConstants@PAY_MEANS_10}'
+							, '${@framework.common.constants.CommonConstants@PAY_MEANS_20}'
+				)
+
+				/* 주문 클레임 구분 코드 */
+				AND		PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+
+				<if test="payMeansCd != null and payMeansCd != ''">
+				/* 결제 수단 코드 : PAY_MEANS_CD */
+				AND		PB.PAY_MEANS_CD = #{payMeansCd}
+				</if>
+
+				/* 주문접수일시 : ORD_ACPT_DTM */
+				AND		OB.ORD_ACPT_DTM BETWEEN #{ordAcptDtmStart} AND DATE_ADD(#{ordAcptDtmEnd}, INTERVAL 1 DAY)
+
+				<if test="searchValueOrder != null and searchValueOrder != ''">
+					<choose>
+						<when test="searchKeyOrder == 'type01'">
+						/* 주문번호 : ORD_NO */
+						AND		OB.ORD_NO = #{searchValueOrder}
+						</when>
+						<when test="searchKeyOrder == 'type02'">
+						/* 주문자명 : ORD_NM */
+						AND		OB.ORD_NM LIKE CONCAT( '%', #{searchValueOrder}, '%' )
+						</when>
+						<when test="searchKeyOrder == 'type03'">
+						/* 주문자ID : ORDR_ID */
+						AND		OB.ORDR_ID LIKE CONCAT( '%', #{searchValueOrder}, '%' )
+						</when>
+					</choose>
+				</if>
+
+				<if test="pageGbCd != null and pageGbCd != ''">
+				/* 페이지 구분 코드 : PAGE_GB_CD */
+				AND		OB.PAGE_GB_CD = #{pageGbCd}
+				</if>
+
+				<if test="ordMdaCd != null and ordMdaCd != ''">
+				/* 주문매체 : ORD_MDA_CD */
+				AND		OB.ORD_MDA_CD LIKE CONCAT( '%', #{ordMdaCd}, '%' )
+				</if>
+
+				AND	EXISTS (
+							SELECT	1
+							FROM	ORDER_DETAIL OD
+							WHERE	OB.ORD_NO = OD.ORD_NO
+
+
+							<if test="ordDtlStatCd != null and ordDtlStatCd != ''">
+							/* 주문 상세 상태 코드 */
+							AND		OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+							</if>
+
+							<if test="arrOrdDtlStatCd != null">
+								/* 주문상세 상태코드 : ORD_DTL_STAT_CD */
+								<foreach collection="arrOrdDtlStatCd" item="item" separator="," open="AND OD.ORD_DTL_STAT_CD IN (" close=")" >
+									#{item }
+								</foreach>
+							</if>
+
+							<if test="searchValueGoods != null and searchValueGoods != ''">
+								<choose>
+									<when test="searchKeyGoods == 'type01'">
+									/* 상품명 : GOODS_NM */
+									AND		OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+									</when>
+									<when test="searchKeyGoods == 'type02'">
+									/* 상품아이디 : GOODS_ID */
+									AND		OD.GOODS_ID = #{searchValueGoods}
+									</when>
+									<when test="searchKeyGoods == 'type03'">
+									/* 단품명 : ITEM_NM */
+									AND		OD.ITEM_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+									</when>
+									<when test="searchKeyGoods == 'type04'">
+									/* 단품번호 : ITEM_NO */
+									AND		OD.ITEM_NO = #{searchValueGoods}
+									</when>
+								</choose>
+							</if>
+
+							<if test="compNo != null">
+							/* 업체 번호 */
+							AND		OD.COMP_NO = #{compNo}
+							</if>
+				)
+
+				ORDER BY OB.ORD_NO DESC
+
+
+		) OB_PB
+		, ORDER_DETAIL OD	/* 주문상세 */
+
+		<if test="viewGb != null and viewGb eq 'CASH'">
+		INNER JOIN CASH_RECEIPT CR ON (
+					OD.ORD_NO = CR.ORD_NO
+			AND 	(
+						(CR.CASH_RCT_STAT_CD IN (
+								'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'		/* 접수 */
+								, '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'	/* 승인 */
+							)
+						) OR (CR.CASH_RCT_STAT_CD IN (
+								'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_30}'		/* 취소 */
+							)
+						)
+			)
+
+			<if test="arrCrTpCd != null and arrCrTpCd.length > 0">
+				/* 현금영수증 발급 유형 코드 : CR_TP_CD */
+				<foreach collection="arrCrTpCd" item="item" separator="," open="AND CR.CR_TP_CD IN (" close=")" >
+					#{item }
+				</foreach>
+			</if>
+
+			<if test="arrCashRctStatCd != null and arrCashRctStatCd.length > 0">
+				/* 현금영수증 상태코드 : CASH_RCT_STAT_CD */
+				<foreach collection="arrCashRctStatCd" item="item" separator="," open="AND CR.CASH_RCT_STAT_CD IN (" close=")" >
+					#{item }
+				</foreach>
+			</if>
+		)
+		</if>
+
+		<if test="viewGb != null and viewGb eq 'TAX'">
+		INNER JOIN TAX_INVOICE TI ON (
+					OD.ORD_NO = TI.ORD_NO
+			AND 	OD.ORD_DTL_SEQ = TI.ORD_DTL_SEQ
+			AND 	(
+						(
+							TI.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+							AND	TI.TAX_IVC_STAT_CD IN (
+								'${@framework.common.constants.CommonConstants@TAX_IVC_STAT_01}'	/* 접수 */
+								, '${@framework.common.constants.CommonConstants@TAX_IVC_STAT_02}'	/* 승인 */
+								, '${@framework.common.constants.CommonConstants@TAX_IVC_STAT_03}'	/* 에러 */
+							)
+						) OR (
+							TI.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_20}'
+							AND	TI.TAX_IVC_STAT_CD IN (
+								'${@framework.common.constants.CommonConstants@TAX_IVC_STAT_04}'	/* 취소 */
+							)
+						)
+			)
+
+			<if test="arrTaxIvcStatCd != null and arrTaxIvcStatCd.length > 0">
+				/* 세금계산서 상태코드 : TAX_IVC_STAT_CD */
+				<foreach collection="arrTaxIvcStatCd" item="item" separator="," open="AND TI.TAX_IVC_STAT_CD IN (" close=")" >
+					#{item }
+				</foreach>
+			</if>
+		)
+		</if>
+
+		WHERE	1 = 1
+		AND		OB_PB.ORD_NO = OD.ORD_NO
+
+		<if test="ordDtlStatCd != null and ordDtlStatCd != ''">
+		/* 주문상세 상태코드 : ORD_DTL_STAT_CD */
+		AND		OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+		</if>
+
+		<if test="arrOrdDtlStatCd != null">
+			<foreach collection="arrOrdDtlStatCd" item="item" separator="," open="AND OD.ORD_DTL_STAT_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="searchValueGoods != null and searchValueGoods != ''">
+			<choose>
+				<when test="searchKeyGoods == 'type01'">
+					/* 상품명 : GOODS_NM */
+					AND		OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+				</when>
+				<when test="searchKeyGoods == 'type02'">
+					/* 상품아이디 : GOODS_ID */
+					AND		OD.GOODS_ID = #{searchValueGoods}
+				</when>
+				<when test="searchKeyGoods == 'type03'">
+					/* 단품명 : ITEM_NM */
+					AND		OD.ITEM_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+				</when>
+				<when test="searchKeyGoods == 'type04'">
+					/* 단품번호 : ITEM_NO */
+					AND		OD.ITEM_NO = #{searchValueGoods}
+				</when>
+			</choose>
+		</if>
+
+		<if test="compNo != null">
+		/* 업체 번호 */
+		AND		OD.COMP_NO = #{compNo}
+		</if>
+	</sql>
+	
+	<select id="getTaxInvoiceSum" resultType="biz.app.receipt.model.TaxInvoiceVO" >
+		<!--
+			Query Name : taxInvoice.getTaxInvoiceSum
+			Description : 세금계산서 추출(Sum)
+		-->
+		SELECT	/* QUERYID(taxInvoice.getTaxInvoiceSum) */
+				TI.TAX_IVC_NO					/* 세금 계산서 번호 */
+				, TI.ORG_TAX_IVC_NO				/* 원 세금 계산서 번호 */
+				, TI.ORD_CLM_GB_CD				/* 주문 클레임 구분 코드 */
+				, TI.ORD_NO						/* 주문 번호 */
+				, TI.ORD_DTL_SEQ				/* 주문 상세 순번 */
+				, TI.CLM_NO						/* 클레임 번호 */
+				, TI.CLM_DTL_SEQ				/* 클레임 상세 순번 */
+				, TI.TAX_IVC_STAT_CD			/* 세금 계산서 상태 코드 */
+				, TI.APCT_GB_CD					/* 신청자 구분 코드 */
+				, TI.MBR_NO						/* 회원 번호 */
+				, TI.USE_GB_CD					/* 사용 구분 코드 */
+				, TI.ISU_MEANS_CD				/* 발급 수단 코드 */
+				, TI.COMP_NM					/* 업체 명 */
+				, TI.BIZ_TP						/* 종목 */
+				, TI.CEO_NM						/* 대표자 명 */
+				, TI.BIZ_CDTS					/* 업태 */
+				, TI.BIZ_NO						/* 사업자 번호 */
+				, TI.POST_NO_OLD				/* 우편 번호 구 */
+				, TI.POST_NO_NEW				/* 우편 번호 신 */
+				, TI.ROAD_ADDR					/* 도로 주소 */
+				, TI.ROAD_DTL_ADDR				/* 도로 상세 주소 */
+				, TI.PRCL_ADDR					/* 지번 주소 */
+				, TI.PRCL_DTL_ADDR				/* 지번 상세 주소 */
+				, TI_SUM.SPL_AMT AS SPL_AMT		/* 공급 금액 */
+				, TI_SUM.STAX_AMT AS STAX_AMT	/* 부가세 금액 */
+				, TI_SUM.TOT_AMT AS TOT_AMT		/* 총 금액 */
+				, TI.ACPT_DTM					/* 접수 일시 */
+				, TI.PRCSR_NO					/* 처리자 번호 */
+				, TI.LNK_DTM					/* 연동 일시 */
+				, TI.LNK_DEAL_NO				/* 연동 거래 번호 */
+				, TI.LNK_RST_CD					/* 연동 결과 코드 */
+				, TI.LNK_RST_MSG				/* 연동 결과 메세지 */
+				, TI.ADDR							/* 주소 */
+				, TI.MEMO						/* 메모 */
+				, TI.SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, TI.SYS_REG_DTM				/* 시스템 등록 일시 */
+				, TI.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+				, TI.SYS_UPD_DTM				/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(TI.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(TI.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	(
+					SELECT	AA.*
+					FROM	(
+							SELECT	1 AS IDX
+									, A.ORD_NO
+									, SUM(A.SPL_AMT) AS SPL_AMT 	/* 공급 금액 */
+									, SUM(A.STAX_AMT) AS STAX_AMT	/* 부가세 금액 */
+									, SUM(A.TOT_AMT) AS TOT_AMT		/* 총 금액 */
+							FROM	TAX_INVOICE A
+							WHERE	1 = 1
+							AND		A.ORD_NO = #{ordNo}
+							AND		A.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+
+							UNION ALL
+
+							SELECT	2 AS IDX
+									, A.ORD_NO
+									, ROUND( SUM( A.PAY_AMT ) / 1.1, 0 ) AS SPL_AMT
+									, SUM( A.PAY_AMT ) - ROUND( SUM( A.PAY_AMT ) / 1.1, 0 ) AS STAX_AMT
+									, SUM( A.PAY_AMT ) AS TOT_AMT
+							FROM	ORDER_DETAIL A
+							WHERE	A.ORD_NO = #{ordNo}
+					) AA
+					WHERE	AA.ORD_NO IS NOT NULL
+					ORDER BY IDX
+					LIMIT 1
+		) TI_SUM
+		LEFT OUTER JOIN TAX_INVOICE TI ON (
+				TI_SUM.ORD_NO = TI.ORD_NO
+		)
+		LIMIT 1
+	</select>
+
+	<select id="getCashReceiptAcceptPossibleCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : taxInvoice.getCashReceiptAcceptPossibleCheck
+			Description : 현금영수증 접수 가능 체크
+		-->
+		SELECT	COUNT(*)
+		FROM	CASH_RECEIPT
+		WHERE	1 = 1
+		AND		ORD_NO = #{ordNo}
+
+		<if test="clmNo != null and clmNo != ''" >
+		AND		CLM_NO = #{clmNo}
+		</if>
+
+		/* 현금영수증 상태 코드 CASH_RCT_STAT_CD */
+		AND		CASH_RCT_STAT_CD IN (
+			'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'	/* 접수 */
+		)
+	</select>
+
+	<select id="getTaxInvoiceAcceptPossibleCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : taxInvoice.getTaxInvoiceAcceptPossibleCheck
+			Description : 세금계산서 접수 가능 체크
+		-->
+		SELECT	COUNT(*)
+		FROM	TAX_RECEIPT
+		WHERE	1 = 1
+		AND		ORD_NO = #{ordNo}
+
+		<if test="clmNo != null and clmNo != ''" >
+		AND		CLM_NO = #{clmNo}
+		</if>
+
+		/* 세금계산서 상태 코드 TAX_IVC_STAT_CD */
+		AND		TAX_IVC_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@TAX_IVC_STAT_01}'	/* 접수 */
+		)
+	</select>
+
+
+
+	<select id="getCashReceiptExistsCheckTaxInvoice" resultType="java.lang.Integer">
+		<!--
+			Query Name : taxInvoice.getCashReceiptExistsCheckTaxInvoice
+			Description : 세금계산서 등록시 현금영수증 기 접수/승인 건 체크
+		-->
+		SELECT  COUNT(*)
+		FROM	CASH_RECEIPT
+		WHERE	1 = 1
+		AND		ORD_NO = #{ordNo}
+		AND		ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+		AND		CASH_RCT_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'	/* 접수 */
+				, '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'	/* 승인 */
+		)
+	</select>
+
+	<select id="getTaxInvoiceExistsCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : taxInvoice.getTaxInvoiceExistsCheck
+			Description : 세금계산서 기 승인 건 체크
+		-->
+		SELECT  COUNT(*)
+		FROM	TAX_INVOICE
+		WHERE	1 = 1
+		AND		ORD_NO = #{ordNo}
+		AND		ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+		AND		TAX_IVC_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'	/* 승인 */
+		)
+	</select>
+
+
+	
+
+
+
+
+			
+</mapper>

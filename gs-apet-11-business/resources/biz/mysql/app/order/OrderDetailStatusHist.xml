@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="orderDetailStatusHist">
+
+	<insert id="insertOrderDetailStatusHist">
+		<!--
+			Query Name : orderDetailStatusHist.insertOrderDetailStatusHist
+			Description : 주문 상세 상태 코드 변경 이력 등록
+		-->
+		INSERT INTO ORDER_DETAIL_STATUS_HIST (
+					ORD_NO					/* 주문 번호 */
+					, ORD_DTL_SEQ			/* 주문 상세 순번 */
+					, HIST_STRT_DTM		/* 이력 시작 일시 */
+					, ORD_DTL_STAT_CD	/* 주문 상세 상태 코드 */
+					, SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, SYS_REG_DTM			/* 시스템 등록 일시 */
+		)
+		SELECT  	ORD_NO					/* 주문 번호 */
+					, ORD_DTL_SEQ			/* 주문 상세 순번 */
+					, NOW()             		/* 이력 시작 일시 */
+					, ORD_DTL_STAT_CD	/* 주문 상세 상태 코드 */
+					, #{sysRegrNo}			/* 시스템 등록자 번호 */
+					, NOW()					/* 시스템 등록 일시 */
+		FROM    ORDER_DETAIL
+		WHERE   1 = 1
+		AND		ORD_NO				= #{ordNo}
+		<if test="ordDtlSeq != null">
+		AND		ORD_DTL_SEQ			= #{ordDtlSeq}
+		AND     0 = (SELECT COUNT(ORD_NO) FROM ORDER_DETAIL_STATUS_HIST WHERE ORD_NO = #{ordNo} AND ORD_DTL_SEQ = #{ordDtlSeq} AND HIST_STRT_DTM = NOW())
+		</if>
+	</insert>
+		
+	
+</mapper>

@@ -1,0 +1,2199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 평가
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsComment">
+	<resultMap type="biz.app.goods.model.GoodsCommentVO" id="goodsCommentMap">
+		<id     property="goodsEstmNo"	column="GOODS_ESTM_NO"/>	<!-- 상품 평가 번호 -->
+		<result property="ttl"			column="TTL"/>				<!-- 제목 -->
+		<result property="content"		column="CONTENT"/>			<!-- 내용 -->
+		<result property="estmScore"	column="ESTM_SCORE"/>		<!-- 평가 점수 -->
+		<result property="bestYn"		column="BEST_YN"/>			<!-- best 여부 -->
+		<result property="dispYn"		column="DISP_YN"/>			<!-- 전시 여부 -->
+		<result property="goodsEstmTp"	column="GOODS_ESTM_TP"/>	<!-- 상품평 타입 -->
+		<result property="likeCnt"		column="LIKE_CNT"/>			<!-- 좋아요 수 -->
+		<result property="loginId"		column="LOGIN_ID"/>			<!-- 로그인 아이디 -->
+		<result property="nickNm"		column="NICK_NM"/>			<!-- 닉네임 -->
+		<result property="prflImg"		column="PRFL_IMG"/>			<!-- 프로필 이미지 -->
+		<result property="petNm"		column="PET_NM"/>			<!-- 펫 이름 -->
+		<result property="petGdGbCd"	column="PET_GD_GB_CD"/>		<!-- 펫 성별 -->
+		<result property="age"			column="AGE"/>				<!-- 펫 나이 -->
+		<result property="weight"		column="WEIGHT"/>			<!-- 펫 무게 -->
+		<result property="rcomYn"		column="RCOM_YN"/>			<!-- 추천 여부 -->
+		<result property="goodsId"		column="GOODS_ID"/>			<!-- 상품 아이디 -->
+		<result property="imgRegYn"		column="IMG_REG_YN"/>		<!-- 이미지 등록 여부 --> 
+		<result property="estmMbrNo"	column="ESTM_MBR_NO"/>		<!-- 평가 회원 번호 -->
+		<result property="estmMbrId"	column="ESTM_MBR_ID"/>		<!-- 평가 회원 ID -->
+		<result property="estmId"		column="ESTM_Id"/>			<!-- 평가 회원 번호 -->
+		<result property="sysRegrNo"	column="SYS_REGR_NO"/>		<!-- 시스템 등록자 번호 -->
+		<result property="sysRegDtm"	column="SYS_REG_DTM"/>		<!-- 시스템 등록 일시 -->
+		<result property="sysUpdrNo"	column="SYS_UPDR_NO"/>		<!-- 시스템 수정자 번호 -->
+		<result property="sysUpdDtm"	column="SYS_UPD_DTM"/>		<!-- 시스템 수정 일시 -->
+		<result property="goodsNm"		column="GOODS_NM"/>			<!-- 상품 명 -->
+		<result property="cstrtShowNm"	column="CSTRT_SHOW_NM"/>	<!-- 구성 노출 명 -->
+		<result property="attrVal"		column="ATTR_VAL"/>			<!-- 구매 상품 옵션 값 -->
+		<result property="bndNmKo"		column="BND_NM_KO"/>		<!-- 브랜드 명 국문 -->
+		<result property="bndNmEn"		column="BND_NM_EN"/>		<!-- 브랜드 명 영문 -->
+		<result property="imgSeq"		column="IMG_SEQ"/>			<!-- 이미지 순번 -->
+		<result property="imgPath"		column="IMG_PATH"/>			<!-- 이미지 경로 -->
+		<result property="commentCnt"	column="COMMENT_CNT"/>		<!-- 댓글 갯수-->
+		<result property="goodsImgSeq"	column="GOODS_IMG_SEQ"/>	<!-- 상품 대표 이미지 순번 -->
+		<result property="goodsImgPath"	column="GOODS_IMG_PATH"/>	<!-- 상품 대표 이미지 경로 -->
+		<result property="saleAmt"		column="SALE_AMT"/>			<!-- 판매 금액-->
+		<result property="dcAmt"		column="DC_AMT"/>			<!-- 할인 적용 금액-->
+		<result property="ordNo"		column="ORD_NO"/>			<!-- 주문번호 -->
+		<result property="ordDtlSeq"	column="ORD_DTL_SEQ"/>		<!-- 주문상세순번 -->
+		<result property="ordAcptDtm"	column="ORD_ACPT_DTM"/>		<!-- 주문 날짜 -->
+		<result property="goodsCstrtTpCd"	column="GOODS_CSTRT_TP_CD"/>
+		<result property="pakGoodsId"	column="PAK_GOODS_ID"/>
+		<result property="pakGoodsNm"	column="PAK_GOODS_NM"/>
+		<result property="petLogNo"		column="PET_LOG_NO"/>		<!-- 펫로그 번호 -->
+		<result property="mbrStatCd"	column="MBR_STAT_CD"/>		<!--회원 상태 코드 -->
+		
+		
+		<result property="snctYn" 		column="SNCT_YN"/> 			<!-- 제제 여부 -->
+		<result property="snctRsn" 		column="SNCT_RSN"/> 		<!-- 제제 사유 -->
+		<result property="petNo" 		column="PET_NO"/> 			<!-- 펫 번호 -->
+		<result property="petGbCd" 		column="PET_GB_CD"/> 		<!-- 펫 구분 코드 -->
+		<result property="petGdGbCd"	column="PET_GD_GB_CD"/> 	<!-- 펫 성별 구분 코드 -->
+		<result property="petKindNm" 	column="PET_KIND_NM"/> 		<!-- 펫 종류 명 -->
+		<result property="petNm" 		column="PET_NM"/> 			<!-- 펫 이름 -->
+		<result property="birth" 		column="BIRTH"/> 			<!-- BIRTH -->
+		<result property="month" 		column="MONTH"/> 			<!-- MONTH -->
+		<result property="allergyYn" 	column="ALLERGY_YN"/> 		<!-- 알러지 여부 -->
+		<result property="fixingYn" 	column="FIXING_YN"/> 		<!-- 중성화 여부 -->
+		<result property="wryDaYn" 		column="WRY_DA_YN"/>	 	<!-- 염려 질환 여부 -->
+		
+		
+		<collection property="goodsCommentImageList" column="GOODS_ESTM_NO" javaType="java.util.ArrayList"
+					ofType="biz.app.goods.model.GoodsCommentImageVO" select="getPageGoodsCommentImageList" />
+		<collection property="goodsEstmQstVOList" column="GOODS_ESTM_NO" javaType="java.util.ArrayList"
+					ofType="biz.app.goods.model.GoodsEstmQstVO" select="getPageGoodsCommentEstmList" />
+	</resultMap>
+
+	<!-- 상품 평가 목록 페이징 조회 -->
+	<select id="pageGoodsComment" resultMap="goodsCommentMap">
+		SELECT	GC.GOODS_ESTM_NO	/* 상품평 번호 */
+				  , GCL.GOODS_ID		/* 상품 번호 */
+				  , GC.TTL				/* 제목 */
+				  , CASE #{goodsCstrtTpCd}
+						WHEN 'PAK'
+							THEN GB.GOODS_NM
+						WHEN 'ATTR'
+							THEN AT.ATTR_VAL
+						ELSE NULL
+					END AS ATTR_VAL	/* 구매 상품 옵션 값, 구성 노출 명 */
+				  , GC.CONTENT			/* 내용 */
+				  , GC.ESTM_SCORE		/* 평가 점수 */
+				  , GCL.BEST_YN			/* BEST 여부 */
+				  , GC.GOODS_ESTM_TP	/* 상품 평가 유형 */
+				  , GC.ESTM_MBR_NO		/* 작성자 */
+				  , OD.ORD_NO			/* 주문 번호 */
+				  , OD.ORD_DTL_SEQ		/* 주문 상세 순번 */
+				  , (SELECT COUNT(*)
+				  	FROM GOODS_ESTM_ACTN G1
+				  	WHERE 1=1
+				  	  AND G1.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+				  	  AND G1.GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+				  	) AS LIKE_CNT 		/* 좋아요 수 */
+				  , CASE WHEN (SELECT MBR_NO
+								 FROM GOODS_ESTM_ACTN GEA
+								WHERE GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+								  AND GEA.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+								  AND GEA.MBR_NO = #{sysRegrNo}
+							) IS NULL
+				  		 THEN 'N'
+				  		 ELSE 'Y'
+				  		 END AS RCOM_YN	/* 좋아요 여부 */
+				  , MB.LOGIN_ID			/* 회원 아이디 */
+				  , CASE MB.MBR_STAT_CD
+						WHEN '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+							THEN '어바웃펫 회원'
+						WHEN '${@framework.common.constants.CommonConstants@MBR_STAT_30}'
+							THEN IFNULL(MB.NICK_NM,'어바웃펫 회원')	
+						ELSE MB.NICK_NM 
+				  	END AS NICK_NM		/* 닉네임 */
+				  , MB.PRFL_IMG			/* 프로필 이미지 */
+				  , GC.PET_NM			/* 펫 이름 */
+				  , GC.PET_GD_GB_CD		/* 펫 성별 */
+				  , GC.AGE				/* 펫 나이 */
+				  , GC.MONTH			/* 펫 개월 수 */
+				  , GC.WEIGHT 			/* 펫 무게 */
+				  , GC.SYS_REG_DTM		/* 작성일자 */
+				  , GC.SYS_REGR_NO		/* */
+				  , MB.MBR_STAT_CD
+			FROM GOODS_COMMENT GC
+			JOIN GOODS_COMMENT_LINK GCL
+			  ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO 
+			JOIN MEMBER_BASE MB
+			  ON GC.ESTM_MBR_NO = MB.MBR_NO
+	   LEFT JOIN ORDER_DETAIL OD
+			  ON OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+	   LEFT JOIN GOODS_BASE GB
+			  ON GB.GOODS_ID = OD.GOODS_ID
+	   LEFT JOIN GOODS_BASE PGB
+			  ON PGB.GOODS_ID = OD.PAK_GOODS_ID
+	   LEFT JOIN (SELECT GA.GOODS_ID
+					   , GROUP_CONCAT(CONCAT(A.ATTR_NM , ' : ', AV.ATTR_VAL) ORDER BY GA.DISP_PRIOR_RANK SEPARATOR ' / ') AS ATTR_VAL
+					FROM GOODS_ATTRIBUTE GA 
+					JOIN `ATTRIBUTE` A ON A.ATTR_NO = GA.ATTR_NO 
+					JOIN ATTRIBUTE_VALUE AV ON AV.ATTR_NO = A.ATTR_NO
+					JOIN ITEM_ATTRIBUTE_VALUE IAV
+					  ON IAV.ATTR_NO = AV.ATTR_NO 
+					 AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+					JOIN ITEM I
+					  ON I.ITEM_NO = IAV.ITEM_NO
+					 AND I.GOODS_ID = GA.GOODS_ID 
+				   WHERE 1 = 1
+					<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+					 AND	GA.GOODS_ID = #{goodsId}
+					</if>
+					<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+					 AND	GA.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 						FROM GOODS_CSTRT_PAK GCP 
+											WHERE GCP.GOODS_ID = #{goodsId})
+					</if>
+					 AND A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					 AND AV.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				   GROUP BY GA.GOODS_ID
+				   ORDER BY GA.DISP_PRIOR_RANK) AT
+			  ON AT.GOODS_ID = OD.GOODS_ID
+	   LEFT JOIN GOODS_CSTRT_PAK GCP
+			  ON GCP.SUB_GOODS_ID = GCL.GOODS_ID
+			 AND GCP.GOODS_ID = OD.PAK_GOODS_ID
+	   LEFT JOIN (SELECT GOODS_ESTM_NO, COUNT(*) AS RPT_CNT
+				  FROM GOODS_ESTM_ACTN
+				  WHERE GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_RPT}'
+				  GROUP BY GOODS_ESTM_NO
+				 )GEA2
+			  ON GEA2.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+	   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+	   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+			WHERE	1 = 1
+			<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+				 AND	GCL.GOODS_ID = #{goodsId}
+			</if>
+			<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+				 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+				 						FROM GOODS_CSTRT_PAK GCP 
+										WHERE GCP.GOODS_ID = #{goodsId})
+			</if>
+			  AND	(GEA2.RPT_CNT IS NULL OR GEA2.RPT_CNT <![CDATA[<]]> 5)
+			<if test='goodsEstmTp != null and goodsEstmTp != ""'>
+				AND	GC.GOODS_ESTM_TP = #{goodsEstmTp}
+			</if>
+			  AND	(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+					OR 
+					(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+					AND PLB.PET_LOG_NO IS NOT NULL
+					AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+					)
+			  AND	GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			<if test='imgRegYn != null and imgRegYn != ""'>
+			  AND	GC.IMG_REG_YN = #{imgRegYn}	/* 포토 상품평 여부 */
+			</if>
+			<if test='goodsEstmNo != null and goodsEstmNo != ""'>
+				AND GC.GOODS_ESTM_NO = #{goodsEstmNo}
+			</if>
+			<if test='estmMbrNo != null and estmMbrNo != 0'>
+				AND GC.ESTM_MBR_NO = #{estmMbrNo}
+			</if>
+			<if test="optGoodsId != null and optGoodsId != ''">
+				 AND	GCL.GOODS_ID = #{optGoodsId}
+			</if>
+		 	ORDER BY GC.${sidx} ${sord}, GC.SYS_REG_DTM DESC
+		 	<if test='allSelectYn == null or allSelectYn != "Y"'>
+				<include refid="bizCommon.pageSql" />
+			</if>
+	</select>
+
+	<!-- 상품평가 데이터 수 조회 -->
+	<select id="pageGoodsCommentCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM GOODS_COMMENT GC
+			JOIN GOODS_COMMENT_LINK GCL
+			  ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO 
+			JOIN MEMBER_BASE MB
+			  ON GC.ESTM_MBR_NO = MB.MBR_NO
+	   LEFT JOIN ORDER_DETAIL OD
+			  ON OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+	   LEFT JOIN (SELECT GOODS_ESTM_NO, COUNT(*) AS RPT_CNT
+				  FROM GOODS_ESTM_ACTN
+				  WHERE GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_RPT}'
+				  GROUP BY GOODS_ESTM_NO
+				)GEA2
+			  ON GEA2.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+	   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+	   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+		WHERE	1 = 1
+			<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+				 AND	GCL.GOODS_ID = #{goodsId}
+			</if>
+			<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+				 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+				 						FROM GOODS_CSTRT_PAK GCP 
+										WHERE GCP.GOODS_ID = #{goodsId})
+			</if>
+			  AND	(GEA2.RPT_CNT IS NULL OR GEA2.RPT_CNT <![CDATA[<]]> 5)
+			<if test='goodsEstmTp != null and goodsEstmTp != ""'>
+				AND	GC.GOODS_ESTM_TP = #{goodsEstmTp}
+			</if>
+			  AND(	
+			  		GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+					OR 
+					(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+					AND PLB.PET_LOG_NO IS NOT NULL
+					AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+					)
+				)
+			  AND	GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			<if test='imgRegYn != null and imgRegYn != ""'>
+			  AND	GC.IMG_REG_YN = #{imgRegYn}	/* 포토 상품평 여부 */
+			</if>
+			<if test='goodsEstmNo != null and goodsEstmNo != ""'>
+				AND GC.GOODS_ESTM_NO = #{goodsEstmNo}
+			</if>
+			<if test='estmMbrNo != null and estmMbrNo != 0'>
+				AND GC.ESTM_MBR_NO = #{estmMbrNo}
+			</if>
+			<if test="optGoodsId != null and optGoodsId != ''">
+				 AND	GCL.GOODS_ID = #{optGoodsId}
+			</if>
+	</select>
+	
+	<select id="getPageGoodsCommentImageList" resultType="biz.app.goods.model.GoodsCommentImageVO">
+		SELECT GCI.IMG_SEQ
+			 , GCI.GOODS_ESTM_NO /* 이미지 상품평 번호 */
+			 , GCI.IMG_PATH 
+			 , GCI.SYS_REG_DTM
+		FROM GOODS_COMMENT_IMAGE GCI
+		WHERE GCI.GOODS_ESTM_NO = #{goodsEstmNo}
+		ORDER BY GCI.IMG_SEQ ASC
+	</select>
+	
+	<select id="getPageGoodsCommentEstmList" resultType="biz.app.goods.model.GoodsEstmQstVO">
+		SELECT DISTINCT
+			   GER.ESTM_RPL_NO
+			 , GER.GOODS_ESTM_NO
+			 , GER.ESTM_QST_NO
+			 , GEQ.QST_CLSF
+			 , GER.ESTM_ITEM_NO
+			 , GEI.ITEM_CONTENT
+		FROM GOODS_ESTM_RPL GER
+		JOIN GOODS_ESTM_QST GEQ
+		  ON GEQ.ESTM_QST_NO = GER.ESTM_QST_NO
+		JOIN GOODS_ESTM_ITEM GEI
+		  ON GEI.ESTM_ITEM_NO = GER.ESTM_ITEM_NO
+		JOIN GOODS_COMMENT_LINK GCL 
+		  ON GCL.GOODS_ESTM_NO = GER.GOODS_ESTM_NO 
+		JOIN GOODS_BASE GB 
+		  ON GB.GOODS_ID = GCL.GOODS_ID 
+		JOIN GOODS_ESTM_QST_CTG_MAP GEQCM
+		  ON GEQCM.ESTM_QST_NO = GEQ.ESTM_QST_NO
+		 AND GEQCM.DISP_CLSF_NO = GB.GOODS_ESTM_DISP_CLSF_NO 
+	   WHERE GER.GOODS_ESTM_NO = #{goodsEstmNo}
+		 AND GEQ.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		ORDER BY GEQCM.DISP_SEQ ASC, GEI.DISP_SEQ ASC
+	</select>
+	
+	<!-- 상품평가 페이징 목록 조건절 -->
+	<sql id="pageGoodsCommentCondition">
+		AND		C.SYS_DEL_YN = 'N'
+		<if test='goodsId != null and goodsId != ""'>
+		AND		C.GOODS_ID = #{goodsId}	/* 상품 아이디 */
+		</if>
+		<if test='imgRegYn != null and imgRegYn != ""'>
+		AND		C.IMG_REG_YN = #{imgRegYn}
+		</if>
+		<if test='rcomYn != null and rcomYn != ""'>
+		AND		C.RCOM_YN = #{rcomYn}
+		</if>
+		<if test="stId != null and stId != ''" >
+		AND 	C.ST_ID = #{stId }
+		</if>
+	</sql>
+	
+		<!-- 상품 평가 목록 페이징 조회 -->
+	<select id="pageGoodsCommentAddBest" resultMap="goodsCommentMap">
+		SELECT 	GC.GOODS_ESTM_NO  			/* 상품 평가 번호 */
+			  , GC.GOODS_ID      			/* 상품 아이디 */
+			  , GC.TTL           			/* 제목 */
+			  , GC.CONTENT       			/* 내용 */
+			  , GC.ESTM_SCORE    			/* 평가 점수 */
+			  , GC.RCOM_YN		  			/* 추천 여부 */
+			  , CASE WHEN GCI.IMG_PATH IS NULL THEN 'N' ELSE 'Y' END AS IMG_REG_YN
+			  , GC.ESTM_MBR_NO   			/* 평가 회원 번호 */
+			  , GC.SYS_REGR_NO
+			  , GC.SYS_REG_DTM
+			  , GC.SYS_UPDR_NO
+			  , GC.SYS_UPD_DTM
+			  , (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = GC.ESTM_MBR_NO) AS ESTM_ID		/* 평가자 로그인 아이디 */
+			  , GCI.IMG_SEQ      			/* 이미지 순번 */
+			  , GCI.IMG_PATH     			/* 이미지 경로 */
+			  , GCI.SYS_REGR_NO AS IMG_SYS_REGR_NO
+			  , GCI.SYS_REG_DTM AS IMG_SYS_REG_DTM
+		FROM (
+			 	SELECT 	C.GOODS_ESTM_NO
+			 		  , C.GOODS_ID
+			 		  , C.TTL
+			 		  , C.CONTENT
+			 		  , C.ESTM_SCORE
+			 		  , IF(RC.GOODS_ESTM_NO is null, '${@framework.common.constants.CommonConstants@COMM_YN_N}', '${@framework.common.constants.CommonConstants@COMM_YN_Y}') RCOM_YN 
+			 		  , C.IMG_REG_YN
+			 		  , C.ESTM_MBR_NO
+			 		  , C.SYS_REGR_NO
+			 		  , C.SYS_REG_DTM
+			 		  , C.SYS_UPDR_NO
+			 		  , C.SYS_UPD_DTM
+			 	FROM	GOODS_COMMENT C
+				          LEFT OUTER JOIN 
+				              (SELECT C.GOODS_ESTM_NO , 
+				                     C.GOODS_ID 
+				                FROM GOODS_COMMENT C 
+				               WHERE 1=1 
+				                     <include refid="pageGoodsCommentCondition" />
+				                     AND C.RCOM_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' 
+				                     ORDER BY C.${sidx} ${sord}
+				                     LIMIT 0, 3 
+				              ) RC ON RC.GOODS_ESTM_NO = C.GOODS_ESTM_NO 
+			 	WHERE	1=1
+			 	<include refid="pageGoodsCommentCondition" />
+			 	ORDER BY C.${sidx} ${sord}
+				<include refid="bizCommon.pageSql" />
+			  ) GC
+		LEFT OUTER JOIN GOODS_COMMENT_IMAGE GCI ON GC.GOODS_ESTM_NO = GCI.GOODS_ESTM_NO
+		ORDER BY  GC.RCOM_YN DESC, GC.${sidx} ${sord}, GCI.IMG_SEQ ASC
+	</select>
+
+	<!-- 상품평가 데이터 수 조회 -->
+	<select id="pageGoodsCommentAddBestCount" resultType="java.lang.Integer">
+		SELECT	COUNT(distinct C.GOODS_ESTM_NO)
+		FROM	GOODS_COMMENT C
+		          LEFT OUTER JOIN 
+		              (SELECT C.GOODS_ESTM_NO , 
+		                     C.GOODS_ID 
+		                FROM GOODS_COMMENT C 
+		               WHERE 1=1 
+		                     <include refid="pageGoodsCommentCondition" />
+		                     AND C.RCOM_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' 
+		                     ORDER BY C.${sidx} ${sord}
+		                     LIMIT 0, 3 
+		              ) RC ON RC.GOODS_ESTM_NO = C.GOODS_ESTM_NO 
+		WHERE	1=1
+		<include refid="pageGoodsCommentCondition" />
+	</select>
+
+
+	<!-- 상품평가 정보 조회 -->
+	<select id="getGoodsCommentBase" resultMap="goodsCommentMap">
+		<!--
+            Query Name : goodsComment.getGoodsCommentBase
+            Description : 리뷰 조회
+        -->
+		SELECT 	GC.GOODS_ESTM_NO  /* 상품 평가 번호 */
+		        ,GC.GOODS_ID      /* 상품 아이디 */
+		        ,GC.TTL           /* 제목 */
+		        ,GC.CONTENT       /* 내용 */
+		        ,GC.ESTM_SCORE    /* 평가 점수 */
+		        ,GC.RCOM_YN		  /* 추천 여부 */
+		        ,GC.IMG_REG_YN    /* 이미지 등록 여부 */
+		        ,GC.ESTM_MBR_NO   /* 평가 회원 번호 */
+		        ,(SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = GC.ESTM_MBR_NO) AS ESTM_ID /* 평가자 로그인 아이디 */
+		        ,GC.SYS_REGR_NO
+		        ,GC.SYS_REG_DTM
+		        ,GC.SYS_UPDR_NO
+		        ,GC.SYS_UPD_DTM
+		        ,GCI.IMG_PATH     /* 이미지 경로 */
+		        ,GCI.IMG_SEQ      /* 이미지 순번 */
+		        ,(SELECT COUNT(1) FROM GOODS_COMMENT COMMENT WHERE GOODS_ID = GC.GOODS_ID) AS COMMENT_CNT
+		FROM GOODS_COMMENT GC
+		LEFT OUTER JOIN GOODS_COMMENT_IMAGE GCI ON GC.GOODS_ESTM_NO = GCI.GOODS_ESTM_NO
+		WHERE 1 = 1
+		AND GC.GOODS_ESTM_NO = ${goodsEstmNo}
+		AND GC.SYS_DEL_YN = 'N'
+		ORDER BY GCI.IMG_SEQ ASC
+	</select>
+
+	<!-- 상품평가 데이터 수 조회 -->
+	<select id="getGoodsCommentCount" resultType="biz.app.goods.model.GoodsCommentCountVO">
+		<!--
+            Query Name : goodsComment.getGoodsCommentCount
+            Description : 리뷰 카운트 조회
+        -->
+		SELECT  GCT.TOTAL_CNT, GCP.PHOTO_CNT, GCB.RCOM_CNT, GCI.INQUIRY_CNT
+		FROM  (
+		  		SELECT	COUNT(*) AS TOTAL_CNT
+		      FROM    GOODS_COMMENT
+		      WHERE   SYS_DEL_YN = 'N'
+		  		AND		  GOODS_ID = #{goodsId}
+		  		<if test="stId != null and stId != ''" >
+				AND ST_ID = #{stId }
+				</if>
+		      ) GCT
+		      ,
+		      (
+		  		SELECT	COUNT(DISTINCT GC.GOODS_ESTM_NO) AS PHOTO_CNT
+		       FROM GOODS_COMMENT GC, GOODS_COMMENT_IMAGE GCI
+     		   WHERE 1=1 
+     		    AND GC.SYS_DEL_YN = 'N'
+		  		AND	GC.GOODS_ID = #{goodsId}
+		  		AND GC.GOODS_ESTM_NO = GCI.GOODS_ESTM_NO
+            	AND IMG_PATH IS NOT NULL
+            	<if test="stId != null and stId != ''" >
+				AND ST_ID = #{stId }
+				</if>
+		      ) GCP
+		      ,
+		      (
+		  		SELECT	COUNT(*) AS RCOM_CNT
+		      FROM    GOODS_COMMENT
+		      WHERE   SYS_DEL_YN = 'N'
+		  		AND		  GOODS_ID = #{goodsId}
+		      AND     RCOM_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		      <if test="stId != null and stId != ''" >
+				AND ST_ID = #{stId }
+			  </if>
+		      ) GCB
+		      ,
+		      (
+		  		SELECT	COUNT(*) AS INQUIRY_CNT
+		      FROM    GOODS_INQUIRY
+		      WHERE   GOODS_ID = #{goodsId}
+		      	AND   DISP_YN = 'Y'
+		      <if test="stId != null and stId != ''" >
+				AND ST_ID = #{stId }
+			  </if>
+		      ) GCI
+	</select>
+
+	<insert id="insertGoodsComment" parameterType="biz.app.goods.model.GoodsCommentPO">
+		<!--
+			Query Name : goodsComment.insertGoodsComment
+			Description : 상품평가 등록
+		-->
+		<selectKey keyProperty="goodsEstmNo" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_COMMENT_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_COMMENT
+			(
+				GOODS_ESTM_NO	/* 상품 평가 번호 */
+			  , ST_ID			/* 사이트 아이디 */
+			  , GOODS_ID		/* 상품 아이디 */
+			  , CONTENT			/* 내용 */
+			  , ESTM_SCORE		/* 평가 점수 */
+			  , ESTM_MBR_NO		/* 평가 회원 번호 */
+			  , IMG_REG_YN		/* 이미지 등록 여부 */
+			  , COMP_NO			/* 업체 번호 */
+			  , GOODS_ESTM_TP	/* 상품 평가 유형 */
+			  , DISP_YN			/* 전시 여부 */
+			  , BEST_YN			/* best 여부 */
+			  , SNCT_YN			/* 제재 여부 */
+			  , PET_NO			/* 펫 번호 */
+			  , PET_GB_CD		/* 펫 구분 코드 */
+			  , PET_KIND_NM		/* 펫 종류 */
+			  , PET_NM			/* 펫 이름 */
+			  , AGE				/* 펫 나이 */
+			  , BIRTH			/* 생일 */
+			  , MONTH			/* 개월 수 */
+			  , WEIGHT			/* 몸무게 */
+			  , PET_GD_GB_CD	/* 펫 성별 */
+			  , ALLERGY_YN		/* 알러지 여부 */
+			  , FIXING_YN		/* 중성화 여부 */
+			  , WRY_DA_YN		/* 염려질환 여부 */
+			  , IMG_PATH		/* 펫 이미지 경로 */
+			  , SYS_REGR_NO		/* 시스템 등록자 번호 */
+			  , SYS_REG_DTM		/* 시스템 등록 일시 */
+			  , SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM		/* 시스템 수정 일시 */
+			  , SYS_DEL_YN		/* 시스템 삭제 여부 */
+			)
+		VALUES
+			(
+				#{goodsEstmNo}
+			  , #{stId}
+			  , #{goodsId}
+			  , #{content}
+			  , #{estmScore}
+			  , #{estmMbrNo}
+			  , #{imgRegYn}
+			  , (SELECT COMP_NO FROM GOODS_BASE WHERE GOODS_ID = #{goodsId})
+			  , #{goodsEstmTp}
+			  , '${@framework.common.constants.CommonConstants@COMM_YN_Y}'  /* 전시 여부 */
+			  , '${@framework.common.constants.CommonConstants@COMM_YN_N}'  /* best 여부 : N */
+			  , '${@framework.common.constants.CommonConstants@COMM_YN_N}'  /* 제재 여부 : N */
+			  , #{petNo}
+			  , #{petGbCd}
+			  , #{petKindNm}
+			  , #{petNm}
+			  , #{age}
+			  , #{birth}
+			  , #{month}
+			  , #{weight}
+			  , #{petGdGbCd}
+			  , #{allergyYn}
+			  , #{fixingYn}
+			  , #{wryDaYn}
+			  , #{petImgPath}
+			  , #{sysRegrNo}
+			  , NOW()
+			  , #{sysRegrNo}
+			  , NOW()
+			  , '${@framework.common.constants.CommonConstants@COMM_YN_N}'  /* 시스템 삭제 여부 : N */
+			)
+	</insert>
+
+	<insert id="insertGoodsCommentImage" parameterType="biz.app.goods.model.GoodsCommentImagePO">
+		<!--
+			Query Name : goodsComment.insertGoodsCommentImage
+			Description : 상품평 이미지 등록
+		-->
+		<selectKey keyProperty="imgSeq" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_COMMENT_IMAGE_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_COMMENT_IMAGE
+			(
+				GOODS_ESTM_NO	/* 상품 평가 번호 */
+				,IMG_SEQ		/* 이미지 순번 */
+				,IMG_PATH		/* 이미지 경로 */
+				,VD_YN			/* 동영상 여부 */
+				,SYS_REGR_NO	/* 시스템 등록자 번호 */
+				,SYS_REG_DTM	/* 시스템 등록 일시 */
+			)
+			VALUES
+			(
+				#{goodsEstmNo}
+			  , #{imgSeq}
+			  , #{imgPath}
+			  , #{vdYn}
+			  , #{sysRegrNo}
+			  , NOW()
+			)
+	</insert>
+
+	<update id="updateGoodsComment">
+		<!--
+			Query Name : goodsComment.updateGoodsComment
+			Description : 상품평 수정
+		-->
+		UPDATE GOODS_COMMENT
+		SET
+			CONTENT				= #{content}	/* 내용 */
+			,ESTM_SCORE			= #{estmScore}	/* 평가 점수 */
+			,IMG_REG_YN			= #{imgRegYn}	/* 이미지 등록 여부 */
+			, PET_NO			= IF(IFNULL(#{petNo}, 0) = 0, NULL, #{petNo})		/* 펫 번호 */
+			, PET_GB_CD			= #{petGbCd}	/* 펫 구분 코드 */
+			, PET_KIND_NM		= #{petKindNm}	/* 펫 종류 */
+			, PET_NM			= #{petNm}		/* 펫 이름 */
+			, AGE				= #{age}		/* 펫 나이 */
+			, BIRTH				= #{birth}		/* 생일 */
+			, MONTH				= #{month}		/* 개월 수 */
+			, WEIGHT			= #{weight}		/* 몸무게 */
+			, PET_GD_GB_CD		= #{petGdGbCd}	/* 펫 성별 */
+			, ALLERGY_YN		= #{allergyYn}	/* 알러지 여부 */
+			, FIXING_YN			= #{fixingYn}	/* 중성화 여부 */
+			, WRY_DA_YN			= #{wryDaYn}	/* 염려질환 여부 */
+			, IMG_PATH			= #{petImgPath}	/* 펫 이미지 경로 */
+			,SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM		= SYSDATE()		/* 시스템 수정 일시 */
+		WHERE GOODS_ESTM_NO		= #{goodsEstmNo}
+		AND ESTM_MBR_NO			= #{estmMbrNo}
+	</update>
+
+	<!-- 상품평 삭제 -->
+	<update id="deleteGoodsComment">
+		UPDATE GOODS_COMMENT
+		SET
+			  DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'  /* 전시 여부 : N */
+			, SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'  /* 시스템 삭제 여부 : Y */
+			, SYS_DELR_NO = #{sysRegrNo}
+			, SYS_DEL_DTM = NOW()
+			, SYS_UPDR_NO = #{sysRegrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE GOODS_ESTM_NO = #{goodsEstmNo}
+		AND ESTM_MBR_NO = #{sysRegrNo}
+	</update>
+
+	<!-- 상품평 이미지 삭제 -->
+	<delete id="deleteGoodsCommentImage">
+		DELETE FROM GOODS_COMMENT_IMAGE
+		WHERE GOODS_ESTM_NO = #{goodsEstmNo}
+		  AND IMG_SEQ = #{imgSeq}
+	</delete>
+	
+	<select id="getMaxImageSequence" resultType="Long">
+		<!--
+			Query Name : goodsComment.getMaxImageSequence
+			Description : 상품 평가 이미지 table에 등록된 이미지 순번의 max값 취득
+		-->
+		SELECT	IFNULL(MAX(IMG_SEQ), 0) + 1 AS IMG_SEQ
+		FROM	GOODS_COMMENT_IMAGE
+		WHERE 	GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+	<!-- Front 마이페이지 - 작성한 상품평 리스트 페이징 조회 -->
+	<select id="pageAfterGoodsComment" resultMap="goodsCommentMap">
+		<!--
+			Query Name : goodsComment.pageAfterGoodsComment
+			Description : 작성한 상품평 리스트 페이징 조회
+		-->
+		SELECT GC.GOODS_ESTM_NO  	/* 상품 평가 번호 */
+				,(SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = GC.BND_NO) AS BND_NM_KO /* 브랜드 명 국문 */
+				,(SELECT BND_NM_EN FROM BRAND_BASE WHERE BND_NO = GC.BND_NO) AS BND_NM_EN /* 브랜드 명 영문 */
+				,GC.GOODS_ID      	/* 상품 아이디 */
+				,GC.GOODS_NM     	/* 상품 명 */
+				,(SELECT IMG_SEQ FROM GOODS_IMG WHERE GOODS_ID = GC.GOODS_ID AND DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') AS GOODS_IMG_SEQ /* 상품 대표이미지 순번 */
+				,(SELECT IMG_PATH FROM GOODS_IMG WHERE GOODS_ID = GC.GOODS_ID AND DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') AS GOODS_IMG_PATH /* 상품 대표이미지 경로 */
+				,GC.PR_WDS      	/* 상품 아이디 */
+				,GC.TTL           	/* 제목 */
+				,GC.CONTENT       	/* 내용 */
+				,GC.ESTM_SCORE    	/* 평가 점수 */
+				,GC.ESTM_MBR_NO   	/* 평가 회원 번호 */
+				,GC.IMG_REG_YN    	/* 이미지 등록 여부 */
+				,GC.SYS_REG_DTM   	/* 시스템 등록 일시 */
+				,GCI.GOODS_ESTM_NO AS IMG_ESTM_NO	/* 상품 평가 번호 */
+				,GCI.IMG_SEQ      	/* 이미지 순번 */
+				,GCI.IMG_PATH     	/* 이미지 경로 */
+				,(SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = GC.ESTM_MBR_NO) AS ESTM_ID /* 평가자 로그인 아이디 */
+ 				,CAST(FN_SPLIT(GC.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT
+				,CAST(FN_SPLIT(GC.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) AS DC_AMT
+				,GC.ORD_NO			/* 주문번호 */
+				,GC.ORD_DTL_SEQ		/* 주문상세순번 */
+		FROM (
+				SELECT C.GOODS_ESTM_NO
+						,C.GOODS_ID
+						,C.TTL
+						,C.CONTENT
+						,C.ESTM_SCORE
+						,C.IMG_REG_YN
+						,C.SYS_REG_DTM
+						,C.ESTM_MBR_NO
+						,B.GOODS_NM
+						,B.BND_NO
+						,B.PR_WDS
+						,FN_GET_GOODS_PRICE(C.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+						,OD.ORD_NO
+						,OD.ORD_DTL_SEQ
+				FROM	GOODS_COMMENT C
+				INNER JOIN GOODS_BASE B ON C.GOODS_ID = B.GOODS_ID
+				LEFT OUTER JOIN ORDER_DETAIL OD ON C.GOODS_ESTM_NO = OD.GOODS_ESTM_NO
+				WHERE	1=1
+				<include refid="pageAfterGoodsCommentCondition" />
+				<include refid="bizCommon.sortSql" />
+				<include refid="bizCommon.pageSql" />
+		) GC
+		LEFT OUTER JOIN GOODS_COMMENT_IMAGE GCI ON GC.GOODS_ESTM_NO = GCI.GOODS_ESTM_NO
+		ORDER BY GC.GOODS_ESTM_NO DESC , GCI.IMG_SEQ ASC
+	</select>
+
+	<!-- Front 마이페이지 - 작성한 상품평 리스트 데이터 수 조회 -->
+	<select id="pageAfterGoodsCommentCount" resultType="java.lang.Integer">
+				SELECT COUNT(DISTINCT GC.GOODS_ESTM_NO)
+		FROM (
+				SELECT C.GOODS_ESTM_NO
+						,C.GOODS_ID
+						,C.TTL
+						,C.CONTENT
+						,C.ESTM_SCORE
+						,C.IMG_REG_YN
+						,C.SYS_REG_DTM
+						,C.ESTM_MBR_NO
+						,B.GOODS_NM
+						,B.BND_NO
+						,B.PR_WDS
+				FROM	GOODS_COMMENT C
+				INNER JOIN GOODS_BASE B ON C.GOODS_ID = B.GOODS_ID
+				WHERE	1=1
+				<include refid="pageAfterGoodsCommentCondition" />
+		) GC
+		LEFT OUTER JOIN GOODS_COMMENT_IMAGE GCI ON GC.GOODS_ESTM_NO = GCI.GOODS_ESTM_NO
+	</select>
+
+	<!-- Front 마이페이지 - 작성한 상품평 리스트 페이징 목록 조건절 -->
+	<sql id="pageAfterGoodsCommentCondition">
+		AND C.SYS_DEL_YN = 'N'  /* 시스템 삭제 여부 : N */
+		<if test="stId != null and stId != ''" >
+		AND C.ST_ID = #{stId }
+		</if>
+		<if test='estmMbrNo != null and estmMbrNo != ""'>
+		AND C.ESTM_MBR_NO = #{estmMbrNo}	/* 평가 회원 번호 */
+		</if>
+		<if test='rcomYn != null and rcomYn != ""'>
+		AND C.RCOM_YN = #{rcomYn}	/* 추천 여부 */
+		</if>
+		<if test='sysRegDtmStart != null and sysRegDtmStart != "" and sysRegDtmEnd != null and sysRegDtmEnd != ""'>
+		AND C.SYS_REG_DTM BETWEEN #{sysRegDtmStart} AND #{sysRegDtmEnd}
+		</if>
+		<if test='searchType != null and searchType != ""'>
+		<choose>
+			<when test='searchType == "1"'>
+				AND C.TTL LIKE CONCAT( '%', #{searchString}, '%' )
+			</when>
+			<when test='searchType == "2"'>
+				AND C.CONTENT LIKE CONCAT( '%', #{searchString}, '%' )
+			</when>
+			<otherwise>
+				AND (C.TTL LIKE CONCAT( '%', #{searchString}, '%' ) OR C.CONTENT LIKE CONCAT( '%', #{searchString}, '%' ))
+			</otherwise>
+		</choose>
+		</if>
+	</sql>
+
+
+	<select id="pageGoodsCommentGrid" resultType="biz.app.goods.model.GoodsCommentVO" >
+		<!--
+			Query Name : goodsComment.pageGoodsCommentGrid
+			Description : 상품평 목록
+		-->
+		SELECT Y.* FROM (
+			SELECT @ROWNUM := @ROWNUM + 1 ROW_NUM, X.* FROM 
+					 (SELECT @ROWNUM := 0 ) VAR,
+					 ( SELECT A.* FROM  
+					 	( SELECT	/* QUERYID(goodsComment.pageGoodsCommentGrid ) */
+							A.GOODS_ESTM_NO	/* 상품 평가 번호 */
+							, A.ST_ID			/* 사이트 아이디 */
+							, S.ST_NM			/* 사이트 명 */
+							, A.TTL				/* 제목 */
+							, CASE A.GOODS_ESTM_TP
+								WHEN 'PLG'
+									THEN PLB.DSCRT
+								ELSE A.CONTENT
+								END AS CONTENT	/* 내용 */
+							, A.ESTM_SCORE		/* 평가 점수 */
+							, A.RCOM_YN			/* 추천 여부 */
+							, A.HITS			/* 조회수 */
+							, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+							, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+							, A.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+							, A.SYS_UPD_DTM		/* 시스템 수정 일시 */
+							, A.SYS_DEL_YN		/* 시스템 삭제 여부 */
+							, A.SYS_DELR_NO		/* 시스템 삭제자 번호 */
+							, A.SYS_DEL_DTM		/* 시스템 삭제 일시 */
+							, A.SYS_DEL_RSN		/* 시스템 삭제 사유 */
+							, A.GOODS_ID		/* 상품 아이디 */
+							, A.IMG_REG_YN		/* 이미지 등록 여부 */
+							, A.ESTM_MBR_NO		/* 평가 회원 번 */
+							, A.COMP_NO			/* 업체 번호 */
+							, A.GOODS_ESTM_TP	/* 상품평 유형 */
+							<![CDATA[
+							, IFNULL(FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@GOODS_ESTM_TP}',A.GOODS_ESTM_TP,''), '일반') AS GOODS_ESTM_TP_NM
+							]]>
+							, (SELECT COUNT(*) FROM goods_estm_actn gea WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO AND MBR_NO = A.ESTM_MBR_NO AND GOODS_ESTM_ACTN_CD = 'LIKE') ESTM_ACTN_LKE /* 좋아요 개수 */
+							, (	SELECT COUNT(*) 
+								FROM goods_estm_actn gea 
+								WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO 
+								AND MBR_NO = A.ESTM_MBR_NO 
+								AND GOODS_ESTM_ACTN_CD = 'RPT'  
+								<if test="tabFlag == null or tabFlag == ''">
+									<if test="rptpRsn != null and rptpRsn != ''">
+										AND RPTP_RSN_CD = #{rptpRsn}
+									</if>
+								</if> 
+							) ESTM_ACTN_RPT /* 신고 개수 */
+							, FN_GET_COMPANY_NAME(A.COMP_NO) COMP_NM
+							, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+							, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+							, B.LOGIN_ID AS ESTM_ID
+							, B.MBR_NM
+							, C.GOODS_NM
+							, A.DISP_YN		/* 전시 여부 */
+							, GCL.BEST_YN		/* BEST 여부 */
+						FROM GOODS_COMMENT A
+						JOIN GOODS_COMMENT_LINK GCL ON (A.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO) 
+						JOIN MEMBER_BASE B ON (A.ESTM_MBR_NO = B.MBR_NO )
+						JOIN GOODS_BASE C ON (C.GOODS_ID = A.GOODS_ID)
+						JOIN ST_STD_INFO S ON A.ST_ID = S.ST_ID
+						JOIN COMPANY_BASE CP ON (A.COMP_NO = CP.COMP_NO)
+				   LEFT JOIN ORDER_DETAIL OD ON OD.GOODS_ESTM_NO = A.GOODS_ESTM_NO
+				   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+				   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+						WHERE 1 = 1
+						AND A.SYS_DEL_YN = 'N'
+						AND (A.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+							OR 
+							(A.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+							AND
+							PLB.PET_LOG_NO IS NOT NULL
+							AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+							)
+						<if test="stId != null and stId != ''" >
+							AND A.ST_ID = #{stId }
+						</if>
+						<if test="goodsId != null and goodsId != ''" >
+							AND GCL.GOODS_ID = #{goodsId }
+						</if>
+						<if test="estmScore != null and estmScore != ''" >
+							AND A.ESTM_SCORE = #{estmScore }
+						</if>
+						<if test="goodsEstmTp != null and goodsEstmTp != ''" >
+							AND A.GOODS_ESTM_TP = #{goodsEstmTp }
+						</if>
+						<if test="dispYn != null and dispYn != ''" >
+							AND A.DISP_YN = #{dispYn }
+						</if>
+						<if test="bestYn != null and bestYn != ''" >
+							AND GCL.BEST_YN = #{bestYn }
+						</if>
+						<if test="estmMbrNo != null " >
+							AND A.ESTM_MBR_NO = #{estmMbrNo}
+						</if>
+						<if test="goodsIds != null" >
+							<foreach collection="goodsIds" item="item" separator="," open="AND A.GOODS_ID IN (" close=")" >
+								#{item }
+							</foreach>
+						</if>
+						<if test="estmMbrNos != null" >
+							<foreach collection="estmMbrNos" item="item" separator="," open="AND A.ESTM_MBR_NO IN (" close=")" >
+								#{item }
+							</foreach>
+						</if>
+						<if test='"Y" == showAllLowCompany'>
+							AND CP.UP_COMP_NO = #{compNo}
+						</if>
+						<if test='"Y" != showAllLowCompany'>
+							<if test="lowCompNo != null and lowCompNo != ''">
+								AND A.COMP_NO = #{lowCompNo} AND CP.UP_COMP_NO = #{compNo}
+							</if>
+							<if test="lowCompNo == null or lowCompNo == ''">
+								<if test="compNo != null and compNo != ''">
+									AND     A.COMP_NO = #{compNo}
+								</if>
+							</if>
+						</if>
+						<if test="loginId != null and loginId != ''">
+							AND B.LOGIN_ID = #{loginId }
+						</if>
+						<if test="mbrNm != null and mbrNm != ''">
+							AND B.MBR_NM = #{mbrNm }
+						</if>
+						<if test="sysDelYn != null and sysDelYn != ''">
+							AND A.SYS_DEL_YN = #{sysDelYn }
+						</if>
+						<if test="sysRegDtmStart != null">
+							AND A.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+							AND A.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+						<if test="goodsEstmNo != null and goodsEstmNo != 0">
+							AND A.GOODS_ESTM_NO = #{goodsEstmNo}
+						</if>
+					) A 
+					WHERE 1 = 1
+					<if test="tabFlag == null or tabFlag == ''">
+						<if test="startLkeCnt != null and startLkeCnt != ''">
+							<![CDATA[
+							AND ESTM_ACTN_LKE >= #{startLkeCnt}
+							]]>
+						</if>
+						<if test="endLkeCnt != null and endLkeCnt != ''">
+							<![CDATA[
+							AND ESTM_ACTN_LKE <= #{endLkeCnt}
+							]]>
+						</if>
+						<if test="rptpCnt != null and rptpCnt != ''">
+							AND ESTM_ACTN_RPT = #{rptpCnt}
+						</if>
+						<if test="rptpRsn != null and rptpRsn != ''">
+							<![CDATA[
+							AND ESTM_ACTN_RPT > 0
+							]]>
+						</if>
+					</if>
+				) X 
+			<choose>
+				<when test='searchOrderBy != null and searchOrderBy.equals("S")'>
+					ORDER BY ESTM_SCORE ASC, SYS_REG_DTM ASC
+				</when>
+				<when test='searchOrderBy != null and searchOrderBy.equals("L")'>
+					ORDER BY ESTM_ACTN_LKE ASC, SYS_REG_DTM ASC
+				</when>
+				<otherwise>
+					ORDER BY SYS_REG_DTM ASC
+				</otherwise>
+			</choose>
+			) Y
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageGoodsCommentGridCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : goodsComment.pageGoodsCommentGridCount
+			Description : 상품평 목록
+		-->
+		SELECT /* QUERYID(goodsComment.pageGoodsCommentGridCount ) */
+				COUNT(*)
+		FROM (
+			SELECT 	(SELECT COUNT(*) FROM goods_estm_actn gea WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO AND MBR_NO = A.ESTM_MBR_NO AND GOODS_ESTM_ACTN_CD = 'LIKE') ESTM_ACTN_LKE /* 좋아요 개수 */
+					, (	SELECT COUNT(*) 
+						FROM goods_estm_actn gea 
+						WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO 
+						AND MBR_NO = A.ESTM_MBR_NO 
+						AND GOODS_ESTM_ACTN_CD = 'RPT'  
+						<if test="tabFlag == null or tabFlag == ''">
+							<if test="rptpRsn != null and rptpRsn != ''">
+								AND RPTP_RSN_CD = #{rptpRsn}
+							</if>
+						</if>
+					) ESTM_ACTN_RPT /* 신고 개수 */
+			FROM	GOODS_COMMENT A JOIN GOODS_COMMENT_LINK GCL ON A.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO 
+			JOIN MEMBER_BASE B ON (A.ESTM_MBR_NO = B.MBR_NO )
+			JOIN ST_STD_INFO S ON A.ST_ID = S.ST_ID
+			JOIN COMPANY_BASE CP ON (A.COMP_NO = CP.COMP_NO)
+			LEFT JOIN ORDER_DETAIL OD ON OD.GOODS_ESTM_NO = A.GOODS_ESTM_NO
+			LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+			LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+			WHERE 1 = 1
+			AND A.SYS_DEL_YN = 'N'
+  			AND (A.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+				OR 
+				(A.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+				AND
+				PLB.PET_LOG_NO IS NOT NULL
+				AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+				)
+			<if test="stId != null and stId != ''" >
+				AND A.ST_ID = #{stId }
+			</if>
+			<if test="goodsId != null and goodsId != ''" >
+				AND GCL.GOODS_ID = #{goodsId }
+			</if>
+			<if test="estmScore != null and estmScore != ''" >
+				AND A.ESTM_SCORE = #{estmScore }
+			</if>
+			<if test="goodsEstmTp != null and goodsEstmTp != ''" >
+				AND A.GOODS_ESTM_TP = #{goodsEstmTp }
+			</if>
+			<if test="dispYn != null and dispYn != ''" >
+				AND A.DISP_YN = #{dispYn }
+			</if>
+			<if test="bestYn != null and bestYn != ''" >
+				AND GCL.BEST_YN = #{bestYn }
+			</if>
+			<if test="estmMbrNo != null " >
+				AND A.ESTM_MBR_NO = #{estmMbrNo}
+			</if>
+			<if test="goodsIds != null" >
+				<foreach collection="goodsIds" item="item" separator="," open="AND A.GOODS_ID IN (" close=")" >
+					#{item }
+				</foreach>
+			</if>
+			<if test="estmMbrNos != null" >
+				<foreach collection="estmMbrNos" item="item" separator="," open="AND A.ESTM_MBR_NO IN (" close=")" >
+					#{item }
+				</foreach>
+			</if>
+			<if test='"Y" == showAllLowCompany'>
+				AND CP.UP_COMP_NO = #{compNo}
+			</if>
+			<if test='"Y" != showAllLowCompany'>
+				<if test="lowCompNo != null and lowCompNo != ''">
+					AND A.COMP_NO = #{lowCompNo} AND CP.UP_COMP_NO = #{compNo}
+				</if>
+				<if test="lowCompNo == null or lowCompNo == ''">
+					<if test="compNo != null and compNo != ''">
+						AND     A.COMP_NO = #{compNo}
+					</if>
+				</if>
+			</if>
+			<if test="loginId != null and loginId != ''">
+				AND B.LOGIN_ID = #{loginId }
+			</if>
+			<if test="mbrNm != null and mbrNm != ''">
+				AND B.MBR_NM = #{mbrNm }
+			</if>
+			<if test="sysDelYn != null and sysDelYn != ''">
+				AND A.SYS_DEL_YN = #{sysDelYn }
+			</if>
+			AND A.SYS_DEL_YN = 'N'
+			<if test="sysRegDtmStart != null">
+				AND A.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+				AND A.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>
+			<if test="goodsEstmNo != null and goodsEstmNo != 0">
+				AND A.GOODS_ESTM_NO = #{goodsEstmNo}
+			</if>
+		) X
+		WHERE 1 = 1 
+		<if test="tabFlag == null or tabFlag == ''">
+			<if test="startLkeCnt != null and startLkeCnt != ''">
+				<![CDATA[
+				AND ESTM_ACTN_LKE >= #{startLkeCnt}
+				]]>
+			</if>
+			<if test="endLkeCnt != null and endLkeCnt != ''">
+				<![CDATA[
+				AND ESTM_ACTN_LKE <= #{endLkeCnt}
+				]]>
+			</if>
+			<if test="rptpCnt != null and rptpCnt != ''">
+				AND ESTM_ACTN_RPT = #{rptpCnt}
+			</if>
+			<if test="rptpRsn != null and rptpRsn != ''">
+				<![CDATA[
+				AND ESTM_ACTN_RPT > 0
+				]]>
+			</if>
+		</if>
+	</select>
+
+
+	<select id="getGoodsComment" resultMap="goodsCommentMap" >
+		<!-- 
+			Query Name : goodsComment.getGoodsComment
+			Description : 상품평 상세
+		-->
+		SELECT	GC.GOODS_ESTM_NO	/* 상품평 번호 */
+				  , GCL.GOODS_ID		/* 상품 번호 */
+				  , GC.TTL				/* 제목 */
+				  , GC.CONTENT			/* 내용 */
+				  , GC.ESTM_SCORE		/* 평가 점수 */
+				  , GCL.BEST_YN			/* BEST 여부 */
+				  , GC.DISP_YN 			/* 전시 여부 */
+				  , GC.GOODS_ESTM_TP	/* 상품 평가 유형 */
+				  , GC.ESTM_MBR_NO		/* 작성자 */
+				  , FN_GET_USER_ID(GC.ESTM_MBR_NO) AS ESTM_MBR_ID /* 작성자ID */ 
+				  , GC.IMG_REG_YN		/* 이미지 등록 여부 */
+				  , (SELECT COUNT(*)
+				  	FROM GOODS_ESTM_ACTN G1
+				  	WHERE 1=1
+				  	  AND G1.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+				  	  AND G1.GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+				  	) AS LIKE_CNT 		/* 좋아요 수 */
+			<!--   ,  CASE WHEN GEA.MBR_NO IS NULL THEN 'N' ELSE 'Y' END AS RCOM_YN -->
+				  , MB.NICK_NM			/* 닉네임 */
+				  , MB.PRFL_IMG			/* 프로필 이미지 */
+				  , GC.PET_NM			/* 펫 이름 */
+				  , GC.PET_GD_GB_CD		/* 펫 성별 */
+				  , GC.AGE				/* 펫 나이 */
+				  , GC.WEIGHT 			/* 펫 무게 */
+				  , GC.SYS_REG_DTM		/* 작성일자 */				  
+				  , GC.SNCT_YN			/* 제제 여부 */
+				  , GC.SNCT_RSN 		/* 제제 사유 */
+				  , GC.PET_NO 			/* 펫 번호 */
+				  , GC.PET_GB_CD 		/* 펫 구분 코드 */
+				  , GC.PET_KIND_NM 		/* 펫 종류 명  */
+				  , GC.PET_NM 			/* 펫 이름 */
+				  , GC.BIRTH 			/* BIRTH */
+				  , GC.`MONTH` 			/* MONTH */
+				  , GC.ALLERGY_YN 		/* 알러지 여부 */
+				  , GC.FIXING_YN 		/* 중성화 여부 */
+				  , GC.WRY_DA_YN 		/* 염려질환여부 */
+				  , GC.IMG_PATH 		/* 이미지경로 */				  
+				  , (SELECT PLB.PET_LOG_NO FROM PET_LOG_BASE PLB
+						JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM
+						ON PLGRM.PET_LOG_NO = PLB.PET_LOG_NO
+						WHERE PLGRM.GOODS_ESTM_NO = GC.GOODS_ESTM_NO) AS PET_LOG_NO
+			FROM GOODS_COMMENT GC
+			JOIN GOODS_COMMENT_LINK GCL
+			  ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO 
+			<if test="!(goodsId != null and goodsId != '')">
+			  AND GC.GOODS_ID = GCL.GOODS_ID
+			</if>
+			JOIN MEMBER_BASE MB
+			  ON GC.ESTM_MBR_NO = MB.MBR_NO
+			WHERE	1 = 1
+			<if test="goodsId != null and goodsId != ''">
+			  AND	GCL.GOODS_ID = #{goodsId}
+			</if>
+			<if test="estmMbrNo != null and estmMbrNo != ''">
+			  AND	GC.ESTM_MBR_NO = #{estmMbrNo}
+			</if>
+			  AND	GC.GOODS_ESTM_TP = #{goodsEstmTp}
+			  AND	GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			  AND	GC.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+
+	<select id="listGoodsCommentImage" resultType="biz.app.goods.model.GoodsCommentImageVO" >
+		<!--
+			Query Name : goodsComment.listGoodsCommentImage
+			Description : 상품평 상세
+		-->
+		SELECT @ROWNUM := @ROWNUM + 1 ROWNUM, A.* FROM (SELECT @ROWNUM := 0 ) VAR, (
+			SELECT	/* QUERYID(goodsComment.listGoodsCommentImage ) */
+			GOODS_ESTM_NO		/* 상품 평가 번호 */
+			, IMG_PATH			/* 이미지 경로 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, IMG_SEQ			/* 이미지 순번 */
+			, VD_YN				/* 동영상 여부 */
+			, (CASE WHEN VD_YN = 'Y' THEN 1 ELSE 0 END) VD_NO /* 이미지 우선 처리. */
+			FROM GOODS_COMMENT_IMAGE
+			WHERE	1 = 1
+			AND		GOODS_ESTM_NO		= #{goodsEstmNo }
+		) A
+		ORDER BY VD_NO, IMG_SEQ
+	</select>
+
+	<update id="updateGoodsCommentBo" parameterType="biz.app.goods.model.GoodsCommentPO" >
+		<!--
+			Query Name : goodsComment.updateGoodsCommentBo
+			Description : 상품평 수정 [BO]
+		-->
+		UPDATE	GOODS_COMMENT SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				, SYS_DEL_RSN		= #{sysDelRsn }			/* 시스템 삭제 사유 */
+			<if test="rcomYn != null">
+				, RCOM_YN			= #{rcomYn }			/* 추천 여부 */
+			</if>
+			<if test="sysDelYn != null and sysDelYn == &quot;Y&quot;" >
+				, SYS_DEL_YN		= #{sysDelYn }			/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		= #{sysUpdrNo }			/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		= #{sysUpdDtm }			/* 시스템 삭제 일시 */
+			</if>
+			<if test="sysDelYn != null and sysDelYn == &quot;N&quot;" >
+				, SYS_DEL_YN		= 'N'			/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		= NULL			/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		= NULL			/* 시스템 삭제 일시 */
+			</if>
+		WHERE	1 = 1
+		AND		GOODS_ESTM_NO		= #{goodsEstmNo }
+	</update>
+
+	<select id="getGoodsCommentCountByOrd" resultType="Integer" >
+		<!--
+			Query Name : goodsComment.getGoodsCommentCountByOrd
+			Description : 주문번호에 해당하는 상품평 갯수조회
+		-->
+		SELECT COUNT(*) 
+		  FROM GOODS_COMMENT GC 
+		 WHERE GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}' 
+		   AND GC.GOODS_ID = 
+		       (
+			       SELECT GOODS_ID 
+			         FROM ORDER_DETAIL OD 
+			        WHERE OD.ORD_NO = #{ordNo} 
+			          AND OD.ORD_DTL_SEQ = #{ordDtlSeq} 
+		       ) 
+	</select>
+	
+	
+	<!-- [FO] 상품평 구매 만족도 -->
+	<select id="getGoodsCommentScore" resultType="biz.app.goods.model.GoodsCommentScoreVO">
+	(
+		SELECT 
+			'0' AS ESTM_SCORE
+		  , COUNT(*) AS SCORE_TOTAL
+		  , AVG(ESTM_SCORE) AS ESTM_AVG
+		FROM
+			GOODS_COMMENT GC
+		JOIN
+			GOODS_COMMENT_LINK GCL 
+		  ON
+			GCL.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+		JOIN MEMBER_BASE MB
+		  ON GC.ESTM_MBR_NO = MB.MBR_NO
+   LEFT JOIN
+			ORDER_DETAIL OD
+		  ON
+			OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+		WHERE 1 = 1
+		<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+			AND	GCL.GOODS_ID = #{goodsId}
+		</if>
+		<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+			AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+									FROM GOODS_CSTRT_PAK GCP
+									WHERE GCP.GOODS_ID = #{goodsId})
+		</if>
+			AND	(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+				OR 
+				(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+				AND PLB.PET_LOG_NO IS NOT NULL
+				AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+				)
+			AND	GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND	GC.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			
+	)
+	UNION ALL
+	(
+		SELECT
+			GC2.ESTM_SCORE
+		  , COUNT(*) AS SCORE_TOTAL
+		  , AVG(ESTM_SCORE) AS ESTM_AVG
+		FROM
+			GOODS_COMMENT GC2
+		JOIN
+			GOODS_COMMENT_LINK GCL2 
+		  ON
+			GCL2.GOODS_ESTM_NO = GC2.GOODS_ESTM_NO
+		JOIN MEMBER_BASE MB
+		  ON GC2.ESTM_MBR_NO = MB.MBR_NO
+   LEFT JOIN
+			ORDER_DETAIL OD
+		  ON
+			OD.GOODS_ESTM_NO = GC2.GOODS_ESTM_NO
+   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL2.GOODS_ESTM_NO)
+   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+		WHERE 1 = 1
+		<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+			AND	GCL2.GOODS_ID = #{goodsId}
+		</if>
+		<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+			AND	GCL2.GOODS_ID IN (SELECT GCP2.SUB_GOODS_ID
+									FROM GOODS_CSTRT_PAK GCP2
+									WHERE GCP2.GOODS_ID = #{goodsId})
+		</if>
+			AND	(GC2.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+				OR 
+				(GC2.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+				AND PLB.PET_LOG_NO IS NOT NULL
+				AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+				)
+			AND	GC2.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND	GC2.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND GC2.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			
+		GROUP BY
+			GC2.ESTM_SCORE
+	)
+	</select>
+	
+	<resultMap id="getGoodsEstmMap" type="biz.app.goods.model.GoodsEstmQstVO">
+		<id property="estmQstNo"			column="ESTM_QST_NO" />
+		<result property="goodsId"			column="GOODS_ID" />
+		<result property="goodsCstrtTpCd"			column="GOODS_CSTRT_TP_CD" />
+		
+		<collection property="estmQstVOList"
+			column="{estmQstNo=ESTM_QST_NO, goodsId=GOODS_ID, goodsCstrtTpCd=GOODS_CSTRT_TP_CD}"
+			javaType="java.util.ArrayList"
+			ofType="biz.app.goods.model.GoodsEstmQstVO"
+			select="getGoodsEstmList"
+		/>
+	</resultMap>
+	
+	<select id="getGoodsEstm" resultMap="getGoodsEstmMap">
+		SELECT
+			GEQCM.ESTM_QST_NO
+			, GB.GOODS_ID
+			, GB.GOODS_CSTRT_TP_CD
+		FROM GOODS_ESTM_QST_CTG_MAP GEQCM
+		JOIN GOODS_BASE GB ON GB.GOODS_ESTM_DISP_CLSF_NO = GEQCM.DISP_CLSF_NO
+		WHERE GB.GOODS_ID = #{goodsId}
+	</select>
+	
+	<!-- [FO] 상품평 평가 결과 리스트 조회 -->
+	<select id="getGoodsEstmList" resultType="biz.app.goods.model.GoodsEstmQstVO">
+		SELECT
+			*
+		FROM(
+				(SELECT
+					GEQ.ESTM_QST_NO
+				  , GEQ.QST_CLSF
+				  , GEQ.QST_CONTENT
+				  , GEI.ESTM_ITEM_NO
+				  , GEI.ITEM_CONTENT
+				  , NULL AS ESTM_CNT
+				  , GEQCM.DISP_SEQ AS SEQ1
+				  , GEI.DISP_SEQ AS SEQ2
+				FROM GOODS_ESTM_QST GEQ 
+				JOIN GOODS_ESTM_ITEM GEI
+				  ON GEI.ESTM_QST_NO = GEQ.ESTM_QST_NO 
+				JOIN GOODS_ESTM_QST_CTG_MAP GEQCM
+				  ON GEQCM.ESTM_QST_NO = GEQ.ESTM_QST_NO 
+				WHERE
+					GEQCM.DISP_CLSF_NO =
+						(SELECT GB.GOODS_ESTM_DISP_CLSF_NO
+						FROM GOODS_BASE GB
+						WHERE GB.GOODS_ID=#{goodsId})
+				 AND GEQ.ESTM_QST_NO = #{estmQstNo}
+			)
+			UNION ALL
+				(SELECT
+					GEQ.ESTM_QST_NO
+				  , GEQ.QST_CLSF
+				  , GEQ.QST_CONTENT
+				  , GEI.ESTM_ITEM_NO
+				  , GEI.ITEM_CONTENT
+				  , COUNT(*) AS ESTM_CNT
+				  , GEQCM.DISP_SEQ AS SEQ1
+				  , GEI.DISP_SEQ AS SEQ2
+				FROM GOODS_ESTM_RPL GER
+				JOIN GOODS_ESTM_QST GEQ
+				  ON GER.ESTM_QST_NO  = GEQ.ESTM_QST_NO
+				JOIN GOODS_ESTM_ITEM GEI
+				  ON GEI.ESTM_ITEM_NO = GER.ESTM_ITEM_NO
+				JOIN GOODS_ESTM_QST_CTG_MAP GEQCM
+				  ON GEQ.ESTM_QST_NO = GEQCM.ESTM_QST_NO
+				JOIN GOODS_COMMENT_LINK GCL
+				  ON GCL.GOODS_ESTM_NO = GER.GOODS_ESTM_NO
+				JOIN GOODS_COMMENT GC
+				  ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO
+		   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+		   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+				WHERE 1 = 1
+				  AND	GEQCM.DISP_CLSF_NO =
+						(SELECT GB.GOODS_ESTM_DISP_CLSF_NO
+						FROM GOODS_BASE GB
+						WHERE GB.GOODS_ID=#{goodsId})
+				<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+				  AND	GCL.GOODS_ID = #{goodsId}
+				</if>
+				<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+				  AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 					   FROM GOODS_CSTRT_PAK GCP 
+										  WHERE GCP.GOODS_ID = #{goodsId})
+				</if>
+				  AND	GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+				  AND	GC.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				  AND	GC.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				  AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				  AND	GEQ.ESTM_QST_NO = #{estmQstNo}
+				GROUP BY GEI.ESTM_ITEM_NO
+			)
+			ORDER BY ESTM_CNT DESC
+			) AS A
+		GROUP BY ESTM_QST_NO, QST_CONTENT, ESTM_ITEM_NO, ITEM_CONTENT
+		ORDER BY SEQ1, SEQ2
+	</select>
+	
+	<!-- [FO] 상품평 이미지 리스트 -->
+	<select id="getGoodsPhotoComment" resultType="biz.app.goods.model.GoodsCommentImageVO">
+		SELECT T.*
+		FROM(
+			SELECT A.GOODS_ESTM_NO
+				 , A.IMG_PATH
+				 , COUNT(*) AS IMG_CNT
+			FROM(
+				SELECT
+						GC.GOODS_ESTM_NO
+					  , GCI.IMG_PATH 
+				FROM
+						GOODS_COMMENT GC 
+				JOIN	GOODS_COMMENT_IMAGE GCI 
+				  ON	GCI.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+				JOIN	GOODS_COMMENT_LINK GCL
+				  ON	GCL.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+		   LEFT JOIN	ORDER_DETAIL OD
+				  ON	OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+				JOIN	MEMBER_BASE MB
+				  ON	GC.ESTM_MBR_NO = MB.MBR_NO
+			   WHERE	1 = 1
+				<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+					 AND	GCL.GOODS_ID = #{goodsId}
+				</if>
+				<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+					 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 						FROM GOODS_CSTRT_PAK GCP 
+											WHERE GCP.GOODS_ID = #{goodsId})
+				</if>
+				 AND	IMG_REG_YN	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SYS_DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SNCT_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}' 
+				ORDER BY GCI.IMG_SEQ ASC
+			) AS A
+			GROUP BY A.GOODS_ESTM_NO
+			ORDER BY A.GOODS_ESTM_NO DESC
+		) AS T
+		<if test="offset != null and offset != 0">
+			<include refid="bizCommon.pageSql" />
+		</if>
+	</select>
+	
+	<select id="getGoodsPhotoCommentCount" resultType="java.lang.Long">
+		SELECT count(*)
+		FROM(
+			SELECT A.GOODS_ESTM_NO
+				 , A.IMG_PATH
+				 , COUNT(*) AS IMG_CNT
+			FROM(
+				SELECT
+						GC.GOODS_ESTM_NO
+					  , GCI.IMG_PATH 
+				FROM
+						GOODS_COMMENT GC 
+				JOIN	GOODS_COMMENT_IMAGE GCI 
+				  ON	GCI.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+				JOIN	GOODS_COMMENT_LINK GCL
+				  ON	GCL.GOODS_ESTM_NO = GC.GOODS_ESTM_NO  
+		   LEFT JOIN	ORDER_DETAIL OD
+				  ON	OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+				JOIN MEMBER_BASE MB
+				  ON GC.ESTM_MBR_NO = MB.MBR_NO
+		   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM ON (PLGRM.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+		   LEFT JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLGRM.PET_LOG_NO)
+			   WHERE	1 = 1
+				<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+					 AND	GCL.GOODS_ID = #{goodsId}
+				</if>
+				<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+					 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 						FROM GOODS_CSTRT_PAK GCP 
+											WHERE GCP.GOODS_ID = #{goodsId})
+				</if>
+				AND	(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+					OR 
+					(GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+					AND PLB.PET_LOG_NO IS NOT NULL
+					AND	OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+					)
+				 AND	IMG_REG_YN	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SYS_DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SNCT_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}'
+				ORDER BY GCI.IMG_SEQ ASC
+			) AS A
+			GROUP BY A.GOODS_ESTM_NO
+			ORDER BY A.GOODS_ESTM_NO DESC
+		) AS T
+	</select>
+	
+	<!-- [FO] 상품평 이미지 리스트 -->
+	<select id="getGoodsPhotoCommentAll" resultType="biz.app.goods.model.GoodsCommentImageVO">
+		SELECT T.*
+		FROM(
+			SELECT A.GOODS_ESTM_NO
+				 , A.IMG_PATH
+				 , COUNT(*) AS IMG_CNT
+			FROM(
+				SELECT
+						GC.GOODS_ESTM_NO
+					  , GCI.IMG_PATH 
+				FROM
+						GOODS_COMMENT GC 
+				JOIN	GOODS_COMMENT_IMAGE GCI 
+				  ON	GCI.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+				JOIN	GOODS_COMMENT_LINK GCL
+				  ON	GCL.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+			LEFT JOIN	ORDER_DETAIL OD
+				  ON	OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+				JOIN	MEMBER_BASE MB
+				  ON	GC.ESTM_MBR_NO = MB.MBR_NO
+			   WHERE	1 = 1
+				<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+					 AND	GCL.GOODS_ID = #{goodsId}
+				</if>
+				<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+					 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 						FROM GOODS_CSTRT_PAK GCP 
+											WHERE GCP.GOODS_ID = #{goodsId})
+				</if>
+				 AND	IMG_REG_YN	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SYS_DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.SNCT_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND	GC.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_NOR}' 
+				ORDER BY GCI.IMG_SEQ ASC
+			) AS A
+			GROUP BY A.GOODS_ESTM_NO
+			ORDER BY A.GOODS_ESTM_NO DESC
+		) AS T
+	</select>
+	
+	
+	<resultMap type="biz.app.goods.model.GoodsEstmQstVO" id="goodsEstmQstMap">
+		<id     property="estmQstNo"	column="ESTM_QST_NO"/>		<!-- 상품 번호 -->
+		<result property="qstContent"	column="QST_CONTENT"/>		<!-- 상품 명 -->
+		<collection property="estmQstVOList" column="ESTM_QST_NO" javaType="java.util.ArrayList"
+					ofType="biz.app.goods.model.GoodsEstmQstVO" select="goodsEstmQstItemList" />
+	</resultMap>
+	
+	<!-- [FO] 상품평 평가 작성에 필요한 상품 정보 -->
+	<select id="commentWriteInfo" resultType="biz.app.goods.model.GoodsBaseVO">
+		SELECT
+			GB.GOODS_ID 
+		  , CASE PGB.GOODS_CSTRT_TP_CD
+			WHEN 'PAK'
+				THEN PGB.GOODS_NM
+			WHEN 'ATTR'
+				THEN PGB.GOODS_NM
+			ELSE GB.GOODS_NM 
+			  	END AS GOODS_NM					/* 상품 명 */
+		  , GI.IMG_PATH
+		  , CASE PGB.GOODS_CSTRT_TP_CD
+			WHEN 'PAK'
+				THEN GB.GOODS_NM
+			WHEN 'ATTR'
+				THEN AT.ATTR_VAL
+			ELSE NULL
+			END AS CSTRT_SHOW_NM	/* 구성 노출 명 */
+		FROM GOODS_BASE GB 
+		JOIN GOODS_IMG GI 
+		  ON GI.GOODS_ID = GB.GOODS_ID
+		 AND GI.DLGT_YN = 'Y'
+   LEFT JOIN (SELECT T.GOODS_ID, T.PAK_GOODS_ID
+			 	FROM ORDER_DETAIL T
+			   WHERE 1 = 1
+			 	 AND T.ORD_NO = #{ordNo}
+			 	 AND T.ORD_DTL_SEQ = #{ordDtlSeq}
+			 ) OD
+		  ON OD.GOODS_ID = GB.GOODS_ID
+		LEFT JOIN GOODS_BASE PGB
+		  ON PGB.GOODS_ID = OD.PAK_GOODS_ID
+		LEFT JOIN (SELECT GA.GOODS_ID
+			   , GROUP_CONCAT(CONCAT(A.ATTR_NM , ' : ', AV.ATTR_VAL) ORDER BY GA.DISP_PRIOR_RANK SEPARATOR ' / ') AS ATTR_VAL
+			FROM GOODS_ATTRIBUTE GA 
+			JOIN `ATTRIBUTE` A ON A.ATTR_NO = GA.ATTR_NO 
+			JOIN ATTRIBUTE_VALUE AV ON AV.ATTR_NO = A.ATTR_NO
+			JOIN ITEM_ATTRIBUTE_VALUE IAV
+			  ON IAV.ATTR_NO = AV.ATTR_NO 
+			 AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+			JOIN ITEM I
+			  ON I.ITEM_NO = IAV.ITEM_NO
+			 AND I.GOODS_ID = GA.GOODS_ID 
+		   WHERE 1 = 1
+			 AND A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			 AND AV.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		   GROUP BY GA.GOODS_ID
+		   ORDER BY GA.DISP_PRIOR_RANK
+		 ) AT
+		  ON AT.GOODS_ID = OD.GOODS_ID
+		WHERE 1 = 1
+		<if test="goodsEstmNo != null and goodsEstmNo != ''">
+		AND GB.GOODS_ID = (SELECT GOODS_ID FROM GOODS_COMMENT WHERE GOODS_ESTM_NO = #{goodsEstmNo})
+		</if>
+		<if test="goodsEstmNo == null || goodsEstmNo == ''">
+		AND GB.GOODS_ID = #{goodsId}
+		</if>
+		GROUP BY GOODS_ID
+	</select>
+	
+	<!-- [FO] 상품평 평가 작성에 필요한 상품 평가 문항 -->
+	<select id="goodsEstmQstList" resultMap="goodsEstmQstMap">
+		SELECT
+			GEQ.ESTM_QST_NO 
+		  , GEQ.QST_CONTENT
+		FROM GOODS_ESTM_QST GEQ
+		JOIN GOODS_ESTM_QST_CTG_MAP GEQCM 
+		  ON GEQCM.ESTM_QST_NO = GEQ.ESTM_QST_NO 
+		JOIN GOODS_BASE GB 
+		  ON GB.GOODS_ESTM_DISP_CLSF_NO = GEQCM.DISP_CLSF_NO
+		WHERE GB.GOODS_ID = #{goodsId}
+	</select>
+	
+	<!-- [FO] 상품평 평가 작성에 필요한 상품 평가 문항 -->
+	<select id="goodsEstmQstItemList" resultType="biz.app.goods.model.GoodsEstmQstVO">
+		SELECT
+			GEQ.ESTM_QST_NO 
+		  , GEI.ESTM_ITEM_NO 
+		  , GEI.ITEM_CONTENT
+		FROM GOODS_ESTM_QST GEQ 
+		JOIN GOODS_ESTM_ITEM GEI 
+		  ON GEI.ESTM_QST_NO = GEQ.ESTM_QST_NO 
+		WHERE GEQ.ESTM_QST_NO = #{estmQstNo}
+	</select>
+	
+	<!-- [FO] 상품평 평가 작성에 필요한 작성자 펫 정보 -->
+	<select id="petBaseList" resultType="biz.app.pet.model.PetBaseVO">
+		SELECT 
+			PB.PET_NO 
+		  , PB.PET_GB_CD 
+		  , PB.IMG_PATH
+		  , PB.PET_KIND_NM  
+		  , PB.PET_NM 
+		  , PB.AGE 
+		  , PB.BIRTH 
+		  , PB.`MONTH` 
+		  , PB.WEIGHT 
+		  , PB.PET_GD_GB_CD
+		  , PB.ALLERGY_YN 
+		  , PB.FIXING_YN 
+		  , PB.WRY_DA_YN 
+		FROM PET_BASE PB 
+		WHERE PB.MBR_NO = #{estmMbrNo}
+	</select>
+	
+	<insert id="insertGoodsEstmRpl" parameterType="biz.app.goods.model.GoodsEstmRplPO">
+	<selectKey keyProperty="estmRplNo" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_ESTM_RPL_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_ESTM_RPL
+			(
+				ESTM_RPL_NO
+			  , GOODS_ESTM_NO
+			  , ESTM_QST_NO
+			  , ESTM_ITEM_NO
+			  , ESTM_SCORE
+			  , SYS_REGR_NO		/* 시스템 등록자 번호 */
+			  , SYS_REG_DTM		/* 시스템 등록 일시 */
+			  , SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM		/* 시스템 수정 일시 */
+			)
+		VALUES
+			(
+				#{estmRplNo}
+			  , #{goodsEstmNo}
+			  , #{estmQstNo}
+			  , #{estmItemNo}
+			  , null
+			  , #{sysRegrNo}
+			  , NOW()
+			  , #{sysRegrNo}
+			  , NOW()
+			)
+	</insert>
+	
+	<update id="updateGoodsEstmRpl" parameterType="biz.app.goods.model.GoodsEstmRplPO">
+		<!--
+			Query Name : goodsComment.updateGoodsEstmRpl
+			Description : 상품평 수정
+		-->
+		UPDATE GOODS_ESTM_RPL
+		SET
+			ESTM_QST_NO		= #{estmQstNo}
+			, ESTM_ITEM_NO		= #{estmItemNo}
+			,SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM		= SYSDATE()		/* 시스템 수정 일시 */
+		WHERE ESTM_RPL_NO		= #{estmRplNo}
+		
+	</update>
+	
+	<insert id="insertGoodsCommentLink" parameterType="biz.app.goods.model.GoodsCommentPO">
+		INSERT INTO GOODS_COMMENT_LINK 
+			  (
+			  	GOODS_ID 
+			  	, GOODS_ESTM_NO
+			  	, BEST_YN
+			  	, SYS_REGR_NO 
+			  	, SYS_REG_DTM 
+			  )
+		VALUES(
+		  	#{goodsId}
+		  	, #{goodsEstmNo}
+		  	, '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		  	, #{sysRegrNo}
+		  	, NOW()
+  		)
+	</insert>
+	
+	<select id="commentLikeCheck" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM GOODS_ESTM_ACTN
+		WHERE GOODS_ESTM_NO = #{goodsEstmNo}
+		AND MBR_NO = #{sysRegrNo}
+		AND GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+	</select>
+	
+	<select id="searchReportGoodsComment" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM GOODS_ESTM_ACTN
+		WHERE GOODS_ESTM_NO = #{goodsEstmNo}
+		AND MBR_NO = #{sysRegrNo}
+		AND GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_RPT}'
+	</select>
+	
+	<insert id="reportGoodsComment" parameterType="biz.app.goods.model.GoodsCommentPO">
+		INSERT INTO GOODS_ESTM_ACTN
+			(
+			GOODS_ESTM_NO
+			, MBR_NO
+			, GOODS_ESTM_ACTN_CD
+			, RPTP_RSN_CD
+			, SYS_REGR_NO 
+			, SYS_REG_DTM 
+			)
+		VALUES
+			(
+			#{goodsEstmNo}
+			, #{sysRegrNo}
+			, '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_RPT}'
+			, #{rptpRsnCd}
+			, #{sysRegrNo}
+			, NOW()
+			)
+	</insert>
+	
+	<delete id="delCommentLike" parameterType="biz.app.goods.model.GoodsCommentPO">
+		DELETE FROM GOODS_ESTM_ACTN
+		WHERE GOODS_ESTM_NO = #{goodsEstmNo}
+		 AND MBR_NO = #{sysRegrNo}
+		 AND GOODS_ESTM_ACTN_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+	</delete>
+	
+	<insert id="addCommentLike" parameterType="biz.app.goods.model.GoodsCommentPO">
+		INSERT INTO GOODS_ESTM_ACTN
+			(
+			GOODS_ESTM_NO
+			, MBR_NO
+			, GOODS_ESTM_ACTN_CD
+			, SYS_REGR_NO 
+			, SYS_REG_DTM 
+			)
+		VALUES
+			(
+			#{goodsEstmNo}
+			, #{sysRegrNo}
+			, '${@framework.common.constants.CommonConstants@GOODS_ESTM_ACTN_LIKE}'
+			, #{sysRegrNo}
+			, NOW()
+			)
+	</insert>
+	
+	<select id="petLogReview" resultType="biz.app.petlog.model.PetLogGoodsVO">
+	<!--
+		Query Name : goodsComment.petlogreview
+		Description : 펫 로그후기(상품)
+	-->
+	SELECT /* QUERYID(goodsComment.petlogreview) */
+		T1.PET_LOG_NO									/* 펫로그 번호 */
+		, RM.GOODS_ESTM_NO
+		, T1.DSCRT											/* 펫로그 내용 */
+		, CMT.GOODS_ID            
+		, CMT.GOODS_ESTM_TP
+		, CMT.ESTM_SCORE
+        , CMT.PET_NO
+        , CMT.AGE
+        , CMT.MONTH
+        , CMT.PET_KIND_NM
+        , CMT.PET_NM
+        , CMT.WEIGHT		
+		, IF( T1.IMG_PATH5 IS NULL, 
+			IF(T1.IMG_PATH4 IS NULL, 
+				IF(T1.IMG_PATH3 IS NULL, 
+				IF(T1.IMG_PATH2 IS NULL, 
+						IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */
+		, CONCAT(
+			 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+			,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+			,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) ) 
+			,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+			,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL			            			
+		, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+		, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+		, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+		, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+		, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+		, T1.PST_NM
+		, T1.VD_PATH 									/* 펫로그 영상 */
+		, T1.VD_THUM_PATH 								/* 펫로그 영상썸네일 경로 */				
+		, T1.CONTS_STAT_CD								/* 펫로그 컨텐츠 상태 코드 */
+        , T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+		, T3.NICK_NM 									/* 펫로그 등록자 닉네임 */
+		, T3.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */	
+        , T1.PET_LOG_CHNL_CD 
+        , (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+		, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+		, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+		, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+		, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */	
+		, CASE #{goodsCstrtTpCd}
+				WHEN 'PAK'
+					THEN GB.GOODS_NM
+				WHEN 'ATTR'
+					THEN AT.ATTR_VAL
+				ELSE NULL
+			END AS OPT_NAME	/* 구매 상품 옵션 값, 구성 노출 명 */
+		, IFNULL((SELECT "Y" FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND MBR_NO = #{mbrNo} AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') , "N") AS LIKE_YN
+		, (SELECT ORD_NO FROM ORDER_DETAIL WHERE GOODS_ESTM_NO = CMT.GOODS_ESTM_NO ) AS ORD_NO
+		, (SELECT ORD_DTL_SEQ FROM ORDER_DETAIL WHERE GOODS_ESTM_NO = CMT.GOODS_ESTM_NO ) AS	ORD_DTL_SEQ
+		, IFNULL((SELECT "Y" FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND MBR_NO = #{mbrNo}) , "N") AS RPT_YN
+		, GCL.BEST_YN
+		, FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@PET_GD_GB}' , PET_GD_GB_CD , '' ) AS PET_GD_NM	/* 펫 성별 */
+		, OD.PAK_GOODS_ID
+		FROM
+			PET_LOG_BASE T1
+			JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = T1.PET_LOG_NO)
+			JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+            JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+			JOIN GOODS_COMMENT_LINK GCL ON (CMT.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO AND CMT.GOODS_ID = GCL.GOODS_ID) 
+			JOIN ORDER_DETAIL OD ON (OD.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+			JOIN GOODS_BASE GB ON (GB.GOODS_ID = OD.GOODS_ID) 
+	   LEFT JOIN (SELECT GA.GOODS_ID
+					   , GROUP_CONCAT(CONCAT(A.ATTR_NM , ' : ', AV.ATTR_VAL) ORDER BY GA.DISP_PRIOR_RANK SEPARATOR ' / ') AS ATTR_VAL
+					FROM GOODS_ATTRIBUTE GA 
+					JOIN `ATTRIBUTE` A ON A.ATTR_NO = GA.ATTR_NO 
+					JOIN ATTRIBUTE_VALUE AV ON AV.ATTR_NO = A.ATTR_NO
+					JOIN ITEM_ATTRIBUTE_VALUE IAV
+					  ON IAV.ATTR_NO = AV.ATTR_NO 
+					 AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+					JOIN ITEM I
+					  ON I.ITEM_NO = IAV.ITEM_NO
+					 AND I.GOODS_ID = GA.GOODS_ID 
+				   WHERE 1 = 1
+					<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+					 AND	GA.GOODS_ID = #{goodsId}
+					</if>
+					<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+					 AND	GA.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+					 						FROM GOODS_CSTRT_PAK GCP 
+											WHERE GCP.GOODS_ID = #{goodsId})
+					</if>
+					 AND A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					 AND AV.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				   GROUP BY GA.GOODS_ID
+				   ORDER BY GA.DISP_PRIOR_RANK) AT
+			ON (AT.GOODS_ID = OD.GOODS_ID)
+            <if test="dispClsfCornNo != null">
+            JOIN DISPLAY_CORNER_ITEM A ON A.PET_LOG_NO = T1.PET_LOG_NO
+            </if>
+		WHERE 1=1
+		<if test="petLogNo != null">
+			AND T1.PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test="dispClsfCornNo != null">
+			AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND NOW() BETWEEN A.DISP_STRTDT AND A.DISP_ENDDT
+		</if>
+		<if test="petLogNo == null || petLogNo == ''">
+				AND T1.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_10}'
+				AND T1.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+				AND (ENC_CPLT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					OR T1.VD_PATH IS NULL)
+				AND CMT.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+				AND CMT.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DISP_STAT_N}'
+				AND OD.GOODS_ESTM_REG_YN = 'Y'
+				AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+			<if test="dispClsfCornNo != null">
+				AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+				AND NOW() BETWEEN A.DISP_STRTDT AND A.DISP_ENDDT
+			</if>
+			<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+				 AND	GCL.GOODS_ID = #{goodsId}
+			</if>
+			<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+				 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+				 						FROM GOODS_CSTRT_PAK GCP 
+										WHERE GCP.GOODS_ID = #{goodsId})
+			</if>
+				<if test="dispClsfCornNo != null">
+				ORDER BY A.DISP_PRIOR_RANK, CMT.SYS_REG_DTM DESC
+				</if>
+				<if test="dispClsfCornNo == null or dispClsfCornNo == ''">
+				ORDER BY CMT.SYS_REG_DTM DESC
+				</if>
+			<if test="petDetailNo == null or petDetailNo == ''">
+				<include refid="bizCommon.pageSql" />
+			</if>
+		</if>
+	</select>
+	
+	<select id="petLogReviewCount" resultType="java.lang.Integer">
+	<!--
+			Query Name	: goodsCommentd.petLogReviewCount
+			Description	: 펫로그 목록 count
+		-->
+		SELECT COUNT(*)
+		FROM /* QUERYID(goodsComment.petLogReviewCount) */
+			PET_LOG_BASE T1
+			LEFT OUTER JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = T1.PET_LOG_NO)
+			LEFT OUTER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+            JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+			JOIN GOODS_COMMENT_LINK GCL ON (CMT.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO) 
+			JOIN ORDER_DETAIL OD ON (OD.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO) 
+			<if test="dispClsfCornNo != null">
+            JOIN DISPLAY_CORNER_ITEM A ON A.PET_LOG_NO = T1.PET_LOG_NO
+            </if>
+		WHERE 1=1
+			AND T1.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_10}'
+			AND T1.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+			AND CMT.GOODS_ESTM_TP = '${@framework.common.constants.CommonConstants@GOODS_ESTM_TP_PLG}'
+			AND CMT.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DISP_STAT_N}'
+			AND OD.GOODS_ESTM_REG_YN = 'Y'
+		<if test="goodsCstrtTpCd == 'ITEM' || goodsCstrtTpCd == 'SET'">
+			 AND	GCL.GOODS_ID = #{goodsId}
+		</if>
+		<if test="goodsCstrtTpCd == 'ATTR' || goodsCstrtTpCd == 'PAK'">
+			 AND	GCL.GOODS_ID IN (SELECT GCP.SUB_GOODS_ID
+			 						FROM GOODS_CSTRT_PAK GCP 
+									WHERE GCP.GOODS_ID = #{goodsId})
+		</if>
+		<if test="dispClsfCornNo != null">
+			AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND NOW() BETWEEN A.DISP_STRTDT AND A.DISP_ENDDT
+			ORDER BY A.DISP_PRIOR_RANK
+		</if>
+	</select>
+	
+	<!--  -->
+	<select id="getMyGoodsComment" resultMap="goodsCommentMap">
+		<!--
+			Query Name	: goodsComment.getMyGoodsComment
+			Description	: 나의 상품 평가
+		-->
+			SELECT
+				GB.GOODS_ID						/* 상품 ID */
+			  , CASE PAKGB.GOODS_CSTRT_TP_CD
+				WHEN 'PAK'
+					THEN PAKGB.GOODS_NM
+				WHEN 'ATTR'
+					THEN PAKGB.GOODS_NM
+				ELSE GB.GOODS_NM
+				END AS GOODS_NM					/* 상품 명 */
+			  , GB.GOODS_CSTRT_TP_CD			/* 구성품 유형 코드 */
+			  , CASE PAKGB.GOODS_CSTRT_TP_CD
+				WHEN 'PAK'
+					THEN GB.GOODS_NM
+				WHEN 'ATTR'
+					THEN AT.ATTR_VAL
+				ELSE NULL
+				END AS CSTRT_SHOW_NM	/* 구성 노출 명 */
+			  , GI.IMG_PATH AS GOODS_IMG_PATH	/* 상품 대표 이미지 */
+			  , OD.ORD_DTL_STAT_CD				/* 주문 상세 상태 코드 */
+			  , OD.SYS_REG_DTM				/* 구매 확정 시간 */
+			  , OB.ORD_ACPT_DTM					/* 주문 시간 */
+			  , GC.GOODS_ESTM_NO				/* 상품 평가 번호 */
+			  , PLGRM.PET_LOG_NO				/* 펫로그 번호 */
+			  , GC.GOODS_ESTM_TP				/* 상품 평가 상태 */
+			  , GEA.LIKE_CNT					/* 좋아요 수 */
+			  , GC.ESTM_SCORE					/* 상품 평가 점수 */
+			  , OD.ORD_NO						/* 주문 번호 */
+			  , OD.ORD_DTL_SEQ					/* 주문 상세 순번 */
+			  , OD.PAK_GOODS_ID					/* 묶음 상품 아이디 */
+			  , PAKGB.GOODS_NM AS PAK_GOODS_NM	/* 묶음 상품 명 */
+		FROM	ORDER_BASE OB
+		JOIN	(SELECT T.*
+				FROM(
+				SELECT OD.ORD_NO
+					 , OD.ORD_DTL_SEQ
+					 , OD.GOODS_ID
+					 , OD.PAK_GOODS_ID
+					 , OD.GOODS_ESTM_NO
+					 , OD.GOODS_ESTM_REG_YN
+					 , OD.ORD_DTL_STAT_CD
+					 , ODSH.SYS_REG_DTM
+				FROM ORDER_BASE OB
+				JOIN ORDER_DETAIL OD 
+				ON OB.ORD_NO = OD.ORD_NO
+				JOIN ORDER_DETAIL_STATUS_HIST ODSH 
+				ON ODSH.ORD_NO = OD.ORD_NO 
+				AND ODSH.ORD_DTL_SEQ = OD.ORD_DTL_SEQ 
+				AND ODSH.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+				WHERE OD.GOODS_ESTM_REG_YN = #{goodsEstmRegYn}
+				AND OB.MBR_NO = #{mbrNo}
+				ORDER BY ODSH.SYS_REG_DTM ASC) AS T
+				GROUP BY T.ORD_NO, T.ORD_DTL_SEQ) AS OD
+		  ON OB.ORD_NO = OD.ORD_NO
+		JOIN	GOODS_BASE GB
+		  ON GB.GOODS_ID = OD.GOODS_ID 
+		JOIN	GOODS_IMG GI
+		  ON GI.GOODS_ID = GB.GOODS_ID 
+		 AND GI.DLGT_YN = 'Y'
+   LEFT JOIN (SELECT GA.GOODS_ID
+				   , GROUP_CONCAT(CONCAT(A.ATTR_NM , ' : ', AV.ATTR_VAL) ORDER BY GA.DISP_PRIOR_RANK SEPARATOR ' / ') AS ATTR_VAL
+				FROM GOODS_ATTRIBUTE GA 
+				JOIN `ATTRIBUTE` A ON A.ATTR_NO = GA.ATTR_NO 
+				JOIN ATTRIBUTE_VALUE AV ON AV.ATTR_NO = A.ATTR_NO
+				JOIN ITEM_ATTRIBUTE_VALUE IAV
+				  ON IAV.ATTR_NO = AV.ATTR_NO 
+				 AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+				JOIN ITEM I
+				  ON I.ITEM_NO = IAV.ITEM_NO
+				 AND I.GOODS_ID = GA.GOODS_ID 
+			   WHERE 1 = 1
+				 AND A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				 AND AV.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			   GROUP BY GA.GOODS_ID
+			   ORDER BY GA.DISP_PRIOR_RANK
+			 ) AT
+		  ON AT.GOODS_ID = OD.GOODS_ID
+   LEFT JOIN (SELECT T.GOODS_ESTM_NO
+				   , T.GOODS_ESTM_TP
+				   , T.ESTM_SCORE
+				   , T.SYS_REG_DTM
+				FROM GOODS_COMMENT T
+			   WHERE 1 = 1
+				 AND T.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				 AND T.SNCT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				 AND T.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			 ) GC
+		  ON GC.GOODS_ESTM_NO = OD.GOODS_ESTM_NO
+   LEFT JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM 
+   		  ON PLGRM.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+   LEFT JOIN (SELECT T.GOODS_ESTM_NO
+				   , COUNT(*) AS LIKE_CNT
+				FROM GOODS_ESTM_ACTN T
+			   GROUP BY T.GOODS_ESTM_NO
+			 ) GEA
+		  ON GEA.GOODS_ESTM_NO = OD.GOODS_ESTM_NO
+   LEFT JOIN (SELECT T.GOODS_ID
+				   , T.GOODS_NM
+				   , T.GOODS_CSTRT_TP_CD
+				FROM GOODS_BASE T
+   			 ) PAKGB
+   		  ON PAKGB.GOODS_ID = OD.PAK_GOODS_ID
+	   WHERE 1 = 1
+		 AND OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+		 AND OB.MBR_NO = #{mbrNo}
+		 AND OD.GOODS_ESTM_REG_YN = #{goodsEstmRegYn}
+		<if test='goodsEstmRegYn != null and goodsEstmRegYn == "Y"'>
+			ORDER BY GC.SYS_REG_DTM DESC, OD.SYS_REG_DTM DESC
+		</if>
+		<if test='goodsEstmRegYn != null and goodsEstmRegYn == "N"'>
+			ORDER BY OD.SYS_REG_DTM DESC
+		</if>
+	</select>
+	
+	<select id="inheritCheck" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		  FROM PET_LOG_GOODS_REVIEW_MAP MAP
+		 WHERE MAP.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+	<insert id="copyGoodsComment" parameterType="biz.app.goods.model.GoodsBasePO">
+		INSERT IGNORE INTO GOODS_COMMENT_LINK(GOODS_ID, GOODS_ESTM_NO, BEST_YN, SYS_REGR_NO, SYS_REG_DTM)
+		SELECT #{goodsId} AS GOODS_ID, GOODS_ESTM_NO, 'N' AS BEST_YN, #{sysRegrNo}, NOW()
+		FROM GOODS_COMMENT_LINK
+		WHERE GOODS_ID = #{fstGoodsId}
+	</insert>
+
+	<select id="getDuplicateCommentCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM goods_comment_link
+		WHERE 1=1
+		  AND goods_id  = #{goodsId}
+		  AND goods_estm_no IN (
+			SELECT goods_estm_no
+			FROM goods_comment_link
+			WHERE goods_id  = #{fstGoodsId}
+		)
+	</select>
+	
+	<select id="getCommentDeleteInfo" resultType="biz.app.goods.model.GoodsCommentPO">
+		SELECT
+			GC.GOODS_ESTM_NO
+			, GC.ESTM_MBR_NO
+			, OD.ORD_NO
+			, OD.ORD_DTL_SEQ
+		FROM
+			GOODS_COMMENT GC
+		JOIN
+			PET_LOG_GOODS_REVIEW_MAP PLGRM
+		  ON
+			PLGRM.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+		JOIN
+			PET_LOG_BASE_DELETE PLBD
+		  ON
+			PLBD.PET_LOG_NO = PLGRM.PET_LOG_NO
+		JOIN
+			ORDER_DETAIL OD
+		  ON
+			OD.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+	   WHERE
+			PLBD.PET_LOG_NO = #{petLogNo}
+	</select>
+
+	<resultMap type="biz.app.goods.model.GoodsCommentVO" id="petLogGoodsCommentMap">
+		<id     property="goodsEstmNo"	column="GOODS_ESTM_NO"/>	<!-- 상품 평가 번호 -->
+		<result property="estmScore"	column="ESTM_SCORE"/>		<!-- 평가 점수 -->
+		<result property="bestYn"		column="BEST_YN"/>			<!-- best 여부 -->
+		<result property="dispYn"		column="DISP_YN"/>			<!-- 전시 여부 -->
+		<result property="goodsEstmTp"	column="GOODS_ESTM_TP"/>	<!-- 상품평 타입 -->
+		<result property="likeCnt"		column="LIKE_CNT"/>			<!-- 좋아요 수 -->
+		<result property="loginId"		column="LOGIN_ID"/>			<!-- 로그인 아이디 -->
+		<result property="nickNm"		column="NICK_NM"/>			<!-- 닉네임 -->
+		<result property="dscrt"		column="DSCRT"/>			<!-- 내용 -->
+		<result property="prflImg"		column="PRFL_IMG"/>			<!-- 프로필 이미지 -->
+		<result property="rcomYn"		column="RCOM_YN"/>			<!-- 추천 여부 -->
+		<result property="goodsId"		column="GOODS_ID"/>			<!-- 상품 아이디 -->
+		<result property="imgRegYn"		column="IMG_REG_YN"/>		<!-- 이미지 등록 여부 --> 
+		<result property="estmMbrNo"	column="ESTM_MBR_NO"/>		<!-- 평가 회원 번호 -->
+		<result property="estmMbrId"	column="ESTM_MBR_ID"/>		<!-- 평가 회원 ID -->
+		<result property="sysRegrNo"	column="SYS_REGR_NO"/>		<!-- 시스템 등록자 번호 -->
+		<result property="sysRegDtm"	column="SYS_REG_DTM"/>		<!-- 시스템 등록 일시 -->
+		<result property="sysUpdrNo"	column="SYS_UPDR_NO"/>		<!-- 시스템 수정자 번호 -->
+		<result property="sysUpdDtm"	column="SYS_UPD_DTM"/>		<!-- 시스템 수정 일시 -->
+		<result property="goodsNm"		column="GOODS_NM"/>			<!-- 상품 명 -->
+		<result property="cstrtShowNm"	column="CSTRT_SHOW_NM"/>	<!-- 구성 노출 명 -->
+		<result property="attrVal"		column="ATTR_VAL"/>			<!-- 구매 상품 옵션 값 -->
+		<result property="imgPathAll"	column="IMG_PATH_ALL"/>		<!-- 이미지 경로 -->
+		<result property="vdPath"		column="VD_PATH"/>			<!-- 이미지 경로 -->
+		<result property="commentCnt"	column="COMMENT_CNT"/>		<!-- 댓글 갯수-->
+		<result property="goodsImgSeq"	column="GOODS_IMG_SEQ"/>	<!-- 상품 대표 이미지 순번 -->
+		<result property="goodsImgPath"	column="GOODS_IMG_PATH"/>	<!-- 상품 대표 이미지 경로 -->
+		<result property="saleAmt"		column="SALE_AMT"/>			<!-- 판매 금액-->
+		<result property="dcAmt"		column="DC_AMT"/>			<!-- 할인 적용 금액-->
+		<result property="ordNo"		column="ORD_NO"/>			<!-- 주문번호 -->
+		<result property="ordDtlSeq"	column="ORD_DTL_SEQ"/>		<!-- 주문상세순번 -->
+		<result property="goodsCstrtTpCd"	column="GOODS_CSTRT_TP_CD"/>
+		<result property="pakGoodsId"	column="PAK_GOODS_ID"/>
+		<result property="pakGoodsNm"	column="PAK_GOODS_NM"/>
+		<result property="petLogNo"		column="PET_LOG_NO"/>		<!-- 펫로그 번호 -->
+		<result property="mbrStatCd"	column="MBR_STAT_CD"/>		<!--회원 상태 코드 -->
+		
+		
+		<result property="snctYn" 		column="SNCT_YN"/> 			<!-- 제제 여부 -->
+		<result property="snctRsn" 		column="SNCT_RSN"/> 		<!-- 제제 사유 -->
+		<result property="petNo" 		column="PET_NO"/> 			<!-- 펫 번호 -->
+		<result property="petGbCd" 		column="PET_GB_CD"/> 		<!-- 펫 구분 코드 -->
+		<result property="petGdGbCd"	column="PET_GD_GB_CD"/> 	<!-- 펫 성별 구분 코드 -->
+		<result property="petKindNm" 	column="PET_KIND_NM"/> 		<!-- 펫 종류 명 -->
+		<result property="petNm" 		column="PET_NM"/> 			<!-- 펫 이름 -->
+		<result property="birth" 		column="BIRTH"/> 			<!-- BIRTH -->
+		<result property="month" 		column="MONTH"/> 			<!-- MONTH -->
+		<result property="age"			column="AGE"/>				<!-- 펫 나이 -->
+		<result property="weight"		column="WEIGHT"/>			<!-- 펫 무게 -->
+		<result property="allergyYn" 	column="ALLERGY_YN"/> 		<!-- 알러지 여부 -->
+		<result property="fixingYn" 	column="FIXING_YN"/> 		<!-- 중성화 여부 -->
+		<result property="wryDaYn" 		column="WRY_DA_YN"/>	 	<!-- 염려 질환 여부 -->
+		
+		<collection property="goodsEstmQstVOList" column="GOODS_ESTM_NO" javaType="java.util.ArrayList"
+				ofType="biz.app.goods.model.GoodsEstmQstVO" select="getPageGoodsCommentEstmList" />
+	</resultMap>
+
+	<select id="getPetLogGoodsComment" resultMap="petLogGoodsCommentMap">
+		SELECT GC.GOODS_ESTM_NO 
+			, GC.ESTM_SCORE
+			, GCL.BEST_YN
+			, GC.GOODS_ID
+			, MB.PRFL_IMG
+			, CONCAT(
+				 IF( PLB.IMG_PATH1 IS NULL, '', PLB.IMG_PATH1 ) 
+				,IF( PLB.IMG_PATH2 IS NULL, '', CONCAT('|', PLB.IMG_PATH2) ) 
+				,IF( PLB.IMG_PATH3 IS NULL, '', CONCAT('|', PLB.IMG_PATH3) ) 
+				,IF( PLB.IMG_PATH4 IS NULL, '', CONCAT('|', PLB.IMG_PATH4) ) 
+				,IF( PLB.IMG_PATH5 IS NULL, '', CONCAT('|', PLB.IMG_PATH5) )
+				) AS IMG_PATH_ALL
+			, PLB.VD_PATH
+			, PLB.DSCRT
+			, MB.NICK_NM
+			, GC.PET_GB_CD
+			, GC.PET_KIND_NM
+			, GC.PET_NM
+			, GC.AGE
+			, GC.WEIGHT
+			, GC.SYS_REG_DTM
+			, GC.DISP_YN
+			, GC.SNCT_RSN
+		FROM GOODS_COMMENT GC
+		JOIN (SELECT T1.GOODS_ESTM_NO
+					, T1.BEST_YN
+					, T1.GOODS_ID
+			FROM GOODS_COMMENT_LINK T1
+			WHERE T1.GOODS_ESTM_NO = #{goodsEstmNo}
+			LIMIT 1) GCL
+		ON GCL.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+		JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM
+		ON PLGRM.GOODS_ESTM_NO = GC.GOODS_ESTM_NO
+		JOIN PET_LOG_BASE PLB
+		ON PLB.PET_LOG_NO = PLGRM.PET_LOG_NO
+		JOIN MEMBER_BASE MB
+		ON MB.MBR_NO = GC.ESTM_MBR_NO
+		WHERE GC.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+</mapper>

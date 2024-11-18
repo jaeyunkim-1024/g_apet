@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="reply">
+	<select id="listApetReplyGrid" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.listApetReplyGrid
+			Description : 펫TV 댓글 목록 그리드
+			- BO
+		-->
+		SELECT T1.APLY_SEQ
+				, T1.APLY
+				, T1.RPL
+				, T1.CONTS_STAT_CD
+				, T2.LOGIN_ID
+				, 'A' AS REPLY_GB
+				, T3.USR_NM AS REPLY_REGR_NM
+				, DATE_FORMAT(T1.SYS_REG_DTM,'%Y-%m-%d') AS SYS_REG_DATE
+				, DATE_FORMAT(T1.SYS_UPD_DTM,'%Y-%m-%d') AS SYS_UPD_DATE
+				, DATE_FORMAT(T1.RPL_REG_DTM,'%Y-%m-%d') AS RPL_REG_DATE
+				, DATE_FORMAT(T1.RPL_UPD_DTM,'%Y-%m-%d') AS RPL_UPD_DATE
+				, T1.SYS_REG_DTM
+				, T1.SYS_UPD_DTM
+				, T1.RPL_REG_DTM
+				, T1.RPL_UPD_DTM
+				, T1.VD_ID
+				, AC.TTL
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH
+				, (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP WHERE APLY_SEQ = T1.APLY_SEQ) AS RPTP_CNT
+		FROM APET_CONTENTS_REPLY T1
+		INNER JOIN APET_CONTENTS AC ON T1.VD_ID = AC.VD_ID
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		LEFT JOIN USER_BASE T3 ON T1.RPL_UPDR_NO = T3.USR_NO
+		WHERE 1 = 1
+		<if test="strtDate != null and endDate != null">
+			AND T1.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+		</if>
+		<if test="loginId != null and loginId != ''">
+			AND T2.LOGIN_ID = #{loginId}
+		</if>
+		<if test="usrNm != null and usrNm != ''">
+			AND T3.USR_NM = #{usrNm}
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+			AND T1.CONTS_STAT_CD = #{contsStatCd}
+		</if>
+		<if test="aply != null and aply != ''">
+			AND T1.APLY LIKE CONCAT('%', TRIM(#{aply}), '%')
+		</if>
+		<if test="rptpRsnCd != null and rptpRsnCd != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP A WHERE A.RPTP_RSN_CD = #{rptpRsnCd} AND A.APLY_SEQ = T1.APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+		<if test="rptpCnt != null and rptpCnt != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP WHERE APLY_SEQ = T1.APLY_SEQ) = #{rptpCnt}
+		</if>
+		<if test="vdSearchTxt != null and vdSearchTxt != ''">
+			<if test="vdSearchGb == '10'">
+				AND AC.VD_ID LIKE CONCAT('%', TRIM(#{vdSearchTxt}), '%')
+			</if>
+			<if test="vdSearchGb == '20'">
+				AND AC.TTL LIKE CONCAT('%', TRIM(#{vdSearchTxt}), '%')
+			</if>
+		</if>
+		<if test="rptpGb != null and rptpGb != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP WHERE APLY_SEQ = T1.APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+	<if test="rptpGb != null and rptpGb != ''">
+		ORDER BY RPTP_CNT DESC, T1.SYS_REG_DTM DESC
+	</if>
+	<if test="rptpGb == null or rptpGb == ''">
+		ORDER BY T1.SYS_REG_DTM DESC
+	</if>
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="listApetReplyGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : reply.listApetReplyGridCount
+			Description : 펫TV 댓글 목록 그리드 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_REPLY T1
+		INNER JOIN APET_CONTENTS AC ON T1.VD_ID = AC.VD_ID
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		LEFT JOIN USER_BASE T3 ON T1.RPL_UPDR_NO = T3.USR_NO
+		WHERE 1 = 1
+		<if test="strtDate != null and endDate != null">
+			AND T1.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+		</if>
+		<if test="loginId != null and loginId != ''">
+			AND T2.LOGIN_ID = #{loginId}
+		</if>
+		<if test="usrNm != null and usrNm != ''">
+			AND T3.USR_NM = #{usrNm}
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+			AND T1.CONTS_STAT_CD = #{contsStatCd}
+		</if>
+		<if test="aply != null and aply != ''">
+			AND T1.APLY LIKE CONCAT('%', TRIM(#{aply}), '%')
+		</if>
+		<if test="rptpRsnCd != null and rptpRsnCd != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP A WHERE A.RPTP_RSN_CD = #{rptpRsnCd} AND A.APLY_SEQ = T1.APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+		<if test="rptpCnt != null and rptpCnt != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP WHERE APLY_SEQ = T1.APLY_SEQ) = #{rptpCnt}
+		</if>
+		<if test="vdSearchTxt != null and vdSearchTxt != ''">
+			<if test="vdSearchGb == '10'">
+				AND AC.VD_ID LIKE CONCAT('%', TRIM(#{vdSearchTxt}), '%')
+			</if>
+			<if test="vdSearchGb == '20'">
+				AND AC.TTL LIKE CONCAT('%', TRIM(#{vdSearchTxt}), '%')
+			</if>
+		</if>
+		<if test="rptpGb != null and rptpGb != ''">
+			AND (SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP WHERE APLY_SEQ = T1.APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+	</select>
+	
+	<select id="getApetReply" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.selectAboutTvReply
+			Description : 펫TV 댓글 단건 조회
+			- BO
+		-->
+		SELECT T1.APLY_SEQ
+				, T1.MBR_NO
+				, T1.APLY
+				, T1.RPL
+				, T1.CONTS_STAT_CD
+				, T1.SYS_REG_DTM
+				, T1.SYS_UPD_DTM
+				, T1.RPL_REG_DTM
+				, T1.RPL_UPD_DTM
+				, T2.LOGIN_ID
+		FROM APET_CONTENTS_REPLY T1
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+	</select>
+	
+	<select id="listPetLogReplyGrid" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.listPetLogReplyGrid
+			Description : 펫로그 댓글 목록 그리드
+			- BO
+		-->
+		SELECT T1.PET_LOG_APLY_SEQ
+				, T1.PET_LOG_NO
+				, T1.APLY
+				, T1.CONTS_STAT_CD
+				, T1.SYS_REG_DTM
+				, T1.SYS_UPD_DTM
+				, T2.LOGIN_ID
+				, T3.DSCRT
+				, (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) AS RPTP_CNT
+		FROM PET_LOG_REPLY T1
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		INNER JOIN PET_LOG_BASE T3 ON T1.PET_LOG_NO = T3.PET_LOG_NO
+		WHERE 1 = 1
+		<if test="strtDate != null and endDate != null">
+			AND T1.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+		</if>
+		<if test="loginId != null and loginId != ''">
+			AND T2.LOGIN_ID = #{loginId}
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+			AND T1.CONTS_STAT_CD = #{contsStatCd}
+		</if>
+		<if test="aply != null and aply != ''">
+			AND T1.APLY LIKE CONCAT('%', TRIM(#{aply}), '%')
+		</if>
+		<if test="rptpRsnCd != null and rptpRsnCd != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP A WHERE A.RPTP_RSN_CD = #{rptpRsnCd} AND A.PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+		<if test="rptpCnt != null and rptpCnt != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) = #{rptpCnt}
+		</if>
+		<if test="rptpGb != null and rptpGb != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+	<if test="rptpGb != null and rptpGb != ''">
+		ORDER BY RPTP_CNT DESC, T1.SYS_REG_DTM DESC
+	</if>
+	<if test="rptpGb == null or rptpGb == ''">
+		ORDER BY T1.SYS_REG_DTM DESC
+	</if>
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="listPetLogReplyGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : reply.listPetLogReplyGridCount
+			Description : 펫로그 댓글 목록 그리드 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM PET_LOG_REPLY T1
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		INNER JOIN PET_LOG_BASE T3 ON T1.PET_LOG_NO = T3.PET_LOG_NO
+		WHERE 1 = 1
+		<if test="strtDate != null and endDate != null">
+			AND T1.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+		</if>
+		<if test="loginId != null and loginId != ''">
+			AND T2.LOGIN_ID = #{loginId}
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+			AND T1.CONTS_STAT_CD = #{contsStatCd}
+		</if>
+		<if test="aply != null and aply != ''">
+			AND T1.APLY LIKE CONCAT('%', TRIM(#{aply}), '%')
+		</if>
+		<if test="rptpRsnCd != null and rptpRsnCd != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP A WHERE A.RPTP_RSN_CD = #{rptpRsnCd} AND A.PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+		<if test="rptpCnt != null and rptpCnt != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) = #{rptpCnt}
+		</if>
+		<if test="rptpGb != null and rptpGb != ''">
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ) <![CDATA[ > ]]> '0'
+		</if>
+	</select>
+	
+	<select id="getPetLogReply" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.getPetLogReply
+			Description : 펫로그 댓글 단건 조회
+			- BO
+		-->
+		SELECT T1.PET_LOG_APLY_SEQ
+				, T1.PET_LOG_NO
+				, T1.MBR_NO
+				, T1.APLY
+				, T1.RPL
+				, T1.CONTS_STAT_CD
+				, T1.SYS_REG_DTM
+				, T1.SYS_UPD_DTM
+				, T2.LOGIN_ID
+		FROM PET_LOG_REPLY T1
+		INNER JOIN MEMBER_BASE T2 ON T1.MBR_NO = T2.MBR_NO
+		WHERE 1 = 1
+			AND PET_LOG_APLY_SEQ = #{petLogAplySeq}
+	</select>
+	
+	<update id="updateApetReplyContsStat" parameterType="biz.app.contents.model.ContentsReplyPO">
+		<!--
+			Query Name : reply.updateApetReplyContsStat
+			Description : 펫TV 댓글 전시 상태 일괄 변경
+			- BO
+		-->
+		UPDATE APET_CONTENTS_REPLY SET
+			CONTS_STAT_CD = #{contsStatCd}
+		WHERE 1 = 1
+			AND APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</update>
+	
+	<update id="updatePetLogReplyContsStat" parameterType="biz.app.contents.model.ContentsReplyPO">
+		<!--
+			Query Name : reply.updatePetLogReplyContsStat
+			Description : 펫로그 댓글 전시 상태 일괄 변경
+			- BO
+		-->
+		UPDATE PET_LOG_REPLY SET
+			CONTS_STAT_CD = #{contsStatCd}
+		WHERE 1 = 1
+			AND PET_LOG_APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</update>
+	
+	<insert id="insertApetReply" parameterType="biz.app.contents.model.ContentsReplyPO">
+		<!--
+			Query Name : reply.insertApetReply
+			Description : 펫TV 운영자 댓글 등록
+			- BO
+		-->
+		UPDATE APET_CONTENTS_REPLY SET
+			RPL = #{rpl}
+			, RPL_REGR_NO = #{sysRegrNo}
+			, RPL_REG_DTM = NOW()
+			, RPL_UPDR_NO = #{sysRegrNo}
+			, RPL_UPD_DTM = NOW()
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+	</insert>
+	
+	<update id="updateApetReply" parameterType="biz.app.contents.model.ContentsReplyPO">
+		<!--
+			Query Name : reply.updateApetReply
+			Description : 펫TV 운영자 댓글 수정
+			- BO
+		-->
+		UPDATE APET_CONTENTS_REPLY SET
+			RPL = #{rpl}
+			, RPL_UPDR_NO = #{sysRegrNo}
+			, RPL_UPD_DTM = NOW()
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+	</update>
+	
+	<update id="deleteApetReply" parameterType="biz.app.contents.model.ContentsReplyPO">
+		<!--
+			Query Name : reply.deleteApetReply
+			Description : 펫TV 운영자 댓글 삭제
+			- BO
+		-->
+		UPDATE APET_CONTENTS_REPLY SET
+			RPL = NULL
+			, RPL_REGR_NO = NULL
+			, RPL_REG_DTM = NULL
+			, RPL_UPDR_NO = NULL
+			, RPL_UPD_DTM = NULL
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+	</update>
+	
+	<select id="listMemberReply" resultType="biz.app.contents.model.ContentsReplyVO">
+		SELECT T1.* /* QUERYID(reply.listMemberReply) */
+		FROM (
+			 SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_10}' AS REPLY_GB_CD
+			      	,	ACR.MBR_NO
+			      	,	0 AS PET_LOG_NO
+			      	, 	AC.TTL
+			      	,	ACR.APLY
+			      	,	( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = ACR.MBR_NO) AS LOGIN_ID
+					,   ACR.RPL
+			      	, 	ACR.APLY_SEQ
+			      	,	'' AS CONTS_STAT_CD
+					,   '' AS SNCT_YN
+			      	,	'' AS PET_LOG_CHNL_CD
+					,	(SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP ACRP WHERE ACRP.VD_ID = ACR.VD_ID AND ACRP.APLY_SEQ = ACR.APLY_SEQ) AS RPTP_CNT
+			      	,	ACR.SYS_REG_DTM
+			FROM apet_contents_reply ACR
+			INNER JOIN apet_contents AC ON ACR.VD_ID = AC.VD_ID AND ACR.MBR_NO = #{mbrNo}
+			 UNION ALL
+			 SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_20}' AS REPLY_GB_CD
+			      	, 	PLR.MBR_NO
+					,   PL.PET_LOG_NO
+			      	,  	PL.DSCRT AS TTL
+					, 	PLR.APLY
+					,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = PL.MBR_NO) AS LOGIN_ID
+					,   '' AS RPL
+			      	, 	PLR.PET_LOG_APLY_SEQ AS APLY_SEQ
+					,   PL.CONTS_STAT_CD
+					,   PL.SNCT_YN
+					,   PL.PET_LOG_CHNL_CD
+					,	(SELECT COUNT(*) FROM PET_LOG_RPTP PLRP WHERE PLRP.PET_LOG_NO = PL.PET_LOG_NO) AS RPTP_CNT
+			      	, 	PLR.SYS_REG_DTM
+			 FROM pet_log_reply PLR
+			 INNER JOIN PET_LOG_BASE PL ON PL.PET_LOG_NO = PLR.PET_LOG_NO AND PLR.MBR_NO = #{mbrNo}
+			UNION ALL
+			 SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_40}' AS REPLY_GB_CD
+			      	, 	ACR.MBR_NO
+					,   ACR.EVENT_NO
+			      	,  	eb.TTL AS TTL
+					, 	ACR.ENRY_APLY
+					,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = ACR.MBR_NO) AS LOGIN_ID
+					,   '' AS RPL
+			      	, 	ACR.PATI_NO AS APLY_SEQ
+			      	,	'' AS CONTS_STAT_CD
+					,   '' AS SNCT_YN
+			      	,	'' AS PET_LOG_CHNL_CD
+					,	'' AS RPTP_CNT
+			      	, 	ACR.SYS_REG_DTM
+			 FROM EVENT_ENTRY_INFO ACR
+			 INNER JOIN event_base eb ON ACR.EVENT_NO = eb.EVENT_NO AND ACR.MBR_NO = #{mbrNo}				 
+		) T1
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="listMemberReplyCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM (
+				 SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_10}' AS REPLY_GB_CD,ACR.MBR_NO, AC.TTL,ACR.APLY,ACR.SYS_REG_DTM
+				 FROM apet_contents AC
+				 INNER JOIN apet_contents_reply ACR ON ACR.VD_ID = AC.VD_ID AND ACR.MBR_NO = #{mbrNo}
+				 UNION ALL
+				 SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_20}' AS REPLY_GB_CD, PLR.MBR_NO ,  PL.DSCRT AS TTL , PLR.APLY , PLR.SYS_REG_DTM
+				 FROM PET_LOG_BASE PL
+				 INNER JOIN pet_log_reply PLR ON PL.PET_LOG_NO = PLR.PET_LOG_NO AND PLR.MBR_NO = #{mbrNo}
+				 UNION ALL
+				 SELECT '40' AS REPLY_GB_CD, ACR.MBR_NO ,  EB.TTL AS TTL , ACR.ENRY_APLY , ACR.SYS_REG_DTM
+				 FROM EVENT_ENTRY_INFO ACR
+				 INNER JOIN EVENT_BASE EB ON ACR.EVENT_NO = EB.EVENT_NO AND ACR.MBR_NO = #{mbrNo}						 
+			) T1
+	</select>
+	
+	<select id="pageApetReplyRptp" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.pageApetReplyRptp
+			Description : 펫TV 댓글 신고 목록 그리드
+			- BO
+		-->
+		SELECT T1.RPTP_NO
+				, T1.VD_ID
+				, T1.APLY_SEQ
+				, T1.MBR_NO
+				, T1.RPTP_CONTENT
+				, T1.RPTP_RSN_CD
+				, T1.SYS_REGR_NO
+				, T1.SYS_REG_DTM
+				, T1.SYS_UPDR_NO
+				, T1.SYS_UPD_DTM
+				, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = T1.MBR_NO) AS LOGIN_ID
+		FROM APET_CONTENTS_REPLY_RPTP T1
+		INNER JOIN APET_CONTENTS_REPLY T2 ON T1.APLY_SEQ = T2.APLY_SEQ
+		WHERE 1 = 1
+			AND T1.APLY_SEQ = #{aplySeq}
+		ORDER BY T1.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageApetReplyRptpCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : reply.pageApetReplyRptpCount
+			Description : 펫TV 댓글 신고 목록 그리드 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_REPLY_RPTP T1
+		INNER JOIN APET_CONTENTS_REPLY T2 ON T1.APLY_SEQ = T2.APLY_SEQ
+		WHERE 1 = 1
+			AND T1.APLY_SEQ = #{aplySeq}
+	</select>
+	
+	<select id="pagePetLogReplyRptp" resultType="biz.app.contents.model.ContentsReplyVO">
+		<!--
+			Query Name : reply.pagePetLogReplyRptp
+			Description : 펫로그 댓글 신고 목록 그리드
+			- BO
+		-->
+		SELECT
+			@ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+			, T1.PET_LOG_RPTP_NO							/* 펫로그 신고번호 */
+			, T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.PET_LOG_APLY_SEQ							/* 펫로그 댓글 순번 */
+			, T2.MBR_NO										/* 펫로그 등록자 */
+			, FN_GET_USER_ID(T1.MBR_NO) AS RPTP_LOGIN_ID	/* 펫로그 신고자 loginId */
+			, FN_GET_USER_ID(T2.MBR_NO) AS LOGIN_ID			/* 펫로그 등록자 loginId */
+			, T1.RPTP_CONTENT								/* 펫로그 신고 내용 */
+			, T1.RPTP_RSN_CD								/* 펫로그 신고사유 */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@RPTP_RSN}' AND DTL_CD = RPTP_RSN_CD) AS RPTP_RSN_NM /* 펫로그 신고사유명 */
+			, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, DATE_FORMAT(T1.SYS_REG_DTM, '%Y.%m.%d') AS regModDtm
+		FROM PET_LOG_RPTP T1
+		INNER JOIN PET_LOG_REPLY T2 ON (T1.PET_LOG_APLY_SEQ = T2.PET_LOG_APLY_SEQ)
+		, (SELECT @ROWNUM:=0) TMP
+		WHERE 1 = 1
+			AND T1.PET_LOG_APLY_SEQ = #{petLogAplySeq}
+		ORDER BY T1.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pagePetLogReplyRptpCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : reply.pagePetLogReplyRptpCount
+			Description : 펫로그 댓글 신고 목록 그리드 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM PET_LOG_RPTP T1
+		INNER JOIN PET_LOG_REPLY T2 ON (T1.PET_LOG_APLY_SEQ = T2.PET_LOG_APLY_SEQ)
+		, (SELECT @ROWNUM:=0) TMP
+		WHERE 1 = 1
+			AND T1.PET_LOG_APLY_SEQ = #{petLogAplySeq}
+	</select>
+	
+	<select id="getApetReplyRptpCnt" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_REPLY_RPTP
+		WHERE 1 = 1
+			AND APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</select>
+	
+	<select id="getPetLogReplyRptpCnt" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM PET_LOG_RPTP
+		WHERE 1 = 1
+			AND PET_LOG_APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</select>
+	
+	<delete id="apetReplyRptpCntRefresh" parameterType="biz.app.contents.model.ContentsReplyPO">
+		DELETE FROM APET_CONTENTS_REPLY_RPTP
+		WHERE 1 = 1
+			AND APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</delete>
+	
+	<delete id="petLogReplyRptpCntRefresh" parameterType="biz.app.contents.model.ContentsReplyPO">
+		DELETE FROM PET_LOG_RPTP
+		WHERE 1 = 1
+			AND PET_LOG_APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</delete>
+	
+	<select id="listApetReplyMbrNo" resultType="Long">
+		SELECT MBR_NO
+		FROM APET_CONTENTS_REPLY
+		WHERE 1 = 1
+			AND APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</select>
+	
+	<select id="listPetLogReplyMbrNo" resultType="Long">
+		SELECT MBR_NO
+		FROM PET_LOG_REPLY
+		WHERE 1 = 1
+			AND PET_LOG_APLY_SEQ IN (
+				<foreach collection="arrReplySeq" item="aplySeq" separator=",">
+					#{aplySeq}
+				</foreach>
+			)
+	</select>
+</mapper>

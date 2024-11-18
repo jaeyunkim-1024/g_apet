@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 09. 18.
+	작성자 : kimdp
+-->
+
+<mapper namespace="obclaimbase">	
+	
+	<insert id="insertObClaimBase">
+		<!--
+			Query Name : obclaimbase.insertObClaimBase
+			Description : Outbound API 주문 클레임 이력 정보 등록
+		-->
+			INSERT INTO OB_CLAIM_BASE (
+			  MARKET_NM
+			  ,SELLER_ID
+			  ,ORD_NO
+			  ,SHOP_ORD_NO
+			  ,CLM_CD
+			  ,CLM_STAT
+			  ,PRD_NO
+			  ,SHOP_PRD_NO
+			  ,SHOP_PRD_NM
+			  ,SELLER_PRD_CD
+			  ,SHOP_PRD_OPT_NO
+			  ,SHOP_PRD_OPT_NM
+			  ,CLM_SLCT_PRD_OPT_NM
+			  ,ORD_CN_MNBD_CD
+			  ,ORD_CN_RSN_CD
+			  ,ORD_CN_DTLS_RSN
+			  ,ORD_CN_QTY
+			  ,ORD_PRD_SEQ
+			  ,CLM_REQ_DT
+			  ,SHOP_CLM_DT
+			  ,AFFLIATE_BNDL_DLV_SEQ
+			  ,CLM_REQ_CONT
+			  ,CLM_REQ_QTY
+			  ,CLM_REQ_RSN
+			  ,CLM_REQ_SEQ
+			  ,OPT_NAME
+			  ,ORD_NM
+			  ,ORD_TLPHN_NO
+			  ,ORD_PRTBL_TEL
+			  ,RCVR_MAIL_NO
+			  ,RCVR_MAIL_NO_SEQ
+			  ,RCVR_BASE_ADDR
+			  ,RCVR_DTLS_ADDR
+			  ,RCVR_TYPE_ADD
+			  ,RCVR_TYPE_BIL_NO
+			  ,TW_MTHD
+			  ,EXCH_NM
+			  ,EXCH_TLPHN_NO
+			  ,EXCH_PRTBL_TEL
+			  ,EXCH_MAIL_NO
+			  ,EXCH_MAIL_NO_SEQ
+			  ,EXCH_BASE_ADDR
+			  ,EXCH_DTLS_ADDR
+			  ,EXCH_TYPE_ADD
+			  ,EXCH_TYPE_BIL_NO
+			  ,CLM_LST_DLV_CST
+			  ,APPMT_DLV_CST
+			  ,CLM_DLV_CST_MTHD
+			  ,TW_PRD_INVC_NO
+			  ,DLV_ETPRS_CD
+			  ,KGL_USE_YN
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			  #{marketNm}
+			  ,#{sellerId}
+			  ,#{ordNo}
+			  ,#{shopOrdNo}
+			  ,#{clmCd}
+			  ,#{clmStat}
+			  ,#{prdNo}
+			  ,#{shopPrdNo}
+			  ,#{shopPrdNm}
+			  ,#{sellerPrdCd}
+			  ,#{shopPrdOptNo}
+			  ,#{shopPrdOptNm}
+			  ,#{clmSlctPrdOptNm}
+			  ,#{ordCnMnbdCd}
+			  ,#{ordCnRsnCd}
+			  ,#{ordCnDtlsRsn}
+			  ,#{ordCnQty}
+			  ,#{ordPrdSeq}
+			  ,#{clmReqDt}
+			  ,#{shopClmDt}			  
+			  ,#{affliateBndlDlvSeq}
+			  ,#{clmReqCont}
+			  ,#{clmReqQty}
+			  ,#{clmReqRsn}
+			  ,#{clmReqSeq}
+			  ,#{optName}
+			  ,#{ordNm}
+			  ,#{ordTlphnNo}
+			  ,#{ordPrtblTel}
+			  ,#{rcvrMailNo}
+			  ,#{rcvrMailNoSeq}
+			  ,#{rcvrBaseAddr}
+			  ,#{rcvrDtlsAddr}
+			  ,#{rcvrTypeAdd}
+			  ,#{rcvrTypeBilNo}
+			  ,#{twMthd}
+			  ,#{exchNm}
+			  ,#{exchTlphnNo}
+			  ,#{exchPrtblTel}
+			  ,#{exchMailNo}
+			  ,#{exchMailNoSeq}
+			  ,#{exchBaseAddr}
+			  ,#{exchDtlsAddr}
+			  ,#{exchTypeAdd}
+			  ,#{exchTypeBilNo}
+			  ,#{clmLstDlvCst}
+			  ,#{appmtDlvCst}
+			  ,#{clmDlvCstMthd}
+			  ,#{twPrdInvcNo}
+			  ,#{dlvEtprsCd}
+			  ,#{kglUseYn}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			) ON DUPLICATE KEY UPDATE SYS_UPD_DTM = NOW()
+
+	</insert>	
+	
+    <select id="pageMarketClaimOrg" resultType="biz.app.market.model.MarketClaimListVO">
+		<!--
+			Query Name : obclaimbase.pageMarketClaimOrg
+			Description : 오픈마켓 원 클레임 목록 페이징 조회
+		-->
+		<![CDATA[
+		SELECT 	/* QUERYID(obclaimbase.pageMarketClaimOrg) */
+				OBC.CLM_SEQ				/* 클레임일련번호 */
+				, OBC.MARKET_NM			/* 마켓명 */
+				, OBC.SELLER_ID			/* 판매자아이디 */
+				, OBC.ORD_NO			/* 11번가주문번호 */
+				, OBC.SHOP_ORD_NO		/* 쇼핑몰주문번호 */
+				, OBC.CLM_NO			/* 쇼핑몰클레임번호 */				
+				, OBC.CLM_CD			/* 클레임종류 */	
+				, OBC.CLM_STAT			/* 클레임상태 */
+				, IF(OBC.CLM_CD='10', OBC.ORD_CN_QTY, OBC.CLM_REQ_QTY) AS CLM_REQ_QTY	/* 요청수량 */
+				, OBC.PRD_NO			/* 11번가상품번호 */	
+				, OBC.SHOP_PRD_NO		/* 쇼핑몰매칭상품코드 */
+				, OBC.SHOP_PRD_NM		/* 쇼핑몰매칭상품명 */
+				, OBC.SHOP_PRD_OPT_NO	/* 쇼핑몰매칭옵션코드 */				
+				, OBC.SHOP_PRD_OPT_NM	/* 쇼핑몰매칭옵션명 */
+				, OBC.CLM_REQ_DT		/* 클레임요청일 */
+			    , CASE WHEN UNIX_TIMESTAMP(OBC.SHOP_CLM_DT) = 0 THEN '0000-00-00 00:00:00' ELSE OBC.SHOP_CLM_DT END AS SHOP_CLM_DT /* 클레임처리완료일 */							
+				, CONCAT(OBC.CLM_REQ_DT,'<br/>',CASE WHEN UNIX_TIMESTAMP(OBC.SHOP_CLM_DT) = 0 THEN '0000-00-00 00:00:00' ELSE OBC.SHOP_CLM_DT END) AS CLM_FULL_DT	/* 클레임요청일&클레임처리완료일*/
+				, OBC.PROC_CD			/* 처리상태(10:취소수집,11:취소승인,12:취소거부,13:취소완료,19:취소수집에러,20:반품수집,21:반품승인,22:반품거부,23:반품완료,29:반품수집에러,30:교환수집,31:교환승인,32:교환거부,33:교환보류,34:교환완료,39:교환수집에러)*/								
+		FROM 	OB_CLAIM_BASE OBC
+		WHERE 	1= 1
+		]]>
+		<include refid="obclaimbase.pageMarketClaimOrgWhere" />				
+    </select>
+    
+    <sql id="pageMarketClaimOrgWhere">
+		<if test="clmCd != null and clmCd != ''">
+		AND 		OBC.CLM_CD = #{clmCd}
+		</if>    
+	    <choose>
+	        <when test="searchDtmType == 'type01'">
+				<if test="ordAcptDtmStart != null">
+				AND 		OBC.SYS_REG_DTM <![CDATA[>=]]> #{ordAcptDtmStart}
+				</if>
+				<if test="ordAcptDtmEnd != null">
+				AND 		OBC.SYS_REG_DTM <![CDATA[<]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+				</if>	        	
+	        </when>
+	        <when test="searchDtmType == 'type02'">
+				<if test="ordAcptDtmStart != null">
+				AND 		OBC.CLM_REQ_DT <![CDATA[>=]]> #{ordAcptDtmStart}
+				</if>
+				<if test="ordAcptDtmEnd != null">
+				AND 		OBC.CLM_REQ_DT <![CDATA[<]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+				</if>		        
+	        </when>
+	    </choose>	            
+		<if test="searchMarketNm != null and searchMarketNm != ''">
+		AND 		OBC.MARKET_NM = #{searchMarketNm}
+		</if>
+		<if test="searchMarketSellerId != null and searchMarketSellerId != ''">
+		AND 		OBC.SELLER_ID = #{searchMarketSellerId}
+		</if>		
+		<if test="ordNo != null and ordNo != ''">
+		AND 		OBC.ORD_NO = #{ordNo}
+		</if>		    
+		<if test="searchValueOrder != null and searchValueOrder != ''">
+		    <choose>
+		        <when test="searchKeyOrder == 'type01'">
+		AND		OBC.ORD_NO = #{searchValueOrder}
+		        </when>
+		        <when test="searchKeyOrder == 'type02'">
+		AND		OBC.SHOP_ORD_NO = #{searchValueOrder}
+		        </when>
+		    </choose>
+		</if>
+		<if test="arrClmStatCd != null and arrClmStatCd.length > 0">
+		AND		OBC.CLM_STAT IN (
+				    <foreach collection="arrClmStatCd" item="ordStatCd" separator="," >
+				    #{ordStatCd}
+				    </foreach>
+				    )
+		</if>		    
+	</sql>
+    
+	<select id="pageMarketClaimOrgCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : obclaimbase.pageMarketClaimOrgCount
+			Description : pageMarketClaimOrgCount
+		-->
+		SELECT	/* QUERYID(obclaimbase.pageMarketClaimOrgCount) */
+				COUNT(*)
+		FROM	
+			OB_CLAIM_BASE OBC
+		WHERE 1 = 1
+		<include refid="obclaimbase.pageMarketClaimOrgWhere" />
+	</select>    
+</mapper>

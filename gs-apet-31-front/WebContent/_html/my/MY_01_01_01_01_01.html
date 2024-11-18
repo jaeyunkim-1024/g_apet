@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"마이펫 정보 수정"}'></include>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<!-- 페이지 헤더 -->
+			
+			<!-- // 페이지 헤더 -->
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="mypet-admin">
+						<!-- PC 타이틀 모바일에서 제거 -->
+						<div class="pc-tit">
+							<h2>마이펫 정보 수정</h2>
+							
+						</div>
+						<!-- // PC 타이틀 모바일에서 제거 -->
+						<div class="mypet-profile">
+							<div>
+								<div class="img-box">
+									<div>
+										<div class="my-picture medium2 animal">
+											<p class="picture"><img src="../../_images/_temp/temp_logimg002.jpg" alt=""></p>
+											<button class="btn edit"></button>
+										</div>
+										<!-- <p class="name">mong2mom</p> -->
+									</div>
+								</div>
+								<div class="t-box">
+									<div class="item">
+										<!-- 정보 입력 -->
+										<div class="member-input">
+											<ul class="list">
+												<li>
+													<strong class="tit">견종</strong>
+													<p class="info">필수 입력 정보</p>
+													<div class="input del">
+														<input type="text" placeholder="견종을 입력해주세요.">
+													</div>
+												</li>
+												<li>
+													<strong class="tit requied">이름</strong>
+													<div class="input del">
+														<input type="text" placeholder="이름을 입력해주세요.">
+													</div>
+												</li>
+												<li>
+													<strong class="tit requied">성별</strong>
+													<div class="flex-wrap">
+														<label class="radio"><input type="radio" name="radio1"><span class="txt">남아</span></label>
+														<label class="radio"><input type="radio" name="radio1" checked=""><span class="txt">여아</span></label>
+													</div>
+												</li>
+												<li>
+													<strong class="tit requied">나이</strong>
+													<div class="flex-wrap wrap"> <!-- wrap 추가 -->
+														<div class="input del t2" data-txt="세">
+															<input type="text" placeholder="0" value="">
+														</div>
+														<div class="input del t2" data-txt="개월">
+															<input type="text" placeholder="0" value="">
+														</div>
+													</div>
+													<!-- 모바일 인풋 -->
+													<!-- <div class="mo-wrap">
+														<div class="input del">
+															<input type="text" placeholder="0 세">
+														</div>
+														<div class="input del">
+															<input type="text" placeholder="9 개월">
+														</div>
+													</div> -->
+													<!-- 모바일 인풋 -->
+													<!-- PC 셀렉트 -->
+													<div class="pc-wrap">
+														<div class="select">
+															<select>
+																<option>선택</option>
+																<option>선택1</option>
+																<option>선택2</option>
+																<option>선택3</option>
+															</select>
+														</div>
+														<div class="select">
+															<select>
+																<option>선택</option>
+																<option>선택1</option>
+																<option>선택2</option>
+																<option>선택3</option>
+															</select>
+														</div>
+													</div>
+													<!-- // PC 셀렉트 -->
+												</li>
+
+												<li>
+													<strong class="tit">몸무게</strong>
+													<div class="input del t2" data-txt="kg">
+														<input type="text" placeholder="입력" value="">
+													</div>
+												</li>
+											</ul>
+										</div>
+										<!-- // 정보 입력 -->
+									</div>
+									<div class="item t2">
+										<p class="tit">건강 정보</p>
+										<!-- 정보 입력 -->
+										<div class="member-input t2">
+											<ul class="list">
+												<li>
+													<strong class="tit">중성화 여부</strong>
+													<div class="radiobox">
+														<span class="radio"><input type="radio" name="radio_a" id="radt_1" checked><label for="radt_1" class="txt">중성화 전</label></span>
+														<span class="radio"><input type="radio" name="radio_a" id="radt_2"><label for="radt_2" class="txt">중성화 완료</label></span>
+													</div>
+												</li>
+												<li>
+													<!-- 03.08 수정 -->
+													<strong class="tit newDn">염려질환
+														<span>중복 선택 가능</span>
+													</strong>
+													<!-- // 03.08 수정 -->
+													<!-- <p class="info">중복 선택 가능</p> -->
+													<div class="filter-item">
+														<div class="tag">
+															<button>피부</button>
+															<button>눈</button>
+															<button>눈물</button>
+															<button>귀</button>
+															<button>관절</button>
+															<button>치아</button>
+															<button>모질</button>
+															<button>호흡기</button>
+															<button>소화기</button>
+															<button>체중</button>
+															<button>노환</button>
+															<button>신장</button>
+														</div>
+													</div>
+												</li>
+												<li>
+													<strong class="tit">알러지여부</strong>
+													<div class="radiobox">
+														<span class="radio"><input type="radio" name="radio_b" id="radt_3" checked><label for="radt_1" class="txt">있어요</label></span>
+														<span class="radio"><input type="radio" name="radio_b" id="radt_4"><label for="radt_2" class="txt">없어요</label></span>
+													</div>
+													<div class="filter-item">
+														<div class="tag">
+															<button>소고기</button>
+															<button>유제품</button>
+															<button>밀</button>
+															<button>닭</button>
+															<button>달걀</button>
+															<button>양고기</button>
+															<button>콩</button>
+															<button>옥수수</button>
+															<button>돼지고기</button>
+															<button>생선</button>
+															<button>밥</button>
+														</div>
+													</div>
+												</li>
+											</ul>
+										</div>
+										<!-- // 정보 입력 -->
+									</div>
+								</div>
+							</div>
+							<div class="btnSet set2">
+								<a href="javascript:;" class="btn lg ">취소</a>
+								<a href="javascript:;" class="btn lg a">저장</a> <!-- 03.08 수정 -->
+							</div>
+						</div>
+						
+						
+
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<!-- 푸터
+        <include class="footer" data-include-html="../inc/footer.html"></include>
+		 -->
+	</div>
+</body>
+</html>

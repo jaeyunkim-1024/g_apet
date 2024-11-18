@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2021. 02. 02.
+	작성자 : kek01
+-->
+
+<mapper namespace="clmDtlCstrt">
+
+	<insert id="insertClmDtlCstrt" parameterType="biz.app.claim.model.ClmDtlCstrtPO">
+		<!--
+			Query Name : clmDtlCstrt.insertClmDtlCstrt
+			Description : 클레임 상세 구성 등록
+		-->
+		
+		<selectKey keyProperty="clmDtlCstrtNo" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_CLM_DTL_CSTRT}') FROM DUAL
+		</selectKey>
+		
+		INSERT  INTO CLM_DTL_CSTRT  /*QUERYID(clmDtlCstrt.insertClmDtlCstrt) */
+	  	(
+	  		CLM_DTL_CSTRT_NO
+	  		,CLM_NO
+	  		,CLM_CSTRT_SEQ
+	  		,CLM_DTL_SEQ
+	  		,CSTRT_GOODS_ID
+	  		,SKU_CD
+	  		,ORD_DTL_CSTRT_NO
+	  		,CSTRT_GOODS_GB_CD
+	  		,CSTRT_QTY
+	  		,ORG_SALE_AMT
+	  		,SALE_AMT
+	  		,SYS_REGR_NO
+	  		,SYS_REG_DTM
+	  		,SYS_UPDR_NO
+	  		,SYS_UPD_DTM
+		) VALUES (
+			#{clmDtlCstrtNo}
+			, #{clmNo}
+			, #{clmCstrtSeq}
+			, #{clmDtlSeq}
+			, #{cstrtGoodsId}
+			, #{skuCd}
+			, #{ordDtlCstrtNo}
+			, #{cstrtGoodsGbCd}
+			, #{cstrtQty}
+			, #{orgSaleAmt}
+			, #{saleAmt}
+			, #{sysRegrNo }
+			, NOW()
+			, #{sysUpdrNo }
+			, NOW()
+		)
+	</insert>
+
+
+	<update id="updateClmDtlCstrt" parameterType="biz.app.claim.model.ClmDtlCstrtPO">
+		<!--
+			Query Name : clmDtlCstrt.updateClmDtlCstrt
+			Description : 클레임 상세 구성 수정
+		-->
+		UPDATE  /*QUERYID(clmDtlCstrt.updateClmDtlCstrt) */
+			    CLM_DTL_CSTRT
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+				
+				<if test="cisClmNo != null and cisClmNo != ''">
+				, CIS_CLM_NO = #{cisClmNo}				/* CIS 클레임 번호 */
+				</if>
+				<if test="cisClmDtlSeq != null and cisClmDtlSeq != ''">
+				, CIS_CLM_DTL_SEQ = #{cisClmDtlSeq}		/* CIS 클레임 상세 순번 */
+				</if>
+				<if test="cisStatCd != null and cisStatCd != ''">
+				, CIS_STAT_CD = #{cisStatCd}			/* CIS 상태 코드 */
+				</if> 
+
+		WHERE	CLM_NO = #{clmNo}
+		  AND	CLM_DTL_SEQ = #{clmDtlSeq}
+		  AND	CLM_CSTRT_SEQ = #{clmCstrtSeq}
+
+	</update>
+		
+	<select id="listClmDtlCstrt" resultType="biz.app.claim.model.ClmDtlCstrtPO" >
+		<!--
+			Query Name : ordClmCstrt.listOrdClmCstrt
+			Description : 클레임 상세 구성 리스트
+		-->
+		SELECT	/* QUERYID(clmDtlCstrt.listClmDtlCstrt) */
+				CDC.CLM_DTL_CSTRT_NO
+				, CDC.CLM_NO
+				, CDC.CLM_DTL_SEQ
+				, CDC.CLM_CSTRT_SEQ
+				, CDC.CSTRT_GOODS_ID
+				, CDC.SKU_CD
+				, CDC.CSTRT_GOODS_GB_CD
+			    , CASE WHEN CDC.CSTRT_GOODS_GB_CD = '${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_20}'
+					   THEN '${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_10}'
+					   ELSE CDC.CSTRT_GOODS_GB_CD
+				   END AS SHOW_CSTRT_GB_CD
+				, CDC.CSTRT_QTY
+				, CDC.ORG_SALE_AMT
+				, CDC.SALE_AMT
+				, CDC.CIS_CLM_NO
+				, CDC.CIS_CLM_DTL_SEQ
+				, CDC.CIS_STAT_CD
+				, GB.GOODS_NM
+				, IT.ITEM_NO
+		  FROM CLM_DTL_CSTRT  CDC
+	INNER JOIN GOODS_BASE GB
+			ON GB.GOODS_ID = CDC.CSTRT_GOODS_ID
+	INNER JOIN ITEM IT
+			ON IT.GOODS_ID = GB.GOODS_ID
+		WHERE CDC.CLM_NO = #{clmNo}
+		   AND CDC.CLM_DTL_SEQ = #{clmDtlSeq}
+	</select>
+	
+	<select id="listClmDtlCstrtForSendCis" resultMap="listclmDtlCstrtForSendCisMap">
+		<!--
+			Query Name : clmDtlCstrt.listClmDtlCstrtForSendCis
+			Description : CIS 회수지시 대상 조회 (클레임 반품접수, 클레임 교환회수접수 대상)
+			Date : 2020. 3. 10  KEK01
+		-->
+		SELECT /* QUERYID(clmDtlCstrt.listClmDtlCstrtForSendCis) */
+		       Z.*
+			   , (SELECT IF(IFNULL(CD.USR_DFN2_VAL,'') = '', 'GS', CD.USR_DFN2_VAL) FROM CODE_DETAIL CD WHERE CD.GRP_CD = 'HDC' AND CD.DTL_CD = Z.DLV_CMPY_CD_TMP_FNL) AS DLV_CMPY_CD
+		  FROM (
+		SELECT Y.*
+			   , IF(Y.ORG_DLVR_PRCS_TP_CD IN (20,21),  IF(Y.DLVT_TP_CD = 10, '05','36'),   /*당일/새벽배송 -> 택배로 변경된 경우에는 주소지변경건이므로 택배사를 05:한진택배로 고정*/
+			                                           IF(Y.DLV_CMPY_CD_TMP is NULL, '36',Y.DLV_CMPY_CD_TMP)) AS DLV_CMPY_CD_TMP_FNL  
+			   , IF(Y.ORG_CLM_NO IS NULL, SHOP_ORDR_NO_TEMP, ORG_CLM_NO)		AS SHOP_ORDR_NO  <!-- 클레임의 클레임일때 상위 클레임번호를 넣어줌, 2021.05.25 by kek01 -->
+			   , IF(Y.ORG_CLM_NO IS NULL, SHOP_SORT_NO_TEMP, ORG_SHOP_SORT_NO)	AS SHOP_SORT_NO  <!-- 클레임의 클레임일때 상위 클레임의 shop_sort_no를 넣어줌, 2021.05.25 by kek01 -->
+		  FROM (
+				SELECT	/* clmDtlCstrt.listClmDtlCstrtForSendCis */
+				        'R1'										AS RTN_TP_CD		/*반품유형코드*/
+						, DATE_FORMAT(CB.ACPT_DTM,'%Y%m%d') 		AS RTN_DUE_DD		/*반품예정일자*/
+						, OD.ADRS_NM 								AS RQST_NM			/*요청자 이름*/
+						, OD.TEL 									AS RQST_TEL_NO		/*요청자 전화번호*/
+						, OD.MOBILE 								AS RQST_CEL_NO		/*요청자 휴대전화*/
+						, OD.POST_NO_NEW 							AS RQST_ZIPCODE		/*요청자 우편번호*/
+						, OD.ROAD_ADDR 								AS RQST_ADDR		/*요청자 주소*/
+						, OD.ROAD_DTL_ADDR 							AS RQST_ADDR_DTL	/*요청자 주소 상세*/
+						, IF (OD.DLVR_DEMAND_YN = 'Y' 
+				 		      ,CONCAT(FN_GET_CODE_NAME('GOODS_RCV_PST',OD.GOODS_RCV_PST_CD,'')
+				 		              , IF(IFNULL(OD.GOODS_RCV_PST_ETC,'') = '', '', CONCAT('(',OD.GOODS_RCV_PST_ETC,')'))
+				 		              , ' / '
+				 		              , FN_GET_CODE_NAME('PBL_GATE_ENT_MTD',OD.PBL_GATE_ENT_MTD_CD,'')
+				 		              , ' / '
+				 		              , OD.DLVR_DEMAND 
+				 		              , IF(IFNULL(OD.DLVR_MEMO,'') = '', '', CONCAT(' / ',OD.DLVR_MEMO))
+				 		              )
+				 		      ,'')										AS RMK_TXT  				/*비고*/
+				 		, ODC.ORD_NO									AS SHOP_ORDR_NO_TEMP		/*상점 주문번호*/
+				 		, CONCAT(ODC.ORD_DTL_SEQ,'_',ODC.ORD_CSTRT_SEQ) AS SHOP_SORT_NO_TEMP		/*상점 주문순번*/
+				 		, CDC.CSTRT_QTY * CD.CLM_QTY					AS EA						/*수량*/
+				 		<!-- , 'GS'											AS DLV_CMPY_CD		/*택배사코드-일단 무조건 GS 로 셋팅하여 전송, 2021.03.12 by서성민*/ -->
+				 		, (SELECT HDC_CD FROM DELIVERY D3 WHERE D3.DLVR_NO IN (SELECT DLVR_NO FROM ORD_DTL_CSTRT_DLVR_MAP ODCDM WHERE ODCDM.ORD_DTL_CSTRT_NO = ODC.ORD_DTL_CSTRT_NO) LIMIT 1) AS DLV_CMPY_CD_TMP /*원주문의 택배사코드*/ 
+				 		, IF (CB2.COMP_GB_CD = '10'				/*자사상품일때*/
+				 		      , CB.DLVR_PRCS_TP_CD				/*배송처리유형코드값으로*/
+				 		      , '10'							/*외부업체상품일때는 무조건 택배 배송*/	
+				 		     )									AS DLVT_TP_CD					/*배송유형코드*/		 		
+				 		/*필요에 의해 추가된 컬럼*/
+				 		, CDC.CLM_NO 
+				 		, CDC.CLM_DTL_SEQ
+				 		, CDC.CLM_CSTRT_SEQ 
+				 		, CDC.CLM_DTL_CSTRT_NO 
+				 		, CB.DLVR_PRCS_TP_CD 
+				 		, OD.ORD_DLVRA_NO 
+				 		, CD.DLVRC_NO 
+						, CB2.COMP_GB_CD        AS COMP_GB_CD
+						, CB2.COMP_NO			AS COMP_NO
+						, IF(CLM_DTL_STAT_CD = '310', 'Y', 'N') AS EXCHG_RTN_YN
+						, OB.DLVR_PRCS_TP_CD AS ORG_DLVR_PRCS_TP_CD
+						, CD.ORG_CLM_NO
+						, CD.ORG_CLM_DTL_SEQ
+		 				, CDC.CSTRT_GOODS_ID
+						, IF(CD.ORG_CLM_NO IS NOT NULL, (SELECT CONCAT(T3.CLM_DTL_SEQ,'_',T3.CLM_CSTRT_SEQ) FROM CLM_DTL_CSTRT T3 WHERE T3.CLM_NO = CD.ORG_CLM_NO AND T3.CLM_DTL_SEQ = CD.ORG_CLM_DTL_SEQ AND T3.CSTRT_GOODS_ID = CDC.CSTRT_GOODS_ID)
+						                              , '') AS ORG_SHOP_SORT_NO 
+				  FROM	CLAIM_DETAIL CD
+						INNER JOIN CLAIM_BASE CB		ON CD.CLM_NO = CB.CLM_NO
+						INNER JOIN CLM_DTL_CSTRT CDC	ON CD.CLM_NO = CDC.CLM_NO 
+													   AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ
+						INNER JOIN ORD_DTL_CSTRT ODC    ON ODC.ORD_DTL_CSTRT_NO = CDC.ORD_DTL_CSTRT_NO
+						INNER JOIN ORDER_BASE OB        ON OB.ORD_NO = ODC.ORD_NO
+						INNER JOIN ORDER_DLVRA OD		ON CD.RTRNA_NO = OD.ORD_DLVRA_NO
+						INNER JOIN COMPANY_BASE CB2		ON CD.COMP_NO = CB2.COMP_NO
+				 WHERE  CD.CLM_DTL_STAT_CD IN (210, 310)	/*반품접수, 교환회수접수*/
+				   AND	CB.CLM_STAT_CD != '40'				/*취소 제외*/
+			) Y
+			) Z
+	</select>
+	<resultMap type="biz.app.order.model.interfaces.CisOrderReturnCmdVO" id="listclmDtlCstrtForSendCisMap">
+		<!-- 필요에 의해 추가된 컬럼 -->
+		<result property="clmNo"			column="CLM_NO"				/>	<!-- 클레임 번호 -->
+		<result property="clmDtlSeq"		column="CLM_DTL_SEQ"		/>	<!-- 클레임 상세 순번 -->
+		<result property="clmCstrtSeq"		column="CLM_CSTRT_SEQ"		/>	<!-- 클레임 구성 순번 -->
+		<result property="clmDtlCstrtNo"	column="CLM_DTL_CSTRT_NO"	/>	<!-- 클레임 상세 구성 번호 -->
+		<result property="dlvrPrcsTpCd"		column="DLVR_PRCS_TP_CD"	/>  <!-- 배송 처리 유형 코드(자사상품일때 유효값) -->
+		<result property="ordDlvraNo"		column="ORD_DLVRA_NO"		/>	<!-- 주문 배송지 번호 -->
+		<result property="compGbCd"		    column="COMP_GB_CD"		    />	<!-- 업체 구분 코드 -->
+		<result property="exchgRtnYn"		column="EXCHG_RTN_YN"		/>	<!-- 교환 회수 여부 -->
+		
+		<!-- 인터페이스 컬럼 -->
+		<collection property="returnInsertPO" ofType="biz.interfaces.cis.model.request.order.ReturnInsertPO">
+			<result property="rtnTpCd"		column="RTN_TP_CD"      />
+			<result property="rtnDueDd"		column="RTN_DUE_DD"		/>
+			<result property="rqstNm"		column="RQST_NM"		/>
+			<result property="rqstTelNo"	column="RQST_TEL_NO"	/>
+			<result property="rqstCelNo"	column="RQST_CEL_NO"	/>
+			<result property="rqstZipcode"	column="RQST_ZIPCODE"	/>
+			<result property="rqstAddr"		column="RQST_ADDR"		/>
+			<result property="rqstAddrDtl"	column="RQST_ADDR_DTL"	/>
+			<result property="rmkTxt"		column="RMK_TXT"		/>
+			<collection property="itemList" ofType="biz.interfaces.cis.model.request.order.ReturnInsertItemPO">
+				<result property="shopOrdrNo"       column="SHOP_ORDR_NO"    />
+				<result property="shopSortNo"		column="SHOP_SORT_NO"	 />
+				<result property="ea"				column="EA"		 		 />
+				<result property="dlvCmpyCd"		column="DLV_CMPY_CD"	 />
+				<result property="rmkTxt"			column="RMK_TXT"		 />
+				<result property="exchgYn"			column="EXCHG_RTN_YN"	 />
+				<result property="dlvtTpCd"			column="DLVT_TP_CD"		 	/>	<!-- 필요에 의해 추가 : 배송유형코드 -->
+				<result property="clmNo"			column="CLM_NO"				/>	<!-- 필요에 의해 추가 : 클레임 번호 -->
+				<result property="clmDtlSeq"		column="CLM_DTL_SEQ"		/>	<!-- 필요에 의해 추가 : 클레임 상세 순번 -->
+				<result property="clmCstrtSeq"		column="CLM_CSTRT_SEQ"		/>	<!-- 필요에 의해 추가 : 클레임 구성 순번 -->
+				<result property="clmDtlCstrtNo"	column="CLM_DTL_CSTRT_NO"	/>	<!-- 필요에 의해 추가 : 클레임 상세 구성 번호 -->
+				<!-- <result property="dlvrcNo"			column="DLVRC_NO"	     /> --> <!-- 필요에 의해 추가 : 배송비 번호 -->
+				<!-- <result property="compGbCd"		column="COMP_GB_CD"	     /> --> <!-- 필요에 의해 추가 : 업체 구분 코드 -->
+				<!-- <result property="compNo"			column="COMP_NO"	     /> --> <!-- 필요에 의해 추가 : 업체 번호 -->
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<select id="listClmDtlCstrtForChkCisDlvrStateChg" resultType="biz.app.order.model.interfaces.CisOrderReturnStateChgVO">
+		<!--
+			Query Name : clmDtlCstrt.listClmDtlCstrtForChkCisDlvrStateChg
+			Description : CIS 회수 상태 변경 대상 조회 (반품+교환회수 대상)
+			Date : 2020. 3. 12  KEK01
+		-->
+		SELECT Z.* /* QUERYID(clmDtlCstrt.listClmDtlCstrtForChkCisDlvrStateChg) */
+		  FROM (
+				   SELECT 
+				          CD.CLM_DTL_STAT_CD										AS CLM_DTL_STAT_CD
+				        , CD.DLVRA_NO  												AS CLM_DLVRA_NO
+				        , CDC.CLM_DTL_CSTRT_NO                                      AS CLM_DTL_CSTRT_NO
+				        , CDC.CLM_NO                                                AS CLM_NO
+				        , CDC.CLM_DTL_SEQ                                           AS CLM_DTL_SEQ
+				        , CDC.CLM_CSTRT_SEQ                                         AS CLM_CSTRT_SEQ
+				        , CDC.CSTRT_GOODS_ID                                        AS CSTRT_GOODS_ID
+				        , CDC.CSTRT_QTY * CD.CLM_QTY                                AS CSTRT_QTY
+						, CB.DLVR_PRCS_TP_CD                                        AS DLVR_PRCS_TP_CD
+						, CB2.COMP_GB_CD                                            AS COMP_GB_CD
+						, IF(CD.CLM_DTL_TP_CD = '30', 'Y', 'N') 					AS EXCHG_RTN_YN  /*교환회수여부*/
+				        , (SELECT GROUP_CONCAT(CDCDM.DLVR_NO) 
+				             FROM CLM_DTL_CSTRT_DLVR_MAP CDCDM 
+				            WHERE CDCDM.CLM_DTL_CSTRT_NO = CDC.CLM_DTL_CSTRT_NO )   AS DLVR_NOS 
+						, IF (CB.DLVR_PRCS_TP_CD IN ('20','21'), 
+						     'Y',
+						     <!-- IF (CB.DLVR_PRCS_TP_CD = '10' AND CD.CLM_DTL_STAT_CD IN ('220','320'), 'Y', 'N')) AS BATCH_EXE_YN -->
+						     IF (CB.DLVR_PRCS_TP_CD = '10' AND CD.CLM_DTL_STAT_CD IN ('220','320'), 'Y', 'Y')) AS BATCH_EXE_YN  /* 송장번호가 없으므로 택배도 일단은 CIS 에서 반품완료까지 받아야한다 */
+						, CDC.CIS_CLM_NO
+						, CDC.CIS_CLM_DTL_SEQ 
+						, CD.ORD_NO 
+						, CD.ORD_DTL_SEQ 
+				  FROM CLAIM_BASE CB 
+				       INNER JOIN CLAIM_DETAIL CD    ON CB.CLM_NO = CD.CLM_NO 
+				                                    AND CD.CLM_DTL_STAT_CD in ('220','230','320','330')	/*220:반품회수지시, 230:반품회수중, 320:교환회수지시, 330:교환회수중*/
+				       INNER JOIN COMPANY_BASE CB2   ON CD.COMP_NO = CB2.COMP_NO
+				                                    AND CB2.COMP_GB_CD = '10'						/*10:자사*/
+				       INNER JOIN CLM_DTL_CSTRT CDC  ON CD.CLM_NO = CDC.CLM_NO
+				                                    AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ
+				                                    AND CDC.CIS_CLM_NO IS NOT NULL
+			 ) Z
+ 		WHERE Z.BATCH_EXE_YN = 'Y'
+		ORDER BY Z.CLM_NO, Z.CLM_DTL_SEQ, Z.CLM_CSTRT_SEQ
+	</select>
+	
+</mapper>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	이메일 전송 이력 
+	작성자  	snw 
+	작성일자  	2016.04.22 
+-->
+
+<mapper namespace="emailSendHistory">
+
+	<select id="listEmailSendHistoryReq" resultType="Long">
+		<!--
+			Query Name : emailSendHistory.listEmailSendHistoryReq
+			Description : 이메일 전송 예정 목록 조회
+		-->
+		SELECT	HIST_NO
+		FROM		EMAIL_SEND_HISTORY
+		WHERE	1=1
+        AND     SEND_REQ_YN ='${@framework.common.constants.CommonConstants@COMM_YN_N}'
+        ORDER BY SYS_REG_DTM ASC
+        LIMIT		0, 500
+	</select>
+
+	<select id="getEmailSendHistory" resultType="biz.app.email.model.EmailSendHistoryVO">
+		<!--
+			Query Name : emailSendHistory.getEmailSendHistory
+			Description : 이메일 전송 이력 상세 조회
+		-->
+		SELECT	HIST_NO
+					,EMAIL_TP_CD
+					,MBR_NO
+					,RECEIVER_NM
+					,RECEIVER_EMAIL
+					,SENDER_NM
+					,SENDER_EMAIL
+					,SUBJECT
+					,CONTENTS
+					,ST_ID
+					,MAP01
+					,MAP02
+					,MAP03
+					,MAP04
+					,MAP05
+					,MAP06
+					,MAP07
+					,MAP08
+					,MAP09
+					,MAP10
+					,MAP11
+					,MAP12
+					,MAP13
+					,MAP14
+					,MAP15
+					,MAP16
+					,MAP17
+					,MAP18
+					,MAP19
+					,MAP20
+					,MAP21
+					,MAP22
+					,MAP23
+					,MAP24
+					,MAP25
+					,MAP26
+					,MAP27
+					,MAP28
+					,MAP29
+					,MAP30
+					,MAP31
+					,MAP32
+					,MAP33
+					,MAP34
+					,MAP35
+					,MAP36
+					,SEND_REQ_YN
+					,SEND_REQ_DTM
+					,SYS_REGR_NO
+					,SYS_REG_DTM
+					,SYS_UPDR_NO
+					,SYS_UPD_DTM
+		FROM		EMAIL_SEND_HISTORY
+		WHERE	HIST_NO = #{histNo}
+	</select>
+	
+	<insert id="insertEmailSendHistory">
+		<!--
+			Query Name : emailSendHistory.insertEmailSendHistory
+			Description : 이메일 전송 이력 등록
+		-->
+		<selectKey keyProperty="histNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_EMAIL_SEND_HIST_NO}') FROM DUAL
+		</selectKey>
+		INSERT INTO EMAIL_SEND_HISTORY
+			(
+				HIST_NO
+				,EMAIL_TP_CD
+				,MBR_NO
+				,RECEIVER_NM
+				,RECEIVER_EMAIL
+				,SENDER_NM
+				,SENDER_EMAIL
+				,SUBJECT
+				,CONTENTS
+				,ST_ID
+				,MAP01
+				,MAP02
+				,MAP03
+				,MAP04
+				,MAP05
+				,MAP06
+				,MAP07
+				,MAP08
+				,MAP09
+				,MAP10
+				,MAP11
+				,MAP12
+				,MAP13
+				,MAP14
+				,MAP15
+				,MAP16
+				,MAP17
+				,MAP18
+				,MAP19
+				,MAP20
+				,MAP21
+				,MAP22
+				,MAP23
+				,MAP24
+				,MAP25
+				,MAP26
+				,MAP27
+				,MAP28
+				,MAP29
+				,MAP30
+				,MAP31
+				,MAP32
+				,MAP33
+				,MAP34
+				,MAP35
+				,MAP36				
+				,SEND_REQ_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+			)
+			VALUES
+			(
+				#{histNo}
+				,#{emailTpCd}
+				,#{mbrNo}
+				,#{receiverNm}
+				,#{receiverEmail}
+				,#{senderNm}
+				,#{senderEmail}
+				,#{subject}
+				,#{contents}
+				,#{stId}
+				,#{map01}
+				,#{map02}
+				,#{map03}
+				,#{map04}
+				,#{map05}
+				,#{map06}
+				,#{map07}
+				,#{map08}
+				,#{map09}
+				,#{map10}
+				,#{map11}
+				,#{map12}
+				,#{map13}
+				,#{map14}
+				,#{map15}
+				,#{map16}
+				,#{map17}
+				,#{map18}
+				,#{map19}
+				,#{map20}
+				,#{map21}
+				,#{map22}
+				,#{map23}
+				,#{map24}
+				,#{map25}
+				,#{map26}
+				,#{map27}
+				,#{map28}
+				,#{map29}
+				,#{map30}
+				,#{map31}
+				,#{map32}
+				,#{map33}
+				,#{map34}
+				,#{map35}
+				,#{map36}
+				, 'N'
+				,#{sysRegrNo}
+				,SYSDATE()
+				,#{sysUpdrNo}
+				,SYSDATE()
+			)	
+	</insert>
+
+	<update id="updateEmailSendHistoryReqComplete">
+		<!--
+			Query Name : emailSendHistory.updateEmailSendHistoryReqComplete
+			Description : 이메일 발송 요청 완료
+		-->
+		UPDATE	EMAIL_SEND_HISTORY
+		SET		SEND_REQ_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					,SEND_REQ_DTM = SYSDATE()
+					,SYS_UPDR_NO = #{sysUpdrNo}
+					,SYS_UPD_DTM = SYSDATE()
+		WHERE	HIST_NO = #{histNo}	
+	</update>
+	
+</mapper>

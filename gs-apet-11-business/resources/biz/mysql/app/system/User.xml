@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user">
+
+	<select id="getUserList" resultType="biz.app.system.model.UserBaseVO">
+		<!--
+			Query Name : user.getUserList
+			Description : 사용자 리스트
+		-->
+		SELECT	/* QUERYID(user.getUserList) */
+				A.USR_NO				/* 사용자 번호 */
+				, A.USR_NM				/* 사용자 명 */
+				, A.USR_STAT_CD			/* 사용자 상태 코드 */
+				, A.COMP_NO				/* 업체 번호 */
+				, A.LOGIN_FAIL_CNT		/* 로그인 실패 수 */
+				, A.USR_GB_CD			/* 사용자 구분 코드 */
+				, A.PSWD_INIT_YN		/* 비밀번호 초기화 여부 */
+				, A.LOGIN_ID			/* 로그인 아이디 */
+				, A.USR_GRP_CD			/* 사용자 그룹 코드 */
+				, A.ORG_NO				/* 조직 번호 */
+				, A.TEL					/* 전화 */
+				, A.MOBILE				/* 휴대폰 */
+				, A.FAX					/* 팩스 */
+				, A.EMAIL				/* 이메일 */
+				, A.CTI_ID					/* CTI ID */
+				, A.CTI_EXT_NO			/* CTI 내선 번호 */
+				, A.PSWD_CHG_DTM		/* 비밀번호 변경 일시 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, CB.COMP_NM 
+		FROM	USER_BASE A JOIN COMPANY_BASE CB ON (A.COMP_NO = CB.COMP_NO)
+		WHERE	1 = 1
+		<if test="usrGbCd != null and usrGbCd != ''">
+		AND		USR_GB_CD = #{usrGbCd}
+		</if>
+		<if test="usrStatCd != null and usrStatCd != ''">
+		AND		USR_STAT_CD = #{usrStatCd}
+		</if>
+		<if test="arrUsrGbCd != null and arrUsrGbCd != ''">
+			<foreach collection="arrUsrGbCd" item="item" separator="," open="AND USR_GB_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+		
+	</select>
+
+	<select id="pageUser" resultType="biz.app.system.model.UserBaseVO">
+		<!--
+			Query Name : user.pageUser
+			Description : 사용자 페이지 목록
+		-->
+		SELECT	/* QUERYID(user.pageUser) */
+				@rownum := @rownum+1 AS ROW_NUM
+				, A.USR_NO				/* 사용자 번호 */
+				, A.USR_NM				/* 사용자 명 */
+				, A.USR_STAT_CD			/* 사용자 상태 코드 */
+				, A.COMP_NO				/* 업체 번호 */
+				, A.LOGIN_FAIL_CNT		/* 로그인 실패 수 */
+				, A.USR_GB_CD			/* 사용자 구분 코드 */
+				, A.PSWD_INIT_YN		/* 비밀번호 초기화 여부 */
+				, A.LOGIN_ID			/* 로그인 아이디 */
+				, A.USR_GRP_CD			/* 사용자 그룹 코드 */
+				, A.ORG_NO				/* 조직 번호 */
+				, A.TEL					/* 전화 */
+				, A.MOBILE				/* 휴대폰 */
+				, A.FAX					/* 팩스 */
+				, A.EMAIL				/* 이메일 */
+				, A.CTI_ID					/* CTI ID */
+				, A.CTI_EXT_NO			/* CTI 내선 번호 */
+				, A.PSWD_CHG_DTM		/* 비밀번호 변경 일시 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, GROUP_CONCAT(A2.AUTH_NM SEPARATOR ',') AS AUTH_NM /* 접근권한 명 (콤마구분) */
+				, DP_NM					/* 소속 명 */
+				, USR_IP				/* 사용자 IP */
+				, DATE_FORMAT(VALID_ST_DTM, '%Y-%m-%d') AS VALID_ST_DTM			/* 유효기간 시작 */
+				, DATE_FORMAT(VALID_EN_DTM, '%Y-%m-%d') AS VALID_EN_DTM			/* 유효기간 종료 */
+				, CONCAT(DATE_FORMAT(VALID_ST_DTM, '%Y-%m-%d'), '~', DATE_FORMAT(VALID_EN_DTM, '%Y-%m-%d')) AS VALID_DTM	/* 유효기간시작~유효기간종료 */
+				, LAST_LOGIN_DTM		/* 최종 로그인 일시 */
+				, COMP_NM				/* 회사 명 */
+		FROM	USER_BASE A LEFT JOIN USER_AUTH_MAP UAM ON (A.USR_NO = UAM.USR_NO) 
+		LEFT JOIN	AUTHORITY A2 ON (UAM.AUTH_NO = A2.AUTH_NO)
+		LEFT JOIN	COMPANY_BASE CB ON (CB.COMP_NO = A.COMP_NO)
+		, (SELECT @rownum :=0) AS R
+		WHERE	1 = 1
+ 
+		<include refid="user.pageUserCondition" />
+		GROUP BY A.USR_NO
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageUserCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : user.pageUserCount
+			Description : 사용자 페이지 목록 카운트
+		-->
+		SELECT	COUNT(*)
+		FROM
+		(
+			SELECT	/* QUERYID(user.pageUserCount) */
+					  A.USR_NO				/* 사용자 번호 */
+					, A.USR_NM				/* 사용자 명 */
+					, A.USR_STAT_CD			/* 사용자 상태 코드 */
+					, A.COMP_NO				/* 업체 번호 */
+					, A.LOGIN_FAIL_CNT		/* 로그인 실패 수 */
+					, A.USR_GB_CD			/* 사용자 구분 코드 */
+					, A.PSWD_INIT_YN		/* 비밀번호 초기화 여부 */
+					, A.LOGIN_ID			/* 로그인 아이디 */
+					, A.USR_GRP_CD			/* 사용자 그룹 코드 */
+					, A.ORG_NO				/* 조직 번호 */
+					, A.TEL					/* 전화 */
+					, A.MOBILE				/* 휴대폰 */
+					, A.FAX					/* 팩스 */
+					, A.EMAIL				/* 이메일 */
+					, A.CTI_ID					/* CTI ID */
+					, A.CTI_EXT_NO			/* CTI 내선 번호 */
+					, A.PSWD_CHG_DTM		/* 비밀번호 변경 일시 */
+					, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, GROUP_CONCAT(A2.AUTH_NM SEPARATOR ',') AS AUTH_NM /* 접근권한 명 (콤마구분) */ 
+					, DP_NM					/* 소속 명 */
+					, USR_IP				/* 사용자 IP */
+					, DATE_FORMAT(VALID_ST_DTM, '%Y-%m-%d') AS VALID_ST_DTM			/* 유효기간 시작 */
+					, DATE_FORMAT(VALID_EN_DTM, '%Y-%m-%d') AS VALID_EN_DTM			/* 유효기간 종료 */
+					, CONCAT(DATE_FORMAT(VALID_ST_DTM, '%Y-%m-%d'), '~', DATE_FORMAT(VALID_EN_DTM, '%Y-%m-%d')) AS VALID_DTM	/* 유효기간시작~유효기간종료 */
+					, LAST_LOGIN_DTM		/* 최종 로그인 일시 */
+			FROM	USER_BASE A LEFT JOIN USER_AUTH_MAP UAM ON (A.USR_NO = UAM.USR_NO) 
+			LEFT JOIN	AUTHORITY A2 ON (UAM.AUTH_NO = A2.AUTH_NO)
+			LEFT JOIN	COMPANY_BASE CB ON (CB.COMP_NO = A.COMP_NO)
+			WHERE	1 = 1
+			<include refid="user.pageUserCondition" />
+			GROUP BY A.USR_NO
+		) T
+	</select>
+
+	<sql id="pageUserCondition">
+		<!--
+			Query Name : user.pageUserCondition
+			Description : 사용자 페이지 목록 조건
+		-->
+		<if test="usrNm != null and usrNm != ''">
+		AND		USR_NM LIKE CONCAT('%', #{usrNm}, '%')
+		</if>
+		<if test="loginId != null and loginId != ''">
+		AND		UPPER(LOGIN_ID) LIKE UPPER(CONCAT('%', #{loginId}, '%'))
+		</if>
+		<if test="usrStatCd != null and usrStatCd != ''">
+		AND		USR_STAT_CD = #{usrStatCd}
+		</if>	
+		<if test="usrGbCd != null and usrGbCd != ''">
+		AND		USR_GB_CD = #{usrGbCd}
+		</if>
+		<if test="authNo != null and authNo != ''">
+		AND		UAM.USR_NO IN (SELECT USR_NO FROM USER_AUTH_MAP UAM2 WHERE AUTH_NO = #{authNo})
+		</if>
+		<if test="compNo != null and compNo != ''">
+		AND 	A.COMP_NO = #{compNo}
+		</if>
+		<if test="usrGrpCd != null and usrGrpCd != ''">
+		AND 	A.USR_GRP_CD = #{usrGrpCd}
+		</if>
+	</sql>
+
+	<select id="getUser" resultType="biz.app.system.model.UserBaseVO">
+		<!--
+			Query Name : user.getUser
+			Description : 관리자 상세
+		-->
+		SELECT	/* QUERYID(user.getUser) */
+				  A.USR_NO				/* 사용자 번호 */
+				, A.USR_NM				/* 사용자 명 */
+				, A.USR_STAT_CD			/* 사용자 상태 코드 */
+				, A.COMP_NO				/* 업체 번호 */
+				, A.LOGIN_FAIL_CNT		/* 로그인 실패 수 */
+				, A.USR_GB_CD			/* 사용자 구분 코드 */
+				, A.PSWD_INIT_YN		/* 비밀번호 초기화 여부 */
+				, A.LOGIN_ID			/* 로그인 아이디 */
+				, A.USR_GRP_CD			/* 사용자 그룹 코드 */
+				, A.ORG_NO				/* 조직 번호 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, A.TEL					/* 전화 */
+				, A.MOBILE				/* 휴대폰 */
+				, A.FAX					/* 팩스 */
+				, A.EMAIL					/* 이메일 */
+				, A.CTI_ID					/* CTI ID */
+				, A.CTI_EXT_NO			/* CTI 내선 번호 */
+				, A.PSWD_CHG_DTM			/* 비밀번호 변경 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+ 				, C.COMP_NM
+ 				, A.DP_NM
+ 				, DATE_FORMAT(LAST_LOGIN_DTM, '%Y-%m-%d %H:%i:%S') AS LAST_LOGIN_DTM
+ 				, A.USR_IP
+ 				, DATE_FORMAT(VALID_ST_DTM, '%Y-%m-%d') AS VALID_ST_DTM
+ 				, DATE_FORMAT(VALID_EN_DTM, '%Y-%m-%d') AS VALID_EN_DTM
+		FROM	USER_BASE A, COMPANY_BASE C
+		WHERE	A.USR_NO = #{usrNo}
+		  AND   A.COMP_NO = C.COMP_NO
+		   
+	</select>
+
+	<select id="getUserIdCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : user.getUserIdCheck
+			Description : 관리자 상세
+		-->
+		SELECT	/* QUERYID(user.getUser) */
+				COUNT(*)
+		FROM	USER_BASE
+		WHERE	1 = 1
+		AND		UPPER(LOGIN_ID)	= UPPER(#{loginId})
+	</select>
+
+
+	<insert id="insertUser" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.insertUser
+			Description : 관리자 등록
+		-->
+		INSERT INTO USER_BASE (
+			  USR_NO				/* 사용자 번호 */
+			, USR_NM				/* 사용자 명 */
+			, PSWD					/* 비밀번호 */
+			, USR_STAT_CD			/* 사용자 상태 코드 */
+			, COMP_NO				/* 업체 번호 */
+			, LOGIN_FAIL_CNT		/* 로그인 실패 수 */
+			, USR_GRP_CD			/* 사용자 그룹 코드 */
+			, USR_GB_CD				/* 사용자 구분 코드 */
+			, USR_SUB_GB_CD			/* 사용자 서브 구분 코드 */
+			, PSWD_INIT_YN			/* 비밀번호 초기화 여부 */
+			, LOGIN_ID				/* 로그인 아이디 */
+			, ORG_NO				/* 조직 번호 */
+			, TEL						/* 전화 */
+			, MOBILE					/* 휴대폰 */
+			, FAX						/* 팩스 */
+			, EMAIL					/* 이메일 */
+			, CTI_ID					/* CTI ID */
+			, CTI_EXT_NO			/* CTI 내선 번호 */
+			, DP_NM				/* 소속명 */
+			, USR_IP			/* 사용자 IP */
+			, VALID_ST_DTM		/* 유효기간 시작 */
+			, VALID_EN_DTM		/* 유효기간 종료 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{usrNo}				/* 사용자 번호 */
+			, #{usrNm}				/* 사용자 명 */
+			, #{pswd}					/* 비밀번호 */
+			, '${@framework.common.constants.CommonConstants@USR_STAT_20}'			/* 사용자 상태 코드 : 사용 */
+			, #{compNo}				/* 업체 번호 */
+			, 0							/* 로그인 실패 수 */
+			, #{usrGrpCd}				/* 사용자 그룹 코드 */
+			, #{usrGbCd}				/* 사용자 구분 코드 */
+			, #{usrSubGbCd}				/*사용자 서브 구분 코드*/
+			, IFNULL(#{pswdInitYn}, '${@framework.common.constants.CommonConstants@USE_YN_N}')	/* 비밀번호 초기화 여부 */
+			, #{loginId}				/* 로그인 아이디 */
+			, #{orgNo}				/* 조직 번호 */
+			, #{tel}						/* 전화 */
+			, #{mobile}				/* 휴대폰 */
+			, #{fax}					/* 팩스 */
+			, #{email}					/* 이메일 */
+			, #{ctiId}					/* CTI ID */
+			, #{ctiExtNo}				/* CTI 내선 번호 */
+			, #{dpNm}				/* 소속명 */
+			, #{usrIp}			/* 사용자 IP */
+			, STR_TO_DATE(#{validStDtm}, "%Y-%m-%d")		/* 유효기간 시작 */
+			, STR_TO_DATE(#{validEnDtm}, "%Y-%m-%d")		/* 유효기간 종료 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */ 
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateUser" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.updateUser
+			Description : 관리자 수정
+		-->
+		UPDATE	USER_BASE SET
+				  USR_NM			= #{usrNm}			/* 사용자 명 */
+				, USR_STAT_CD		= #{usrStatCd}		/* 사용자 상태 코드 */
+				, USR_GB_CD			= #{usrGbCd}		/* 사용자 구분 코드 */
+				, TEL				= #{tel}					/* 전화 */
+				, MOBILE			= #{mobile}				/* 휴대폰 */
+				, EMAIL				= #{email}			/* 이메일 */
+				, CTI_ID			= #{ctiId}				/* CTI ID */
+				, CTI_EXT_NO		= #{ctiExtNo}			/* CTI 내선 번호 */
+				, USR_IP			= #{usrIp}			/* 사용자 IP */
+				, VALID_ST_DTM		= #{validStDtm}		/* 유효기간 시작 */
+				, VALID_EN_DTM		= #{validEnDtm}		/* 유효기간 종료 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				, LAST_LOGIN_DTM	= #{lastLoginDtm}
+		WHERE	1 = 1
+		AND		USR_NO				= #{usrNo}
+	</update>
+
+	<insert id="insertUserAuthMap" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.insertUserAuthMap
+			Description : 관리자 수정
+		-->
+		INSERT INTO USER_AUTH_MAP (
+			  USR_NO			/* 사용자 번호 */
+			, AUTH_NO			/* 권한 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{usrNo}			/* 사용자 번호 */
+			, #{authNo}			/* 권한 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<delete id="deleteUserAuthMap" parameterType="biz.app.system.model.UserBasePO">
+		DELETE
+		FROM	USER_AUTH_MAP
+		WHERE	USR_NO = #{usrNo}
+	</delete>
+
+	<update id="updateInfoUser" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.updateInfoUser
+			Description : 관리자 수정
+		-->
+		UPDATE	USER_BASE SET
+				  <!--  이메일만 수정 가능하게 수정 (uid상에서) 201228 이지희
+				  USR_NM			= #{usrNm}			/* 사용자 명 */
+		<if test="pswd != null and pswd != ''">
+				, PSWD				= #{pswd}
+				, PSWD_CHG_DTM		= NOW()				/* 비밀번호 변경 일시 */
+				, PSWD_INIT_YN		= '${@framework.common.constants.CommonConstants@USE_YN_N}'	/* 비밀번호 초기화 여부 */
+		</if>
+				, FAX				= #{fax}			/* 팩스 */ -->
+				  TEL				= #{tel}			/* 전화 */
+				, MOBILE			= #{mobile}			/* 휴대폰 */
+				, EMAIL				= #{email}			/* 이메일 */
+				, SYS_UPDR_NO		= #{usrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		USR_NO				= #{usrNo}
+	</update>
+
+	<select id="pageUserLogin" resultType="biz.app.system.model.UserLoginHistVO">
+		SELECT	/* QUERYID(user.pageUserLogin) */
+				A.USR_NO
+				, A.LOGIN_IP
+				, A.LOGIN_DTM
+				, B.LOGIN_ID
+				, B.USR_NM
+		FROM	USER_LOGIN_HIST A
+		INNER JOIN USER_BASE B ON A.USR_NO = B.USR_NO
+		WHERE	A.USR_NO = #{usrNo}
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageUserLoginCount" resultType="java.lang.Integer">
+		SELECT	/* QUERYID(user.pageUserLoginCount) */
+				COUNT(*)
+		FROM	USER_LOGIN_HIST A
+		INNER JOIN USER_BASE B ON A.USR_NO = B.USR_NO
+		WHERE	A.USR_NO = #{usrNo}
+	</select>
+
+	<update id="updatePasswordUser" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.updatePasswordUser
+			Description : 관리자 수정
+		-->
+		UPDATE	USER_BASE SET
+				PSWD				= NULL
+				, PSWD_CHG_DTM		= NOW()			/* 비밀번호 변경 일시 */
+				, PSWD_INIT_YN		= IFNULL(#{pswdInitYn}, '${@framework.common.constants.CommonConstants@USE_YN_N}')	/* 비밀번호 초기화 여부 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}
+				, SYS_UPD_DTM		= NOW()
+				, LOGIN_FAIL_CNT	= 0
+		WHERE	USR_NO				= #{usrNo}
+	</update>
+	
+	<select id="listAuth" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : user.listAuth
+			Description : 권한 리스트
+		-->
+		SELECT	A.AUTH_NO, A.AUTH_NM, CASE WHEN B.AUTH_NO IS NOT NULL THEN 'Y' ELSE NULL END AS 'USE_YN'
+		FROM 	AUTHORITY A LEFT JOIN (SELECT AUTH_NO FROM USER_AUTH_MAP WHERE USR_NO = #{usrNo}) B
+		ON		(A.AUTH_NO = B.AUTH_NO)
+		WHERE	A.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</select>
+	
+	<insert id="insertUserAuthHist" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.insertUserAuthHist
+			Description : 사용자 권한 이력 등록
+		-->
+		INSERT INTO USER_AUTH_HIST (
+			HIST_NO
+			, USR_NO
+			, AUTH_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_USER_AUTH_HIST_SEQ}')
+			, #{usrNo}
+			, #{authNo}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<insert id="insertUserStausHist" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.insertUserStausHist
+			Description : 사용자 상태 이력 등록
+		-->
+		INSERT INTO USER_STATUS_HIST (
+			USR_NO
+			, HIST_STRT_DTM
+			, USR_STAT_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{usrNo}
+			, NOW()
+			, #{usrStatCd}
+			, #{sysRegrNo}
+			, NOW()		
+		)
+	</insert>
+	
+	<select id="getUserAuthMapList" resultType="biz.app.system.model.UserBaseVO"> 
+		<!--
+			Query Name : user.getUserAuthMapList
+			Description : 사용자 권한 매핑 조회
+		-->
+		SELECT	T1.AUTH_NO
+				, T1.AUTH_NM
+		FROM	AUTHORITY T1 
+		<if test="usrNo != null and usrNo > 0">
+			JOIN USER_AUTH_MAP T2 ON (T1.AUTH_NO = T2.AUTH_NO)
+		</if>
+		WHERE	1=1
+			AND	T1.USE_YN = 'Y' 
+		<if test="usrNo != null and usrNo > 0">
+			AND T2.USR_NO = #{usrNo}
+		</if>
+	</select>
+	
+	<!-- <select id="getUserAuthMenuListCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM
+		(
+			SELECT	CASE WHEN A.MENU_NO_ONE != MENU_NO_ONE_LAG THEN A.MENU_NM_ONE
+					ELSE NULL 
+					END AS MENU_NM_ONE
+					, CASE WHEN A.MENU_NO_TWO != MENU_NO_TWO_LAG THEN A.MENU_NM_TWO
+					ELSE NULL 
+					END AS MENU_NM_TWO
+					, MENU_NM_THREE
+			FROM 
+			(
+				WITH MENU_AUTH AS
+				(
+					SELECT	T1.MENU_NO
+							, T1.UP_MENU_NO 
+							, T1.MENU_NM
+							, T1.SORT_SEQ 
+					FROM 	MENU_BASE T1 JOIN MENU_AUTHORITY T2 ON (T1.MENU_NO = T2.MENU_NO)
+					WHERE 	1=1
+						AND T2.AUTH_NO = #{authNo}
+						AND T1.USE_YN = 'Y'
+				)	
+				SELECT	T3.MENU_NM AS MENU_NM_ONE
+						, IFNULL(LAG (T3.MENU_NO) OVER(ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ), 'NULL') AS MENU_NO_ONE_LAG
+						, T4.MENU_NM AS MENU_NM_TWO
+						, IFNULL(LAG (T4.MENU_NO) OVER(ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ), 'NULL') AS MENU_NO_TWO_LAG
+				 		, T5.MENU_NM AS MENU_NM_THREE
+				 		, T3.MENU_NO AS MENU_NO_ONE
+				 		, T4.MENU_NO AS MENU_NO_TWO
+				FROM 	MENU_AUTH T3 JOIN MENU_AUTH T4 ON (T3.MENU_NO = T4.UP_MENU_NO)
+				LEFT JOIN MENU_AUTH T5 ON (T4.MENU_NO = T5.UP_MENU_NO)
+				WHERE	1=1
+					AND T3.UP_MENU_NO = 0
+				ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ 
+			) A
+		) B
+	</select> -->
+	
+	<select id="getUserAuthMenuList" resultType="biz.app.system.model.UserBaseVO">
+		<!--
+			Query Name : user.getUserAuthMenuList
+			Description : 사용자 권한 메뉴 조회(임시)
+		-->
+		SELECT	CASE WHEN A.MENU_NO_ONE != MENU_NO_ONE_LAG THEN A.MENU_NM_ONE
+				ELSE NULL 
+				END AS MENU_NM_ONE
+				, CASE WHEN A.MENU_NO_TWO != MENU_NO_TWO_LAG THEN A.MENU_NM_TWO
+				ELSE NULL 
+				END AS MENU_NM_TWO
+				, MENU_NM_THREE
+		FROM 
+		(
+			WITH MENU_AUTH AS
+			(
+				SELECT	T1.MENU_NO
+						, T1.UP_MENU_NO 
+						, T1.MENU_NM
+						, T1.SORT_SEQ 
+				FROM 	MENU_BASE T1 JOIN MENU_AUTHORITY T2 ON (T1.MENU_NO = T2.MENU_NO)
+				WHERE 	1=1
+					AND T2.AUTH_NO = #{authNo}
+					AND T1.USE_YN = 'Y'
+			)	
+			SELECT	T3.MENU_NM AS MENU_NM_ONE
+					, IFNULL(LAG (T3.MENU_NO) OVER(ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ), 'NULL') AS MENU_NO_ONE_LAG
+					, T4.MENU_NM AS MENU_NM_TWO
+					, IFNULL(LAG (T4.MENU_NO) OVER(ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ), 'NULL') AS MENU_NO_TWO_LAG
+			 		, T5.MENU_NM AS MENU_NM_THREE
+			 		, T3.MENU_NO AS MENU_NO_ONE
+			 		, T4.MENU_NO AS MENU_NO_TWO
+			FROM 	MENU_AUTH T3 JOIN MENU_AUTH T4 ON (T3.MENU_NO = T4.UP_MENU_NO)
+			LEFT JOIN MENU_AUTH T5 ON (T4.MENU_NO = T5.UP_MENU_NO)
+			WHERE	1=1
+				AND T3.UP_MENU_NO = 0
+			ORDER BY T3.SORT_SEQ, T4.SORT_SEQ, T5.SORT_SEQ 
+		) A
+	</select>
+	
+	<select id="selectAuthNoListForSession" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : user.selectAuthNoListForSession
+			Description : 로그인 시 세션에 저장할 auth 리스트
+		-->
+		SELECT	/* QUERYID(adminLogin.selectAuthNoListForSession) */
+				AUTH_NO
+		FROM	USER_AUTH_MAP UA
+		WHERE	USR_NO = #{usrNo}
+		AND  	(SELECT USE_YN 
+				   FROM AUTHORITY
+				  WHERE AUTH_NO = UA.AUTH_NO) ='${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</select>
+	
+	<select id="selectPswdHist" resultType="String" >
+		<!--
+			Query Name : user.selectPswdHist
+			Description : 비밀번호 변경  최근 3개 이력
+		-->
+		SELECT  	/* QUERYID(adminLogin.selectPswdHist) */
+					PSWD
+		FROM 		USER_PSWD_HIST
+		WHERE 		USR_NO = #{usrNo}
+		ORDER BY 	SYS_REG_DTM DESC
+		LIMIT 		2
+	</select>
+	
+	<update id="updateNewPswd"  parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.updateNewPswd
+			Description : 비밀번호 변경 화면에서 변경
+		-->
+		UPDATE	USER_BASE SET
+				PSWD				= #{pswd}
+				, PSWD_CHG_DTM		= NOW()			/* 비밀번호 변경 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}
+				, SYS_UPD_DTM		= NOW()
+				, LOGIN_FAIL_CNT	= 0
+		WHERE	USR_NO				= #{usrNo}
+	</update>
+	
+	<insert id="insertPswdHist" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : user.insertPswdHist
+			Description : 비밀번호 변경 이력 등록
+		-->
+		INSERT INTO USER_PSWD_HIST (
+			  USR_NO			/* 사용자 번호 */
+			, HIST_STRT_DTM		/* 이력 시작 일시 */
+			, PSWD				/* 비밀번호*/
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호*/
+		) VALUES (
+			  #{usrNo}			/* 사용자 번호 */
+			, NOW()				/* 이력 시작 일시 */
+			, #{pswd}			/* 비밀번호*/
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 등록자 번호*/
+		)
+	</insert>
+	
+	<select id="userCompanyDupChk" resultType="int">
+		SELECT COUNT(*) FROM USER_BASE WHERE COMP_NO = #{compNo}
+	</select>
+	
+	<update id="updateUserState" parameterType="biz.app.system.model.UserBasePO">
+		<!--
+			Query Name : admin.updateUserState
+			Description : 사용자 상태 업데이트
+			Writer : 이지희
+			Date : 2021.03.10.
+		-->
+		UPDATE	USER_BASE
+		SET		USR_STAT_CD = #{usrStatCd}
+				,SYS_UPDR_NO = #{sysUpdrNo}
+				,SYS_UPD_DTM = NOW()
+		WHERE	USR_NO = #{usrNo}		 
+	</update>
+	
+</mapper>

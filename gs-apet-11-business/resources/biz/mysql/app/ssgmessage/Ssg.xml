@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ssg">
+
+	<insert id="insertSms" useGeneratedKeys="true" keyProperty="fseq">
+		<!--
+			Query Name : ssg.insertSms
+			Description : SMS 전송테이블  등록
+		-->
+		INSERT INTO ABOUTPET_MSG.SSG_SEND_TRAN_SMS_REAL  /* QUERYID(ssg.insertSms) */
+		(
+			  FUSERID		/* USER 계정 */
+			, FMSGTYPE		/* 메시지 타입 */
+			, FMESSAGE		/* 메시지 본문 */
+			, FSENDDATE		/* 발송 시간 */
+			, FDESTINE		/* 수신자 전화번호 */
+			, FCALLBACK		/* 발신자 전화번호 */
+			, FSENDSTAT)	/* 전송 상태 */
+			VALUES
+		(
+			 #{fuserid}
+			,'${@framework.common.constants.CommonConstants@MSG_TP_SMS}'
+			,#{fmessage}
+			, IFNULL(#{fsenddate}, NOW())
+			,#{fdestine}
+			,#{fcallback}
+			,#{fsendstat}
+		)
+	</insert>
+
+	<insert id="insertMms" useGeneratedKeys="true" keyProperty="fseq">
+		<!--
+			Query Name : ssg.insertMms
+			Description : MMS 전송테이블  등록
+		-->
+		INSERT INTO ABOUTPET_MSG.SSG_SEND_TRAN_MMS_REAL  /* QUERYID(ssg.insertMms) */
+		(
+			  FUSERID		/* USER 계정 */
+			, FMSGTYPE		/* 메시지 타입 */
+			, FSUBJECT		/* 메시지 제목 */
+			, FMESSAGE		/* 메시지 본문 */
+			, FSENDDATE		/* 발송 시간 */
+			, FDESTINE		/* 수신자 전화번호 */
+			, FCALLBACK		/* 발신자 전화번호 */
+			, FSENDSTAT		/* 전송 상태 */
+			, FFILECNT		/* 파일 개수 */
+			, FFILEPATH		/* 파일 경로 */
+		)
+			VALUES
+		(
+			 #{fuserid}
+			,#{fmsgtype}
+			,#{fsubject}
+			,#{fmessage}
+			, IFNULL(#{fsenddate}, NOW())
+			,#{fdestine}
+			,#{fcallback}
+			,#{fsendstat}
+			,#{ffilecnt}
+			,#{ffilepath}
+		)
+	</insert>
+
+	<insert id="insertKko" useGeneratedKeys="true" keyProperty="fseq">
+		<!--
+			Query Name : ssg.insertKko
+			Description : MMS 전송테이블  등록
+		-->
+		INSERT INTO ABOUTPET_MSG.SSG_SEND_TRAN_KKO  /* QUERYID(ssg.insertKko) */
+		(
+			  FUSERID			/* USER 계정 */
+			, FYELLOWID			/* KKO발신프로필키 */
+			, FTEMPLATEKEY		/* KKO 템플릿 키 */
+			, FMSGTYPE          /* 메시지 타입 */
+			, FKKOSUBJECT		/* 카카오 제목 */
+			, FMESSAGE          /* 메시지 본문 */
+			, FSENDDATE         /* 발송 시간 */
+			, FDESTINE          /* 수신자 전화번호*/
+			, FCALLBACK         /* 발신자 전화번호*/
+			, FSENDSTAT         /* 발송 상태 */
+			, FKKOBUTTON        /* 카카오 버튼 */
+			, FKKORESENDTYPE    /* 실패시 재발송 타입 */
+			, FKKORESENDMSG     /* 실패시 재발송 메시지 본문 */
+			, FRETRY            /* 실패시 재발송 횟수 */
+		)
+			VALUES
+		(
+			 #{fuserid}
+			,#{fyellowid}
+			,#{ftemplatekey}
+			,#{fmsgtype}
+			,#{fkkosubject}
+			,#{fmessage}
+			, IFNULL(#{fsenddate}, NOW())
+			,#{fdestine}
+			,#{fcallback}
+			,#{fsendstat}
+			,#{fkkobutton}
+			,#{fkkoresendtype}
+			,#{fkkoresendmsg}
+			,0
+		)
+	</insert>
+	
+	<select id="selectSmsLog" resultType="biz.common.model.SsgMessageSendVO">
+		<!--
+			Query Name : ssg.selectSmsLog
+			Description : SMS, KKO 발송 로그 조회 (SSG)
+		-->
+				
+		SELECT 
+				FSEQ
+				, FSERIAL
+				, FGROUPSEQ
+				, FUSERID
+				, FSECTIONCODE
+				, FCAMPCODE
+				<if test='fmsgtype == @framework.common.constants.CommonConstants@MSG_TP_KKO'>				
+				, FYELLOWID
+				, FKKOSUBJECT
+				, FTEMPLATEKEY
+				, FKKOBUTTON
+				, FFILECNT
+				, FFILEPATH
+				, FKKORESENDTYPE
+				, FKKORESENDMSG
+				, FRETRY
+				</if>
+				<if test='fmsgtype == @framework.common.constants.CommonConstants@MSG_TP_LMS or fmsgtype == @framework.common.constants.CommonConstants@MSG_TP_MMS'>
+				, FBARCODE
+				, FFILECNT
+				, FFILEPATH
+				</if>
+				, FMSGTYPE
+				, FMESSAGE
+				, FSENDDATE
+				, FSENDSTAT
+				, FDESTINE
+				, FCALLBACK
+				, FRSLTSTAT
+				, FMOBILECOMP
+				, FRSLTDATE
+				, FMODIDATE
+				, FINSERTDATE
+				, FCHANGEWORD1
+				, FCHANGEWORD2
+				, FCHANGEWORD3
+				, FCHANGEWORD4
+				, FCHANGEWORD5
+				, FETC1
+				, FETC2
+				, FETC3
+				, FETC4
+				, FETC5
+				, FETC6
+				, FETC7
+				, FETC8
+				<if test='fmsgtype != @framework.common.constants.CommonConstants@MSG_TP_KKO'>		
+				, FRESENDSEQ
+				</if>
+		FROM ${tableNm} 
+		WHERE 1=1
+		<choose>
+			<when test="fresendseq != null">			
+			AND FRESENDSEQ = #{fresendseq}
+			</when>
+			<otherwise>
+			AND FSEQ = #{fseq} 
+			</otherwise>
+		</choose> 
+		
+	</select>
+</mapper>

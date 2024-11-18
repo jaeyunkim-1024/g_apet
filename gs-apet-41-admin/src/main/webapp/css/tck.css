@@ -1,0 +1,43 @@
+@charset 'utf-8';
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css);
+/* reset */
+html,body {width:100%; height:100%; margin:0; padding:0; font-size:100%; min-width:1300px; overflow: hidden; background-color: #333;}
+
+article,aside,canvas,video,details,embed,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block;}
+command,datalist,keygen,mark,meter,progress,rp,rt,ruby,time,wbr{display:inline;}
+
+body,div,span,applet,object,iframe,
+h1,h2,h3,h4,h5,h6,p,blockquote,pre,
+a,abbr,acronym,address,big,cite,code,del,dfn,
+em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,
+dl,dt,dd,ol,ul,li,
+fieldset,form,label,legend,button,
+table,caption,tbody,tfoot,thead,tr,th,td,
+header,hgroup,footer ,nav ,section ,article ,aside ,figure ,video ,audio{margin:0;padding:0;border:0;font-size:100%;color:inherit;*zoom:1;background:none;table-layout: fixed;}
+body{font-family:'Nanum Gothic','Malgun Gothic','돋움',dotum, Arial, 'Open Sans', sans-serif; font-size:12px; color:#333; line-height:16px;}
+ul,ol{list-style:none}
+em,address{font-style:normal}
+img{border:0;background:transparent;-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF)"; /* IE8 */filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF);/* IE6 & 7 */*zoom:1;}
+select,textarea,input,label,img{vertical-align:middle;}
+legend,caption{display:none;}
+hr{margin-bottom:30px;border:none !important;}
+table{border-collapse:collapse;border-spacing:0;border:0; width:100%;}
+table th,table td{word-wrap:break-word;}
+button,a{text-decoration:none;cursor:pointer;}
+a:hover{text-decoration:none;}
+/* button, input[type=submit], input[type=reset], input[type=button] {overflow:visible; margin:0; padding:0; cursor:pointer; border:0; background:transparent;} */
+button, input[type=submit], input[type=reset], input[type=button] {margin:0; padding:2; cursor:pointer; }
+button::-moz-focus-inner {border:0;padding:0;}
+input, select, textarea, button {font-family:'Nanum Gothic','Malgun Gothic','돋움',dotum, Arial, sans-serif;font-size:100%;}
+input[type=button] { padding: 1px 2px; }
+
+
+div.area {padding:5px;}
+ul.softphone {height:25px;}
+ul.softphone > li { float:left; margin-right:2px; width:auto; color:white;}
+ul.softphone > li.tit { width:80px; font-weight: bold;}
+
+.area table th {color:#fff;text-align:left;}
+.area table td {padding:1px;}
+
+.ml20 { margin-left:20px;}

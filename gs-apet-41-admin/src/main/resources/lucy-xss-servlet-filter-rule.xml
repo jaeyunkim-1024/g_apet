@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns="http://www.navercorp.com/lucy-xss-servlet">
+    <defenders>
+        <!-- XssPreventer 등록 -->
+        <defender>
+            <name>xssPreventerDefender</name>
+            <class>com.navercorp.lucy.security.xss.servletfilter.defender.XssPreventerDefender</class>
+        </defender>
+
+        <!-- XssSaxFilter 등록 -->
+        <defender>
+            <name>xssSaxFilterDefender</name>
+            <class>com.navercorp.lucy.security.xss.servletfilter.defender.XssSaxFilterDefender</class>
+            <init-param>
+                <param-value>lucy-xss-sax.xml</param-value>   <!-- lucy-xss-filter의 sax용 설정파일 -->
+                <param-value>true</param-value>        <!-- 필터링된 코멘트를 남길지 여부, 성능 효율상 false 추천 -->
+            </init-param>
+        </defender>
+
+        <!-- XssFilter 등록 -->
+        <defender>
+            <name>xssFilterDefender</name>
+            <class>com.navercorp.lucy.security.xss.servletfilter.defender.XssFilterDefender</class>
+            <init-param>
+                <param-value>lucy-xss.xml</param-value>    <!-- lucy-xss-filter의 dom용 설정파일 -->
+                <param-value>true</param-value>         <!-- 필터링된 코멘트를 남길지 여부, 성능 효율상 false 추천 -->
+            </init-param>
+        </defender>
+    </defenders>
+
+    <!-- default defender 선언, 필터링 시 지정한 defender가 없으면 여기 정의된 default defender를 사용해 필터링 한다. -->
+    <default>
+        <defender>xssPreventerDefender</defender>
+    </default>
+
+    <!-- url 별 필터링 룰 선언 -->
+    <url-rule-set>
+        <!-- url disable이 true이면 지정한 url 내의 모든 파라메터는 필터링 되지 않는다. -->
+        <url-rule>
+            <url>/appweb/noticeLetterInsert.do</url>
+            <params>
+            	<param name="content" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url>/dwFaq/bbsLetterInsert.do</url>
+            <params>
+            	<param name="content" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url>/dwFaq/bbsLetterUpdate.do</url>
+            <params>
+            	<param name="content" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/company/policyInsert.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/company/policyUpdate.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/event/eventInsert.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/event/eventUpdate.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/appweb/sendPushMessage.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/appweb/updateNoticeSendList.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/appweb/saveNoticeTemplate.do</url>
+        </url-rule>
+        <url-rule>
+       		<url disable="true">/appweb/insertTerms.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/appweb/updateTerms.do</url>
+        </url-rule>
+        <url-rule>
+            <url>/goods/goodsInsert.do</url>
+            <params>
+            	<param name="contentPc" useDefender="false" />
+            	<param name="contentMobile" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url>/goods/goodsUpdate.do</url>
+            <params>
+            	<param name="contentPc" useDefender="false" />
+            	<param name="contentMobile" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/promotion/exhibitionBaseSave.do</url>
+        </url-rule>
+        <url-rule>
+		     <url disable="true">/sample/testMessage.do</url>
+		</url-rule>
+		<url-rule>
+		     <url disable="true">/sample/testEmail.do</url>
+		</url-rule>
+		<url-rule>
+		     <url disable="true">/sample/sampleSendPush.do</url>
+		</url-rule>
+		<url-rule>
+		     <url disable="true">/COMPFAQ/bbsLetterUpdate.do</url>
+		</url-rule>
+		<url-rule>
+		     <url disable="true">/COMPFAQ/bbsLetterInsert.do</url>
+		</url-rule>
+		<url-rule>
+            <url disable="true">/display/displayCornerItemSave.do</url>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/promotion/couponInsert.do</url>
+            <params>
+            	<param name="notice" useDefender="false" />
+            </params>
+        </url-rule>
+        <url-rule>
+            <url disable="true">/promotion/couponUpdate.do</url>
+            <params>
+            	<param name="notice" useDefender="false" />
+            </params>
+        </url-rule>
+    </url-rule-set>
+</config>

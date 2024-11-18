@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2021. 02. 10.
+	작성자 : kek01
+-->
+
+<mapper namespace="ordDtlCstrtDlvrMap">
+
+	<insert id="insertOrdDtlCstrtDlvrMap" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMap
+			Description : 주문 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO ORD_DTL_CSTRT_DLVR_MAP	/*QUERYID(ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMap) */
+		(
+			  ORD_DTL_CSTRT_NO			/* 주문 상세 구성 번호 */
+			, DLVR_NO					/* 배송 번호 */
+			, CIS_OO_QTY				/* CIS 출고 수량 */
+			, DLGT_YN					/* 대표 여부 */
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+		) VALUES (
+			  #{ordDtlCstrtNo}			/* 주문 상세 구성 번호 */
+			, #{dlvrNo}					/* 배송 번호 */
+			, #{cisOoQty}				/* CIS 출고 수량 */
+			, #{DlgtYn}					/* 대표 여부 */
+			, #{sysRegrNo}				/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<insert id="insertOrdDtlCstrtDlvrMapByOrdNo" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMapByOrdNo
+			Description : 주문 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO ORD_DTL_CSTRT_DLVR_MAP	/*QUERYID(ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMap) */
+		(
+				  ORD_DTL_CSTRT_NO			/* 주문 상세 구성 번호 */
+				, DLVR_NO					/* 배송 번호 */
+				, DLGT_YN					/* 대표 여부 */
+				, SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, SYS_REG_DTM				/* 시스템 등록 일시 */
+		) 
+		SELECT  ODC.ORD_DTL_CSTRT_NO
+				, #{dlvrNo}				/* 배송 번호 */
+				, 'Y'					/* 대표 여부 */
+				, #{sysRegrNo}			/* 시스템 등록자 번호 */
+				, NOW()					/* 시스템 등록 일시 */
+   		FROM	ORD_DTL_CSTRT ODC
+		        INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OD.ORD_NO 
+		                                  AND ODC.ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+		        INNER JOIN COMPANY_BASE CB ON CB.COMP_NO = OD.COMP_NO
+		                                  AND CB.COMP_GB_CD = #{compGbCd}  /* 업체유형코드*/
+		WHERE	ODC.ORD_NO = #{ordNo}
+		<if test="compNo != null and compNo != ''">
+		  AND   OD.COMP_NO = #{compNo}
+		</if>
+		<if test="dlvrcNo != null and dlvrcNo != ''">
+		  AND   OD.DLVRC_NO = #{dlvrcNo}
+		</if>
+	</insert>
+	
+	<insert id="insertOrdDtlCstrtDlvrMapByDlvrNo" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMapByDlvrNo
+			Description : 주문 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO ORD_DTL_CSTRT_DLVR_MAP  /*QUERYID(ordDtlCstrtDlvrMap.insertOrdDtlCstrtDlvrMapByDlvrNo) */
+		       (
+		 			 ORD_DTL_CSTRT_NO				/* 주문 상세 구성 번호 */
+		 			,DLVR_NO						/* 배송 번호 */
+		 			,DLGT_YN						/* 대표 여부 */
+		 			,SYS_REGR_NO
+		 			,SYS_REG_DTM
+		 			,SYS_UPDR_NO
+		 			,SYS_UPD_DTM      
+		       )
+		SELECT   ODCDM.ORD_DTL_CSTRT_NO 			/* 주문 상세 구성 번호 */
+		        ,#{newDlvrNo}		AS DLVR_NO		/* 신규 배송 번호 */
+		        ,'N'				AS DLGT_YN		/* 대표 여부 */
+		        ,#{sysRegrNo}		AS SYS_REGR_NO
+		        ,NOW()				AS SYS_REG_DTM
+		        ,#{sysRegrNo}		AS SYS_UPDR_NO
+		        ,NOW()				AS SYS_UPD_DTM
+		  FROM  ORD_DTL_CSTRT_DLVR_MAP ODCDM 
+		 WHERE  ODCDM.DLVR_NO = #{dlvrNo}
+	</insert>
+		
+	<update id="updateOrdDtlCstrtDlvrMap" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.updateOrdDtlCstrtDlvrMap
+			Description : 주문 상세 구성 배송 매핑 수정
+		-->
+		UPDATE	ORD_DTL_CSTRT_DLVR_MAP	/*QUERYID(ordDtlCstrtDlvrMap.updateOrdDtlCstrtDlvrMap) */
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}					/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM	= NOW()							/* 시스템 수정 일시 */
+			<if test="newDlvrNo != null and newDlvrNo != ''">
+			  , DLVR_NO	= #{newDlvrNo}							/* 배송 번호 */
+			</if>
+			<if test="cisOoQty != null and cisOoQty != ''">
+			  , CIS_OO_QTY	= #{cisOoQty}					/* CIS 출고 수량 */
+			</if>
+			<if test="DlgtYn != null and DlgtYn != ''">
+			  , DLGT_YN	= #{DlgtYn}							/* 대표 여부 */
+			</if>
+		WHERE 1 = 1
+			AND	ORD_DTL_CSTRT_NO = #{ordDtlCstrtNo}			/* 주문 상세 구성 번호 */
+			<if test="dlvrNo != null and dlvrNo != ''">
+				AND DLVR_NO	= #{dlvrNo}							/* 배송 번호 */
+			</if>
+	</update>
+	
+	<select id="getDlvrNoUseCount" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapSO" resultType="java.lang.Integer">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.getDlvrNoUseCount
+			Description : 배송지시에 생성된 배송번호가 동일한 주문(클레임)상세에 매핑된 경우, 매핑된 카운트 조회 (세트상품/사은품 에 하나의 배송번호로 매핑된 경우)
+			Date : 2020. 4. 5  kek01
+		-->
+			<if test='clmDlvrYn != null and clmDlvrYn eq "N" '>
+				/*주문 일때*/  
+				SELECT COUNT(ORD_DTL_CSTRT_NO)
+				  FROM ORD_DTL_CSTRT_DLVR_MAP
+				 WHERE ORD_DTL_CSTRT_NO IN (SELECT ORD_DTL_CSTRT_NO   FROM ORD_DTL_CSTRT CDC  WHERE ORD_NO = #{ordNo} AND ORD_DTL_SEQ = #{ordDtlSeq} )
+				   AND DLVR_NO = #{dlvrNo}
+				   AND ORD_DTL_CSTRT_NO != #{ordDtlCstrtNo}
+			</if>
+			<if test='clmDlvrYn != null and clmDlvrYn eq "Y" '>
+				/*클레임 일때*/  
+				SELECT COUNT(CLM_DTL_CSTRT_NO)
+				  FROM CLM_DTL_CSTRT_DLVR_MAP
+				 WHERE CLM_DTL_CSTRT_NO IN (SELECT CLM_DTL_CSTRT_NO   FROM CLM_DTL_CSTRT CDC  WHERE CLM_NO = #{ordNo} AND CLM_DTL_SEQ = #{ordDtlSeq} )
+				   AND DLVR_NO = #{dlvrNo}
+				   AND CLM_DTL_CSTRT_NO != #{ordDtlCstrtNo}
+			</if>
+	</select>
+	
+	<delete id="deleteOrdDtlCstrtDlvrMap" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : ordDtlCstrtDlvrMap.deleteOrdDtlCstrtDlvrMap
+			Description : 배송지시시 중복으로 들어간 데이터 매핑 삭제 (대표송장번호가 있을경우 대표송장번호 제외삭제, 대표배송번호가 없을 경우 가장 먼저 등록된 배송번호)
+			Date : 2021. 8. 5
+		-->
+		/*QUERYID(ordDtlCstrtDlvrMap.deleteOrdDtlCstrtDlvrMap) */
+		DELETE FROM ORD_DTL_CSTRT_DLVR_MAP WHERE DLVR_NO IN (
+			SELECT DLVR_NO FROM (
+		        SELECT 
+					ODCDM.DLVR_NO AS DLVR_NO
+		            , MIN(DLVR_NO) OVER (PARTITION BY ODC.ORD_DTL_SEQ, ODC.ORD_CSTRT_SEQ) AS MIN_DLVR_NO
+		            , SUM(IF(DLVR_NO = FN_GET_ORDER_DLVR_NO(ODC.ORD_NO, ODC.ORD_DTL_SEQ, 'Y'), 1, 0)) OVER (PARTITION BY ODC.ORD_DTL_SEQ, ODC.ORD_CSTRT_SEQ ) AS COUNT_DLVR_NO
+		            , ODC.ORD_NO
+		            , ODC.ORD_DTL_SEQ
+				FROM ORD_DTL_CSTRT_DLVR_MAP ODCDM
+		        JOIN ORD_DTL_CSTRT ODC ON ODC.ORD_DTL_CSTRT_NO = ODCDM.ORD_DTL_CSTRT_NO
+		        WHERE 1 = 1
+		        	AND ODC.ORD_NO = #{ordNo}
+		         	AND ODC.ORD_DTL_SEQ = #{ordDtlSeq}
+		    ) T1
+		    WHERE 1=1
+				AND ( T1.DLVR_NO != IF(T1.COUNT_DLVR_NO > 0, FN_GET_ORDER_DLVR_NO(T1.ORD_NO, T1.ORD_DTL_SEQ, 'Y'), T1.MIN_DLVR_NO ) ) 
+		)
+			
+	</delete>	
+</mapper>

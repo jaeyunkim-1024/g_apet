@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<article class="popLayer a popDeliItem" id="popDeliItem"><!-- popDeliItem -->
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">배송 선택</h1>
+					<button type="button" class="btnPopClose" onclick="window.self.close();">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+					<section class="sect">
+						<div class="hdt">
+							<span class="tit">역삼동 우리집</span>
+							<button type="button" class="btn sm">변경</button>
+						</div>
+						<div class="addrs">[01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우</div>
+						<!-- 배송시간선택테이블 -->
+						<div class="deli_time_wrap">
+							<table>
+								<colgroup>
+									<col width="16.6%" />
+									<col width="16.6%" />
+									<col width="16.6%" />
+									<col width="16.6%" />
+									<col width="16.6%" />
+									<col width="16.6%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th colspan="2" class="deli_day_info">배송시간</th>
+										<th><span>오늘</span><span class="deli_day">8/23</span></th>
+										<th><span>내일</span><span class="deli_day">8/23</spanp></th>
+										<th><span>모레</span><span class="deli_day">8/23</span></th>
+										<th><span>목</span><span class="deli_day">8/23</span></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>새벽</td>
+										<td>7시<br />이전</td>
+										<td colspan="4" class="disabled"><span>서비스 지역이 아니에요</span></td>
+									</tr>
+									<tr>
+										<td rowspan="3">당일</td>
+										<td>오후<br />4~10시</td>
+										<td class="disabled"><span>마감</span></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+									</tr>
+									<tr>
+										<td>오후<br />6~10시</td>
+										<td class="disabled"><span>마감</span></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+									</tr>
+									<tr>
+										<td>오후<br />8~11시</td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+										<td><label class="radio only"><input type="radio" name="radio1" checked=""><span class="txt">선택</span></label></td>
+									</tr>
+									<tr>
+										<td colspan="2">GS전담배송</td>
+										<td colspan="4"><label class="radio"><input type="radio" name="radio1" checked=""><span class="txt">1~2일 소요 (주말, 공휴일 제외)</span></label></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- //배송시간선택테이블 -->
+					
+						<div class="deli_info">
+							<li class="ttl">새벽배송안내</li>
+							<li>• 서울, 경기 일부지역에 서비스됩니다.</li>
+							<li>• 오후 9시 이전 주문 시 다음날 새벽배송이 가능합니다.</li>
+							<li>• 일요일, 명절연휴(설날/추석 당일)에는 영업휴일 다음날 새벽배송 됩니다.</li>
+						</div>
+						<div class="deli_info">
+							<li class="ttl">당일배송안내</li>
+							<li>• 서울, 인천, 경기 일부지역에 서비스됩니다.</li>
+							<li>• 오후 1시 이전 주문 시 당일배송이 가능합니다.</li>
+							<li>• 당일 오후 4~10시 배송시간 선택 시 일요일에는 영업휴일 다음날 배송됩니다.</li>
+							<li>• 당일 오후 6~10시, 8~11시 배송 시간 선택 시 명절연휴(설날/추석 당일)에는 영업휴일 다음날 배송됩니다.</li>
+						</div>
+						<div class="deli_info">
+							<li class="ttl">GS전담배송안내</li>
+							<li>• GS리테일의 지정 택배사인 한진택배가 GS 전담배송 서비스를 진행하여 관리합니다.</li>
+							<li>• GS전담배송 불가지역의 경우 일반택배로 발송됩니다.</li>
+							<li>• 주문일로부터 1~2일 소요됩니다.</li>
+							<li>• 오후 4시 이전 주문 시 다음날 도착합니다.</li>
+							<li>• 오후 4시 이후 주문시 2일 이내 도착합니다.</li>
+							<li>• 주말, 공휴일에는 영업휴일 다음날 배송됩니다.</li>
+						</div>
+					</section>
+
+				</main>
+			</div>
+			
+			
+			<div class="pbt">
+				<div class="bts">
+					<button type="button" class="btn xl a btnGet">확인</button>
+				</div>
+			</div>
+		</div>
+	</article>
+
+	<script>
+		ui.popLayer.open('popDeliItem');
+	</script>
+</body>
+</html>

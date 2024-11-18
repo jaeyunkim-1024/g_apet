@@ -1,0 +1,16 @@
+/* 2021.04.28 수정 */
+.my-accd .qalist>li .hBox .tit {
+    font-weight:400;
+}
+
+.my-accd .qalist>li .hBox .info .dds .dd.date {
+    font-weight:400;
+}
+
+.my-accd .qalist>li .cBox .reply .msg {
+    font-weight:400;
+}
+
+.my-accd .qalist>li .hBox .info .dds .dd.rep.com {
+    font-weight:400;
+}

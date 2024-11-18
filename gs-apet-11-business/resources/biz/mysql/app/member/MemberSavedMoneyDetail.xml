@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 적립금 내역
+	작성자  		snw
+	작성일자  	2017.02.01
+-->
+
+<mapper namespace="memberSavedMoneyDetail">
+
+	<insert id="insertMemberSavedMoneyDetail">
+		<!--
+			Query Name : memberSavedMoneyDetail.insertMemberSavedMoneyDetail
+			Description : 회원 적립금 내역 등록
+		-->
+		/*QUERYID(memberSavedMoneyDetail.insertMemberSavedMoneyDetail) */
+		INSERT INTO MEMBER_SAVED_MONEY_DETAIL (
+			 MBR_NO					/* 회원 번호 */
+			, SVMN_SEQ				/* 적립금 순번 */
+			, HIST_SEQ				/* 이력 순번 */
+			, SVMN_PRCS_CD		/* 적립금 처리 코드 */
+			, SVMN_PRCS_RSN_CD	/* 적립금 처리 사유 코드 */
+			, ETC_RSN           /* 기타 사유 */
+			, PRCS_AMT				/* 처리 금액 */
+			, PRCS_DTM				/* 처리 일시 */
+			, PAY_NO					/* 결제 번호 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+		) SELECT
+			  #{mbrNo}				/* 회원 번호 */
+			, #{svmnSeq}				/* 적립금 순번 */
+			, (SELECT IFNULL(MAX(HIST_SEQ), 0) + 1 FROM MEMBER_SAVED_MONEY_DETAIL WHERE MBR_NO = #{mbrNo} AND SVMN_SEQ = #{svmnSeq})
+			, #{svmnPrcsCd}			/* 적립금 처리 코드 */
+			, #{svmnPrcsRsnCd}		/* 적립금 처리 사유 코드 */
+			, #{etcRsn}             /* 기타 사유 */
+			, #{prcsAmt}				/* 처리 금액 */
+			, NOW()					/* 처리 일시 */
+			, #{payNo}				/* 결제 번호 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+	</insert>
+
+	<select id="listMemberSavedMoneyDetail" resultType="biz.app.member.model.MemberSavedMoneyDetailVO">
+		<!--
+			Query Name : memberSavedMoneyDetail.listMemberSavedMoneyDetail
+			Description : 회원 적립금 내역 목록 조회
+		-->
+		SELECT	/* QUERYID(memberSavedMoneyDetail.listMemberSavedMoneyDetail) */
+					 MSMD.MBR_NO					/* 회원 번호 */
+					, MSMD.SVMN_SEQ				/* 적립금 순번 */
+					, MSMD.HIST_SEQ				/* 이력 순번 */
+					, MSMD.SVMN_PRCS_CD		/* 적립금 처리 코드 */
+					, MSMD.SVMN_PRCS_RSN_CD	/* 적립금 처리 사유 코드 */
+					, MSMD.PRCS_DTM				/* 처리 일시 */
+					, MSMD.PRCS_AMT				/* 처리 금액 */
+					, FN_GET_SAVED_MONEY_RESTORE_AMT(MSMD.MBR_NO, MSMD.SVMN_SEQ, MSMD.HIST_SEQ) AS RESTORE_AMT
+					, MSMD.PAY_NO					/* 결제 번호 */
+					, MSMD.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, MSMD.SYS_REG_DTM			/* 시스템 등록 일시 */
+		FROM		MEMBER_SAVED_MONEY_DETAIL MSMD
+					,MEMBER_SAVED_MONEY MSM
+		WHERE	MSMD.MBR_NO = MSM.MBR_NO
+		AND		MSMD.SVMN_SEQ = MSM.SVMN_SEQ
+		<if test="mbrNo != null">
+		AND		MSMD.MBR_NO	= #{mbrNo}
+		</if>
+		<if test="svmnSeq != null">
+		AND		MSMD.SVMN_SEQ = #{svmnSeq}
+		</if>
+		<if test="payNo != null">
+		AND		MSMD.PAY_NO = #{payNo}
+		</if>
+		<if test="svmnPrcsCd != null and svmnPrcsCd != ''">
+		AND		MSMD.SVMN_PRCS_CD = #{svmnPrcsCd}
+		</if>
+		<if test="svmnPrcsRsnCd != null and svmnPrcsRsnCd != ''">
+		AND		MSMD.SVMN_PRCS_RSN_CD = #{svmnPrcsRsnCd}
+		</if>
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+</mapper>

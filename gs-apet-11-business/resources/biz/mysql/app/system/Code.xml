@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="code">
+
+	<select id="pageCodeGroup" resultType="biz.app.system.model.CodeGroupVO">
+		<!--
+			Query Name : code.pageCodeGroup
+			Description : pageCodeGroup
+		-->
+		SELECT	/* QUERYID(code.pageCodeGroup) */
+				  GRP_CD 	 /*그룹 코드*/
+				, GRP_NM 	 /*그룹 명*/
+				, USR_DFN1_NM /*사용자 정의1 명*/
+				, USR_DFN2_NM /*사용자 정의2 명*/
+				, USR_DFN3_NM /*사용자 정의3 명*/
+				, USR_DFN4_NM /*사용자 정의4 명*/
+				, USR_DFN5_NM /*사용자 정의5 명*/
+				, SYS_REGR_NO /*시스템 등록자 번호*/
+				, SYS_REG_DTM /*시스템 등록 일시*/
+				, SYS_UPDR_NO /*시스템 수정자 번호*/
+				, SYS_UPD_DTM /*시스템 수정 일시*/
+				, SYS_DEL_YN  /*시스템 삭제 여부*/
+				, SYS_DELR_NO /*시스템 삭제자 번호*/
+				, SYS_DEL_DTM /*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CODE_GROUP
+		WHERE	1=1
+		AND		SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		<if test="grpCd != null and grpCd != ''">
+		AND		GRP_CD LIKE CONCAT('%', #{grpCd}, '%')
+		</if>
+		<if test="grpNm != null and grpNm != ''">
+		AND		GRP_NM LIKE CONCAT('%', #{grpNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCodeGroupCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : code.pageCodeGroupCount
+			Description : pageCodeGroupCount
+		-->
+		SELECT /* QUERYID(code.pageCodeGroupCount) */
+				COUNT(*)
+		FROM	CODE_GROUP
+		WHERE	1 = 1
+		AND		SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		<if test="grpCd != null and grpCd != ''">
+		AND		GRP_CD LIKE CONCAT('%', #{grpCd}, '%')
+		</if>
+		<if test="grpNm != null and grpNm != ''">
+		AND		GRP_NM LIKE CONCAT('%', #{grpNm}, '%')
+		</if>
+	</select>
+
+	<select id="getCodeGroup" resultType="biz.app.system.model.CodeGroupVO">
+		<!--
+			Query Name : code.pageCodeGroup
+			Description : pageCodeGroup
+		-->
+		SELECT	/* QUERYID(code.getCodeGroup) */
+				  GRP_CD 	 /*그룹 코드*/
+				, GRP_NM 	 /*그룹 명*/
+				, USR_DFN1_NM /*사용자 정의1 명*/
+				, USR_DFN2_NM /*사용자 정의2 명*/
+				, USR_DFN3_NM /*사용자 정의3 명*/
+				, USR_DFN4_NM /*사용자 정의4 명*/
+				, USR_DFN5_NM /*사용자 정의5 명*/
+				, SYS_REGR_NO /*시스템 등록자 번호*/
+				, SYS_REG_DTM /*시스템 등록 일시*/
+				, SYS_UPDR_NO /*시스템 수정자 번호*/
+				, SYS_UPD_DTM /*시스템 수정 일시*/
+				, SYS_DEL_YN  /*시스템 삭제 여부*/
+				, SYS_DELR_NO /*시스템 삭제자 번호*/
+				, SYS_DEL_DTM /*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CODE_GROUP
+		WHERE	1=1
+		AND		GRP_CD = #{grpCd}
+	</select>
+
+	<insert id="insertCodeGroup" parameterType="biz.app.system.model.CodeGroupPO">
+		INSERT INTO CODE_GROUP (
+			  GRP_CD			/* 그룹 코드 */
+			, GRP_NM			/* 그룹 명 */
+			, USR_DFN1_NM		/* 사용자 정의1 명 */
+			, USR_DFN2_NM		/* 사용자 정의2 명 */
+			, USR_DFN3_NM		/* 사용자 정의3 명 */
+			, USR_DFN4_NM		/* 사용자 정의4 명 */
+			, USR_DFN5_NM		/* 사용자 정의5 명 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, SYS_DEL_YN		/* 시스템 삭제 여부 */
+		) VALUES (
+			  #{grpCd}			/* 그룹 코드 */
+			, #{grpNm}			/* 그룹 명 */
+			, #{usrDfn1Nm}		/* 사용자 정의1 명 */
+			, #{usrDfn2Nm}		/* 사용자 정의2 명 */
+			, #{usrDfn3Nm}		/* 사용자 정의3 명 */
+			, #{usrDfn4Nm}		/* 사용자 정의4 명 */
+			, #{usrDfn5Nm}		/* 사용자 정의5 명 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		)
+	</insert>
+
+	<update id="updateCodeGroup" parameterType="biz.app.system.model.CodeGroupPO">
+		UPDATE	CODE_GROUP SET
+				  GRP_NM			= #{grpNm}			/* 그룹 명 */
+				, USR_DFN1_NM		= #{usrDfn1Nm}		/* 사용자 정의1 명 */
+				, USR_DFN2_NM		= #{usrDfn2Nm}		/* 사용자 정의2 명 */
+				, USR_DFN3_NM		= #{usrDfn3Nm}		/* 사용자 정의3 명 */
+				, USR_DFN4_NM		= #{usrDfn4Nm}		/* 사용자 정의4 명 */
+				, USR_DFN5_NM		= #{usrDfn5Nm}		/* 사용자 정의5 명 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()		/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GRP_CD				= #{grpCd}
+	</update>
+
+	<update id="deleteCodeGroup" parameterType="biz.app.system.model.CodeGroupPO">
+		UPDATE	CODE_GROUP SET
+				  SYS_DEL_YN		= '${@framework.common.constants.CommonConstants@USE_YN_Y}'		/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		= #{sysDelrNo}		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		= NOW()				/* 시스템 삭제 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GRP_CD				= #{grpCd}
+	</update>
+
+	<select id="pageCodeDetail" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : code.pageCodeDetail
+			Description : pageCodeDetail
+		-->
+		SELECT	/* QUERYID(code.pageCodeDetail) */
+				 A.DTL_CD		/*상세 코드*/
+				,A.DTL_NM		/*상세 명*/
+				,A.DTL_SHT_NM	/*상세 약어 명*/
+				,A.SORT_SEQ		/*정렬 순서*/
+				,A.USE_YN		/*사용 여부*/
+				,A.USR_DFN1_VAL	/*사용자 정의1 값*/
+				,A.USR_DFN2_VAL	/*사용자 정의2 값*/
+				,A.USR_DFN3_VAL	/*사용자 정의3 값*/
+				,A.USR_DFN4_VAL	/*사용자 정의4 값*/
+				,A.GRP_CD 		/*그룹 코드*/
+				,B.GRP_NM		/* 그룹명 */
+				,A.USR_DFN4_VAL	/*사용자 정의4 값*/
+				,A.USR_DFN5_VAL	/*사용자 정의5 값*/
+				,A.SYS_REGR_NO	/*시스템 등록자 번호*/
+				,A.SYS_REG_DTM	/*시스템 등록 일시*/
+				,A.SYS_UPDR_NO	/*시스템 수정자 번호*/
+				,A.SYS_UPD_DTM	/*시스템 수정 일시*/
+				,A.SYS_DEL_YN	/*시스템 삭제 여부*/
+				,A.SYS_DELR_NO	/*시스템 삭제자 번호*/
+				,A.SYS_DEL_DTM	/*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CODE_DETAIL A
+				INNER JOIN CODE_GROUP B ON A.GRP_CD = B.GRP_CD
+		WHERE	1=1
+		AND		A.GRP_CD = #{grpCd}
+		AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCodeDetailCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : code.pageCodeDetailCount
+			Description : pageCodeDetailCount
+		-->
+		SELECT	/* QUERYID(code.pageCodeDetailCount) */
+				COUNT(*)
+		FROM	CODE_DETAIL A
+				INNER JOIN CODE_GROUP B ON A.GRP_CD = B.GRP_CD
+		WHERE	1 = 1
+		AND		A.GRP_CD = #{grpCd}
+		AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+	</select>
+
+	<select id="pageCodeDetailInterface" resultType="biz.app.system.model.interfaces.CodeDetailVO">
+		<!--
+			Query Name : code.pageCodeDetailInterface
+			Description : pageCodeDetailInterface
+		-->
+		SELECT	/* QUERYID(code.pageCodeDetailInterface) */
+				 A.DTL_CD		/*상세 코드*/
+				,A.DTL_NM		/*상세 명*/
+				,A.DTL_SHT_NM	/*상세 약어 명*/
+				,A.SORT_SEQ		/*정렬 순서*/
+				,A.USE_YN		/*사용 여부*/
+				,A.USR_DFN1_VAL	/*사용자 정의1 값*/
+				,A.USR_DFN2_VAL	/*사용자 정의2 값*/
+				,A.USR_DFN3_VAL	/*사용자 정의3 값*/
+				,A.GRP_CD 		/*그룹 코드*/
+				,B.GRP_NM		/* 그룹명 */
+				,A.USR_DFN4_VAL	/*사용자 정의4 값*/
+				,A.USR_DFN5_VAL	/*사용자 정의5 값*/
+				,A.SYS_REGR_NO	/*시스템 등록자 번호*/
+				,A.SYS_REG_DTM	/*시스템 등록 일시*/
+				,A.SYS_UPDR_NO	/*시스템 수정자 번호*/
+				,A.SYS_UPD_DTM	/*시스템 수정 일시*/
+				,A.SYS_DEL_YN	/*시스템 삭제 여부*/
+				,A.SYS_DELR_NO	/*시스템 삭제자 번호*/
+				,A.SYS_DEL_DTM	/*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, CGAM.API_GRP_CD
+		FROM	CODE_GROUP_API_MAP CGAM 
+		INNER JOIN CODE_DETAIL A ON CGAM.GRP_CD = A.GRP_CD
+		INNER JOIN CODE_GROUP B ON A.GRP_CD = B.GRP_CD
+		WHERE	1=1
+		<if test="grpCd != null and grpCd != ''">
+		AND        CGAM.API_GRP_CD = #{grpCd}
+		</if>
+		AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		ORDER BY	CGAM.API_GRP_CD ASC, A.SORT_SEQ ASC
+	</select>
+	
+	<select id="getCodeDetail" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : code.pageCodeDetail
+			Description : pageCodeDetail
+		-->
+		SELECT	/* QUERYID(code.pageCodeDetail) */
+				 A.DTL_CD		/*상세 코드*/
+				,A.DTL_NM		/*상세 명*/
+				,A.DTL_SHT_NM	/*상세 약어 명*/
+				,A.SORT_SEQ		/*정렬 순서*/
+				,A.USE_YN		/*사용 여부*/
+				,A.USR_DFN1_VAL	/*사용자 정의1 값*/
+				,A.USR_DFN2_VAL	/*사용자 정의2 값*/
+				,A.USR_DFN3_VAL	/*사용자 정의3 값*/
+				,A.GRP_CD 		/*그룹 코드*/
+				,A.USR_DFN4_VAL	/*사용자 정의4 값*/
+				,A.USR_DFN5_VAL	/*사용자 정의5 값*/
+				,A.SYS_REGR_NO	/*시스템 등록자 번호*/
+				,A.SYS_REG_DTM	/*시스템 등록 일시*/
+				,A.SYS_UPDR_NO	/*시스템 수정자 번호*/
+				,A.SYS_UPD_DTM	/*시스템 수정 일시*/
+				,A.SYS_DEL_YN	/*시스템 삭제 여부*/
+				,A.SYS_DELR_NO	/*시스템 삭제자 번호*/
+				,A.SYS_DEL_DTM	/*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CODE_DETAIL A
+				INNER JOIN CODE_GROUP B ON A.GRP_CD = B.GRP_CD
+		WHERE	1=1
+		AND		A.GRP_CD = #{grpCd}
+		AND		A.DTL_CD = #{dtlCd}
+	</select>
+
+	<insert id="insertCodeDetail" parameterType="biz.app.system.model.CodeDetailPO">
+		INSERT INTO CODE_DETAIL (
+			  DTL_CD			/* 상세 코드 */
+			, DTL_NM			/* 상세 명 */
+			, DTL_SHT_NM		/* 상세 약어 명 */
+			, SORT_SEQ			/* 정렬 순서 */
+			, USE_YN			/* 사용 여부 */
+			, USR_DFN1_VAL		/* 사용자 정의1 값 */
+			, USR_DFN2_VAL		/* 사용자 정의2 값 */
+			, USR_DFN3_VAL		/* 사용자 정의3 값 */
+			, GRP_CD			/* 그룹 코드 */
+			, USR_DFN4_VAL		/* 사용자 정의4 값 */
+			, USR_DFN5_VAL		/* 사용자 정의5 값 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, SYS_DEL_YN		/* 시스템 삭제 여부 */
+		) VALUES (
+			  #{dtlCd}			/* 상세 코드 */
+			, #{dtlNm}			/* 상세 명 */
+			, #{dtlShtNm}		/* 상세 약어 명 */
+			, #{sortSeq}		/* 정렬 순서 */
+			, #{useYn}			/* 사용 여부 */
+			, #{usrDfn1Val}		/* 사용자 정의1 값 */
+			, #{usrDfn2Val}		/* 사용자 정의2 값 */
+			, #{usrDfn3Val}		/* 사용자 정의3 값 */
+			, #{grpCd}			/* 그룹 코드 */
+			, #{usrDfn4Val}		/* 사용자 정의4 값 */
+			, #{usrDfn5Val}		/* 사용자 정의5 값 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, '${@framework.common.constants.CommonConstants@USE_YN_N}'		/* 시스템 삭제 여부 */
+		)
+	</insert>
+
+	<update id="updateCodeDetail" parameterType="biz.app.system.model.CodeDetailPO">
+		UPDATE	CODE_DETAIL SET
+				  DTL_NM		= #{dtlNm}		/* 상세 명 */
+				, DTL_SHT_NM	= #{dtlShtNm}	/* 상세 약어 명 */
+				, SORT_SEQ		= #{sortSeq}	/* 정렬 순서 */
+				, USE_YN		= #{useYn}		/* 사용 여부 */
+				, USR_DFN1_VAL	= #{usrDfn1Val}	/* 사용자 정의1 값 */
+				, USR_DFN2_VAL	= #{usrDfn2Val}	/* 사용자 정의2 값 */
+				, USR_DFN3_VAL	= #{usrDfn3Val}	/* 사용자 정의3 값 */
+				, USR_DFN4_VAL	= #{usrDfn4Val}	/* 사용자 정의4 값 */
+				, USR_DFN5_VAL	= #{usrDfn5Val}	/* 사용자 정의5 값 */
+				, SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		DTL_CD			= #{dtlCd}
+		AND		GRP_CD			= #{grpCd}
+	</update>
+
+	<update id="deleteCodeDetail" parameterType="biz.app.system.model.CodeDetailPO">
+		UPDATE	CODE_DETAIL SET
+				  SYS_DEL_YN		= '${@framework.common.constants.CommonConstants@USE_YN_Y}'		/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		= #{sysDelrNo}		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		= NOW()				/* 시스템 삭제 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GRP_CD				= #{grpCd}
+		AND		DTL_CD				= #{dtlCd}
+	</update>
+
+	<select id="createAutoSearchKeyWord" resultType="biz.app.system.model.CodeGroupVO">
+		<!--
+			Query Name : code.createAutoSearchKeyWord
+			Description : createAutoSearchKeyWord
+		-->
+		SELECT /* QUERYID(code.createAutoSearchKeyWord) */
+		    	CG.GRP_CD
+		     ,	CG.GRP_NM
+		FROM code_group CG
+		LEFT JOIN CODE_DETAIL CD ON CG.GRP_CD = CD.GRP_CD
+		WHERE CG.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		<include refid="bizCommon.sortSql" />
+	</select>
+</mapper>

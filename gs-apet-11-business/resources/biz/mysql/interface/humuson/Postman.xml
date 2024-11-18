@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	Humuson Postman
+	작성자 		snw
+	작성일자  	2017. 05. 18.
+-->
+
+<mapper namespace="postman">
+
+	<insert id="insertDcgEmail" useGeneratedKeys="true" keyProperty="seq">
+		<!--
+			Query Name : postman.insertDcgEmail
+			Description : DCG 메일 등록
+		-->	
+		INSERT INTO ${tableNm}
+		(
+			TO_NAME
+			,TO_EMAIL
+			,FROM_NAME
+			,FROM_EMAIL
+			,SUBJECT
+			<if test="siteId != null and siteId != ''">
+			,SITE_ID
+			</if>
+			<if test="contents != null and contents != ''">
+			,CONTENTS
+			</if>
+			<if test="map1 != null and map1 != ''">
+			,MAP1
+			</if>
+			<if test="map2 != null and map2 != ''">
+			,MAP2
+			</if>
+			<if test="map3 != null and map3 != ''">
+			,MAP3
+			</if>
+			<if test="map4 != null and map4 != ''">
+			,MAP4
+			</if>
+			<if test="map5 != null and map5 != ''">
+			,MAP5
+			</if>
+			<if test="map6 != null and map6 != ''">
+			,MAP6
+			</if>
+			<if test="map7 != null and map7 != ''">
+			,MAP7
+			</if>
+			<if test="map8 != null and map8 != ''">
+			,MAP8
+			</if>
+			<if test="map9 != null and map9 != ''">
+			,MAP9
+			</if>
+			<if test="map10 != null and map10 != ''">
+			,MAP10
+			</if>
+			<if test="map11 != null and map11 != ''">
+			,MAP11
+			</if>
+			<if test="map12 != null and map12 != ''">
+			,MAP12
+			</if>
+			<if test="map13 != null and map13 != ''">
+			,MAP13
+			</if>
+			<if test="map14 != null and map14 != ''">
+			,MAP14
+			</if>
+			<if test="map15 != null and map15 != ''">
+			,MAP15
+			</if>
+			<if test="map16 != null and map16 != ''">
+			,MAP16
+			</if>
+			<if test="map17 != null and map17 != ''">
+			,MAP17
+			</if>
+			<if test="map18 != null and map18 != ''">
+			,MAP18
+			</if>
+			<if test="map19 != null and map19 != ''">
+			,MAP19
+			</if>
+			<if test="map20 != null and map20 != ''">
+			,MAP20
+			</if>
+			<if test="map21 != null and map21 != ''">
+			,MAP21
+			</if>
+			<if test="map22 != null and map22 != ''">
+			,MAP22
+			</if>
+			<if test="map23 != null and map23 != ''">
+			,MAP23
+			</if>
+			<if test="map24 != null and map24 != ''">
+			,MAP24
+			</if>
+			<if test="map25 != null and map25 != ''">
+			,MAP25
+			</if>
+			<if test="map26 != null and map26 != ''">
+			,MAP26
+			</if>
+			<if test="map27 != null and map27 != ''">
+			,MAP27
+			</if>
+			<if test="map28 != null and map28 != ''">
+			,MAP28
+			</if>
+			<if test="map29 != null and map29 != ''">
+			,MAP29
+			</if>
+			<if test="map30 != null and map30 != ''">
+			,MAP30
+			</if>
+			<if test="map31 != null and map31 != ''">
+			,MAP31
+			</if>
+			<if test="map32 != null and map32 != ''">
+			,MAP32
+			</if>
+			<if test="map33 != null and map33 != ''">
+			,MAP33
+			</if>
+			<if test="map34 != null and map34 != ''">
+			,MAP34
+			</if>
+			<if test="map35 != null and map35 != ''">
+			,MAP35
+			</if>
+			<if test="map36 != null and map36 != ''">
+			,MAP36
+			</if>
+			<if test="mailCode != null and mailCode != ''">
+			,MAIL_CODE
+			</if>
+			,SEND_FLAG
+			,REGISTER_D
+		)
+		VALUES
+		(
+			#{toName}
+			,#{toEmail}
+			,#{fromName}
+			,#{fromEmail}
+			,#{subJect}
+			<if test="siteId != null and siteId != ''">
+			,#{siteId}
+			</if>
+			<if test="contents != null and contents != ''">
+			,#{contents}
+			</if>
+			<if test="map1 != null and map1 != ''">
+			,#{map1}
+			</if>
+			<if test="map2 != null and map2 != ''">
+			,#{map2}
+			</if>
+			<if test="map3 != null and map3 != ''">
+			,#{map3}
+			</if>
+			<if test="map4 != null and map4 != ''">
+			,#{map4}
+			</if>
+			<if test="map5 != null and map5 != ''">
+			,#{map5}
+			</if>
+			<if test="map6 != null and map6 != ''">
+			,#{map6}
+			</if>
+			<if test="map7 != null and map7 != ''">
+			,#{map7}
+			</if>
+			<if test="map8 != null and map8 != ''">
+			,#{map8}
+			</if>
+			<if test="map9 != null and map9 != ''">
+			,#{map9}
+			</if>
+			<if test="map10 != null and map10 != ''">
+			,#{map10}
+			</if>
+			<if test="map11 != null and map11 != ''">
+			,#{map11}
+			</if>
+			<if test="map12 != null and map12 != ''">
+			,#{map12}
+			</if>			
+			<if test="map13 != null and map13 != ''">
+			,#{map13}
+			</if>
+			<if test="map14 != null and map14 != ''">
+			,#{map14}
+			</if>
+			<if test="map15 != null and map15 != ''">
+			,#{map15}
+			</if>
+			<if test="map16 != null and map16 != ''">
+			,#{map16}
+			</if>
+			<if test="map17 != null and map17 != ''">
+			,#{map17}
+			</if>
+			<if test="map18 != null and map18 != ''">
+			,#{map18}
+			</if>
+			<if test="map19 != null and map19 != ''">
+			,#{map19}
+			</if>
+			<if test="map20 != null and map20 != ''">
+			,#{map20}
+			</if>
+			<if test="map21 != null and map21 != ''">
+			,#{map21}
+			</if>
+			<if test="map22 != null and map22 != ''">
+			,#{map22}
+			</if>
+			<if test="map23 != null and map23 != ''">
+			,#{map23}
+			</if>
+			<if test="map24 != null and map24 != ''">
+			,#{map24}
+			</if>
+			<if test="map25 != null and map25 != ''">
+			,#{map25}
+			</if>
+			<if test="map26 != null and map26 != ''">
+			,#{map26}
+			</if>
+			<if test="map27 != null and map27 != ''">
+			,#{map27}
+			</if>
+			<if test="map28 != null and map28 != ''">
+			,#{map28}
+			</if>
+			<if test="map29 != null and map29 != ''">
+			,#{map29}
+			</if>
+			<if test="map30 != null and map30 != ''">
+			,#{map30}
+			</if>
+			<if test="map31 != null and map31 != ''">
+			,#{map31}
+			</if>
+			<if test="map32 != null and map32 != ''">
+			,#{map32}
+			</if>
+			<if test="map33 != null and map33 != ''">
+			,#{map33}
+			</if>
+			<if test="map34 != null and map34 != ''">
+			,#{map34}
+			</if>
+			<if test="map35 != null and map35 != ''">
+			,#{map35}
+			</if>
+			<if test="map36 != null and map36 != ''">
+			,#{map36}
+			</if>
+			<if test="mailCode != null and mailCode != ''">
+			,#{mailCode}
+			</if>
+			, 'N'
+			, GETDATE()
+		)
+	</insert>
+
+	<insert id="insertDcgEmailMapping">
+		<!--
+			Query Name : postman.insertDcgEmailMapping
+			Description : DCG 메일 Mapping 등록
+		-->	
+		INSERT INTO ${tableNm}_MAPPING
+		(
+			LIST_SEQ
+			<if test="lmap1 != null and lmap1 != ''">
+			,LMAP1
+			</if>
+			<if test="lmap2 != null and lmap2 != ''">
+			,LMAP2
+			</if>
+			<if test="lmap3 != null and lmap3 != ''">
+			,LMAP3
+			</if>
+			<if test="lmap4 != null and lmap4 != ''">
+			,LMAP4
+			</if>
+			<if test="lmap5 != null and lmap5 != ''">
+			,LMAP5
+			</if>
+			<if test="lmap6 != null and lmap6 != ''">
+			,LMAP6
+			</if>
+			<if test="lmap7 != null and lmap7 != ''">
+			,LMAP7
+			</if>
+			<if test="lmap8 != null and lmap8 != ''">
+			,LMAP8
+			</if>
+			<if test="lmap9 != null and lmap9 != ''">
+			,LMAP9
+			</if>
+			<if test="lmap10 != null and lmap10 != ''">
+			,LMAP10
+			</if>
+			,REGISTER_D
+		)
+		VALUES
+		(
+			#{listSeq}
+			<if test="lmap1 != null and lmap1 != ''">
+			,#{lmap1}
+			</if>
+			<if test="lmap2 != null and lmap2 != ''">
+			,#{lmap2}
+			</if>
+			<if test="lmap3 != null and lmap3 != ''">
+			,#{lmap3}
+			</if>
+			<if test="lmap4 != null and lmap4 != ''">
+			,#{lmap4}
+			</if>
+			<if test="lmap5 != null and lmap5 != ''">
+			,#{lmap5}
+			</if>
+			<if test="lmap6 != null and lmap6 != ''">
+			,#{lmap6}
+			</if>
+			<if test="lmap7 != null and lmap7 != ''">
+			,#{lmap7}
+			</if>
+			<if test="lmap8 != null and lmap8 != ''">
+			,#{lmap8}
+			</if>
+			<if test="lmap9 != null and lmap9 != ''">
+			,#{lmap9}
+			</if>
+			<if test="lmap10 != null and lmap10 != ''">
+			,#{lmap10}
+			</if>			
+			, GETDATE()
+		)
+	</insert>	
+	
+</mapper>

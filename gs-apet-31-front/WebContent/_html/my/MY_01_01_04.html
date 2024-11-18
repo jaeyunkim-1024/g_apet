@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"마이펫 등록","class":"noneAc"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					
+					<!-- 마이펫 등록  -->
+					<div class="pet-wrap">
+						<!-- PC 타이틀 모바일에서 제거  -->
+						<div class="pc-tit">
+							<h2>마이펫 등록</h2>
+						</div>
+						<!-- // PC 타이틀 모바일에서 제거  -->
+						<!-- 진행율  -->
+						<div class="step-bar">
+							<span style="width: 66%">진행율</span>
+						</div>
+						<!-- // 진행율  -->
+						<div class="step-area">
+							
+							<p class="tit">
+								마지막이에요!<br>
+								<span>댕댕이</span>에 대해 조금 더 알려주시겠어요?
+							</p>
+							<p class="sut-txt">
+								추가정보를 등록하시면 다양한 맞춤 추천을 받을 수 있어요.
+							</p>
+						
+							<!-- 정보 입력 -->
+							<div class="member-input t2">
+								<ul class="list">
+									<li>
+										<strong class="tit">중성화 여부</strong>
+										<div class="radiobox">
+											<span class="radio"><input type="radio" name="radio_a" id="radt_1" checked><label for="radt_1" class="txt">중성화 전</label></span>
+											<span class="radio"><input type="radio" name="radio_a" id="radt_2"><label for="radt_2" class="txt">중성화 완료</label></span>
+										</div>
+									</li>
+									<li>
+										<!-- 04.13 수정 -->
+										<strong class="tit newDn">염려질환
+											<span>중복선택 가능</span>
+										</strong>
+										<!-- // 04.13 수정 -->
+										<!-- <p class="info">중복 선택 가능</p> -->
+										<div class="filter-item">
+											<div class="tag">
+												<button>피부</button>
+												<button>눈</button>
+												<button>눈물</button>
+												<button>귀</button>
+												<button>관절</button>
+												<button>치아</button>
+												<button>모질</button>
+												<button>호흡기</button>
+												<button>소화기</button>
+												<button>체중</button>
+												<button>노환</button>
+												<button>신장</button>
+											</div>
+										</div>
+									</li>
+									<li>
+										<strong class="tit">알러지여부</strong>
+										<div class="radiobox">
+											<span class="radio"><input type="radio" name="radio_b" id="radt_3" checked><label for="radt_1" class="txt">있어요</label></span>
+											<span class="radio"><input type="radio" name="radio_b" id="radt_4"><label for="radt_2" class="txt">없어요</label></span>
+										</div>
+										<div class="filter-item">
+											<div class="tag">
+												<button>소고기</button>
+												<button>유제품</button>
+												<button>밀</button>
+												<button>닭</button>
+												<button>달걀</button>
+												<button>양고기</button>
+												<button>콩</button>
+												<button>옥수수</button>
+												<button>돼지고기</button>
+												<button>생선</button>
+												<button>밥</button>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+							<!-- // 정보 입력 -->
+							<div class="btnSet">
+								<a href="javascript:;" class="btn lg d">이전</a>
+								<a href="javascript:;" class="btn lg a">완료</a><!-- 03.08 수정 -->
+							</div>
+						</div>
+					</div>
+					<!-- // 마이펫 등록  -->
+					
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+
+		</script>
+	</div>
+</body>
+</html>

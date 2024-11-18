@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="leave">
+
+	<insert id="insertLeaveMemberBaseForBatch" parameterType="biz.app.member.model.MemberBasePO">
+		INSERT INTO LEAVE_MEMBER_BASE (
+			MBR_NO
+			, ST_ID
+			, POLICY_NO
+			, LOGIN_ID
+			, PET_LOG_URL
+			, PET_LOG_SRT_URL
+			, RCOM_CD
+			, RCOM_URL
+			, MBR_GB_CD
+			, MBR_STAT_CD
+			, MBR_GRD_CD
+			, GD_GB_CD
+			, NTN_GB_CD
+			, JOIN_DTM
+			, MOD_DTM
+			, JOIN_PATH_CD
+			, JOIN_ENV_CD
+			, CTF_YN
+			, DI_CTF_VAL
+			, GSPT_NO
+			, GSPT_USE_YN
+			, GSPT_STATE_CD
+			, GSPT_START_DTM
+			, GSPT_STOP_DTM
+			, DEVICE_TOKEN
+			, DEVICE_TP_CD
+			, INFO_RCV_YN
+			, MKNG_RCV_YN
+			, PST_INFO_AGR_YN
+			, ALM_RCV_YN
+			, DFFC_MBR_YN
+			, PET_SCHL_YN
+			, PSWD_INIT_YN
+			, PSWD_CHG_DTM
+			, LOGIN_FAIL_CNT
+			, LAST_LOGIN_DTM
+			, PSWD_CHG_SCD_DTM
+			, SIMP_SCR_NO
+			, BILL_INPUT_FAIL_CNT
+			, MOBILE_CD
+			, MBR_LEV_RSN_CD
+			, MBR_LEV_CONTENT
+			, MBR_LEV_DTM
+			, RE_JOIN_PSB_DT
+			, DORMANT_APL_DTM
+			, DORMANT_RLS_DTM
+			, PET_LOG_ITRDC
+			, PRFL_IMG
+			, MBR_STOP_DTM
+			, DLGT_PET_GB_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, BUY_CNT
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.mbrNo}
+			, #{item.stId}
+			, #{item.policyNo}
+			, #{item.loginId}
+			, #{item.petLogUrl}
+			, #{item.petLogSrtUrl}
+			, #{item.rcomCd}
+			, #{item.rcomUrl}
+			, #{item.mbrGbCd}
+			, #{item.mbrStatCd}
+			, #{item.mbrGrdCd}
+			, #{item.gdGbCd}
+			, #{item.ntnGbCd}
+			, #{item.joinDtm}
+			, #{item.modDtm}
+			, #{item.joinPathCd}
+			, #{item.joinEnvCd}
+			, #{item.ctfYn}
+			, #{item.diCtfVal}
+			, #{item.gsptNo}
+			, #{item.gsptUseYn}
+			, #{item.gsptStateCd}
+			, #{item.gsptStartDtm}
+			, #{item.gsptStopDtm}
+			, #{item.deviceToken}
+			, #{item.deviceTpCd}
+			, #{item.infoRcvYn}
+			, #{item.mkngRcvYn}
+			, #{item.pstInfoAgrYn}
+			, #{item.almRcvYn}
+			, #{item.dffcMbrYn}
+			, #{item.petSchlYn}
+			, #{item.pswdInitYn}
+			, #{item.pswdChgDtm}
+			, #{item.loginFailCnt}
+			, #{item.lastLoginDtm}
+			, #{item.pswdChgScdDtm}
+			, #{item.simpScrNo}
+			, #{item.billInputFailCnt}
+			, #{item.mobileCd}
+			, #{item.mbrLevRsnCd}
+			, #{item.mbrLevContent}
+			, #{item.mbrLevDtm}
+			, #{item.reJoinPsbDt}
+			, #{item.dormantAplDtm}
+			, #{item.dormantRlsDtm}
+			, #{item.petLogItrdc}
+			, #{item.prflImg}
+			, #{item.mbrStopDtm}
+			, #{item.dlgtPetGbCd}
+			, #{item.sysRegrNo}
+			, #{item.sysRegDtm}
+			, #{item.sysUpdrNo}
+			, #{item.sysUpdDtm}
+			, #{item.buyCnt}
+		)		
+		</foreach>
+	</insert>
+	
+	<insert id="insertLeaveMemberBizInfoForBatch" parameterType="biz.app.member.model.MemberBizInfoPO">
+		INSERT INTO LEAVE_MEMBER_BIZ_INFO (
+			MBR_NO
+			, BIZ_NO
+			, BIZ_ID
+			, BIZ_NM
+			, POST_NO_OLD
+			, POST_NO_NEW
+			, ROAD_ADDR
+			, ROAD_DTL_ADDR
+			, PRCL_ADDR
+			, PRCL_DTL_ADDR
+			, PTN_DATE
+			, STAT_CD
+			, BIZ_CDTS
+			, BIZ_TP
+			, REL_POST_NO_OLD
+			, REL_POST_NO_NEW
+			, REL_ROAD_ADDR
+			, REL_ROAD_DTL_ADDR
+			, REL_PRCL_ADDR
+			, REL_PRCL_DTL_ADDR
+			, RE_POST_NO_OLD
+			, RE_POST_NO_NEW
+			, RE_ROAD_ADDR
+			, RE_ROAD_DTL_ADDR
+			, RE_PRCL_ADDR
+			, RE_PRCL_DTL_ADDR
+			, CHRG_PART
+			, BANK_CD
+			, MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.mbrNo}
+			, #{item.bizNo}
+			, #{item.bizId}
+			, #{item.bizNm}
+			, #{item.postNoOld}
+			, #{item.postNoNew}
+			, #{item.roadAddr}
+			, #{item.roadDtlAddr}
+			, #{item.prclAddr}
+			, #{item.prclDtlAddr}
+			, #{item.ptnDate}
+			, #{item.statCd}
+			, #{item.bizCdts}
+			, #{item.bizTp}
+			, #{item.relPostNoOld}
+			, #{item.relPostNoNew}
+			, #{item.relRoadAddr}
+			, #{item.relRoadDtlAddr}
+			, #{item.relPrclAddr}
+			, #{item.relPrclDtlAddr}
+			, #{item.rePostNoOld}
+			, #{item.rePostNoNew}
+			, #{item.reRoadAddr}
+			, #{item.reRoadDtlAddr}
+			, #{item.rePrclAddr}
+			, #{item.rePrclDtlAddr}
+			, #{item.chrgPart}
+			, #{item.bankCd}
+			, #{item.memo}
+			, #{item.sysRegrNo}
+			, #{item.sysRegDtm}
+			, #{item.sysUpdrNo}
+			, #{item.sysUpdDtm}
+		)
+		</foreach>
+	</insert>
+	
+	<insert id="insertLeaveMemberBase" parameterType="biz.app.member.model.MemberBasePO">
+		INSERT INTO LEAVE_MEMBER_BASE (
+			MBR_NO
+			, ST_ID
+			, POLICY_NO
+			, LOGIN_ID
+			, PET_LOG_URL
+			, PET_LOG_SRT_URL
+			, RCOM_CD
+			, RCOM_URL
+			, MBR_GB_CD
+			, MBR_STAT_CD
+			, MBR_GRD_CD
+			, GD_GB_CD
+			, NTN_GB_CD
+			, JOIN_DTM
+			, MOD_DTM
+			, JOIN_PATH_CD
+			, JOIN_ENV_CD
+			, CTF_YN
+			, DI_CTF_VAL
+			, GSPT_NO
+			, GSPT_USE_YN
+			, GSPT_STATE_CD
+			, GSPT_START_DTM
+			, GSPT_STOP_DTM
+			, DEVICE_TOKEN
+			, DEVICE_TP_CD
+			, INFO_RCV_YN
+			, MKNG_RCV_YN
+			, PST_INFO_AGR_YN
+			, ALM_RCV_YN
+			, DFFC_MBR_YN
+			, PET_SCHL_YN
+			, PSWD_INIT_YN
+			, PSWD_CHG_DTM
+			, LOGIN_FAIL_CNT
+			, LAST_LOGIN_DTM
+			, PSWD_CHG_SCD_DTM
+			, SIMP_SCR_NO
+			, BILL_INPUT_FAIL_CNT
+			, MOBILE_CD
+			, MBR_LEV_RSN_CD
+			, MBR_LEV_CONTENT
+			, MBR_LEV_DTM
+			, RE_JOIN_PSB_DT
+			, DORMANT_APL_DTM
+			, DORMANT_RLS_DTM
+			, PET_LOG_ITRDC
+			, PRFL_IMG
+			, MBR_STOP_DTM
+			, DLGT_PET_GB_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, BUY_CNT
+		) VALUES (
+			#{mbrNo}
+			, #{stId}
+			, #{policyNo}
+			, #{loginId}
+			, #{petLogUrl}
+			, #{petLogSrtUrl}
+			, #{rcomCd}
+			, #{rcomUrl}
+			, #{mbrGbCd}
+			, #{mbrStatCd}
+			, #{mbrGrdCd}
+			, #{gdGbCd}
+			, #{ntnGbCd}
+			, #{joinDtm}
+			, #{modDtm}
+			, #{joinPathCd}
+			, #{joinEnvCd}
+			, #{ctfYn}
+			, #{diCtfVal}
+			, #{gsptNo}
+			, #{gsptUseYn}
+			, #{gsptStateCd}
+			, #{gsptStartDtm}
+			, #{gsptStopDtm}
+			, #{deviceToken}
+			, #{deviceTpCd}
+			, #{infoRcvYn}
+			, #{mkngRcvYn}
+			, #{pstInfoAgrYn}
+			, #{almRcvYn}
+			, #{dffcMbrYn}
+			, #{petSchlYn}
+			, #{pswdInitYn}
+			, #{pswdChgDtm}
+			, #{loginFailCnt}
+			, #{lastLoginDtm}
+			, #{pswdChgScdDtm}
+			, #{simpScrNo}
+			, #{billInputFailCnt}
+			, #{mobileCd}
+			, #{mbrLevRsnCd}
+			, #{mbrLevContent}
+			, #{mbrLevDtm}
+			, #{reJoinPsbDt}
+			, #{dormantAplDtm}
+			, #{dormantRlsDtm}
+			, #{petLogItrdc}
+			, #{prflImg}
+			, #{mbrStopDtm}
+			, #{dlgtPetGbCd}
+			, #{sysRegrNo}
+			, #{sysRegDtm}
+			, #{sysUpdrNo}
+			, #{sysUpdDtm}
+			, #{buyCnt}
+		)	
+	</insert>
+	
+	
+	<insert id="insertLeaveMemberBizInfo" parameterType="biz.app.member.model.MemberBizInfoPO">
+		INSERT INTO LEAVE_MEMBER_BIZ_INFO (
+			MBR_NO
+			, BIZ_NO
+			, BIZ_ID
+			, BIZ_NM
+			, POST_NO_OLD
+			, POST_NO_NEW
+			, ROAD_ADDR
+			, ROAD_DTL_ADDR
+			, PRCL_ADDR
+			, PRCL_DTL_ADDR
+			, PTN_DATE
+			, STAT_CD
+			, BIZ_CDTS
+			, BIZ_TP
+			, REL_POST_NO_OLD
+			, REL_POST_NO_NEW
+			, REL_ROAD_ADDR
+			, REL_ROAD_DTL_ADDR
+			, REL_PRCL_ADDR
+			, REL_PRCL_DTL_ADDR
+			, RE_POST_NO_OLD
+			, RE_POST_NO_NEW
+			, RE_ROAD_ADDR
+			, RE_ROAD_DTL_ADDR
+			, RE_PRCL_ADDR
+			, RE_PRCL_DTL_ADDR
+			, CHRG_PART
+			, BANK_CD
+			, MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{mbrNo}
+			, #{bizNo}
+			, #{bizId}
+			, #{bizNm}
+			, #{postNoOld}
+			, #{postNoNew}
+			, #{roadAddr}
+			, #{roadDtlAddr}
+			, #{prclAddr}
+			, #{prclDtlAddr}
+			, #{ptnDate}
+			, #{statCd}
+			, #{bizCdts}
+			, #{bizTp}
+			, #{relPostNoOld}
+			, #{relPostNoNew}
+			, #{relRoadAddr}
+			, #{relRoadDtlAddr}
+			, #{relPrclAddr}
+			, #{relPrclDtlAddr}
+			, #{rePostNoOld}
+			, #{rePostNoNew}
+			, #{reRoadAddr}
+			, #{reRoadDtlAddr}
+			, #{rePrclAddr}
+			, #{rePrclDtlAddr}
+			, #{chrgPart}
+			, #{bankCd}
+			, #{memo}
+			, #{sysRegrNo}
+			, #{sysRegDtm}
+			, #{sysUpdrNo}
+			, #{sysUpdDtm}
+		)
+	</insert>
+</mapper>

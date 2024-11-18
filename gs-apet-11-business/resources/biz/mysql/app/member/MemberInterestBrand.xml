@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 관심 브랜드
+	작성자  	wyjeong
+	작성일자  	2017. 02. 13
+-->
+
+<mapper namespace="memberInterestBrand">
+
+	<select id="getMemberInterestBrand" resultType="biz.app.member.model.MemberInterestBrandVO">
+		<!--
+			Query Name : memberInterestBrand.getMemberInterestBrand
+			Description : 회원 관심 브랜드 조회
+		-->
+		SELECT	MBR_NO
+				,BND_NO
+		FROM	MEMBER_INTEREST_BRAND
+		WHERE	MBR_NO = #{mbrNo}
+		AND		BND_NO = #{bndNo}
+	</select>
+
+	<insert id="insertMemberInterestBrand">
+		<!--
+			Query Name : memberInterestBrand.insertMemberInterestBrand
+			Description : 회원 관심 브랜드 등록
+		-->
+		INSERT INTO	MEMBER_INTEREST_BRAND
+			(
+				MBR_NO
+				,BND_NO
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+			)
+		VALUES
+			(
+				#{mbrNo}
+				,#{bndNo}
+				,#{sysRegrNo}
+				,SYSDATE()
+			)
+	</insert>
+
+	<select id="pageMemberInterestBrand" resultType="biz.app.member.model.MemberInterestBrandVO">
+		SELECT A.*
+		FROM
+			(
+			SELECT
+				 MIB.MBR_NO			/* 회원번호 */
+				,MIB.BND_NO			/* 브랜드 번호 */
+		        ,MIB.SYS_REGR_NO	/* 등록자 */
+		        ,MIB.SYS_REG_DTM	/* 등록일 */
+		        ,BB.BND_NM_KO		/* 브랜드 명 국문 */
+		        ,BB.BND_NM_EN		/* 브랜드 명 영문 */
+		        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM 	/* 노출 브랜드명 */
+		        ,BB.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 */
+		        ,BB.BND_ITRDC_MO_IMG_PATH	/* 브랜드 소개 모바일 이미지 */
+			FROM
+		 		MEMBER_INTEREST_BRAND MIB
+		 		LEFT OUTER JOIN BRAND_BASE BB ON (MIB.BND_NO = BB.BND_NO)
+			WHERE MIB.MBR_NO = ${mbrNo}
+			) A
+		ORDER BY SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 회원 관심 상품 목록 : 데이터 수-->
+	<select id="pageMemberInterestBrandCount" resultType="Integer">
+		SELECT  COUNT(*)
+		FROM
+			(
+			SELECT
+				 MIB.MBR_NO
+			FROM
+				MEMBER_INTEREST_BRAND MIB
+		 		LEFT OUTER JOIN BRAND_BASE BB ON (MIB.BND_NO = BB.BND_NO)
+			WHERE MIB.MBR_NO = ${mbrNo}
+			) A
+	</select>
+
+	<delete id="deleteMemberInterestBrands">
+		<!--
+			Query Name : memberInterestBrand.deleteMemberInterestBrands
+			Description : 회원 관심 브랜드 삭제(여러건)
+		-->
+
+		DELETE
+		FROM	MEMBER_INTEREST_BRAND
+		WHERE	MBR_NO = #{mbrNo}
+		AND		BND_NO IN (${bndNos})
+	</delete>
+
+	<delete id="deleteMemberInterestBrand">
+		<!--
+			Query Name : memberInterestBrand.deleteMemberInterestBrand
+			Description : 회원 관심 브랜드 삭제
+		-->
+
+		DELETE
+		FROM	MEMBER_INTEREST_BRAND
+		WHERE	1=1
+		<if test='bndNo != null and bndNo != ""'>
+		AND		BND_NO = #{bndNo}
+		</if>
+		<if test='mbrNo != null'>
+		AND		MBR_NO = #{mbrNo}
+		</if>
+		<if test='strgPeriod != null'>
+		AND		DATE_ADD(SYS_REG_DTM, INTERVAL #{strgPeriod} DAY) <![CDATA[<]]> NOW()
+		</if>
+	</delete>
+
+
+	<select id="listMemberInterestBrands" resultType="biz.app.member.model.MemberInterestBrandVO">
+	<!--
+		Query Name : memberInterestBrand.listMemberInterestBrands
+		Description : 마이페이지 > 찜 > 찜한 브랜드 목록
+	 -->
+	SELECT /* QUERYID (memberInterestBrand.listMemberInterestBrands) */
+			A.*
+		FROM
+			(
+			SELECT
+				 MIB.MBR_NO			/* 회원번호 */
+				,MIB.BND_NO			/* 브랜드 번호 */
+		        ,MIB.SYS_REGR_NO	/* 등록자 */
+		        ,MIB.SYS_REG_DTM	/* 등록일 */
+		        ,BB.BND_NM_KO		/* 브랜드 명 국문 */
+		        ,BB.BND_NM_EN		/* 브랜드 명 영문 */
+		        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM 	/* 노출 브랜드명 */
+		        ,BB.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 */
+		        ,BB.BND_ITRDC_MO_IMG_PATH	/* 브랜드 소개 모바일 이미지 */
+			FROM
+		 		MEMBER_INTEREST_BRAND MIB
+		 		LEFT OUTER JOIN BRAND_BASE BB ON (MIB.BND_NO = BB.BND_NO)
+			WHERE MIB.MBR_NO = ${mbrNo}
+			) A
+		ORDER BY A.SYS_REG_DTM DESC
+	</select>
+
+	<!-- 회원 관심 상품 목록 : 데이터 수-->
+	<select id="pageMemberInterestBrandsCount" resultType="Integer">
+		SELECT  COUNT(*)
+		FROM
+			(
+			SELECT
+				 MIB.MBR_NO			/* 회원번호 */
+				,MIB.BND_NO			/* 브랜드 번호 */
+		        ,MIB.SYS_REGR_NO	/* 등록자 */
+		        ,MIB.SYS_REG_DTM	/* 등록일 */
+		        ,BB.BND_NM_KO		/* 브랜드 명 국문 */
+		        ,BB.BND_NM_EN		/* 브랜드 명 영문 */
+		        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM 	/* 노출 브랜드명 */
+		        ,BB.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 */
+		        ,BB.BND_ITRDC_MO_IMG_PATH	/* 브랜드 소개 모바일 이미지 */
+			FROM
+		 		MEMBER_INTEREST_BRAND MIB
+		 		LEFT OUTER JOIN BRAND_BASE BB ON (MIB.BND_NO = BB.BND_NO)
+			WHERE MIB.MBR_NO = ${mbrNo}
+			) A
+	</select>
+	
+	<select id="pageMemberInterestBrands" resultType="biz.app.member.model.MemberInterestBrandVO">
+	<!--
+		Query Name : memberInterestBrand.pageMemberInterestBrands
+		Description : 마이페이지 > 위시리스트 > 위시리스트 브랜드 목록
+	 -->
+	SELECT /* QUERYID (memberInterestBrand.pageMemberInterestBrands) */
+			A.*
+	FROM
+			(
+			SELECT
+				 MIB.MBR_NO			/* 회원번호 */
+				,MIB.BND_NO			/* 브랜드 번호 */
+		        ,MIB.SYS_REGR_NO	/* 등록자 */
+		        ,MIB.SYS_REG_DTM	/* 등록일 */
+		        ,BB.BND_NM_KO		/* 브랜드 명 국문 */
+		        ,BB.BND_NM_EN		/* 브랜드 명 영문 */
+		        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM 	/* 노출 브랜드명 */
+		        ,BB.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 */
+		        ,BB.BND_ITRDC_MO_IMG_PATH	/* 브랜드 소개 모바일 이미지 */
+			FROM
+		 		MEMBER_INTEREST_BRAND MIB
+		 		LEFT OUTER JOIN BRAND_BASE BB ON (MIB.BND_NO = BB.BND_NO)
+			WHERE MIB.MBR_NO = ${mbrNo}
+				<include refid="bizCommon.sortSql" />
+				<include refid="bizCommon.pageSql" />
+			) A	
+	</select>
+</mapper>

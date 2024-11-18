@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업레이어 A 전체 덮는크기 -->
+		<article class="popLayer a popEventLayer" id="popEventLayer">
+			<div class="pbd">
+				<div class="pct">
+					<main class="poptents">
+						<!--  갈아끼기 -->
+						<img src="//via.placeholder.com/750x872" alt="접속장애 공지 안내" >
+						<!--  //갈아끼기 -->
+					</main>
+				</div>
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn bd_n">오늘 하루 보지않기</button> <!-- bd_n 클래스는 버튼에 보더 없앨 때 사용 -->
+						<button type="button" class="btn bd_n d" onclick="ui.popLayer.close('popEventLayer');">닫기</button>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popEventLayer");
+			
+
+			var popSwiper = new Swiper(".swiPopCont .swiper-container", {
+		        slidesPerView: 1,
+		        slidesPerGroup: 1,
+		        freeMode: false,
+		        /* APET-1151 2021.07.20 추가함 start */
+		        autoplay: {
+	        	   delay: 3000,
+	        	   disableOnInteraction: false, // touch or click 시 autoplay 멈춤현상 수정 2021.07.28 추가함
+	        	 },
+			    /* APET-1151 2021.07.20 추가함 end */
+		        loop: true,
+		        pagination: {
+		          el: ".swiPopCont .swiper-pagination",
+		          clickable: true,
+		        },
+		        navigation: {
+		          nextEl: ".swiPopCont .swiper-button-next",
+		          prevEl: ".swiPopCont .swiper-button-prev",
+		        },
+		    });
+		</script>
+
+</body>
+</html>

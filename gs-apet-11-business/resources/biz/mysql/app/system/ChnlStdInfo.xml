@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chnlStdInfo">
+
+	<select id="pageChnlStdInfo" resultType="biz.app.system.model.ChnlStdInfoVO">
+		<!--
+			Query Name : chnlStdInfo.pageChnlStdInfo
+			Description : 채널 기준 정보 페이지 리스트
+		-->
+		SELECT	/* QUERYID(chnlStdInfo.pageChnlStdInfo) */
+				CHNL_ID			/* 채널 ID */
+				, CHNL_NM		/* 채널 명 */
+				, CHNL_SHT		/* 채널 약어 */
+				, CHNL_GB_CD		/* 채널 구분 코드 */
+				, CCL_TG_YN			/* 정산 대상 여부 */
+				, TAX_IVC_ISSUE_YN	/* 세금 계산서 발행 여부 */
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CHNL_STD_INFO
+		WHERE	1 = 1
+		<include refid="chnlStdInfo.pageChnlStdInfoWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageChnlStdInfoCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : chnlStdInfo.pageChnlStdInfoCount
+			Description : 채널 기준 정보 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(chnlStdInfo.pageChnlStdInfoCount) */
+				COUNT(*)
+		FROM	CHNL_STD_INFO
+		WHERE	1 = 1
+		<include refid="chnlStdInfo.pageChnlStdInfoWhere" />
+	</select>
+
+	<sql id="pageChnlStdInfoWhere">
+		<if test='chnlId != null'>
+		AND		CHNL_ID = #{chnlId}
+		</if>
+		<if test='chnlNm != null and chnlNm != ""'>
+		AND		CHNL_NM LIKE CONCAT('%', #{chnlNm}, '%')	/* 채널 명 */
+		</if>
+		<if test='chnlGbCd != null and chnlGbCd != ""'>
+		AND		CHNL_GB_CD = #{chnlGbCd}		/* 채널 구분코드 */
+		</if>		
+	</sql>
+
+	<select id="getChnlStdInfo" resultType="biz.app.system.model.ChnlStdInfoVO">
+		<!--
+			Query Name : chnlStdInfo.getChnlStdInfo
+			Description : 채널 기준 상세 정보 조회
+		-->
+		SELECT	/* QUERYID(chnlStdInfo.getChnlStdInfo) */
+					CHNL_ID			/* 채널 ID */
+					, CHNL_NM		/* 채널 명 */
+					, CHNL_SHT		/* 채널 약어 */
+					, CHNL_GB_CD		/* 채널 구분 코드 */
+					, CCL_TG_YN			/* 정산 대상 여부 */
+					, TAX_IVC_ISSUE_YN	/* 세금 계산서 발행 여부 */
+					, SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, SYS_REG_DTM			/* 시스템 등록 일시 */
+					, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		CHNL_STD_INFO
+		WHERE	1 = 1
+		AND		CHNL_ID = #{chnlId}
+	</select>
+
+	<insert id="insertChnlStdInfo" parameterType="biz.app.system.model.ChnlStdInfoPO">
+		<!--
+			Query Name : chnlStdInfo.insertChnlStdInfo
+			Description : 채널 기준 정보 등록
+		-->
+		INSERT INTO CHNL_STD_INFO (
+			CHNL_ID			/* 채널 ID */
+			, CHNL_NM		/* 채널 명 */
+			, CHNL_SHT		/* 채널 약어 */
+			, CHNL_GB_CD		/* 채널 구분 코드 */
+			, CCL_TG_YN			/* 정산 대상 여부 */
+			, TAX_IVC_ISSUE_YN	/* 세금 계산서 발행 여부 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES ( 
+			#{chnlId}			/* 채널 ID */
+			, #{chnlNm}				/* 채널 명 */
+			, #{chnlSht}				/* 채널 약어 */
+			, #{chnlGbCd}				/* 채널 구분 코드 */
+			, #{cclTgYn}				/* 정산 대상 여부 */
+			, #{taxIvcIssueYn}				/* 세금 계산서 발행 여부 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateChnlStdInfo" parameterType="biz.app.system.model.ChnlStdInfoPO">
+		<!--
+			Query Name : chnlStdInfo.updateChnlStdInfo
+			Description : 채널 기준 정보 수정
+		-->
+		UPDATE	CHNL_STD_INFO SET
+			CHNL_NM = #{chnlNm}				/* 채널 명 */
+			<if test="chnlSht != null and chnlSht != ''" >
+			, CHNL_SHT = #{chnlSht}				/* 채널 약어 */
+			</if>
+			<if test="chnlGbCd != null and chnlGbCd != ''" >
+			, CHNL_GB_CD = #{chnlGbCd}				/* 채널 구분 코드 */
+			</if>
+			<if test="cclTgYn != null and cclTgYn != ''" >
+			, CCL_TG_YN = #{cclTgYn}				/* 정산 대상 여부 */
+			</if>
+			<if test="taxIvcIssueYn != null and taxIvcIssueYn != ''" >
+			, TAX_IVC_ISSUE_YN = #{taxIvcIssueYn}				/* 세금 계산서 발행 여부 */
+			</if>
+			, SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+		WHERE CHNL_ID = #{chnlId}
+	</update>
+
+	<delete id="deleteChnlStdInfo" parameterType="biz.app.system.model.ChnlStdInfoPO">
+		<!--
+			Query Name : chnlStdInfo.deleteChnlStdInfo
+			Description : 채널 기준 정보 삭제
+		-->
+		DELETE
+		FROM	CHNL_STD_INFO
+		WHERE CHNL_ID = #{chnlId}
+	</delete>
+	
+</mapper>

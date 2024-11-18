@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set15","tit":""}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page shop od order com" id="container">
+			
+			<div class="pageHeadPc">
+				<div class="inr">
+					<div class="hdt">
+						<h3 class="tit">주문완료</h3>
+					</div>
+				</div>
+			</div>
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="ordersets">
+						
+						<section class="topbox">
+							<div class="hdd">
+								<div class="hd">
+									<em class="nm">홍길동</em>님 <br>주문이 완료되었습니다.
+								</div>
+								<div class="dd">주문하신 내역은 ‘주문/배송조회’ 에서 확인하실 수 있습니다.</div>
+							</div>
+							<div class="cdd"><!-- if 가상계좌 -->
+								<div class="msg">입금내역 확인 후 배송이 시작됩니다.</div>
+								<div class="inf">
+									<ul class="lst">
+										<li>
+											<div class="dt">계좌정보</div>
+											<div class="dd"><a href="javascript:;" class="lk">국민은행 1234567891234567</a> <a href="javascript:;" class="btn sm copy">계좌번호복사</a></div>
+										</li>
+										<li>
+											<div class="dt">예금주명</div>
+											<div class="dd">㈜펫츠비</div>
+										</li>
+										<li>
+											<div class="dt">입금기한</div>
+											<div class="dd">11월 30일까지</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</section>
+						
+						<section class="sect odnb">
+							<div class="hdts"><span class="tit">주문 번호</span></div>
+							<div class="cdts">
+								<div class="box">
+									<i class="nums">123456789</i>
+								</div>
+							</div>
+						</section>
+
+						<section class="sect addr">
+							<div class="hdts"><span class="tit">배송지</span></div>
+							<div class="cdts">
+								<div class="adrset">
+									<div class="name">
+										<em class="t">우리집</em>
+									</div>
+									<div class="adrs">
+										[01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우
+									</div>
+									<div class="tels">박이슬/010-1234-1234 안심번호 사용</div>
+								</div>
+								<div class="adrreq">
+									<div class="pwf">
+										<em class="t">문앞</em> <em class="p">공동현관 비밀번호 입력</em>
+										<div class="txt">벨 누르지말고 문 앞에 놔주세요~~~~</div>
+									</div>
+								</div>
+							</div>
+						</section>
+						<section class="sect bprc">
+							<div class="hdts"><span class="tit">결제 정보</span></div>
+							<div class="cdts">
+								<ul class="prcset">
+									<li>
+										<div class="dt">총 상품금액</div>
+										<div class="dd">
+											<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<li>
+										<div class="dt">쿠폰 할인</div>
+										<div class="dd">
+											<span class="prc dis"><em class="p">-10,000</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<li>
+										<div class="dt">우주코인 추가할인</div>
+										<div class="dd">
+											<span class="prc dis"><em class="p">-2,500</em><i class="w">원</i></span>
+										</div>
+									</li>
+									<li>
+										<div class="dt">배송비</div>
+										<div class="dd">
+											<span class="prc"><em class="p">+2,500</em><i class="w">원</i></span>
+										</div>
+									</li>
+								</ul>
+								<div class="tot">
+									<div class="dt">총 결제금액</div>
+									<div class="dd">
+										<span class="prc"><em class="p">32,500</em><i class="w">원</i></span>
+									</div>
+								</div>
+								<!-- 21.08.03 APET-1258 lcm01 : 우주코인추가 -->
+								<!-- <div class="gdpnt">배송 완료 후 GS&POINT 포인트 <em class="p">123P 적립</em><span class="pc">, </span><br class="mo"/>로그 후기 작성하면 <em class="p">500P 추가 적립</em></div>	 CSR-1383 210722 lju02	APET-1250 210721 lju02 - 샵 서비스명 변경 -->
+							</div>
+						</section>
+						
+						
+						<section class="sect binf">
+							<div class="hdts"><span class="tit">결제수단 정보</span></div>
+							<div class="cdts">
+								<div class="result">
+									<div class="hd"><em class="b">일반결제</em> <i class="t">신용카드</i> <i class="t">가상계좌</i> </div>
+									<div class="dd">현대카드(1234-****-****-****) / 일시불 </div>
+									<div class="dd">국민은행(1234567890) / 입금기한 11월 30일까지</div>
+									<!-- 04.16 : 삭제
+									<div class="bts">
+										<div class="btnSet">
+											<a href="javascript:;" class="btn lg d">상세 주문내역</a>
+											<a href="javascript:;" class="btn lg a">계속 쇼핑하기</a>
+										</div>
+									</div>
+									-->
+								</div>
+							</div>
+						</section>
+						
+						<!-- 21.08.03 APET-1258 lcm01 : 우주코인추가 -->
+						<section class="sect bprc point">
+							<div class="hdts"><span class="tit">&nbsp;</span></div>
+							<div class="cdts">
+								<!-- 01 주문서-리테일멤버십 가입 안한 경우 -->
+								<div class="gdpnt onlywooju">
+									<ul class="">
+										<li><div class="tit">우주코인</div> <div><em class="blt max">최대</em> <em class="p">20,000C</em><span>적립예정</span></div></li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 02 주문서-우주멤버십 등록 안한 경우 -->
+								<div class="gdpnt onlygs">
+									<ul class="gsr">
+										<li>
+											<div class="titbox"><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></div>
+											<div class="log-p" style="">로그 후기 작성시 <em class="p">500P</em> 추가적립</div>
+										</li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 03 주문서-멤버십 둘다 등록 한 경우 -->
+								<div class="gdpnt member">
+									<ul class="">
+										<li class="gsr">
+											<div class="titbox"><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></div>
+											<div class="log-p" style="">로그 후기 작성시 <em class="p">500P</em> 추가적립</div>
+										</li>
+										<li class="wooju"><div class="tit">우주코인</div> <div><em class="blt max">최대</em> <em class="p">20,000C</em><span>적립예정</span></div></li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+								
+								<!-- 04 우주코인 추가적립 진행하는 경우 : 21.08.10 -->
+								<div class="gdpnt wooju_">
+									<ul class="">
+										<li><div class="tit">GS&POINT</div> <div><em class="p">123P</em><span>적립예정</span></div></li>
+										<!-- <li><div class="tit">우주코인</div> <div><em class="blt max">최대</em> <em class="p">10,000C + 10,000C</em> 적립예정</div></li> -->
+										<li>
+											<div class="tit">우주코인</div>
+											<div class="wj_point_box">	<!-- APETQA-6980 210903 lju02 -->
+												<div><em class="blt max">최대</em><em class="p">10,000C</em></div>
+												<div><em class="p"> + 추가 10,000C</em><span>적립예정</span></div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="info-t3">구매확정 후 포인트가 적립됩니다.</div>
+							</div>
+							
+						</section>
+						<!-- //21.08.03 APET-1258 lcm01 : 우주코인추가 -->
+						<!-- 04.16 : 추가 -->
+						<div class="my_btnWrap">
+							<div class="btnSet">
+								<a href="javascript:;" class="btn lg d">상세 주문내역</a>
+								<a href="javascript:;" class="btn lg a">계속 쇼핑하기</a>
+							</div>
+						</div>
+						<!-- // 04.16 : 추가 -->
+					</div>
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+
+		<script>
+			
+		</script>
+
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 푸터 -->
+		<include class="footer bg" data-include-html="../inc/footer.html"></include>
+
+	</div>
+</body>
+</html>

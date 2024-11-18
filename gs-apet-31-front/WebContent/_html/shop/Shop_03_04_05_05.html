@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝레이어 바닥에서 올라오는 리뷰작성완료 -->
+		<article class="popBot popRevCom" id="popRevCom">
+			<div class="pbd">
+				<div class="pct">
+					<main class="poptents">
+						<section class="rvcoms">
+							<div class="ben"></div>
+							<div class="tit">후기를 작성해 주셔서 감사해요!</div>
+							<div class="msg">보다 나은 쇼핑 혜택을 드리고자 <br> XXX를 드릴게요:-)</div>
+							<div class="btnSet">
+								<button type="button" class="btn lg a" onclick="ui.popBot.close('popRevCom');">확인</button>
+							</div>
+						</section>
+					</main>
+				</div>
+			</div>
+		</article>
+
+		<script>
+			ui.popBot.open("popRevCom");
+		</script>
+
+</body>
+</html>

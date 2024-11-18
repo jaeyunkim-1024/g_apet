@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+	<Properties>
+		<Property name="logName">apet_admin</Property>
+		<Property name="layoutPattern">%d [%t] %-5level %c(%M:%L) - %m%n</Property>
+	</Properties>
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+		</Console>
+		<RollingFile name="logfileDaily"
+			fileName="/LOG/BE/${logName}.log"
+			filePattern="/LOG/BE/${logName}.log.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100"
+				fileIndex="min" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+	    <logger name="jdbc.sqlonly" level="info" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </logger>         
+	    <logger name="jdbc.resultsettable" level="info" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </logger>         
+	    <logger name="framework" level="info" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </logger>
+	    <logger name="biz" level="debug" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </logger>
+	    <logger name="admin" level="debug" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </logger>
+	    <Root level="error" additivity="false">
+	      <AppenderRef ref="logfileDaily" />
+	    </Root>
+	  </Loggers>
+</Configuration>

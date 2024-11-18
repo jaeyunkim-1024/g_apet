@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="eduConts">
+
+	<select id="getEduCategoryList" resultType="biz.app.contents.model.EduContsVO">
+		<!--
+			Query Name	: eduConts.getEduCategoryList
+			Description	: 교육용 카테고리 목록
+		-->
+		SELECT	/* QUERYID(eduConts.getEduCategoryList) */
+			DISTINCT
+			<choose>
+				<when test="eudContsCtgMCd != null and eudContsCtgMCd != ''">
+					EUD_CONTS_CTG_S_CD AS CODE
+				</when>
+				<when test="eudContsCtgLCd != null and eudContsCtgLCd != ''">
+					EUD_CONTS_CTG_M_CD AS CODE
+				</when>
+				<otherwise>
+					EUD_CONTS_CTG_L_CD AS CODE
+				</otherwise>
+			</choose>
+		FROM APET_CONTENTS AC 
+		WHERE	1 = 1
+			AND VD_GB_CD = 10
+			AND PET_GB_CD = #{petGbCd}
+		<if test='eudContsCtgLCd != null and eudContsCtgLCd != ""'>
+			AND EUD_CONTS_CTG_L_CD = #{eudContsCtgLCd}
+		</if>
+		<if test='eudContsCtgMCd != null and eudContsCtgMCd != ""'>
+			AND EUD_CONTS_CTG_M_CD = #{eudContsCtgMCd}
+		</if>
+	</select>
+	
+	<select id="pageEduConts" resultType="biz.app.contents.model.EduContsVO">
+		<!--
+			Query Name	: eduConts.pageEduConts
+			Description	: 교육용 영상 목록 페이지
+		-->
+		SELECT
+				T1.*
+		FROM
+			(
+				SELECT	/* QUERYID(eduConts.pageEduConts) */
+						AC.VD_ID 											/* 영상 ID */
+						, AC.TTL 											/* 제목 */
+						, IFNULL((SELECT MAX(STEP_NO) FROM APET_CONTENTS_DETAIL ACD WHERE ACD.VD_ID = AC.VD_ID ),0) AS STEP /* 스텝 */
+						, CONCAT_WS(">",
+							(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND DTL_CD = AC.PET_GB_CD),		
+							(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_L' AND DTL_CD = AC.EUD_CONTS_CTG_L_CD), 
+							(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD),
+							(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_S' AND DTL_CD = AC.EUD_CONTS_CTG_S_CD) 
+							) AS CATEGORY 									/* 카테고리 */
+						, AC.LOD_CD 										/* 난이도 */
+						, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+						, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+						, AC.HITS											/* 조회수 */
+						, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+						, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND ACI.VD_ID = AC.VD_ID ) AS LIKE_CNT	/* 좋아요 */
+						, AC.DISP_YN										/* 전시 여부 */
+						, AC.SYS_REG_DTM									/* 시스템 등록 일시 */
+						, AC.SYS_REGR_NO									/* 시스템 등록자 번호 */
+						, AC.SYS_UPD_DTM									/* 시스템 수정 일시  */
+						, AC.SYS_UPDR_NO									/* 시스템 수정자 번호 */
+						, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+						, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				FROM APET_CONTENTS AC 
+				WHERE 	AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+				<if test='vdTpCd != null and vdTpCd != ""'>
+				    AND AC.SRIS_NO IS NOT NULL
+				</if>
+				<if test="sysRegDtmStart != null">
+					AND AC.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+				</if>
+				<if test="sysRegDtmEnd != null">
+					AND AC.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+				</if>
+				<if test='petGbCd != null and petGbCd != ""'>
+					AND PET_GB_CD = #{petGbCd}
+				</if>
+				<if test='eudContsCtgLCd != null and eudContsCtgLCd != ""'>
+					AND EUD_CONTS_CTG_L_CD = #{eudContsCtgLCd}
+				</if>
+				<if test='eudContsCtgMCd != null and eudContsCtgMCd != ""'>
+					AND EUD_CONTS_CTG_M_CD = #{eudContsCtgMCd}
+				</if>
+				<if test='eudContsCtgSCd != null and eudContsCtgSCd != ""'>
+					AND EUD_CONTS_CTG_S_CD = #{eudContsCtgSCd}
+				</if>
+				<if test='lodCd != null and lodCd != ""'>
+					AND AC.LOD_CD = #{lodCd}
+				</if>
+				<if test='dispYn != null and dispYn != ""'>
+					AND AC.DISP_YN = #{dispYn}
+				</if>
+				<if test='ttl != null and ttl != ""'>
+					AND AC.TTL LIKE CONCAT('%', #{ttl}, '%')
+				</if>
+			) T1
+		WHERE 1=1
+		<if test='shareFrom != null and shareFrom != ""'>
+			AND T1.SHARE_CNT &gt;= #{shareFrom}
+		</if>
+		<if test='shareTo != null and shareTo != ""'>
+			AND T1.SHARE_CNT &lt;= #{shareTo}
+		</if>
+		<if test='likeFrom != null and likeFrom != ""'>
+			AND T1.LIKE_CNT &gt;= #{likeFrom}
+		</if>
+		<if test='likeTo != null and likeTo != ""'>
+			AND T1.LIKE_CNT &lt;= #{likeTo}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageEduContsCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: eduConts.pageEduContsCount
+			Description	: 교육용 영상 목록 카운트
+		-->
+		SELECT /* QUERYID(eduConts.pageEduContsCount) */
+			COUNT(T1.VD_ID)
+		FROM
+			(
+				SELECT	
+						AC.VD_ID
+						, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT
+						, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND ACI.VD_ID = AC.VD_ID ) AS LIKE_CNT
+				FROM APET_CONTENTS AC 
+				, (SELECT @ROWNUM:=0) TMP
+				WHERE 	AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+				<if test='vdTpCd != null and vdTpCd != ""'>
+				    AND AC.SRIS_NO IS NOT NULL
+				</if>
+				<if test="sysRegDtmStart != null">
+					AND AC.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+				</if>
+				<if test="sysRegDtmEnd != null">
+					AND AC.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+				</if>
+				<if test='petGbCd != null and petGbCd != ""'>
+					AND PET_GB_CD = #{petGbCd}
+				</if>
+				<if test='eudContsCtgLCd != null and eudContsCtgLCd != ""'>
+					AND EUD_CONTS_CTG_L_CD = #{eudContsCtgLCd}
+				</if>
+				<if test='eudContsCtgMCd != null and eudContsCtgMCd != ""'>
+					AND EUD_CONTS_CTG_M_CD = #{eudContsCtgMCd}
+				</if>
+				<if test='eudContsCtgSCd != null and eudContsCtgSCd != ""'>
+					AND EUD_CONTS_CTG_S_CD = #{eudContsCtgSCd}
+				</if>
+				<if test='lodCd != null and lodCd != ""'>
+					AND AC.LOD_CD = #{lodCd}
+				</if>
+				<if test='dispYn != null and dispYn != ""'>
+					AND AC.DISP_YN = #{dispYn}
+				</if>
+				<if test='ttl != null and ttl != ""'>
+					AND AC.TTL LIKE CONCAT('%', #{ttl}, '%')
+				</if>
+			) T1
+		WHERE 1=1
+		<if test='shareFrom != null and shareFrom != ""'>
+			AND T1.SHARE_CNT &gt;= #{shareFrom}
+		</if>
+		<if test='shareTo != null and shareTo != ""'>
+			AND T1.SHARE_CNT &lt;= #{shareTo}
+		</if>
+		<if test='likeFrom != null and likeFrom != ""'>
+			AND T1.LIKE_CNT &gt;= #{likeFrom}
+		</if>
+		<if test='likeTo != null and likeTo != ""'>
+			AND T1.LIKE_CNT &lt;= #{likeTo}
+		</if>
+	</select>
+	
+	
+	<!-- 교육용 영상 상세 조회  resultMap -->
+	<resultMap type="biz.app.contents.model.EduContsVO" id="eduContsDetailMap">	
+		<id		property="vdId"				column="VD_ID"/>				<!-- 영상 ID -->
+		<result property="petGbCd"			column="PET_GB_CD"/>			<!-- 펫 구분 코드 -->
+		<result property="eudContsCtgLCd"	column="EUD_CONTS_CTG_L_CD"/>	<!-- 교육용 컨텐츠 카테고리 L -->
+		<result property="eudContsCtgMCd"	column="EUD_CONTS_CTG_M_CD"/>	<!-- 교육용 컨텐츠 카테고리 M -->
+		<result property="eudContsCtgSCd"	column="EUD_CONTS_CTG_S_CD"/>	<!-- 교육용 컨텐츠 카테고리 S -->		
+		<result property="dispYn"			column="DISP_YN"/>				<!-- 전시 여부 -->
+		<result property="ttl"				column="TTL"/>					<!-- 제목 -->
+		<result property="lodCd"			column="LOD_CD"/>				<!-- 난이도 -->
+		<result property="prpmCd"			column="PRPM_CD"/>				<!-- 준비물 코드 -->
+		<result property="flNo"				column="FL_NO"/>				<!-- 파일 번호 -->
+		<result property="thumAutoYn"				column="THUM_AUTO_YN"/>			<!-- 썸네일 자동 여부 -->
+		<result property="hits"				column="HITS"/>					<!-- 조회수 -->
+		<result property="likeCnt"			column="LIKE_CNT"/>				<!-- 좋아요 -->
+		<result property="shareCnt"			column="SHARE_CNT"/>			<!-- 공유수 -->
+		<result property="sysRegrNo"        column="SYS_REGR_NO"/>          <!-- 시스템 등록자 번호 -->
+        <result property="sysRegDtm"        column="SYS_REG_DTM"/>          <!-- 시스템 등록 일시 -->
+        <result property="sysUpdrNo"        column="SYS_UPDR_NO"/>          <!-- 시스템 수정자 번호 -->
+        <result property="sysUpdDtm"        column="SYS_UPD_DTM"/>          <!-- 시스템 수정 일시 -->
+        <result property="sysRegrNm"        column="SYS_REGR_NM"/>          <!-- 시스템 등록자 -->
+        <result property="sysUpdrNm"        column="SYS_UPDR_NM"/>          <!-- 시스템 수정자 -->
+        <collection property="fileList" 	column="FL_NO"  javaType="java.util.ArrayList" ofType="biz.app.contents.model.ApetAttachFileVO"			select="listApetAttachFile"/>
+        <collection property="tagList" 		column="VD_ID"  javaType="java.util.ArrayList" ofType="biz.app.contents.model.ApetContentsTagMapVO"		select="listApetContentsTagMap"/>
+        <collection property="goodsList" 	column="VD_ID"  javaType="java.util.ArrayList" ofType="biz.app.contents.model.ApetContentsGoodsMapVO"	select="listApetContentsGoodsMap"/>
+	</resultMap>
+	
+	<select id="getEduConts" resultMap="eduContsDetailMap">
+		<!--
+			Query Name	: eduConts.getEduConts
+			Description	: 교육용 영상 상세 조회
+		-->
+		SELECT 	/* QUERYID(eduConts.getEduConts) */
+			VD_ID 							/* 영상 ID */
+			, PET_GB_CD 					/* 펫 구분 코드 */
+			, EUD_CONTS_CTG_L_CD 			/* 교육용 컨텐츠 카테고리 L */
+			, EUD_CONTS_CTG_M_CD 			/* 교육용 컨텐츠 카테고리 M */
+			, EUD_CONTS_CTG_S_CD 			/* 교육용 컨텐츠 카테고리 S */
+			, DISP_YN 						/* 전시 여부 */
+			, TTL 							/* 제목 */
+			, CONTENT 						/* 내용 */
+			, LOD_CD						/* 난이도 */
+			, PRPM_CD 						/* 준비물 코드 */
+			, AC.FL_NO						/* 파일 번호 */
+			, AC.THUM_AUTO_YN				/* 썸네일 자동 여부 */
+			, HITS 							/* 조회수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID=AC.VD_ID AND ACI.INTR_GB_CD='10') AS LIKE_CNT 	/* 좋아요 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE ACS.VD_ID=AC.VD_ID) AS SHARE_CNT								/* 공유수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT 							/* 댓글수 */
+			, AC.SYS_REG_DTM				/* 시스템 등록 일시 */ 
+			, AC.SYS_REGR_NO 				/* 시스템 등록자 번호 */
+			, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM		/* 시스템 등록자 */
+			, AC.SYS_UPD_DTM 				/* 시스템 수정 일시 */
+			, AC.SYS_UPDR_NO				/* 시스템 수정자 번호 */			
+			, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM		/* 시스템 수정자 */
+			, SRT_URL						/* 단축URL */
+		FROM APET_CONTENTS AC
+		WHERE VD_ID= #{vdId}
+	</select>
+	
+	<select id="listApetAttachFile" resultType="biz.app.contents.model.ApetAttachFileVO">
+		<!--
+			Query Name	: eduConts.listApetAttachFile
+			Description	: 교육 첨부파일 목록 조회
+		-->
+		SELECT	/* QUERYID(eduConts.getAttachFiles) */
+			FL_NO
+			, SEQ
+			, CONTS_TP_CD
+			, PHY_PATH
+			, ORG_FL_NM
+			, FL_SZ
+			, OUTSIDE_VD_ID
+			, VD_LNTH
+			, SYS_REG_DTM		
+			, SYS_REGR_NO		
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+		  FROM APET_ATTACH_FILE AAF
+		 WHERE FL_NO = #{flNo}
+	</select>
+	
+	<select id="listApetContentsTagMap" resultType="biz.app.contents.model.ApetContentsTagMapVO">
+		<!--
+			Query Name	: eduConts.listApetContentsTagMap
+			Description	: 교육 태그 조회
+		-->
+		SELECT	/* QUERYID(eduConts.listApetContentsTagMap) */
+			VD_ID
+			, ACTM.TAG_NO
+			, TAG_NM
+			, ACTM.SYS_REG_DTM		
+			, ACTM.SYS_REGR_NO		
+			, FN_GET_USER_NAME(ACTM.SYS_REGR_NO) AS SYS_REGR_NM
+		FROM APET_CONTENTS_TAG_MAP ACTM
+		JOIN TAG_BASE TB ON ACTM.TAG_NO = TB.TAG_NO
+		WHERE VD_ID= #{vdId}
+	</select>
+	
+	<select id="listApetContentsGoodsMap" resultType="biz.app.contents.model.ApetContentsGoodsMapVO">
+		<!--
+			Query Name	: eduConts.listApetContentsGoodsMap
+			Description	: 교육 상품 조회
+		-->
+		SELECT	/* QUERYID(eduConts.listApetContentsGoodsMap) */
+			VD_ID
+			, GOODS_ID
+			, SYS_REG_DTM		
+			, SYS_REGR_NO		
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+		FROM APET_CONTENTS_GOODS_MAP
+		WHERE VD_ID= #{vdId}
+	</select>
+	
+	<select id="getApetContentsWatchHist" resultType="biz.app.contents.model.ApetContentsDetailVO">
+		<!--
+			Query Name	: eduConts.getApetContentsWatchHist
+			Description	: 교육 이력 조회
+		-->
+		SELECT	/* QUERYID(eduConts.getApetContentsWatchHist) */ 
+			MBR_NO
+			, VD_ID
+			, HITS
+			, STEP_NO
+			, VD_LNTH			
+			, SYS_REG_DTM		
+			, SYS_REGR_NO
+			, SYS_UPD_DTM
+			, SYS_UPDR_NO			
+			, IFNULL(CPLT_YN, 'N') AS CPLT_YN
+		FROM APET_CONTENTS_WATCH_HIST
+		WHERE VD_ID= #{vdId}
+		  AND MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="getInterestYn" resultType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: eduConts.getInterestYn
+			Description	: 펫스쿨 영상 찜보관 여부
+		-->
+		SELECT	/* QUERYID(eduConts.getInterestYn) */ 
+			  SUM(IF(INTR_GB_CD='${@framework.common.constants.CommonConstants@INTR_GB_10}', 1,0)) AS LIKE_CNT  /* 좋아요 */
+			, SUM(IF(INTR_GB_CD='${@framework.common.constants.CommonConstants@INTR_GB_20}', 1,0)) AS ZZIM_CNT	/* 찜 */			
+		FROM APET_CONTENTS_INTEREST
+		WHERE VD_ID= #{vdId}
+		  AND MBR_NO = #{mbrNo}
+		  
+	</select>
+	
+	<select id="getMyPetYn" resultType="java.lang.String">
+		<!--
+			Query Name	: eduConts.getMyPetYn
+			Description	: 마이펫 등록 여부
+		-->
+		SELECT	/* QUERYID(eduConts.getMyPetYn) */ 
+			IF(COUNT(*)=0 ,'N', 'Y') AS MYPET_YN						
+		FROM PET_BASE
+		WHERE MBR_NO = #{mbrNo}		  
+	</select>
+	
+	<select id="getApetContentsList" resultType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: eduConts.getApetContentsDetail
+			Description	: 다음교육 list
+		-->
+		SELECT /* QUERYID(eduConts.getApetContentsList) */
+			  VD_ID
+			, FL_NO
+			, TTL
+			, LOD_CD
+			, CONTENT
+			, OUTSIDE_VD_ID
+			, CASE WHEN MY_LAST_STEP IS NULL THEN 0
+				   ELSE ROUND((MY_LAST_STEP + 1)/STEP_CNT*100)
+				   END AS STEP_PROGRESS
+			, BASE_FL_NO	
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T5 WHERE T5.FL_NO = BASE_FL_NO AND T5.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}') AS THUM_PATH	   
+		FROM(
+			SELECT	
+				  T1.VD_ID			
+				, T1.FL_NO
+				, T3.TTL
+				, T3.LOD_CD
+				, T3.CONTENT			
+				, T2.OUTSIDE_VD_ID
+				, (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL T4 WHERE T4.VD_ID = T1.VD_ID) AS STEP_CNT
+				, (SELECT STEP_NO FROM APET_CONTENTS_WATCH_HIST T5 WHERE T5.VD_ID = T1.VD_ID AND MBR_NO = #{mbrNo} ) AS MY_LAST_STEP
+				, CASE WHEN CAST(T3.EUD_CONTS_CTG_M_CD AS UNSIGNED) &gt; CAST(#{eudContsCtgMCd} AS UNSIGNED) THEN CAST(T3.EUD_CONTS_CTG_M_CD AS UNSIGNED)
+					   WHEN CAST(T3.EUD_CONTS_CTG_M_CD AS UNSIGNED) = CAST(#{eudContsCtgMCd} AS UNSIGNED) THEN 
+					   		CASE WHEN T3.SYS_REG_DTM &lt; (SELECT SYS_REG_DTM FROM APET_CONTENTS WHERE VD_ID=#{vdId}) THEN CAST(CONCAT('2',IFNULL(T3.EUD_CONTS_CTG_M_CD, '99')) AS UNSIGNED)
+					   		     ELSE CAST(T3.EUD_CONTS_CTG_M_CD AS UNSIGNED) END 
+				       ELSE CAST(CONCAT('1',IFNULL(T3.EUD_CONTS_CTG_M_CD, '99')) AS UNSIGNED)
+				       END AS LIST_ORDER
+				, T3.FL_NO AS BASE_FL_NO        
+			FROM APET_CONTENTS_DETAIL T1
+			JOIN APET_ATTACH_FILE T2 ON T1.FL_NO = T2.FL_NO
+			JOIN APET_CONTENTS T3 ON T1.VD_ID = T3.VD_ID 
+			WHERE T1.STEP_NO = 0		
+			AND T1.VD_ID != #{vdId}
+			AND T2.OUTSIDE_VD_ID IS NOT NULL	
+			AND T3.EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}'
+			AND T3.PET_GB_CD = #{petGbCd}
+			AND T3.DISP_YN = 'Y'	
+			AND T3.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'					
+		) T6 	
+		ORDER BY LIST_ORDER, VD_ID
+		LIMIT 10	   
+	</select>
+	
+	<insert id="saveContsInterest" parameterType="biz.app.contents.model.ApetContentsDetailPO">
+		<!--
+			Query Name	: eduConts.saveContsInterest
+			Description	: 펫스쿨 찜보관 저장
+		-->
+		INSERT INTO APET_CONTENTS_INTEREST (	/* QUERYID(eduConts.saveContsInterest) */
+			  MBR_NO
+			, VD_ID				/* 영상 ID */
+			, INTR_GB_CD		/* 관심 구분 코드 */			
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			
+		) VALUES (
+			  #{mbrNo}				
+			, #{vdId}			
+			, '${@framework.common.constants.CommonConstants@INTR_GB_20}'
+			, #{sysRegrNo}
+			, NOW()			
+		)
+	</insert>
+	
+	<delete id="deleteContsInterest" parameterType="biz.app.contents.model.ApetContentsDetailPO">
+		<!--
+			Query Name : eduConts.deleteContsInterest
+			Description : 펫스쿨 찜보관 삭제
+		-->	
+		DELETE /* QUERYID(eduConts.deleteContsInterest) */
+		FROM  APET_CONTENTS_INTEREST
+		WHERE MBR_NO = #{mbrNo}
+		  AND VD_ID = #{vdId}
+		  AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}'
+	</delete>
+	
+	<update id="saveContsHit" parameterType="biz.app.contents.model.EduContsPO">
+ 		<!--
+			Query Name : eduConts.saveContsHit
+			Description : 펫스쿨 조회수 저장
+		-->
+		/* QUERYID(eduConts.saveContsHit) */
+		UPDATE APET_CONTENTS
+		SET HITS = IFNULL(HITS, 0)+1
+		WHERE VD_ID = #{vdId}
+ 	</update>
+ 	
+ 	<update id="saveSrtUrl" parameterType="biz.app.contents.model.EduContsPO">
+ 		<!--
+			Query Name : eduConts.saveSrtUrl
+			Description : 펫스쿨 단축URL 저장
+		-->
+		/* QUERYID(eduConts.saveSrtUrl) */
+		UPDATE APET_CONTENTS
+		SET SRT_URL = #{srtUrl}
+		WHERE VD_ID = #{vdId}
+ 	</update>
+	
+</mapper>

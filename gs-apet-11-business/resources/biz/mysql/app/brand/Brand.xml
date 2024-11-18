@@ -1,0 +1,1216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="brand">
+
+	<resultMap type="biz.app.brand.model.BrandBaseVO" id="BrandBaseMap">
+		<id 	property="bndNo"				column="BND_NO"/>
+		<result property="bndTpCd"              column="BND_TP_CD"/>
+		<result property="bndNmKo"				column="BND_NM_KO"/>
+		<result property="bndNmEn"				column="BND_NM_EN"/>
+		<result property="dlgtBndNmEn"			column="DLGT_BND_NM_EN"/>
+		<result property="dlgtBndNmKo"			column="DLGT_BND_NM_KO"/>
+		<result property="useYn"				column="USE_YN"/>
+		<result property="sortSeq"				column="SORT_SEQ"/>
+		<result property="koInitCharCd"			column="KO_INIT_CHAR_CD"/>
+		<result property="enInitCharCd"			column="EN_INIT_CHAR_CD"/>
+		<result property="bndItrdc"				column="BND_ITRDC"/>
+		<result property="bndItrdcImgPath"		column="BND_ITRDC_IMG_PATH"/>
+		<result property="bndMoItrdc"			column="BND_MO_ITRDC"/>
+		<result property="bndItrdcMoImgPath"	column="BND_ITRDC_MO_IMG_PATH"/>
+		<result property="bndCntsTpCd"			column="BND_CNTS_TP_CD"/>
+		<result property="bndStry"			    column="BND_STRY"/>
+		<result property="tnImgPath"			column="TN_IMG_PATH"/>
+		<result property="tnMoImgPath"			column="TN_MO_IMG_PATH"/>
+		<result property="sysRegrNo"			column="SYS_REGR_NO"/>
+		<result property="sysRegrNm"			column="SYS_REGR_NM"/>
+		<result property="sysRegDtm"			column="SYS_REG_DTM"/>
+		<result property="bndShowYn"			column="BND_SHOW_YN"/>
+		<result property="compNo"				column="COMP_NO"/>
+		<result property="compNm"				column="COMP_NM"/>
+		<result property="compStatCd"			column="COMP_STAT_CD"/>
+		<result property="bndNm"				column="BND_NM"/>
+		<collection property="stStdList" column="BND_NO" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="getStStdInfoById"/>
+	</resultMap>
+
+	<select id="getStStdInfoById" resultType="biz.app.st.model.StStdInfoVO">
+		SELECT
+			M.ST_ID, S.ST_NM
+		FROM
+			ST_STD_INFO S INNER JOIN ST_BND_MAP M ON S.ST_ID = M.ST_ID
+		WHERE
+			M.BND_NO = #{BND_NO}
+	</select>
+
+
+
+	<resultMap type="biz.app.brand.model.BrandInitialVO" id="brandInitialMap">
+		<id     property="initCharCd"		column="INIT_CHAR_CD"/>			<!-- 초성 코드 -->
+		<result	property="initCharGbCd"		column="INIT_CHAR_GB_CD"/>		<!-- 초성 구분 코드 -->
+		<result property="initCharNm"		column="INIT_CHAR_NM"/>				<!-- 초성 명 -->
+		<collection property="brandList" ofType="biz.app.brand.model.BrandVO">
+			<id     property="bndNo"		column="BND_NO"/>			<!-- 브랜드 번호 -->
+			<result property="bndNmKo"		column="BND_NM_KO"/>		<!-- 브랜드 명 국문 -->
+			<result property="bndNmEn"		column="BND_NM_EN"/>		<!-- 브랜드 명 영문 -->
+			<result property="bndNm"		column="BND_NM"/>			<!-- 노출 브랜드 명 -->
+		</collection>
+	</resultMap>
+
+
+
+	<select id="getBrand" resultType="biz.app.brand.model.BrandVO">
+		SELECT	/* QUERYID(brand.getBrand) */
+				 BND_NO
+				,BND_NM_KO
+				,KO_INIT_CHAR_CD
+				,BND_NM_EN
+				,EN_INIT_CHAR_CD
+				,BND_ITRDC
+				,BND_ITRDC_IMG_PATH
+				,SORT_SEQ
+				,USE_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+				,BND_SHOW_YN
+		FROM	BRAND_BASE
+		WHERE	BND_NO = #{bndNo}
+		AND		USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+	<select id="getBrandDetail" resultMap="BrandBaseMap" >
+		<!--
+			Query Name : brand.getBrandDetail
+			Description : 브랜드 정보 조회
+		-->
+		SELECT	/* QUERYID(brand.getBrandDetail) */
+				  A.BND_NO					/* 브랜드 번호 */
+				, A.BND_NM_KO				/* 브랜드 명 국문 */
+				, A.KO_INIT_CHAR_CD			/* 국문 초성 코드 */
+				, A.BND_NM_EN				/* 브랜드 명 영문 */
+				, A.EN_INIT_CHAR_CD			/* 영문 초성 코드 */
+				, A.BND_CNTS_TP_CD	        /* 브랜드 콘텐츠 유형 */
+				, A.BND_ITRDC				/* 브랜드 소개 */
+				, A.BND_MO_ITRDC			/* 브랜드 모바일 소개 */
+				, A.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 경로 */
+				, A.BND_ITRDC_MO_IMG_PATH	/* 브랜드 모바일 소개 이미지 경로 */
+				, A.BND_STRY				/* 브랜드 스토리 */
+				, A.BND_SHOW_YN
+				, A.SORT_SEQ				/* 정렬 순서 */
+				, A.TN_IMG_PATH             /* 썸네일 이미지 경로 */
+			    , A.TN_MO_IMG_PATH          /* 썸네일 모바일 이미지 경로 */
+			    <if test='cateCdL != null'>
+				, SUBSTRING_INDEX(FN_GET_DISP_CTG_PATH(#{cateCdL}),  '<![CDATA[>]]>' , 1) as CATE_ICON
+				</if>
+				<if test='mbrNo != null'>
+				,IF((SELECT COUNT(*) FROM MEMBER_INTEREST_BRAND WHERE BND_NO = A.BND_NO AND MBR_NO = #{mbrNo}) > 0, 'Y','N') AS INTEREST_YN
+				</if>
+				,FN_GET_BRAND_NAME(A.BND_NO) AS BND_NM			/* 노출 브랜드 명 */
+		FROM	BRAND_BASE A
+				,ST_BND_MAP B
+		WHERE	A.BND_NO		= #{bndNo}
+				<if test='useYn != null'>
+				AND A.USE_YN = #{useYn}
+				</if>
+				AND A.BND_NO = B.BND_NO
+				AND B.ST_ID = #{stId}
+	</select>
+
+	<insert id="insertBrandBase" parameterType="biz.app.brand.model.BrandBasePO" >
+		<!--
+			Query Name : brand.insertBrandBase
+			Description : 브랜드 등록
+		-->
+		INSERT INTO BRAND_BASE (
+			  BND_NO					/* 브랜드 번호 */
+			, BND_TP_CD                 /* 브랜드 유형 */
+			, BND_NM_KO					/* 브랜드 명 국문 */
+			, USE_YN					/* 사용 여부 */
+			, BND_NM_EN					/* 브랜드 명 영문 */
+			, SORT_SEQ					/* 정렬 순서 */
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+			, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM				/* 시스템 수정 일시 */
+			, KO_INIT_CHAR_CD			/* 국문 초성 코 */
+			, EN_INIT_CHAR_CD			/* 영문 초성 코 */
+			, BND_ITRDC					/* 브랜드 소 */
+			, BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 경 */
+			, BND_MO_ITRDC				/* 브랜드 소개 */
+			, BND_ITRDC_MO_IMG_PATH		/* 브랜드 소개 이미지 경 */
+			, BND_CNTS_TP_CD            /* 브랜드 콘텐츠 유형 */
+			, BND_SHOW_YN		        /* 노출 여부 */
+			, BND_STRY                  /* 브랜드 스토리 */
+			, TN_IMG_PATH               /* 썸네일 이미지 경로 */
+			, TN_MO_IMG_PATH            /* 썸네일 모바일 이미지 경로 */
+
+		) VALUES (
+			  #{bndNo }					/* 브랜드 번호 */
+			, #{bndTpCd }               /* 브랜드 유형 */
+			, #{bndNmKo }				/* 브랜드 명 국문 */
+			, #{useYn }					/* 사용 여부 */
+			, #{bndNmEn }				/* 브랜드 명 영문 */
+			, #{sortSeq }				/* 정렬 순서 */
+			, #{sysRegrNo }				/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+			, #{sysUpdrNo }				/* 시스템 수정자 번호 */
+			, NOW()						/* 시스템 수정 일시 */
+			, #{koInitCharCd }			/* 국문 초성 코 */
+			, #{enInitCharCd }			/* 영문 초성 코 */
+			, #{bndItrdc }				/* 브랜드 소개 */
+			, #{bndItrdcImgPath }		/* 브랜드 소개 이미지 경 */
+			, #{bndMoItrdc }			/* 브랜드 모바일 소개 */
+			, #{bndItrdcMoImgPath }		/* 브랜드 모바일 소개 이미지 경 */
+			, #{bndCntsTpCd }		    /* 브랜드 콘텐츠 유형 */
+<!-- 			/*, #{bndShowYn } */		/* 브랜드 노출 여부 */ -->
+			, 'Y'		        			/* 브랜드 노출 여부 */
+			, #{bndStry }		        /* 브랜드 스토리 */
+			, #{tnImgPath }		        /* 썸네일 이미지 경로 */
+			, #{tnMoImgPath }		    /* 썸네일 모바일 이미지 경로 */
+		)
+	</insert>
+
+	<insert id="insertStBrandMap" parameterType="biz.app.st.model.StStdInfoPO">
+		<!--
+			Query Name : brand.insertStBrandMap
+			Description : 사이트와 브랜드 매핑 정보 등록
+		-->
+		INSERT INTO ST_BND_MAP (
+			  ST_ID				/* 사이트 아이디 */
+			, BND_NO			/* 브랜드 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{bndNo}			/* 브랜드 번호 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+	
+	<insert id="insertCompanyBrand" parameterType="biz.app.brand.model.CompanyBrandPO">
+		<!--
+			Query Name : brand.insertCompanyBrand
+			Description : 업체와 브랜드 매핑 정보 등록
+		-->
+		INSERT INTO COMPANY_BRAND (
+			  COMP_NO
+			, BND_NO
+			, DLGT_BND_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM  
+		) SELECT COMP_NO, #{bndNo}, 'N', #{sysRegrNo}, NOW() 
+			FROM COMPANY_BASE CB 
+			WHERE COMP_GB_CD in ('10', '20')
+	</insert>
+
+	<delete id="deleteStStdBrand" parameterType="Long" >
+		<!--
+			Query Name : brand.deleteStStdBrand
+			Description : 사이트 브랜드 삭제
+		-->
+		DELETE FROM ST_BND_MAP
+		 WHERE 1 = 1
+		   AND BND_NO = #{bndNo }
+	</delete>
+	
+	<delete id="deleteCompanyBrand" parameterType="Long" >
+		<!--
+			Query Name : brand.deleteCompanyBrand
+			Description : 업체 브랜드 삭제
+		-->
+		DELETE FROM COMPANY_BRAND
+		 WHERE 1 = 1
+		   AND BND_NO = #{bndNo }
+		   
+	</delete>
+	
+	
+	
+
+	<select id="getBrandBase" resultMap="BrandBaseMap" >
+		<!--
+			Query Name : brand.getBrandBase
+			Description : 브랜드 조회
+		-->
+		SELECT	/* QUERYID(brand.getBrandBase) */
+				  A.BND_NO					/* 브랜드 번호 */
+				, A.BND_TP_CD                  /* 브랜드 유형 */
+				, A.BND_NM_EN	AS DLGT_BND_NM_EN	/* 대표 브랜드 명 국문 */
+				, A.BND_NM_KO	AS DLGT_BND_NM_KO	/* 대표 브랜드 명 영문 */
+				, A.BND_NM_KO				/* 브랜드 명 국문 */
+				, A.USE_YN					/* 사용 여부 */
+				, A.BND_NM_EN				/* 브랜드 명 영문 */
+				, A.SORT_SEQ				/* 정렬 순서 */
+				, A.SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM				/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM				/* 시스템 수정 일시 */
+				, A.KO_INIT_CHAR_CD			/* 국문 초성 코 */
+				, A.EN_INIT_CHAR_CD			/* 영문 초성 코 */
+				, A.BND_ITRDC				/* 브랜드 소 */
+				, A.BND_ITRDC_IMG_PATH		/* 브랜드 소개 이미지 경 */
+				, A.BND_MO_ITRDC			/* 브랜드 모바일 소 */
+				, A.BND_ITRDC_MO_IMG_PATH	/* 브랜드 모바일 소개 이미지 경 */
+				, A.BND_CNTS_TP_CD	        /* 브랜드 콘텐츠 유형 */
+				, A.BND_STRY                /* 브랜드 스토리 */
+			    , A.TN_IMG_PATH             /* 썸네일 이미지 경로 */
+			    , A.TN_MO_IMG_PATH          /* 썸네일 모바일 이미지 경로 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				,A.BND_SHOW_YN
+		FROM	BRAND_BASE A
+		WHERE	A.BND_NO		= #{bndNo }
+	</select>
+
+	<select id="pageBrandBase" resultMap="BrandBaseMap">
+		<!--
+			Query Name : brand.pageBrandBase
+			Description : 브랜드 리스트 조회
+		-->
+		SELECT A.BND_NO
+			 , A.BND_NM_KO
+			 , A.BND_NM_EN
+			 , A.BND_TP_CD
+			 , A.USE_YN
+			 , A.SORT_SEQ
+			 , A.KO_INIT_CHAR_CD
+			 , A.EN_INIT_CHAR_CD
+			 , A.BND_ITRDC
+			 , A.BND_ITRDC_IMG_PATH
+			 , A.BND_SHOW_YN
+			 , A.SYS_REGR_NO
+			 , FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			 , A.SYS_REG_DTM
+             , FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM   /* 시스템 수정자 */
+             , A.SYS_UPD_DTM
+		  FROM BRAND_BASE A
+		 WHERE 1 = 1
+		 <if test="compNo != null and compNo != ''">
+		    AND EXISTS (SELECT 1 FROM COMPANY_BRAND CB WHERE CB.COMP_NO = #{compNo} AND A.BND_NO = CB.BND_NO)
+		 </if>
+		 <if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.BND_NO
+							FROM ST_STD_INFO S JOIN ST_BND_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+						WHERE A.BND_NO = SM.BND_NO)
+		</if>
+		<if test="bndNo != null" >
+		  AND A.BND_NO = #{bndNo }
+		</if>
+		<if test="bndNos != null" >
+			<foreach collection="bndNos" item="item" separator="," open="AND A.BND_NO IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+		<if test="bndNm != null and bndNm != ''" >
+		  AND (
+			A.BND_NM_KO LIKE CONCAT('%', #{bndNm }, '%')
+			OR A.BND_NM_EN LIKE CONCAT('%', #{bndNm }, '%')
+		  )
+		</if>
+		<if test="bndNms != null" >
+			<foreach collection="bndNms" item="item" separator="OR" open="AND (" close=")" >
+				A.BND_NM_KO LIKE CONCAT('%', #{item }, '%') OR A.BND_NM_EN LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		<if test="bndShowYn != null and bndShowYn != ''">
+		  AND A.BND_SHOW_YN = #{bndShowYn }
+		</if>
+		<if test="useYn != null and useYn != ''" >
+            AND A.USE_YN = #{useYn}
+        </if>
+		<!-- ORDER BY A.BND_NM_KO ASC, A.BND_SHOW_YN DESC, A.USE_YN DESC, A.BND_NO DESC -->
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+		
+	</select>
+
+	<select id="pageBrandBaseCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : brand.pageBrandBaseCount
+			Description : 브랜드 리스트 조회
+		-->
+		SELECT COUNT(*)
+		  FROM BRAND_BASE A
+		 WHERE
+			1 = 1
+		<if test="compNo != null and compNo != ''">
+		    AND EXISTS (SELECT 1 FROM COMPANY_BRAND CB WHERE CB.COMP_NO = #{compNo} AND A.BND_NO = CB.BND_NO)
+		</if>
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.BND_NO
+							FROM ST_STD_INFO S JOIN ST_BND_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+						WHERE A.BND_NO = SM.BND_NO)
+		</if>
+		<if test="bndNo != null" >
+		  AND A.BND_NO = #{bndNo }
+		</if>
+		<if test="bndNos != null" >
+			<foreach collection="bndNos" item="item" separator="," open="AND A.BND_NO IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+		<if test="bndNm != null and bndNm != ''" >
+		  AND (
+			A.BND_NM_KO LIKE CONCAT('%', #{bndNm }, '%')
+			OR A.BND_NM_EN LIKE CONCAT('%', #{bndNm }, '%')
+		  )
+		</if>
+		<if test="bndNms != null" >
+			<foreach collection="bndNms" item="item" separator="OR" open="AND (" close=")" >
+				A.BND_NM_KO LIKE CONCAT('%', #{item }, '%') OR A.BND_NM_EN LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		<if test="bndShowYn != null and bndShowYn != ''">
+		  AND A.BND_SHOW_YN = #{bndShowYn }
+		</if>
+		<if test="useYn != null and useYn != ''" >
+            AND A.USE_YN = #{useYn}
+        </if>
+	</select>
+
+
+	<delete id="deleteBrandBase" parameterType="Long" >
+		<!--
+			Query Name : brand.deleteBrandBase
+			Description : 브랜드 삭제
+		-->
+		DELETE FROM BRAND_BASE
+		 WHERE 1 = 1
+		   AND BND_NO = #{bndNo }
+	</delete>
+
+
+	<update id="updateBrandBase" parameterType="biz.app.brand.model.BrandBasePO" >
+		<!--
+			Query Name : brand.updateBrandBase
+			Description : 브랜드 업데이트
+		-->
+		UPDATE /*QUERYID(brand.updateBrandBase) */	BRAND_BASE SET
+				  SYS_UPDR_NO				= #{sysUpdrNo }				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				= NOW()						/* 시스템 수정 일시 */
+				, BND_NM_KO					= #{bndNmKo }				/* 브랜드 명 국문 */
+				, USE_YN					= #{useYn }					/* 사용 여부 */
+				, BND_NM_EN					= #{bndNmEn }				/* 브랜드 명 영문 */
+				, SORT_SEQ					= #{sortSeq }				/* 정렬 순서 */
+				, KO_INIT_CHAR_CD			= #{koInitCharCd }			/* 국문 초성 코 */
+				, EN_INIT_CHAR_CD			= #{enInitCharCd }			/* 영문 초성 코 */
+				, BND_ITRDC					= #{bndItrdc }				/* 브랜드 소 */
+				, BND_ITRDC_IMG_PATH		= #{bndItrdcImgPath }		/* 브랜드 소개 이미지 경 */
+				, BND_MO_ITRDC				= #{bndMoItrdc }			/* 브랜드 모바일소 */
+				, BND_ITRDC_MO_IMG_PATH		= #{bndItrdcMoImgPath }		/* 브랜드 모바일소개 이미지 경 */
+				, BND_CNTS_TP_CD			= #{bndCntsTpCd }			/* 브랜드 콘텐츠 유형 */
+				, BND_SHOW_YN				= #{bndShowYn }				/* 브랜드 소개 이미지 경 */
+				, BND_STRY				    = #{bndStry }				/* 브랜드 스토리 */
+				, TN_IMG_PATH				= #{tnImgPath }				/* 썸네일 이미지 경로 */
+				, TN_MO_IMG_PATH			= #{tnMoImgPath }		    /* 썸네일 모바일 이미지 경로 */
+				, BND_TP_CD                 = #{bndTpCd }               /* 브랜드 유형 */
+		WHERE	1 = 1
+		AND		BND_NO					= #{bndNo }
+	</update>
+
+	<select id="listBrandCate" resultType="biz.app.display.model.DisplayCategoryVO">
+		SELECT
+			 DISP_CLSF_NO 	/* 전시 분류 번호 */
+			,DISP_CLSF_NM	/* 전시 분류 명 */
+		FROM
+			DISPLAY_CATEGORY
+		WHERE
+			DISP_CLSF_CD ='${@framework.common.constants.CommonConstants@DISP_CLSF_10}'
+		AND
+			DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		AND
+			DISP_YN ='${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		AND
+			DISP_LVL='${@framework.common.constants.CommonConstants@DISP_LVL_1}'
+		ORDER BY DISP_PRIOR_RANK ASC
+	</select>
+
+	<select id="listLowestCate" resultType="biz.app.brand.model.BrandCategoryVO">
+		SELECT
+			T1.DISP_CLSF_NO
+		FROM
+			DISPLAY_CATEGORY AS T1
+			LEFT JOIN DISPLAY_CATEGORY AS T2 ON T2.DISP_CLSF_NO = T1.UP_DISP_CLSF_NO
+			LEFT JOIN DISPLAY_CATEGORY AS T3 ON T3.DISP_CLSF_NO = T2.UP_DISP_CLSF_NO
+		WHERE
+			T2.UP_DISP_CLSF_NO = #{dispClsfNo}
+	</select>
+
+	<select id="listSeries" resultType="biz.app.brand.model.BrandVO">
+		SELECT BND_NO,
+       		BND_NM_KO,
+       		BND_NM_EN,
+       		SORT_SEQ
+  		FROM
+  			BRAND_BASE
+ 		WHERE
+			1=1
+       		AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+        <if test="dispClsfNos != null" >
+			<foreach collection="dispClsfNos" item="item" separator="," open="AND BND_NO IN
+                    (select distinct (db.bnd_no) from display_brand db where db.disp_clsf_no in (" close="))" >
+				#{item }
+			</foreach>
+		</if>
+		ORDER BY SORT_SEQ;
+	</select>
+
+	<select id="listInitCharBrand" parameterType="biz.app.brand.model.BrandPO" resultType="biz.app.brand.model.BrandVO">
+		<!--
+			Query Name : display.listInitCharBrand
+			Description : 메인 브랜드(초성별 검색)
+		-->
+			SELECT BND.BND_NO, CD.DTL_CD, CD.DTL_NM
+			<choose>
+				<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_EN">
+					,BND.BND_NM_EN
+				</when>
+				<otherwise>
+					,BND.BND_NM_KO
+				</otherwise>
+			</choose>
+			FROM CODE_DETAIL CD
+			LEFT OUTER JOIN (
+								SELECT BB.BND_NO
+									  ,BB.BND_NM_KO, CDK.DTL_CD AS CHAR_CD_KO, CDK.DTL_NM AS CHAR_NM_KO
+									  ,BB.BND_NM_EN, CDE.DTL_CD AS CHAR_CD_EN, CDE.DTL_NM AS CHAR_NM_EN
+									  ,CDK.USR_DFN1_VAL AS GUBUN
+			                          ,BB.KO_INIT_CHAR_CD
+			                          ,BB.EN_INIT_CHAR_CD
+			                          ,BB.SORT_SEQ
+								  FROM BRAND_BASE BB
+							INNER JOIN ST_BND_MAP SBM ON SBM.BND_NO = BB.BND_NO AND SBM.ST_ID = #{stId}
+							INNER JOIN CODE_DETAIL CDK ON CDK.DTL_CD = BB.KO_INIT_CHAR_CD
+							INNER JOIN CODE_DETAIL CDE ON CDE.DTL_CD = BB.EN_INIT_CHAR_CD
+								 WHERE BB.BND_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+								   AND BB.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			                       <if test="dispClsfNo != null and dispClsfNo > 0" >
+			                       	AND BB.BND_NO IN (SELECT BND_NO FROM DISPLAY_BRAND WHERE DISP_CLSF_NO = #{dispClsfNo})
+			                       </if>
+							) BND ON
+							<choose>
+								<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_EN">
+									BND.EN_INIT_CHAR_CD = CD.DTL_CD
+								</when>
+								<otherwise>
+									BND.KO_INIT_CHAR_CD = CD.DTL_CD
+								</otherwise>
+							</choose>
+			WHERE CD.GRP_CD = '${@framework.common.constants.CommonConstants@INIT_CHAR}'
+			  AND USR_DFN1_VAL = #{initCharGb}
+			ORDER BY CD.SORT_SEQ, BND.SORT_SEQ
+			<choose>
+				<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_EN">
+					,BND.BND_NM_EN
+				</when>
+				<otherwise>
+					,BND.BND_NM_KO
+				</otherwise>
+			</choose>
+
+	</select>
+
+	<resultMap type="biz.app.brand.model.DisplayBrandTreeVO" id="resultDisplayTree">
+		<id     property="id"			column="ID"/>
+		<result property="text"			column="TEXT"/>
+		<result property="parent"		column="PARENT"/>
+		<result property="leaf"		column="LEAF"/>
+		<collection property="state" ofType="biz.app.brand.model.DisplayBrandTreeStateVO">
+			<result property="selected"	column="SELECTED"/>
+		</collection>
+	</resultMap>
+
+	<select id="listBrandDisplayTree" resultMap="resultDisplayTree">
+		<!--
+			Query Name : brand.listBrandDisplayTree
+			Description : test
+		-->
+		SELECT	/* QUERYID(brand.listBrandDisplayTree) */
+				A.DISP_CLSF_NO		AS ID		/* 전시 분류 번호 */
+				, A.DISP_CLSF_NM		AS TEXT		/* 전시 분류 명 */
+				, A.UP_DISP_CLSF_NO	AS PARENT	/* 상위 전시 분류 번호 */
+				, IF(B.BND_NO IS NOT NULL, 'true', 'false') AS SELECTED
+		FROM	DISPLAY_CATEGORY A
+		LEFT OUTER JOIN DISPLAY_BRAND B ON A.DISP_CLSF_NO = B.DISP_CLSF_NO AND B.BND_NO = ${bndNo}
+		WHERE	A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		<choose>
+			<when test="dispClsfCd != null and dispClsfCd != ''">
+			AND		A.DISP_CLSF_CD = #{dispClsfCd}
+			</when>
+			<otherwise>
+			AND		A.DISP_CLSF_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF_40}'
+			</otherwise>
+		</choose>
+		ORDER BY A.DISP_LVL, A.DISP_PRIOR_RANK
+	</select>
+
+	<select id="listBrandShowDispClsf" resultType="biz.app.brand.model.DisplayBrandTreeVO" >
+	<!--
+		Query Name : brand.listBrandShowDispClsf
+		Description : 브랜드 전시분류 리스트
+	-->
+	SELECT	/* QUERYID(popup.listPopupShowDispClsf ) */
+			  B.DISP_CLSF_NO			/* 전시 분류 번호 */
+			, FN_GET_DISP_CTG_PATH(B.DISP_CLSF_NO ) DISP_CTG_PATH
+			, B.BND_NO				/* 브랜드 번호 */
+			, B.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, B.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, B.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, D.ST_ID						/* 사이트 ID */
+			, D.ST_NM					/* 사이트 명 */
+	FROM	DISPLAY_BRAND B
+	INNER JOIN DISPLAY_CATEGORY     C ON (C.DISP_CLSF_NO = B.DISP_CLSF_NO)
+	INNER JOIN ST_STD_INFO D ON (D.ST_ID = C.ST_ID)
+	WHERE	1 = 1
+	AND		B.BND_NO		= #{bndNo}
+	ORDER BY B.DISP_PRIOR_RANK, B.DISP_CLSF_NO
+</select>
+
+	<insert id="insertDisplayBrand" parameterType="biz.app.display.model.DisplayBrandPO" >
+
+		INSERT INTO DISPLAY_BRAND (
+			  DISP_CLSF_NO     /* 전시 분류 번호 */
+			, BND_NO           /* 브랜드번호 */
+			, DISP_PRIOR_RANK  /* 전시우선순위 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfNo}			/* 전시 분류 번호  */
+			, #{bndNo}			    /* 브랜드번호 */
+			, #{dispPriorRank}		/* 전시우선순위 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteDisplayBrand" parameterType="biz.app.display.model.DisplayBrandPO" >
+		DELETE
+		FROM	DISPLAY_BRAND
+		WHERE	BND_NO = #{bndNo}
+	</delete>
+
+	<resultMap type="biz.app.brand.model.BrandGoodsVO" id="listBrandGoodsMap">
+		<id property="goodsId"					column="GOODS_ID"/>
+		<result property="goodsNm"				column="GOODS_NM"/>
+		<result property="goodsStatCd"			column="GOODS_STAT_CD"/>
+		<result property="mdlNm"				column="MDL_NM"/>
+		<result property="compNo"				column="COMP_NO"/>
+		<result property="compNm"				column="COMP_NM"/>
+		<result property="mmft"					column="MMFT"/>
+		<result property="saleStrtDtm"			column="SALE_STRT_DTM"/>
+		<result property="saleEndDtm"			column="SALE_END_DTM"/>
+		<result property="showYn"				column="SHOW_YN"/>
+		<result property="goodsTpCd"			column="GOODS_TP_CD"/>
+		<result property="bigo"					column="BIGO"/>
+		<result property="bndNo"				column="BND_NO"/>
+		<result property="bndNmKo"				column="BND_NM_KO"/>
+		<result property="saleAmt"				column="SALE_AMT"/>
+		<result property="bndNo"				column="BND_NO"/>
+
+ 		<collection property="stStdList" column="{goodsId=GOODS_ID, stUseYn=ST_USE_YN}" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="inline.getStStdInfoGoodsById"/>
+
+	</resultMap>
+	<select id="listBrandGoods" resultMap="listBrandGoodsMap">
+		<!--
+			Query Name : Brand.listBrandGoods
+			Description : 브랜드상품리스트
+		-->
+		SELECT	/* QUERYID(brand.listBrandGoods) */ A.GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, F.BND_NO
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM
+			GOODS_BASE A LEFT
+				JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+				LEFT JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+				JOIN GOODS_PRICE D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+				JOIN BRAND_GOODS F ON A.GOODS_ID = F.GOODS_ID
+
+		WHERE
+			F.BND_NO = #{bndNo}
+			AND F.BND_GOODS_DISP_GB  = #{bndGoodsDispGb}
+			AND D.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		    <if test="stStdList != null and stStdList.size() != 0">
+		    AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = A.GOODS_ID
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    )
+		    </if>
+	</select>
+
+	<insert id="insertBrandGoods" parameterType="biz.app.brand.model.BrandGoodsPO" >
+
+		INSERT INTO BRAND_GOODS (
+			   GOODS_ID              /* 상품아이디 */
+			,  BND_NO		         /* 브랜드번호 */
+			,  BND_GOODS_DISP_GB     /* 브랜드상품전시구분 */
+			,  DISP_PRIOR_RANK	     /* 전시우선순위 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsId}			/* 상품아이디 */
+			, #{bndNo}			    /* 브랜드번호 */
+			, #{bndGoodsDispGb}		/* 브랜드상품전시구분 */
+			, #{dispPriorRank}		/* 전시우선순위 */
+
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteBrandGoods" parameterType="biz.app.brand.model.BrandGoodsPO" >
+		DELETE
+		FROM	BRAND_GOODS
+		WHERE	BND_NO = #{bndNo}
+		<if test="bndGoodsDispGb != null and bndGoodsDispGb != ''">
+		  AND  BND_GOODS_DISP_GB = #{bndGoodsDispGb }
+		</if>
+	</delete>
+
+	<select id="listBrandNewGoods" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : Brand.listBrandNewGoods
+			Description : 브랜드 NEW 상품 조회
+		-->
+		SELECT
+			GBT.*
+			,CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT		/* 상품판매가 */
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			 END AS DC_AMT
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+			 END AS FO_SALE_AMT			/* 최종판매가 */
+		FROM (
+			(SELECT AA.*
+			 FROM
+			 (
+				SELECT
+					(@RN := @RN + 1) AS RANK
+					,GB.GOODS_ID
+					,GB.GOODS_NM
+					,FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+					,GI.IMG_SEQ
+					,GI.IMG_PATH
+				FROM
+					(SELECT @RN := 0) R
+					,BRAND_GOODS BG
+					,GOODS_BASE GB
+					,GOODS_IMG GI
+				WHERE
+					BG.BND_NO = #{bndNo}
+					AND BG.BND_GOODS_DISP_GB = '${@framework.common.constants.CommonConstants@BND_GOODS_DISP_GB_10}'
+					AND BG.GOODS_ID = GB.GOODS_ID
+					AND GB.GOODS_ID = GI.GOODS_ID
+					AND GI.DLGT_YN = 'Y'
+					AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+					AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					AND GB.SHOW_YN = 'Y'
+					<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+						#{code}
+					</foreach>
+				ORDER BY GB.SYS_REG_DTM DESC
+				LIMIT 0,6
+			 ) AA
+			)
+			UNION ALL
+			(SELECT BB.*
+			 FROM
+			 (
+				SELECT
+					(@RN2 := @RN2 + 1) AS RANK
+					,A.*
+				FROM
+					(SELECT @RN2 := 10) R,
+					(SELECT
+						GB.GOODS_ID
+						,GB.GOODS_NM
+						,FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+						,GI.IMG_SEQ
+						,GI.IMG_PATH
+					FROM
+						GOODS_BASE GB
+						,GOODS_IMG GI
+		    		WHERE
+		    			GB.GOODS_ID NOT IN (
+		    				SELECT GOODS_ID
+		    				FROM BRAND_GOODS
+		    				WHERE BND_NO = #{bndNo}
+								AND BND_GOODS_DISP_GB = '${@framework.common.constants.CommonConstants@BND_GOODS_DISP_GB_10}'
+						)
+						AND GB.BND_NO = #{bndNo}
+		    			AND GB.GOODS_ID = GI.GOODS_ID
+						AND GI.DLGT_YN = 'Y'
+						AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+						AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						AND GB.SHOW_YN = 'Y'
+						<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+							#{code}
+						</foreach>
+		    		ORDER BY GB.SYS_REG_DTM DESC
+		    		LIMIT 0, 6) A
+				) BB
+			)
+		) GBT
+		ORDER BY RANK
+		LIMIT 0, 6
+	</select>
+
+	<select id="listBrandBestGoods" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : Brand.listBrandBestGoods
+			Description : 브랜드 BEST 상품 조회
+		-->
+		SELECT
+			GBT.*
+			,CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT		/* 상품판매가 */
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			 END AS DC_AMT
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+			 END AS FO_SALE_AMT			/* 최종판매가 */
+		FROM (
+			(SELECT AA.*
+			 FROM
+			 (
+				SELECT
+					(@RN := @RN + 1) AS RANK
+					,GB.GOODS_ID
+					,GB.GOODS_NM
+					,FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+					,GI.IMG_SEQ
+					,GI.IMG_PATH
+				FROM
+					(SELECT @RN := 0) R
+					,BRAND_GOODS BG
+					,GOODS_BASE GB
+					,GOODS_IMG GI
+				WHERE
+					BG.BND_NO = #{bndNo}
+					AND BG.BND_GOODS_DISP_GB = '${@framework.common.constants.CommonConstants@BND_GOODS_DISP_GB_20}'
+					AND BG.GOODS_ID = GB.GOODS_ID
+					AND GB.GOODS_ID = GI.GOODS_ID
+					AND GI.DLGT_YN = 'Y'
+					AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+					AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					AND GB.SHOW_YN = 'Y'
+					<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+						#{code}
+					</foreach>
+				ORDER BY GB.SYS_REG_DTM DESC
+				LIMIT 0,6
+			 ) AA
+			)
+			UNION ALL
+			(SELECT BB.*
+			 FROM
+			 (
+				SELECT
+					(@RN2 := @RN2 + 1) AS RANK
+					,A.*
+				FROM
+					(SELECT @RN2 := 10) R,
+					(SELECT
+						GB.GOODS_ID
+						,GB.GOODS_NM
+						,FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+						,GI.IMG_SEQ
+						,GI.IMG_PATH
+					FROM
+						GOODS_BASE GB
+						,GOODS_IMG GI
+		    		WHERE
+		    			GB.GOODS_ID NOT IN (
+		    				SELECT GOODS_ID
+		    				FROM BRAND_GOODS
+		    				WHERE BND_NO = #{bndNo}
+								AND BND_GOODS_DISP_GB = '${@framework.common.constants.CommonConstants@BND_GOODS_DISP_GB_20}'
+						)
+						AND GB.BND_NO = #{bndNo}
+		    			AND GB.GOODS_ID = GI.GOODS_ID
+						AND GI.DLGT_YN = 'Y'
+						AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+						AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						AND GB.SHOW_YN = 'Y'
+						<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+							#{code}
+						</foreach>
+		    		ORDER BY GB.PPLRT_RANK ASC
+		    		LIMIT 0, 6) A
+				) BB
+			)
+		) GBT
+		ORDER BY RANK
+		LIMIT 0, 6
+	</select>
+
+	<select id="listBrandRelGoods" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : Brand.listBrandRelGoods
+			Description : 연관 브랜드 상품 조회(상품상세)
+		-->
+		SELECT *
+		  FROM
+		       (SELECT T.GOODS_ID,
+		              GOODS_NM,
+		              REG_DTM,
+		              IFNULL(SALE_QTY, 0) SALE_QTY ,
+		              IMG_SEQ ,
+		              IMG_PATH
+		         FROM
+		              (SELECT GB.GOODS_ID,
+		                     GB.GOODS_NM,
+		                     GB.SYS_REG_DTM REG_DTM ,
+		                     GI.IMG_SEQ ,
+		                     GI.IMG_PATH
+		                FROM DISPLAY_GOODS DG,
+		                     GOODS_BASE GB,
+		                     GOODS_IMG GI,
+		                     (SELECT GB.BND_NO,
+		                            DISP_CLSF_NO
+		                       FROM GOODS_BASE GB,
+		                            DISPLAY_GOODS DG
+		                      WHERE GB.GOODS_ID = #{goodsId}
+		                            AND GB.GOODS_ID = DG.GOODS_ID
+		                            AND DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		                     ) RT
+		               WHERE DG.DISP_CLSF_NO = RT.DISP_CLSF_NO
+		                     AND DG.GOODS_ID = GB.GOODS_ID
+		                     AND GB.BND_NO = RT.BND_NO
+		                     AND GB.GOODS_ID != #{goodsId}
+		                     AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+		                     AND GB.GOODS_ID = GI.GOODS_ID
+		                     AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		                     AND NOW() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+		                     AND GB.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		                     AND GB.WEB_MOBILE_GB_CD IN ( '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}' , #{webMobileGbCd} )
+		              ) T
+		            LEFT OUTER JOIN BEST_GOODS_TOTAL BGT
+		                ON T.GOODS_ID = BGT.GOODS_ID
+		              AND TOTAL_DT = (SELECT MAX(TOTAL_DT) FROM BEST_GOODS_TOTAL )
+		       ) T
+		ORDER BY SALE_QTY DESC ,
+		       REG_DTM DESC LIMIT 6;
+	</select>
+
+	<select id="listBrandEvent" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : Brand.listBrandEvent
+			Description : 브랜드 기획전 조회
+		-->
+		SELECT
+			DC.DISP_CLSF_NO
+			,DB.BNR_IMG_PATH
+		    ,DB.BNR_MOBILE_IMG_PATH
+		FROM
+			DISPLAY_CATEGORY DC
+		    ,DISPLAY_BANNER DB
+		WHERE
+			DC.DISP_CLSF_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF_20}'
+		    AND DC.BND_NO = #{bndNo}
+		    AND DC.ST_ID = #{stId}
+		    AND now() BETWEEN DC.DISP_STRTDT AND DC.DISP_ENDDT
+		    AND DISP_YN = 'Y'
+		    AND DEL_YN = 'N'
+		    AND DC.DISP_CLSF_NO = DB.DISP_CLSF_NO
+		ORDER BY DC.DISP_PRIOR_RANK
+	</select>
+
+	<select id="listIndexTopBrand" resultType="biz.app.brand.model.BrandTop10VO">
+		<!--
+			Query Name : Brand.listIndexTopBrand
+			Description : Top 10 브랜드 조회
+		-->
+				SELECT TOT.*
+					  ,B.BND_NM_KO
+							,B.BND_NM_EN
+				FROM
+				(
+						SELECT
+							 A.TOTAL_DT
+							,A.BND_NO
+							,SUM(A.SALE_QTY_RANK) AS SALE_QTY_RANK
+						FROM BEST_BRAND_TOTAL AS A
+						WHERE A.ST_ID = #{stId}
+						AND A.TOTAL_GB_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF_20}'
+						AND A.TOTAL_DT = (SELECT MAX(TOTAL_DT) FROM BEST_BRAND_TOTAL WHERE ST_ID = #{stId})
+				        GROUP BY A.TOTAL_DT, A.BND_NO
+				 ) TOT
+				INNER JOIN BRAND_BASE AS B ON B.BND_NO = TOT.BND_NO
+				ORDER BY TOT.SALE_QTY_RANK DESC
+				LIMIT 5
+	</select>
+
+	<select id="listBrandChar" parameterType="biz.app.brand.model.BrandPO" resultType="biz.app.brand.model.BrandVO">
+		SELECT BND_NO
+		<choose>
+			<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_E">
+				,BND_NM_EN
+			</when>
+			<otherwise>
+				,BND_NM_KO
+			</otherwise>
+		</choose>
+	  	  FROM BRAND_BASE
+		 WHERE
+		<choose>
+			<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_E">
+				EN_INIT_CHAR_CD = #{enInitCharCd}
+			</when>
+			<otherwise>
+				KO_INIT_CHAR_CD = #{koInitCharCd}
+			</otherwise>
+		</choose>
+		   AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	  ORDER BY SORT_SEQ
+		<choose>
+			<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_E">
+				,BND_NM_EN
+			</when>
+			<otherwise>
+				,BND_NM_KO
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="listBrandInitChar" resultType="biz.app.system.model.CodeDetailVO">
+		SELECT
+			 DTL_CD
+			,DTL_NM
+			,USR_DFN1_VAL
+		FROM CODE_DETAIL
+		WHERE
+			GRP_CD = '${@framework.common.constants.CommonConstants@INIT_CHAR}'
+			AND SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		ORDER BY USR_DFN1_VAL DESC, SORT_SEQ ASC
+	</select>
+
+	<select id="listBrand" parameterType="biz.app.brand.model.BrandBaseSO" resultType="biz.app.brand.model.BrandBaseSO">
+			SELECT BB.BND_NO
+				  ,BB.BND_NM_KO, CDK.DTL_CD AS CHAR_CD_KO, CDK.DTL_NM AS CHAR_NM_KO
+		          ,BB.BND_NM_EN, CDE.DTL_CD AS CHAR_CD_EN, CDE.DTL_NM AS CHAR_NM_EN
+			  FROM BRAND_BASE BB
+		INNER JOIN ST_BND_MAP SBM ON SBM.BND_NO = BB.BND_NO AND SBM.ST_ID = #{stId}
+		INNER JOIN CODE_DETAIL CDK ON CDK.DTL_CD = BB.KO_INIT_CHAR_CD
+		INNER JOIN CODE_DETAIL CDE ON CDE.DTL_CD = BB.EN_INIT_CHAR_CD
+			 WHERE BB.BND_SHOW_YN = 'Y'
+			   AND BB.USE_YN = 'Y'
+
+			<if test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_KO and initCharCd != null and initCharCd != ''" >
+				AND CDK.DTL_CD = #{initCharCd}
+			</if>
+
+			<if test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_EN and initCharCd != null and initCharCd != ''" >
+				AND CDE.DTL_CD = #{initCharCd}
+			</if>
+
+			<if test="brandSrchWord != null and brandSrchWord != ''" >
+				AND ( BB.BND_NM_EN LIKE CONCAT('%', #{brandSrchWord}, '%') OR BB.BND_NM_KO LIKE CONCAT('%', #{brandSrchWord}, '%') )
+			</if>
+
+			<if test="dispClsfNo != null and dispClsfNo != ''" >
+			   AND BB.BND_NO IN
+				  (
+						SELECT BND_NO FROM GOODS_BASE GB
+					INNER JOIN DISPLAY_GOODS DG ON DG.GOODS_ID = GB.GOODS_ID
+						 WHERE DG.DISP_CLSF_NO IN
+							  (
+									SELECT IFNULL(IFNULL(C3.DISP_CLSF_NO, C2.DISP_CLSF_NO), C1.DISP_CLSF_NO) AS DISP_CLSF_NO
+									  FROM DISPLAY_CATEGORY C1
+								 LEFT JOIN DISPLAY_CATEGORY C2 ON C1.DISP_CLSF_NO = C2.UP_DISP_CLSF_NO
+								 LEFT JOIN DISPLAY_CATEGORY C3 ON C2.DISP_CLSF_NO = C3.UP_DISP_CLSF_NO
+									 WHERE C1.DISP_CLSF_NO = #{dispClsfNo}
+							   )
+					)
+			</if>
+
+		<choose>
+			<when test="initCharGb == @framework.common.constants.CommonConstants@INIT_CHAR_GB_EN">
+				ORDER BY CDE.SORT_SEQ
+		                ,BB.BND_NM_EN
+			</when>
+			<otherwise>
+				ORDER BY CDK.SORT_SEQ
+		                ,BB.BND_NM_KO
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+	<resultMap type="biz.app.display.model.DisplayCategoryVO" id="brandCategoryMap">
+		<id     property="dispClsfNo"		column="UP_DISP_CLSF_NO"/>			<!-- 전시 카테고리 코드 -->
+		<result	property="dispClsfNm"		column="UP_DISP_CLSF_NM"/>			<!-- 전시 카테고리명 -->
+		<collection property="seriesList" ofType="biz.app.brand.model.BrandVO">
+			<id     property="bndNo"		column="BND_NO"/>			<!-- 브랜드 번호 -->
+			<result property="bndNmKo"		column="BND_NM_KO"/>		<!-- 브랜드 명 국문 -->
+			<result property="bndNmEn"		column="BND_NM_EN"/>		<!-- 브랜드 명 영문 -->
+			<result property="bndNm"		column="BND_NM"/>			<!-- 노출 브랜드 명 -->
+		</collection>
+	</resultMap>
+
+	<select id="listBrandByDisplayCategory" resultMap="brandCategoryMap">
+		<!--
+			Query Name : brand.listBrandByDisplayCategory
+			Description : 전시분류별 브랜드 리스트
+		-->
+		SELECT	/* QUERYID(brand.listBrandByDisplayCategory) */
+	         BB.BND_NO				/* 브랜드 번호 */
+	        ,BB.BND_NM_KO			/* 브랜드 명 국문 */
+	        ,BB.KO_INIT_CHAR_CD		/* 국문 초성 코드 */
+	        ,BB.BND_NM_EN			/* 브랜드 명 영문 */
+	        ,BB.EN_INIT_CHAR_CD		/* 영문 초성 코드 */
+	        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM	/* 노출 브랜드 명 */
+	        ,DG.DISP_CLSF_NO		/* 브랜드가 속한 카테고리 전시 번호 */
+	        ,DC.UP_DISP_CLSF_NO		/* 최상위 카테고리 전시 번호 */
+	        ,(SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DC.UP_DISP_CLSF_NO) AS UP_DISP_CLSF_NM		/* 최상위 카테고리명 */
+	    FROM
+	    	DISPLAY_CATEGORY DC,
+	        BRAND_BASE BB
+	        INNER JOIN ST_BND_MAP SBM ON BB.BND_NO = SBM.BND_NO AND SBM.ST_ID = #{stId}
+	        INNER JOIN GOODS_BASE GB ON GB.BND_NO = BB.BND_NO
+	        INNER JOIN DISPLAY_GOODS DG ON DG.GOODS_ID = GB.GOODS_ID
+	    WHERE
+	    	<foreach collection="dispClsfNos" item="no" separator="," open="DG.DISP_CLSF_NO IN (" close=")">
+	        #{no}
+	        </foreach>
+	        AND DC.DISP_CLSF_NO = (SELECT UP_DISP_CLSF_NO FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DG.DISP_CLSF_NO)
+	        AND BB.USE_YN = 'Y'
+	        AND BB.BND_SHOW_YN = 'Y'
+	    GROUP BY DC.UP_DISP_CLSF_NO, BB.BND_NO
+	    ORDER BY DC.UP_DISP_CLSF_NO, GB.SYS_REG_DTM DESC
+	</select>
+
+	<select id="listBrandByInitChar" resultMap="brandInitialMap">
+		<!--
+			Query Name : brand.listBrandByInitChar
+			Description : 전시분류별 초성 브랜드 리스트
+		-->
+		SELECT	/* QUERYID(brand.listBrandByInitChar) */
+	         IC.DTL_CD AS INIT_CHAR_CD			/* 초성 코드 */
+			,IC.USR_DFN1_VAL AS INIT_CHAR_CD	/* 초성 구분 코드 */
+			,IC.DTL_NM AS INIT_CHAR_NM			/* 초성 명 */
+			,IC.USR_DFN1_VAL AS INIT_CHAR_GB_CD	/* 초성 구분 코드 */
+		    ,BB.BND_NO							/* 브랜드 번호 */
+			,BB.BND_NM_KO						/* 브랜드 명 국문 */
+			,BB.BND_NM_EN						/* 브랜드 명 영문 */
+			,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM	/* 노출 브랜드명 */
+	    FROM
+	    	(
+				SELECT
+			    	 USR_DFN1_VAL
+			    	,DTL_CD
+					,DTL_NM
+			        ,SORT_SEQ
+				FROM CODE_DETAIL
+				WHERE
+					GRP_CD = '${@framework.common.constants.CommonConstants@INIT_CHAR}'
+					AND USE_YN = 'Y'
+			) IC
+			,(
+				SELECT
+			         BB.BND_NO
+			        ,BB.BND_NM_KO
+			        ,BB.KO_INIT_CHAR_CD
+			        ,BB.BND_NM_EN
+			        ,BB.EN_INIT_CHAR_CD
+			        ,BB.SORT_SEQ
+			    FROM
+			        BRAND_BASE BB
+			        INNER JOIN ST_BND_MAP SBM ON BB.BND_NO = SBM.BND_NO AND SBM.ST_ID = #{stId}
+			        INNER JOIN GOODS_BASE GB ON GB.BND_NO = BB.BND_NO
+			        INNER JOIN DISPLAY_GOODS DG ON DG.GOODS_ID = GB.GOODS_ID
+			    WHERE
+			        <foreach collection="dispClsfNos" item="no" separator="," open="DG.DISP_CLSF_NO IN (" close=")">
+			        #{no}
+			        </foreach>
+			        AND BB.USE_YN = 'Y'
+			        AND BB.BND_SHOW_YN = 'Y'
+			    GROUP BY BB.BND_NO
+			) BB
+	    WHERE
+	    	IC.DTL_CD = BB.KO_INIT_CHAR_CD
+    		OR IC.DTL_CD = BB.EN_INIT_CHAR_CD
+	    ORDER BY IC.SORT_SEQ, BB.SORT_SEQ
+	</select>
+
+
+	<select id="listBrandByStyle" resultType="biz.app.brand.model.BrandBaseVO">
+		<!--
+			Query Name : brand.listBrandByStyle
+			Description : StyleDCG 브랜드 리스트
+		-->
+	   SELECT	/* QUERYID(brand.listBrandByStyle) */
+	         BB.BND_NO				/* 브랜드 번호 */
+	        ,BB.BND_NM_KO			/* 브랜드 명 국문 */
+	        ,BB.KO_INIT_CHAR_CD		/* 국문 초성 코드 */
+	        ,BB.BND_NM_EN			/* 브랜드 명 영문 */
+	        ,BB.EN_INIT_CHAR_CD		/* 영문 초성 코드 */
+	        ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM	/* 노출 브랜드명 */
+	    FROM
+	    	BRAND_BASE BB
+	    	INNER JOIN ST_BND_MAP SBM ON BB.BND_NO = SBM.BND_NO AND SBM.ST_ID = #{stId}
+	        INNER JOIN GOODS_BASE GB ON GB.BND_NO = BB.BND_NO
+	        INNER JOIN DISPLAY_GOODS DG ON DG.GOODS_ID = GB.GOODS_ID
+	    WHERE
+	    	<foreach collection="dispClsfNos" item="no" separator="," open="DG.DISP_CLSF_NO IN (" close=")">
+	        #{no}
+	        </foreach>
+	        AND BB.USE_YN = 'Y'
+	        AND BB.BND_SHOW_YN = 'Y'
+	        AND BB.BND_TP_CD = '${@framework.common.constants.CommonConstants@BND_TP_20}'
+	    GROUP BY BB.BND_NO
+	    ORDER BY BB.SORT_SEQ
+	</select>
+	
+	<select id="getSameBrandNameCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : brand.getSameBrandNameCount
+			Description : 동일한 브랜드 명 존재 여부 조회
+		-->
+		SELECT	/* QUERYID(brand.getSameBrandNameCount) */ 
+			COUNT(*)
+		  FROM BRAND_BASE A
+		 WHERE A.BND_NM_KO = #{bndNm }
+		 <if test="bndNo != null" >
+		  AND A.BND_NO != #{bndNo }
+		</if>
+			
+	</select>
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	SMS 전송 이력
+	작성자  	snw
+	작성일자  	2016.04.22
+-->
+
+<mapper namespace="smsHist">
+
+
+	<insert id="insertSmsHist">
+		<!--
+			Query Name : smsHist.insertSmsHist
+			Description : SMS 이력 등록
+		-->
+		INSERT INTO SMS_HIST
+			(
+				SMS_HIST_ID
+				,SMS_GB_CD
+				,SND_NO
+				,TTL
+				,CONTENT
+				,RSV_YN
+				,RSV_DTM
+				,USR_DFN_1
+				,USR_DFN_2
+				,SND_RST_STAT
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+			)
+			VALUES
+			(
+				#{smsHistId}
+				,#{smsGbCd}
+				,#{sndNo}
+				,#{ttl}
+				,#{content}
+				,#{rsvYn}
+				,#{rsvDtm}
+				,#{usrDfn1}
+				,#{usrDfn2}
+				,#{sndRstStat}
+				,#{sysRegrNo}
+				,SYSDATE()
+			)
+	</insert>
+
+	<update id="updateSmsHistResult">
+		<!--
+			Query Name : smsHist.updateSmsHistResult
+			Description : SMS 이력 결과 등록
+		-->
+		UPDATE 	SMS_HIST
+		SET		RST_NO = #{rstNo}
+				,RST_MSG = #{rstMsg}
+				,RST_SND_CNT = #{rstSndCnt}
+				,RST_RMN_CNT = #{rstRmnCnt}
+				,SYS_UPDR_NO = #{sysUpdrNo}
+				,SYS_UPD_DTM = SYSDATE()
+		WHERE	SMS_HIST_ID = #{smsHistId}
+	</update>
+
+	<select id="getEmSmtLogTableName"  resultType="java.lang.String" >
+		<!--
+			Query Name : smsHist.getEmSmtLogTableName
+			Description : 테이블명
+		-->
+	<!-- 		SHOW TABLES  LIKE 'EM_SMT_LOG%' -->
+		SHOW /* QUERYID(smsHist.getEmSmtLogTableName) */ TABLES
+		FROM VECI_20
+		WHERE TABLES_IN_VECI_20 LIKE 'EM_SMT_LOG%' OR TABLES_IN_VECI_20 LIKE 'EM_MMT_LOG%';
+
+	</select>
+	<select id="pageEmSmtLogBaseOLD"  resultType="biz.common.model.EmSmtLogVO" >
+		<!--
+			Query Name : smsHist.pageEmSmtLogBaseOld
+			Description :
+		-->
+				SELECT  /* QUERYID(smsHist.pageEmSmtLogBaseOld) */
+					  mt_pr
+					, date_client_req
+					, callback
+					, content
+					, recipient_num
+		          FROM ${tableName}
+				 WHERE 1 = 1
+				<if test="recipientNum != null and recipientNum != '' ">
+				   AND recipient_num = #{recipientNum}
+				</if>
+				ORDER BY mt_pr DESC
+	</select>
+
+	<select id="pageEmSmtLogBaseCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pageEmSmtLogBaseCount
+			Description : pageEmSmtLogBaseCount
+		-->
+		SELECT  /* QUERYID(smsHist.pageEmSmtLogBaseCount) */
+			COUNT(*)
+		from (
+			select
+				'SMS' AS GUBUN
+          	FROM  ${tableName}
+		 	WHERE 1 = 1
+				<if test="recipientNum != null and recipientNum != '' ">
+				   AND recipient_num = #{recipientNum}
+				</if>
+			UNION ALL
+			select
+				'MMS' AS GUBUN
+          	FROM  ${mmsTableName}
+          	WHERE 1 = 1
+				<if test="recipientNum != null and recipientNum != '' ">
+				   AND recipient_num = #{recipientNum}
+				</if>
+		) A
+	</select>
+
+	<select id="pageEmSmtLogBase"  resultType="biz.common.model.EmSmtLogVO" >
+		SELECT  /* QUERYID(smsHist.pageEmSmtLogBase) */
+		*
+		from (
+			select
+				'SMS' AS GUBUN
+				,  mt_pr
+				, date_client_req
+				, callback
+				, content
+				, recipient_num
+	          	FROM  ${tableName}
+			 	WHERE 1 = 1
+				<if test="recipientNum != null and recipientNum != '' ">
+				   AND recipient_num = #{recipientNum}
+				</if>
+			union all
+			select
+				'MMS' AS GUBUN
+				, mt_pr
+				, date_client_req
+				, callback
+				, content
+				, recipient_num
+	          	FROM  ${mmsTableName}
+	          	WHERE 1 = 1
+				<if test="recipientNum != null and recipientNum != '' ">
+				   AND recipient_num = #{recipientNum}
+				</if>
+		) A
+		ORDER BY mt_pr DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+
+
+	<select id="pageEmSmtLogBaseCountOld" resultType="java.lang.Integer">
+		<!--
+			Query Name : pageEmSmtLogBaseCountOld
+			Description : test
+		-->
+		SELECT	/* QUERYID(smsHist.pageEmSmtLogBaseCountOld) */
+				COUNT(*)
+		FROM	${tableName}
+		 WHERE 1 = 1
+		<if test="recipientNum != null and recipientNum != ''  ">
+		   AND recipient_num = #{recipientNum}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,2 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=utf-8" %>
+<frame:select grpCd="${code.grpCd}" selectKey="${code.selectKey }" usrDfn1Val="${code.usrDfn1Val}" usrDfn2Val="${code.usrDfn2Val}" usrDfn3Val="${code.usrDfn3Val}" usrDfn4Val="${code.usrDfn4Val}" usrDfn5Val="${code.usrDfn5Val}" defaultName="${code.defaultName }" showValue="${code.showValue }" />

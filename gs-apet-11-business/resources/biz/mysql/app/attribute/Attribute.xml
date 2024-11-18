@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="attribute">
+
+<insert id="insertNewAttribute" useGeneratedKeys="true" keyProperty="attrNo">
+	<!--
+			Query Name : attribute.insertNewAttribute
+			Description : 새로운 속성 추가
+	-->
+	<selectKey keyProperty="attrNo" resultType="java.lang.Long" order="BEFORE">
+		SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_ATTRIBUTE_SEQ}') FROM DUAL
+	</selectKey>
+	INSERT /* QUERYID(attribute.insertNewAttribute) */ INTO ATTRIBUTE (
+		ATTR_NO
+		,ATTR_NM
+		,USE_YN
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+	) VALUES (
+			#{attrNo }			/* 속성번호 */
+			, #{attrNm }			/* 속성명*/
+			, #{useYn }
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+	)
+</insert>
+
+<select id="checkAttributeExist" resultType="biz.app.attribute.model.AttributeVO">
+	<!--
+			Query Name : attribute.checkCountAttributeExist
+			Description : 속성 존재 체크
+	-->
+	SELECT /* QUERYID(attribute.checkAttributeExist) */
+		ATTR_NO,
+		ATTR_NM,
+		USE_YN
+	FROM ATTRIBUTE
+	WHERE UPPER(TRIM(ATTR_NM) )= UPPER(#{attrNm})
+	AND USE_YN=  '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+</select>
+
+
+</mapper>

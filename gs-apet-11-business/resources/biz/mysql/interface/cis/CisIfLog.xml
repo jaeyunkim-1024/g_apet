@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	CIS IF Log
+	작성자 		kek01
+	작성일자  	2021. 01. 15.
+-->
+
+<mapper namespace="cisIfLog">
+
+	<insert id="insertCisIfLog" parameterType="biz.interfaces.cis.model.CisIfLogPO">
+		<!--
+			Query Name	: cisIfLog.insertCisIfLog
+			Description	: CIS IF Log 등록
+		-->
+		INSERT INTO CIS_IF_LOG	/* QUERYID(cisIfLog.insertCisIfLog) */
+		(
+			  LOG_NO             /* 로그 번호 */
+			, STEP				 /* 단계 */
+			, HTTPS_STATUS_CD	 /* 응답 HTTP Status Code */
+			, CIS_RES_CD		 /* CIS 결과코드 */
+			, CIS_RES_MSG		 /* CIS 결과 메시지 */
+			, REQUEST_URL		 /* 호출 URL */
+			, CALL_ID			 /* CIS Call ID */
+			, REQ_JSON			 /* 요청 JSON */
+			, SYS_REG_DTM		 /* 시스템 등록일시 */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호 */
+			, SYS_REQ_START_DTM  /* 요청시작일시 */
+		) VALUES (
+			  #{logNo}			 /* 로그 번호 */
+			, #{step}			 /* 단계 */
+			, #{httpsStatusCd}	 /* 응답 HTTP Status Code */
+			, #{cisResCd}		 /* CIS 결과코드 */
+			, #{cisResMsg}		 /* CIS 결과 메시지 */
+			, #{requestUrl}		 /* 호출 URL */
+			, #{callId}			 /* CIS Call ID */
+			, #{reqJson}		 /* 요청 JSON */
+			, #{sysRegDtm}		 /* 시스템 등록일시 */
+			, #{sysRegrNo}		 /* 시스템 등록자 번호 */
+			, #{sysReqStartDtm}	 /* 요청시작일시 */
+		)
+	</insert>
+	
+	<insert id="insertCisIfLogOne" parameterType="biz.interfaces.cis.model.CisIfLogPO">
+		<!--
+			Query Name	: cisIfLog.insertCisIfLogOne
+			Description	: CIS IF Log 등록
+		-->
+		INSERT INTO CIS_IF_LOG	/* QUERYID(cisIfLog.insertCisIfLogOne) */
+		(
+			  LOG_NO             /* 로그 번호 */
+			, STEP				 /* 단계 */
+			, HTTPS_STATUS_CD	 /* 응답 HTTP Status Code */
+			, CIS_RES_CD		 /* CIS 결과코드 */
+			, CIS_RES_MSG		 /* CIS 결과 메시지 */
+			, REQUEST_URL		 /* 호출 URL */
+			, CALL_ID			 /* CIS Call ID */
+			, REQ_JSON			 /* 요청 JSON */
+			, RES_JSON			 /* 응답 JSON */
+			, SYS_REG_DTM		 /* 시스템 등록일시 */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호 */
+			, SYS_REQ_START_DTM  /* 요청시작일시 */
+			, SYS_REQ_END_DTM	 /* 요청종료일시 */
+			, SYS_RES_DTM		 /* 응답일시 */
+		) VALUES (
+			  #{logNo}			 /* 로그 번호 */
+			, #{step}			 /* 단계 */
+			, #{httpsStatusCd}	 /* 응답 HTTP Status Code */
+			, #{cisResCd}		 /* CIS 결과코드 */
+			, #{cisResMsg}		 /* CIS 결과 메시지 */
+			, #{requestUrl}		 /* 호출 URL */
+			, #{callId}			 /* CIS Call ID */
+			, #{reqJson}		 /* 요청 JSON */
+			, #{resJson}		 /* 응답 JSON */
+			, #{sysRegDtm}		 /* 시스템 등록일시 */
+			, #{sysRegrNo}		 /* 시스템 등록자 번호 */
+			, #{sysReqStartDtm}  /* 요청시작일시 */
+			, #{sysReqEndDtm}	 /* 요청종료일시 */
+			, #{sysResDtm}		 /* 응답일시 */
+		)
+	</insert>
+	
+	<update id="updateCisIfLog" parameterType="biz.interfaces.cis.model.CisIfLogPO">
+		<!--
+			Query Name	: cisIfLog.updateCisIfLog
+			Description	: CIS IF Log 수정
+		-->
+		UPDATE CIS_IF_LOG	/* QUERYID(cisIfLog.updateCisIfLog) */
+		SET
+			  SYS_REQ_END_DTM	= #{sysReqEndDtm}			/* 요청종료일시 */
+			<if test="step != null and step != ''">
+			, STEP				= #{step}					/* 단계 */
+			</if>
+			<if test="httpsStatusCd != null and httpsStatusCd != ''">
+			, HTTPS_STATUS_CD	= #{httpsStatusCd}			/* 응답 HTTP Status Code */
+			</if>
+			<if test="cisResCd != null and cisResCd != ''">
+			, CIS_RES_CD		= #{cisResCd}				/* CIS 결과코드 */
+			</if>
+			<if test="cisResMsg != null and cisResMsg != ''">
+			, CIS_RES_MSG		= #{cisResMsg}				/* CIS 결과 메시지 */
+			</if>
+			<if test="resJson != null and resJson != ''">
+			, RES_JSON			= #{resJson}				/* 응답 JSON */
+			</if>
+			<if test="sysResDtm != null and sysResDtm != ''">
+			, SYS_RES_DTM		= #{sysResDtm}				/* 응답일시 */
+			</if>
+		WHERE
+			LOG_NO = #{logNo}
+	</update>
+	
+	<delete id="deleteCisIfLog" parameterType="biz.interfaces.cis.model.CisIfLogPO">
+		DELETE FROM CIS_IF_LOG
+		WHERE 1=1
+			<if test="logNo != null">
+			AND LOG_NO = #{logNo}
+			</if>
+			<if test="sysRegDtm != null and sysRegDtm != ''">
+			AND	SYS_REG_DTM &gt;= DATE_ADD(#{sysRegDtm}, INTERVAL -2 DAY) AND SYS_REG_DTM &lt; #{sysRegDtm}  /*2일전 ~ 오늘날짜*/
+			</if>
+	</delete>
+	
+	<select id="pageCisIfLogList" parameterType="biz.interfaces.cis.model.CisIfLogSO" resultType="biz.interfaces.cis.model.CisIfLogVO">
+		<!--
+			Query Name	: cisIfLog.pageCisIfLogList
+			Description	: CIS IF Log 조회
+		-->
+		SELECT	/* QUERYID(cisIfLog.pageCisIfLogList) */
+			  LOG_NO             /* 로그 번호 */
+			, STEP				 /* 단계 */
+			, HTTPS_STATUS_CD	 /* 응답 HTTP Status Code */
+			, CIS_RES_CD		 /* CIS 결과코드 */
+			, CIS_RES_MSG		 /* CIS 결과 메시지 */
+			, REQUEST_URL		 /* 호출 URL */
+			, CALL_ID			 /* CIS Call ID */
+			, REQ_JSON			 /* 요청 JSON */
+			, RES_JSON			 /* 응답 JSON */
+			, SYS_REG_DTM		 /* 시스템 등록일시 */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호 */
+			, SYS_REQ_START_DTM  /* 요청시작일시 */
+			, SYS_REQ_END_DTM	 /* 요청종료일시 */
+			, SYS_RES_DTM		 /* 응답일시 */
+		FROM
+			CIS_IF_LOG
+		WHERE	1 = 1
+			<if test="step != null and step != ''">
+			AND STEP = #{step}
+			</if>
+			<if test="httpsStatusCd != null and httpsStatusCd != ''">
+			AND HTTPS_STATUS_CD = #{httpsStatusCd}
+			</if>
+			<if test="cisResCd != null and cisResCd != ''">
+	        AND CIS_RES_CD = #{cisResCd}
+	        </if>
+			<if test="callId != null and callId != ''">
+	        AND CALL_ID = #{callId}
+	        </if>
+			<if test="sysReqStartDtmStart != null and sysReqStartDtmStart != '' and sysReqStartDtmEnd != null and sysReqStartDtmEnd != ''">
+	        AND SYS_REQ_START_DTM &gt;= #{sysReqStartDtmStart} AND SYS_REQ_START_DTM &lt; #{sysReqStartDtmEnd}  /* 조회조건 - 요청시작일시 */
+	        </if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="petBase">
+        <select id="listPetBase" resultType="biz.app.pet.model.PetBaseVO">
+            <!--
+                Query Name : petBase.listPetBase
+                Description : 반려 동물 조회
+            -->
+            SELECT
+                PET_NO
+                , MBR_NO
+                , IMG_PATH
+                , PET_GB_CD
+				, FN_GET_CODE_NAME('PET_GB', A.PET_GB_CD, 'N') AS PET_GB_CD_NM /*펫 구분 명*/
+                , PET_KIND_NM
+                , PET_NM
+                , PET_GD_GB_CD
+                , AGE
+                , MONTH
+                , BIRTH
+                , WEIGHT
+                , NAVER_PET_KEY
+<!--   삭제 		, DLGT_YN -->
+                , ALLERGY_YN
+                , FIXING_YN
+                , WRY_DA_YN
+                , (SELECT COUNT(*) FROM PET_INCL_RECODE B WHERE A.PET_NO = B.PET_NO) AS PET_INCL_CNT
+                , SYS_REGR_NO
+                , SYS_REG_DTM
+                , DATE_FORMAT(SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT
+                , SYS_UPDR_NO
+                , SYS_UPD_DTM
+			    , (SELECT REPLACE(GROUP_CONCAT(FN_GET_CODE_NAME('DA', AAA.DA_CD, 'N')), ',', ', ') FROM PET_DA AAA WHERE A.PET_NO = AAA.PET_NO AND AAA.DA_GB_CD = '${@framework.common.constants.CommonConstants@DA_GB_10}') AS DISEASE_NM
+			    , (SELECT REPLACE(GROUP_CONCAT(FN_GET_CODE_NAME('DA', AAA.DA_CD, 'N')), ',', ', ') FROM PET_DA AAA WHERE A.PET_NO = AAA.PET_NO AND AAA.DA_GB_CD = '${@framework.common.constants.CommonConstants@DA_GB_20}') AS ALLERGY_NM
+            FROM PET_BASE A
+            WHERE 1=1
+            <if test="mbrNo != null and mbrNo != 0">
+                AND MBR_NO = #{mbrNo}
+            </if>
+            <choose>
+            	<when test="sort != null and sort != ''">
+		            ORDER BY ${sort} ${order}
+            	</when>
+            	<otherwise>
+		            ORDER BY SYS_REG_DTM DESC
+            	</otherwise>
+            </choose>
+        </select>
+
+        <select id="listPetBaseGroupByMbrNo" resultType="biz.app.pet.model.PetBaseVO">
+            <!--
+                Query Name : petBase.listPetBase
+                Description : 반려 동물 간략 정보 조회
+            -->
+            SELECT
+                    PET_GB_CD
+                ,   GROUP_CONCAT(PET_KIND_NM) AS PET_KIND_NMS
+                ,   GROUP_CONCAT(PET_NM) AS PET_NMS
+                ,   COUNT(*) AS CNT
+            FROM PET_BASE
+            WHERE 1=1
+            <if test="mbrNo != null and mbrNo != 0">
+                AND MBR_NO = #{mbrNo}
+            </if>
+            GROUP BY PET_GB_CD
+        </select>
+
+        <insert id="insertPetBase" useGeneratedKeys="true" parameterType="biz.app.pet.model.PetBasePO">
+        	<!--
+			   Query Name	: petBase.insertPetBase 
+			   Description	: 펫 정보 삽입
+			   Writer		: 조은지
+			   Date 		: 2021. 1. 22.
+			-->
+            <!-- <selectKey keyProperty="petNo" resultType="java.lang.Long" order="BEFORE">
+                    SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_BASE_SEQ}') FROM DUAL
+            </selectKey> -->
+            INSERT INTO PET_BASE(
+                    PET_NO
+                    , MBR_NO
+                    , IMG_PATH
+                    , PET_GB_CD
+                    , PET_KIND_NM
+                    , PET_NM
+                    , PET_GD_GB_CD
+                    , AGE
+                    , MONTH
+                    , BIRTH
+                    , WEIGHT
+                    , NAVER_PET_KEY
+<!--    삭제 			, DLGT_YN -->
+                    , ALLERGY_YN
+                    , FIXING_YN
+                    , WRY_DA_YN
+                    , SYS_REGR_NO
+                    , SYS_REG_DTM
+                    , SYS_UPDR_NO
+                    , SYS_UPD_DTM
+                    , BIRTH_BATCH
+            )
+            VALUES(
+                      #{petNo}
+                    , #{mbrNo}
+                    , #{imgPath}
+                    , #{petGbCd}
+                    , #{petKindNm}
+                    , #{petNm}
+                    , #{petGdGbCd}
+                    , #{age}
+                    , #{month}
+                    , #{birth}
+                    , #{weight}
+                    , #{naverPetKey}
+<!--   삭제 			, #{dlgtYn} -->
+                    , #{allergyYn}
+                    , #{fixingYn}
+                    , #{wryDaYn}
+                    , #{sysRegrNo}
+                    , NOW()
+                    , #{sysUpdrNo}
+                    , NOW()
+                    , #{birthBatch}
+            )
+        </insert>
+        
+        <select id="pagePetInclRecodeCount" resultType="java.lang.Integer">
+            <!--
+			   Query Name	: petBase.pagePetInclRecodeCount
+			   Description	: 접종내역 카운트
+			   Writer		: 조은지
+			   Date 		: 2021. 1. 22.
+			-->
+        	SELECT	COUNT(*)
+        	FROM	PET_INCL_RECODE A
+        	WHERE	1=1
+				AND	PET_NO = #{petNo}
+				<if test="tabNo == 1">
+					AND	INCL_GB_CD != '${@framework.common.constants.CommonConstants@INCL_GB_40}' 	
+				</if>					
+				<if test="tabNo == 2">
+					AND INCL_GB_CD = '${@framework.common.constants.CommonConstants@INCL_GB_40}'
+				</if>
+        </select>
+        
+        <select id="pagePetInclRecode" resultType="biz.app.pet.model.PetInclRecodeVO">
+            <!--
+			   Query Name	: petBase.pagePetInclRecode
+			   Description	: 접종내역
+			   Writer		: 조은지
+			   Date 		: 2021. 1. 22.
+			-->
+        	SELECT	PET_NO
+					, INCL_NO
+					, INCL_GB_CD
+					, INCL_KIND_CD
+					, INCL_NM
+					, ITEM_NM
+					, INCL_DT
+					, ADD_INCL_CD
+					, ADD_INCL_DT
+					, TRMT_HSPT_NM
+					, IMG_PATH
+					, ALM_SET_YN
+					, SYS_REGR_NO
+					, SYS_REG_DTM
+					, SYS_UPDR_NO
+					, SYS_UPD_DTM
+					, MEMO
+					, IFNULL(IMG_PATH, 'N') AS CTFC
+			FROM	PET_INCL_RECODE A
+			WHERE	1=1
+				AND	PET_NO = #{petNo}
+				AND	INCL_DT BETWEEN #{inclStDt} AND #{inclEnDt}
+				<if test="tabNo == 1">
+					AND	INCL_GB_CD != '${@framework.common.constants.CommonConstants@INCL_GB_40}' 	
+				</if>					
+				<if test="tabNo == 2">
+					AND INCL_GB_CD = '${@framework.common.constants.CommonConstants@INCL_GB_40}'
+				</if>
+			<include refid="bizCommon.sortSql" />
+			<include refid="bizCommon.pageSql" />
+        </select>
+        
+        <select id ="pagePetInclRecodeFront" resultType="biz.app.pet.model.PetInclRecodeVO">
+           <!--
+			   Query Name	: petBase.pagePetInclRecodeFrontCount
+			   Description	: 접종내역 Front
+			   Writer		: kms
+			   Date 		: 2021. 1. 22.
+			-->
+       		SELECT	PET_NO
+					, INCL_NO
+					, INCL_GB_CD
+					, INCL_KIND_CD
+					, INCL_NM
+					, ITEM_NM
+					, INCL_DT
+					, ADD_INCL_CD
+					, ADD_INCL_DT
+					, TRMT_HSPT_NM
+					, IMG_PATH
+					, ALM_SET_YN
+					, SYS_REGR_NO
+					, SYS_REG_DTM
+					, SYS_UPDR_NO
+					, SYS_UPD_DTM
+					, MEMO
+			FROM	PET_INCL_RECODE A
+			WHERE	1=1
+				AND	PET_NO = #{petNo}
+				<include refid="bizCommon.sortSql" />
+				<include refid="bizCommon.pageSql" />
+        </select>
+        
+        
+      	<select id="pagePetInclRecodeFrontCount" resultType="java.lang.Integer">
+            <!--
+			   Query Name	: petBase.pagePetInclRecodeFrontCount
+			   Description	: 접종내역 Front
+			   Writer		: kms
+			   Date 		: 2021. 1. 22.
+			-->
+        	SELECT	COUNT(*)
+        	FROM	PET_INCL_RECODE A
+        	WHERE	1=1
+				AND	PET_NO = #{petNo}
+        </select>
+        
+        <select id="getPetInfo" resultType="biz.app.pet.model.PetBaseVO">
+        	<!--
+			   Query Name	: petBase.getPetInfo
+			   Description	: 펫 상세 정보
+			   Writer		: 조은지
+			   Date 		: 2021. 1. 22.
+			-->
+        	SELECT	A.AGE 
+					, A.ALLERGY_YN 
+					, A.BIRTH 
+<!-- 	삭제			, A.DLGT_YN  -->
+					, A.FIXING_YN 
+					, A.IMG_PATH 
+					, A.MBR_NO 
+					, A.`MONTH` 
+					, A.NAVER_PET_KEY 
+					, A.PET_GB_CD 
+					, A.PET_GD_GB_CD 
+					, A.PET_KIND_NM 
+					, A.PET_NM 
+					, A.PET_NO 
+					, A.SYS_REG_DTM 
+					, A.SYS_REGR_NO 
+					, A.SYS_UPD_DTM 
+					, A.SYS_UPDR_NO 
+					, A.WEIGHT 
+					, A.WRY_DA_YN 
+				    , (SELECT REPLACE(GROUP_CONCAT(FN_GET_CODE_NAME('DA', AAA.DA_CD, 'N')), ',', ', ') FROM PET_DA AAA WHERE A.PET_NO = AAA.PET_NO AND AAA.DA_GB_CD = '${@framework.common.constants.CommonConstants@DA_GB_10}') AS DISEASE_NM
+				    , (SELECT REPLACE(GROUP_CONCAT(FN_GET_CODE_NAME('DA', AAA.DA_CD, 'N')), ',', ', ') FROM PET_DA AAA WHERE A.PET_NO = AAA.PET_NO AND AAA.DA_GB_CD = '${@framework.common.constants.CommonConstants@DA_GB_20}') AS ALLERGY_NM
+				    , IF(A.BIRTH IS NULL OR A.BIRTH = "", '1', '2') AS AGE_CHOOSE	/** 나이 선택 구분 : 1 - 개월수, 2 - 생년월일 */
+			FROM	PET_BASE A 
+			WHERE	1=1
+				AND A.PET_NO = #{petNo}
+				<if test="mbrNo != null and mbrNo != ''">
+	        		AND A.MBR_NO = #{mbrNo}
+	        	</if>
+        </select> 
+        
+        <insert id="insertPetDa" parameterType="biz.app.pet.model.PetDaPO">
+	        <!--
+			   Query Name	: petBase.insertPetDa
+			   Description	: 펫 질환/알러지 삽입
+			   Writer		: 조은지
+			   Date 		: 2021. 1. 22.
+			-->
+            <!-- <selectKey keyProperty="daNo" resultType="java.lang.Long" order="BEFORE">
+            	SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_DA_SEQ}') FROM DUAL
+            	SELECT MAX(DA_NO)+1 FROM PET_DA
+            </selectKey> -->
+			<!-- INSERT INTO PET_DA
+			(
+				PET_NO
+				, DA_NO
+				, DA_GB_CD
+				, DA_CD
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+			) VALUES (
+				#{petNo}
+				, (SELECT DA_NO FROM(SELECT MAX(DA_NO)+1 AS DA_NO FROM PET_DA)A)
+				, #{daGbCd}
+				, #{daCd}
+				, #{sysRegrNo}
+				, NOW()
+				, #{sysUpdrNo}
+				, NOW()
+			) -->
+			INSERT INTO PET_DA
+			(
+				PET_NO
+				, DA_GB_CD
+				, DA_CD
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+			) VALUES
+			<foreach collection="list" item="item" separator=","> 
+			(
+				#{item.petNo}
+				, #{item.daGbCd}
+				, #{item.daCd}
+				, #{item.sysRegrNo}
+				, NOW()
+				, #{item.sysUpdrNo}
+				, NOW()
+			)
+			</foreach>
+        </insert>
+        
+        <update id="updatePetBase"  parameterType="biz.app.pet.model.PetBasePO">
+        	<!--
+			   Query Name	: petBase.updatePetBase 
+			   Description	: 반려동물 기본정보 수정
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 2.
+			-->
+        	UPDATE PET_BASE SET
+                IMG_PATH		= #{imgPath}
+<!--                 , PET_GB_CD		= #{petGbCd} -->
+                , PET_KIND_NM	= #{petKindNm}
+                , PET_NM		= #{petNm}
+                , PET_GD_GB_CD	= #{petGdGbCd}
+                , AGE			= #{age}
+                , MONTH			= #{month}
+                , BIRTH			= #{birth}
+                , WEIGHT		= #{weight}
+<!--            , NAVER_PET_KEY	= #{naverPetKey} -->
+<!--   삭제 		, DLGT_YN		= #{dlgtYn} -->
+                , ALLERGY_YN	= #{allergyYn}
+                , FIXING_YN		= #{fixingYn}
+                , WRY_DA_YN		= #{wryDaYn}
+                , SYS_UPDR_NO	= #{sysUpdrNo}
+                , SYS_UPD_DTM	= NOW()
+                , BIRTH_BATCH 	= #{birthBatch}
+         	WHERE PET_NO = #{petNo}
+        </update>
+        
+        <delete id="deletePetInclRecode" parameterType="biz.app.pet.model.PetInclRecodePO">
+        	<!--
+			   Query Name	: petBase.deletePetInclRecode 
+			   Description	: 반려동물 건강수첩 삭제
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 2.
+			-->
+			DELETE FROM PET_INCL_RECODE WHERE PET_NO = #{petNo}
+        </delete>
+        
+        <delete id="deletePetDa" parameterType="biz.app.pet.model.PetDaPO">
+        	<!--
+			   Query Name	: petBase.deletePetDa 
+			   Description	: 반려동물 질환/알러지 삭제
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 2.
+			-->
+        	DELETE FROM PET_DA WHERE PET_NO = #{petNo}
+        </delete>
+        
+        <delete id="deletePetBase" parameterType="biz.app.pet.model.PetBasePO">
+        	<!--
+			   Query Name	: petBase.deletePetBase 
+			   Description	: 반려동물 삭제
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 2.
+			-->
+        	DELETE FROM PET_BASE WHERE PET_NO = #{petNo}
+        </delete>
+        
+        <select id="selectPetDa" resultType="biz.app.pet.model.PetDaVO">
+	        <!--
+			   Query Name	: petBase.selectPetDa 
+			   Description	: 반려동물 질환 리스트
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 8.
+			-->
+			SELECT	PET_NO
+					, DA_NO
+					, DA_GB_CD
+					, DA_CD
+					, SYS_REGR_NO
+					, SYS_REG_DTM
+					, SYS_UPDR_NO
+					, SYS_UPD_DTM 
+			FROM	PET_DA
+			WHERE	1=1
+				AND PET_NO = #{petNo}
+        </select>
+        
+        <update id="updateMemberDlgtPetGbCd" parameterType="biz.app.member.model.MemberBasePO">
+        	<!--
+			   Query Name	: petBase.updateMemberDlgtPetGbCd 
+			   Description	: 회원 기본 반려동물 등록
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 9.
+			-->
+			UPDATE MEMBER_BASE SET
+				DLGT_PET_GB_CD = #{dlgtPetGbCd}
+				, SYS_UPDR_NO = #{sysUpdrNo}
+				, SYS_UPD_DTM = NOW()
+				, UPDR_IP = #{updrIp}
+			WHERE	1=1
+				AND MBR_NO = #{mbrNo}
+        </update>
+        
+        <select id="selectPetCnt" resultType="int">
+        	<!--
+			   Query Name	: petBase.selectPetCnt 
+			   Description	: 반려동물 카운트
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 9.
+			-->
+			SELECT	COUNT(*)
+			FROM	PET_BASE
+			WHERE	1=1
+				AND MBR_NO = #{mbrNo}
+        </select>
+        
+        <select id="selectMemberPetLogUrl" resultType="string">
+        	<!--
+			   Query Name	: petBase.selectMemberPetLogUrl 
+			   Description	: 회원 펫로그 URL 조회
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 9.
+			-->
+        	SELECT	PET_LOG_URL
+        	FROM	MEMBER_BASE
+        	WHERE	1=1
+        		AND MBR_NO = #{mbrNo}
+        </select>
+        
+        <update id="updateMemberPetLogUrl" parameterType="biz.app.member.model.MemberBasePO">
+        	<!--
+			   Query Name	: petBase.updateMemberPetLogUrl 
+			   Description	: 회원 펫로그 URL UPDATE
+			   Writer		: 조은지
+			   Date 		: 2021. 2. 9.
+			-->
+        	UPDATE MEMBER_BASE SET
+        		<choose>
+        			<when test="petLogUrlDeleteYn.equals('Y')">
+        				PET_LOG_URL = NULL
+        			</when>
+        			<otherwise>
+        				PET_LOG_URL = FN_PET_LOG_URL_RANDOM()
+        			</otherwise>
+        		</choose>
+        		, SYS_UPDR_NO = #{sysUpdrNo}
+        		, SYS_UPD_DTM = NOW()
+        		, UPDR_IP = #{updrIp}
+        	WHERE	1=1
+        		AND MBR_NO = #{mbrNo}
+        </update>
+        
+        <insert id ="insertMyPetInclRecode" parameterType="biz.app.pet.model.PetInclRecodePO">
+        	INSERT INTO PET_INCL_RECODE
+        		(
+        		PET_NO
+        		, INCL_NO
+        		, INCL_GB_CD
+        		, INCL_KIND_CD
+        		, INCL_NM
+        		, ITEM_NM
+        		, INCL_DT
+        		, ADD_INCL_CD
+        		, ADD_INCL_DT
+        		, TRMT_HSPT_NM
+        		, IMG_PATH
+        		, ALM_SET_YN
+        		, MEMO
+        		, SYS_REGR_NO
+        		, SYS_REG_DTM
+        		)
+        		VALUES
+        		(
+        		#{petNo}
+        		, #{inclNo}
+        		, #{inclGbCd}
+        		, #{inclKindCd}
+        		, #{inclNm}
+        		, #{itemNm}
+        		, #{inclDt}
+        		, #{addInclCd}
+        		, #{addInclDt}
+        		, #{trmtHsptNm}
+        		, #{imgPath}
+        		, #{almSetYn}
+        		, #{memo}
+        		, #{sysRegrNo}
+				, NOW()
+        		)
+        </insert>
+        
+        <select id="getMyPetInclRecode" resultType ="biz.app.pet.model.PetInclRecodeVO">
+        	SELECT
+        	     PET_NO
+        		, INCL_NO
+        		, INCL_GB_CD
+        		, INCL_KIND_CD
+        		, INCL_NM
+        		, ITEM_NM
+        		, INCL_DT
+        		, ADD_INCL_CD
+        		, ADD_INCL_DT
+        		, TRMT_HSPT_NM
+        		, IMG_PATH
+        		, ALM_SET_YN
+        		, MEMO
+        	FROM
+        		PET_INCL_RECODE T1
+        	WHERE 
+        		1 = 1
+        	<if test="inclNo != null and inclNo != ''">
+        		AND INCL_NO = #{inclNo}
+        	</if>
+        	<if test="mbrNo != null and mbrNo != ''">
+        		AND EXISTS (SELECT 1
+        					FROM PET_BASE T2
+        					WHERE T2.PET_NO = T1.PET_NO
+        					  AND T2.MBR_NO = #{mbrNo} )
+        	</if>				
+        </select>
+        
+        <update id="updateMyPetInclRecode" parameterType="biz.app.pet.model.PetInclRecodePO">
+			UPDATE
+				PET_INCL_RECODE
+			SET 
+        		INCL_GB_CD = #{inclGbCd}
+        		, INCL_KIND_CD = #{inclKindCd}
+        		, INCL_NM = #{inclNm}
+        		, ITEM_NM = #{itemNm}
+        		, INCL_DT = #{inclDt}
+        		, ADD_INCL_CD = #{addInclCd}
+        		, ADD_INCL_DT = #{addInclDt}
+        		, TRMT_HSPT_NM = #{trmtHsptNm}
+        		<if test = "imgPath != null and imgPath != ''">
+        		, IMG_PATH = #{imgPath}
+        		</if>
+        		, ALM_SET_YN = #{almSetYn}
+        		, MEMO = #{memo}
+        		, SYS_UPDR_NO = #{sysUpdrNo}
+				, SYS_UPD_DTM = NOW()
+			WHERE
+				INCL_NO = #{inclNo}	
+        </update>
+        
+        <delete id="deleteMyPetInclRecode" parameterType="biz.app.pet.model.PetInclRecodePO">
+        	DELETE FROM
+        		PET_INCL_RECODE
+        	WHERE
+        		INCL_NO = #{inclNo}		
+        </delete>
+        
+        <update id="appPetImageUpdate" parameterType="biz.app.pet.model.PetBasePO">
+        	UPDATE PET_BASE SET
+        		IMG_PATH = #{imgPath}
+        	WHERE	1=1
+        		AND PET_NO = #{petNo}
+        </update>
+        
+        <update id = "appInclPetImageUpdate" parameterType="biz.app.pet.model.PetInclRecodePO">
+        	UPDATE 
+        		PET_INCL_RECODE
+        	SET 
+        		IMG_PATH = #{imgPath}
+        	WHERE
+        		PET_NO = #{petNo}	
+        	AND INCL_NO = #{inclNo}
+        </update>
+        
+        <select id="selectPetNosForSession" resultType="String">
+        	SELECT GROUP_CONCAT(PET_NO) FROM PET_BASE WHERE MBR_NO = #{mbrNo}
+        </select>
+        
+        <select id="selectMaxPetNo" resultType="Long">
+        	SELECT MAX(PET_NO)+1 FROM PET_BASE
+        </select>
+        
+        <select id="listPetGb" resultType="String">
+        	SELECT	PET_GB_CD
+        	FROM	PET_BASE
+        	WHERE	MBR_NO = #{mbrNo}
+        </select>
+</mapper>

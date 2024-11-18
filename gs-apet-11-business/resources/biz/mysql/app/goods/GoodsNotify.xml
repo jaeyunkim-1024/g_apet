@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 고시 정보
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsNotify">
+
+	<!-- 상품 고시 정보 목록 조회 : 상품의 고시정보 및 값정보 -->
+	<select id="listGoodsNotifyUsed" resultType="biz.app.goods.model.GoodsNotifyVO">
+		SELECT  NI.NTF_ITEM_ID
+		        ,NI.ITEM_NM
+		        ,NI.DSCRT
+		        ,NI.BIGO
+		        ,GN.ITEM_VAL
+		        ,GN.GOODS_ID
+		FROM    NOTIFY_ITEM NI LEFT OUTER JOIN GOODS_NOTIFY GN ON NI.NTF_ITEM_ID = GN.NTF_ITEM_ID AND GN.GOODS_ID = #{goodsId}
+		WHERE   NI.NTF_ID = (SELECT NTF_ID FROM GOODS_BASE WHERE GOODS_ID = #{goodsId})
+		ORDER BY NI.NTF_ITEM_ID ASC
+	</select>
+
+
+	<insert id="insertNotifyInfo" parameterType="biz.app.goods.model.NotifyInfoPO" >
+		<!--
+			Query Name : goodsNotify.insertNotifyInfo
+			Description : 고시 정보 등록
+		-->
+		INSERT INTO NOTIFY_INFO (
+			  NTF_ID			/* 고시 아이디 */
+			, NTF_NM			/* 고시 명 */
+			, DTL_ITEM			/* 상세 품목 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{ntfId }			/* 고시 아이디 */
+			, #{ntfNm }			/* 고시 명 */
+			, #{dtlItem }		/* 상세 품목 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<insert id="insertNotifyItem" parameterType="biz.app.goods.model.NotifyItemPO">
+		<!--
+			Query Name : goodsNotify.insertNotifyItem
+			Description : 고시 아이템 등록
+		-->
+		INSERT INTO NOTIFY_ITEM (
+			  NTF_ID			/* 고시 아이디 */
+			, NTF_ITEM_ID		/* 고시 항목 아이디 */
+			, ITEM_NM			/* 항목 명 */
+			, DSCRT				/* 설명 */
+			, BIGO				/* 비고 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{ntfId }			/* 고시 아이디 */
+			, #{ntfItemId }		/* 고시 항목 아이디 */
+			, #{itemNm }		/* 항목 명 */
+			, #{dscrt }			/* 설명 */
+			, #{bigo }			/* 비고 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<insert id="insertGoodsNotify" parameterType="biz.app.goods.model.GoodsNotifyPO" >
+		<!--
+			Query Name : goodsNotify.insertGoodsNotify
+			Description : 상품 고시 정보 등록
+		-->
+		INSERT INTO GOODS_NOTIFY (
+			  NTF_ITEM_ID		/* 고시 항목 아이디 */
+			, ITEM_VAL			/* 항목 값 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+		) VALUES (
+			  #{ntfItemId }		/* 고시 항목 아이디 */
+			, #{itemVal }		/* 항목 값 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{goodsId }		/* 상품 아이디 */
+		)
+	</insert>
+
+
+	<update id="updateGoodsNotify" parameterType="biz.app.goods.model.GoodsNotifyPO" >
+		<!--
+			Query Name : goodsNotify.updateGoodsNotify
+			Description : 상품 고시 정보 수정
+		-->
+		UPDATE	GOODS_NOTIFY SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= #{sysUpdDtm }		/* 시스템 수정 일시 */
+				, ITEM_VAL			= #{itemVal }		/* 항목 값 */
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+		AND		NTF_ITEM_ID		= #{ntfItemId }
+	</update>
+
+
+	<select id="listNotifyInfo" resultType="biz.app.goods.model.NotifyInfoVO" >
+		<!--
+			Query Name : goodsNotify.listNotifyInfo
+			Description : 고시 정보 코드 조회
+		-->
+		SELECT A.NTF_ID
+			 , CONCAT(A.NTF_NM, CASE WHEN A.DTL_ITEM IS NULL OR A.DTL_ITEM = '' THEN '' ELSE CONCAT(' [', A.DTL_ITEM, ']') END ) AS NTF_NM
+			 , A.DTL_ITEM
+		  FROM NOTIFY_INFO A
+		 ORDER BY CASE WHEN A.NTF_NM = '기타' THEN 1 ELSE 2 END, A.NTF_ID
+	</select>
+
+	<select id="listNotifyItem" resultType="biz.app.goods.model.NotifyItemVO" >
+		<!--
+			Query Name : goodsNotify.listNotifyItem
+			Description : 고시 정보 조회.. 상품 입력값 함께 조회
+		-->
+		SELECT B.NTF_ID
+			 , A.NTF_NM
+			 , B.NTF_ITEM_ID
+			 , B.ITEM_NM
+			 , B.DSCRT
+			 , B.INPUT_MTD_CD
+			 , B.BIGO
+			 , C.ITEM_VAL
+		  FROM NOTIFY_INFO A, NOTIFY_ITEM B
+		  LEFT OUTER JOIN GOODS_NOTIFY C ON (C.GOODS_ID = #{goodsId } AND C.NTF_ITEM_ID = B.NTF_ITEM_ID)
+		 WHERE 1 = 1
+		 <if test="ntfId != null and ntfId != ''">
+		   AND A.NTF_ID = #{ntfId}
+		 </if>
+		   AND A.NTF_ID = B.NTF_ID
+		 ORDER BY B.NTF_ITEM_ID
+	</select>
+
+	<select id="listNotifyItemInterface" resultType="biz.app.goods.model.interfaces.NotifyItemVO" >
+		<!--
+			Query Name : goodsNotify.listNotifyItemInterface
+			Description : 고시 정보 조회.. 상품 입력값 함께 조회 (API용)
+		-->
+		SELECT B.NTF_ID
+			 , B.NTF_ITEM_ID
+			 , B.ITEM_NM
+			 , B.DSCRT
+			 , B.INPUT_MTD_CD
+			 , B.BIGO
+		  FROM NOTIFY_INFO A, NOTIFY_ITEM B
+		 WHERE 1 = 1
+		 <if test="ntfId != null and ntfId != ''">
+		   AND A.NTF_ID = #{ntfId}
+		 </if>
+		   AND A.NTF_ID = B.NTF_ID
+		 ORDER BY B.NTF_ITEM_ID
+	</select>
+
+	<delete id="deleteGoodsNotify" parameterType="java.lang.String" >
+		<!--
+			Query Name : goodsNotify.listNotifyItem
+			Description : 고시 정보 조회 삭제
+		-->
+		DELETE FROM GOODS_NOTIFY
+		 WHERE 1 = 1
+		   AND GOODS_ID = #{goodsId }
+	</delete>
+
+
+	<select id="listGoodsNotify" resultType="biz.app.goods.model.GoodsNotifyVO" >
+		<!--
+			Query Name : goodsNotify.listGoodsNotify
+			Description : 고시 정보 조회
+		-->
+		SELECT	/* QUERYID(goodsNotify.listGoodsNotify ) */
+				  NTF_ITEM_ID		/* 고시 항목 아이디 */
+				, ITEM_VAL			/* 항목 값 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, GOODS_ID			/* 상품 아이디 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_NOTIFY
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+	</select>
+
+	<select id="getCheckGoodsNotify" resultType="biz.app.goods.model.NotifyInfoVO" >
+		<!--
+			Query Name : goodsNotify.getCheckGoodsNotify
+			Description : 고시 아이디 존재 체크
+		-->
+		SELECT	/* QUERYID(goodsNotify.getCheckGoodsNotify ) */
+				  NTF_ID		/* 고시 아이디 */
+				, NTF_NM		/* 고시 명 */
+				, DTL_ITEM	/* 상세 품목 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM	NOTIFY_INFO
+		WHERE	1 = 1
+			AND	NTF_ID = #{ntfId}
+	</select>
+</mapper>

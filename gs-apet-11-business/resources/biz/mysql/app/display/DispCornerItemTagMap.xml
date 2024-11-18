@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dispCornerItemTagMap">
+
+	<insert id="insertDispCornerItemTag" parameterType="biz.app.display.model.DispCornerItemTagMapPO">
+		<!--
+			Query Name : dispCornerItemTagMap.insertDispCornerItemTag
+			Description : 전시 코너 아이템 태그 등록
+			- BO
+		-->
+		INSERT INTO 
+			DISP_CORNER_ITEM_TAG_MAP (
+				DISP_CNR_ITEM_NO
+				, TAG_NO
+			) VALUES (
+				#{dispCnrItemNo}
+				, #{tagNo}
+			)
+	</insert>
+	
+	<delete id="deleteDispCornItemTag" parameterType="biz.app.display.model.DispCornerItemTagMapPO">
+		<!--
+			Query Name : dispCornerItemTagMap.deleteDispCornItemTag
+			Description : 전시 코너 아이템 태그 삭제
+			- BO
+		-->
+		DELETE FROM DISP_CORNER_ITEM_TAG_MAP
+		WHERE 1 = 1 
+		<if test="dispCnrItemNo != null and dispCnrItemNo != ''">
+		AND DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+		</if>
+	</delete>
+	
+</mapper>

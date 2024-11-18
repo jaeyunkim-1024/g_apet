@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<article class="popLayer a popDelsel" id="popDelsel">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">배송지 선택</h1>
+					<button type="button" class="btnPopClose" onclick="window.self.close();">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="uiDelisel">
+						<ul class="delist">
+							<li class="active">
+								<div class="box">
+									<nav class="uidropmu dmenu">
+										<button type="button" class="bt st">메뉴열기</button>
+										<ul class="menu">
+											<li><button type="button" class="bt">수정</button></li>
+											<li><button type="button" class="bt">삭제</button></li>
+										</ul>									
+									</nav>
+									<label class="radio"><input type="radio" name="rd_deli_sel" checked><span class="txt"><em class="tt txd">우리집<em class="bdg">기본배송지</em></em></span></label><!-- 21.06.14 APETQA-4614 구조단 수정해주세요 lcm01 -->
+									<div class="inf">
+										<div class="adrs"> [01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우 </div>
+										<div class="usrs">박이슬 / 010-1234-1234</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="box">
+									<nav class="uidropmu dmenu">
+										<button type="button" class="bt st">메뉴열기</button>
+										<div class="list">
+											<ul class="menu">
+												<li><button type="button" class="bt">수정</button></li>
+												<li><button type="button" class="bt">삭제</button></li>
+											</ul>
+										</div>
+									</nav>
+									<label class="radio"><input type="radio" name="rd_deli_sel"><span class="txt"><em class="tt txd">옆집</em></span></label>
+									<div class="inf">
+										<div class="adrs"> [01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우 </div>
+										<div class="usrs">박이슬 / 010-1234-1234</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="box">
+									<nav class="uidropmu dmenu">
+										<button type="button" class="bt st">메뉴열기</button>
+										<div class="list">
+											<ul class="menu">
+												<li><button type="button" class="bt">수정</button></li>
+												<li><button type="button" class="bt">삭제</button></li>
+											</ul>
+										</div>
+									</nav>
+									<label class="radio"><input type="radio" name="rd_deli_sel"><span class="txt"><em class="tt txd">회사 제목을길게했을경우버튼을침범하는지체크하자자자자자자자자자자</em></span></label>
+									<div class="inf">
+										<div class="adrs"> [01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우 </div>
+										<div class="usrs">박이슬 / 010-1234-1234</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<div class="btadds">
+							<button type="button" class="bt btDiAdd">배송지 추가</button>
+						</div>
+					</div>
+					
+					<div class="btnSet bot"><button type="button" class="btn lg a">확인</button></div>
+					
+				</main>
+			</div>
+			
+		</div>
+	</article>
+
+	<script>
+		ui.popLayer.open("popDelsel");
+	</script>
+
+</body>
+</html>

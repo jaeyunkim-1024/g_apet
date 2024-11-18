@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	적용 혜택
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+<mapper namespace="aplBnft">
+
+	<insert id="insertAplBnft">
+		<!--
+			Query Name : aplBnft.insertAplBnft
+			Description : 적용 혜택 등록
+		-->
+		INSERT INTO APL_BNFT
+		(
+			ORD_NO					/* 주문 번호 */
+			, ORD_DTL_SEQ			/* 주문 상세 순번 */
+			, APL_BENEFIT_NO		/* 적용 혜택 번호 */
+			, APL_BNFT_GB_CD		/* 적용 혜택 구분 코드 */
+			, APL_BNFT_TP_CD		/* 적용 혜택 유형 코드 */
+			, APL_NO					/* 적용 번호 */
+			, MBR_CP_NO			/* 회원 쿠폰 번호 */
+			, APL_AMT				/* 적용 금액 */
+			, RMN_APL_AMT		/* 잔여 적용 금액 */
+			, COMP_BDN_AMT		/* 업체 분담 금액 */
+			, CNC_YN					/* 취소 여부 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) SELECT
+			#{ordNo}					/* 주문 번호 */
+			, #{ordDtlSeq}			/* 주문 상세 순번 */
+			, (SELECT IFNULL(MAX(APL_BENEFIT_NO), 0) + 1 FROM APL_BNFT WHERE ORD_NO = #{ordNo} AND ORD_DTL_SEQ = #{ordDtlSeq}) /* 적용 혜택 번호 */
+			, #{aplBnftGbCd} 		/* 적용 혜택 구분 코드 */
+			, #{aplBnftTpCd}			/* 적용 혜택 유형 코드 */
+			, #{aplNo}				/* 적용 번호 */
+			, #{mbrCpNo}			/* 회원 쿠폰 번호 */
+			, #{aplAmt}				/* 적용 금액 */
+			, #{rmnAplAmt}			/* 잔여 적용 금액 */
+			, #{compBdnAmt}		/* 업체 분담 금액 */
+			, #{cncYn}					/* 취소 여부 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+	</insert>
+
+	<select id="listAplBnft" resultType="biz.app.order.model.AplBnftVO">
+		<!--
+			Query Name : aplBnft.insertAplBnft
+			Description : 적용 혜택 목록
+		-->
+		SELECT 	ORD_NO					/* 주문 번호 */
+					, ORD_DTL_SEQ			/* 주문 상세 순번 */
+					, APL_BENEFIT_NO		/* 적용 혜택 번호 */
+					, APL_BNFT_GB_CD		/* 적용 혜택 구분 코드 */
+					, APL_BNFT_TP_CD		/* 적용 혜택 유형 코드 */
+					, APL_NO					/* 적용 번호 */
+					, MBR_CP_NO			/* 회원 쿠폰 번호 */
+					, APL_AMT				/* 적용 금액 */
+					, RMN_APL_AMT		/* 잔여 적용 금액 */
+					, CNC_YN					/* 취소 여부 */
+					, COMP_BDN_AMT		/* 업체 분담 금액 */
+					, SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, SYS_REG_DTM			/* 시스템 등록 일시 */
+		FROM		APL_BNFT
+		WHERE	1=1
+		<if test="ordNo != null and ordNo != ''">
+		AND		ORD_NO = #{ordNo}
+		</if>
+		<if test="aplBnftGbCd != null and aplBnftGbCd != ''">
+		AND		APL_BNFT_GB_CD = #{aplBnftGbCd}
+		</if>
+		<if test="cncYn != null and cncYn != ''">
+		AND		CNC_YN = #{cncYn}
+		</if>
+	</select>
+
+	<select id="listAplBnftMbrCpNo" resultType="Long">
+		<!--
+			Query Name : aplBnft.listAplBnftMbrCoNo
+			Description : 쿠폰 적용 혜택 중 주문에 사용된 회원 쿠폰 목록 조회
+		-->
+		SELECT 	MBR_CP_NO					/* 적용 번호 */
+		FROM		APL_BNFT
+		WHERE	ORD_NO = #{ordNo}
+		AND		APL_BNFT_GB_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}'
+		AND		CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		GROUP BY MBR_CP_NO
+	</select>
+
+	<update id="updateAplBnftCancel">
+		<!--
+			Query Name : aplBnft.updateAplBnftCancel
+			Description : 적용혜택 취소 처리
+		-->
+		UPDATE	APL_BNFT
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+					, CNC_YN  = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'		/* 취소여부 */
+		WHERE	ORD_NO = #{ordNo}
+		AND		ORD_DTL_SEQ = #{ordDtlSeq}
+	</update>
+
+	<select id="listAplBnftCancelCoupon" resultType="biz.app.order.model.AplBnftVO">
+		<!--
+			Query Name : aplBnft.listAplBnftCancelCoupon
+			Description : 쿠폰 적용 혜택 중 복원 해야할 쿠폰 목록
+		-->
+		SELECT  T1.APL_NO
+		        	,T1.MBR_CP_NO
+		FROM    (        
+			        SELECT  	RAB.APL_NO
+			                	,RAB.MBR_CP_NO
+			                	,COUNT(RAB.CNC_YN) AS CNC_YN_CNT
+			                	,SUM(RAB.CNC_CNT) AS CNC_Y_CNT
+			        FROM    	(
+				                SELECT 	 AB.APL_NO
+					                        , AB.MBR_CP_NO
+					                        , AB.CNC_YN
+					                        , CASE WHEN AB.CNC_YN = 'Y' THEN 1
+					                               ELSE 0
+					                          END CNC_CNT
+				                FROM    	APL_BNFT AB
+				                        	,COUPON_BASE CB
+				                WHERE   	AB.APL_NO = CB.CP_NO
+				                AND     	AB.APL_BNFT_GB_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}'
+				                AND     	AB.ORD_NO = #{ordNo}
+				                AND     	CB.CP_RSTR_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				                ) RAB
+			        GROUP BY RAB.APL_NO, RAB.MBR_CP_NO
+			        ) T1
+		WHERE   T1.CNC_YN_CNT = T1.CNC_Y_CNT
+	</select>
+	
+
+</mapper>

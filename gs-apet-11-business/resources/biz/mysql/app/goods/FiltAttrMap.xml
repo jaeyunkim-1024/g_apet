@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="filtAttrMap">
+
+	<insert id="insertFiltAttrMap" parameterType="biz.app.goods.model.FiltAttrMapPO" >
+		<!--
+			Query Name : GoodsFiltAttr.filtAttrMapInsert
+			Description : 필터 속성 매핑 등록
+		-->
+		INSERT INTO FILT_ATTR_MAP(
+			GOODS_ID
+			, FILT_GRP_NO
+			, FILT_ATTR_SEQ
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{goodsId}
+			, #{filtGrpNo}
+			, #{filtAttrSeq}
+			, #{sysRegrNo}
+			, now()
+		)
+	</insert>
+	
+	<delete id="deleteFiltAttrMap" parameterType="biz.app.goods.model.FiltAttrMapPO">
+		<!--
+			Query Name : GoodsFiltAttr.deleteFiltAttrMap
+			Description : 필터 속성 매핑 삭제
+		-->
+		DELETE FROM FILT_ATTR_MAP 
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+	
+	<select id="listFiltAttrMap" resultType="biz.app.goods.model.FiltAttrMapVO" >
+		<!--
+			Query Name : filtAttrMap.listFiltAttrMap
+			Description : 필터 속성 리스트
+		-->
+		SELECT	/* QUERYID(GoodsFiltAttr.getFiltAttr) */
+			T1.FILT_GRP_NO
+			, T1.FILT_ATTR_SEQ
+			, T1.FILT_ATTR_NM
+			, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+			, FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+			, T1.SYS_REG_DTM
+			, T1.SYS_UPD_DTM
+			<if test="goodsId != null and goodsId != ''">
+				, T2.FILT_ATTR_SEQ AS CHECKED_FILT_ATTR_SEQ
+				, T3.FILT_GRP_MNG_NM
+			</if>
+		FROM GOODS_FILT_ATTR T1
+		<if test="goodsId != null and goodsId != ''">
+			LEFT JOIN FILT_ATTR_MAP T2 ON (T1.FILT_ATTR_SEQ = T2.FILT_ATTR_SEQ AND T1.FILT_GRP_NO = T2.FILT_GRP_NO  AND T2.GOODS_ID = #{goodsId} )
+			LEFT JOIN GOODS_FILT_GRP T3 ON (T2.FILT_GRP_NO = T3.FILT_GRP_NO)
+		</if>
+		WHERE 1 = 1
+		<if test="filtGrpNo != null">	
+			AND T1.FILT_GRP_NO	 = #{filtGrpNo}
+		</if>
+		<if test="copyYn != null and copyYn != ''">	
+			AND T2.GOODS_ID = #{goodsId}
+		</if>
+	</select>
+	
+
+</mapper>

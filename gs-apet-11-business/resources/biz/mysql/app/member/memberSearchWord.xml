@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 Mapper
+	작성자  	KKB
+	작성일자  	2021.03.09
+-->
+
+<mapper namespace="memberSearchWord">
+
+
+	<insert id="insertMemberSearchWord" parameterType="biz.app.member.model.MemberSearchWordPO">
+		<!--
+			Query Name : memberSearchWord.insertMemberSearchWord
+			Description : insertMemberSearchWord
+		-->
+		<selectKey keyProperty="seq" resultType="java.lang.Long" order="BEFORE">
+			SELECT IF (MAX(SEQ) IS NULL, '0', MAX(SEQ+1)) FROM MEMBER_SEARCH_WORD WHERE MBR_NO = #{mbrNo}
+		</selectKey>
+		INSERT INTO MEMBER_SEARCH_WORD (
+			  MBR_NO			/* 회원 번호 */
+			  , SEQ				/* 순번 */
+			  , SRCH_GB_CD		/* 검색 구분 코드 */
+			  , SRCH_WORD		/* 검색어 */
+			  , SYS_REGR_NO		/* 시스템 등록자 번호 */
+			  , SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{mbrNo}			/* 회원 번호 */
+			, #{seq}			/* 순번 */
+			, #{srchGbCd}		/* 검색 구분 코드 */
+			, #{srchWord}		/* 검색어 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<select id="listMemberSearchWord" resultType="biz.app.member.model.MemberSearchWordVO">
+		<!--
+			Query Name : memberSearchWord.listMemberSearchWord
+			Description : listMemberSearchWord
+		-->
+		SELECT	/* QUERYID(memberSearchWord.listMemberSearchWord) */
+		 		MBR_NO			/* 회원 번호 */
+			  , SEQ				/* 순번 */
+			  , SRCH_GB_CD		/* 검색 구분 코드 */
+			  , SRCH_WORD		/* 검색어 */
+			  , SYS_REGR_NO		/* 시스템 등록자 번호 */
+			  , SYS_REG_DTM		/* 시스템 등록 일시 */
+		FROM	MEMBER_SEARCH_WORD
+		WHERE	MBR_NO = #{mbrNo}
+		AND SRCH_GB_CD = #{srchGbCd}
+		ORDER BY SEQ DESC
+	</select>
+
+	<delete id="deleteMemberSearchWord">
+		DELETE FROM MEMBER_SEARCH_WORD
+		WHERE MBR_NO = #{mbrNo}
+		AND	SEQ = #{seq}
+	</delete>
+</mapper>

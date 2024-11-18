@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminLogin">
+
+	<select id="getUser" resultType="biz.app.system.model.UserBaseVO">
+		<!--
+			Query Name : adminLogin.getUser
+			Description : 관리자 상세
+		-->
+		SELECT	/* QUERYID(adminLogin.getUser) */
+			*, IFNULL(FN_GET_COMPANY_NAME(UP_COMP_NO),'') AS UP_COMP_NM 
+		FROM
+		(
+				SELECT 
+					  A.USR_NO			/* 사용자 번호 */
+					, A.USR_NM			/* 사용자 명 */
+					, A.PSWD			/* 비밀번호 */
+					, A.USR_STAT_CD		/* 사용자 상태 코드 */
+					, A.COMP_NO			/* 업체 번호 */
+					, A.LOGIN_FAIL_CNT	/* 로그인 실패 수 */
+					, A.USR_GB_CD		/* 사용자 구분 코드 */
+					, A.PSWD_INIT_YN	/* 비밀번호 초기화 여부 */
+					, A.LOGIN_ID		/* 로그인 아이디 */
+					, A.USR_GRP_CD		/* 사용자 그룹 코드 */
+					, A.ORG_NO			/* 조직 번호 */
+					, A.TEL				/* 전화 */
+					, A.MOBILE			/* 휴대폰 */
+					, A.FAX				/* 팩스 */
+					, A.EMAIL			/* 이메일 */
+					, A.CTI_ID					/* CTI ID */
+					, A.CTI_EXT_NO			/* CTI 내선 번호 */
+					, A.PSWD_CHG_DTM	/* 비밀번호 변경 일시 */
+					, CB.COMP_NM
+			        , IFNULL(CB.UP_COMP_NO, 0) UP_COMP_NO /* 상위업체 번호 */
+					, CB.MD_USR_NO  /* MD 사용자 번호 */
+					, CB.COMP_STAT_CD
+					, A.LAST_LOGIN_DTM
+					, CASE WHEN DATE_ADD(PSWD_CHG_DTM, INTERVAL 90 DAY) <![CDATA[<=]]> NOW()
+			            THEN 'Y'
+			            ELSE 'N'
+			        END AS PSWD_CHG_SCHD_YN
+			        , CASE WHEN DATE_ADD(LAST_LOGIN_DTM, INTERVAL 30 DAY)<![CDATA[<]]> NOW()
+			            THEN 'Y'
+			            ELSE 'N'
+			        END AS LOGIN_A_MONTH_YN
+			        , CASE WHEN VALID_EN_DTM <![CDATA[<]]> CURDATE()
+			            THEN 'Y'
+			            ELSE 'N'
+			        END AS VALID_YN
+				FROM	USER_BASE A JOIN COMPANY_BASE CB ON (A.COMP_NO = CB.COMP_NO)
+				WHERE	1=1
+				AND     UPPER(A.LOGIN_ID) = UPPER(#{loginId})
+				<if test='usrGrpCd != null and usrGrpCd != ""'>
+					AND 	A.USR_GRP_CD = #{usrGrpCd}
+				</if>
+				LIMIT 1
+		) C	
+	</select>
+	
+
+	<update id="updateUserFailCnt">
+		<!--
+			Query Name : adminLogin.updateUserFailCnt
+			Description : 비밀번호 실패횟수 업데이트
+		-->
+		UPDATE	USER_BASE SET
+				LOGIN_FAIL_CNT	= LOGIN_FAIL_CNT + 1
+		WHERE	UPPER(LOGIN_ID)	= UPPER(#{loginId})
+	</update>
+	
+	<update id="updateUserLogin">
+		<!--
+			Query Name : adminLogin.updateUserLogin
+			Description : 로그인 시 정보 업데이트 & 저장된 lastLoginDtm 조회
+		-->
+		UPDATE	USER_BASE SET
+				LOGIN_FAIL_CNT	= 0,
+				LAST_LOGIN_DTM = NOW()
+		WHERE	UPPER(LOGIN_ID)	= UPPER(#{loginId})
+		<selectKey keyColumn="LAST_LOGIN_DTM" keyProperty="lastLoginDtm" resultType="biz.app.system.model.UserBasePO" order="AFTER" >
+			SELECT LAST_LOGIN_DTM
+			FROM USER_BASE
+			WHERE UPPER(LOGIN_ID)	= UPPER(#{loginId})
+		</selectKey>
+	</update>
+
+	<insert id="insertUserLoginHist" parameterType="biz.app.login.model.UserLoginHistPO">
+		<!--
+			Query Name : adminLogin.insertUserLoginHist
+			Description : 로그인 이력 등록
+		-->
+		INSERT INTO USER_LOGIN_HIST (
+			  USR_NO			/* 사용자 번호 */
+			, LOGIN_IP			/* 로그인 IP */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, LOGIN_DTM			/* 로그인 일시 */
+		) VALUES (
+			  #{usrNo}			/* 사용자 번호 */
+			, #{loginIp}		/* 로그인 IP */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, NOW()				/* 로그인 일시 */
+		)
+	</insert>
+	
+
+	<select id="selectUserAgreeInfoList" resultType="biz.app.system.model.UserAgreeInfoVO">
+		<!--
+			Query Name	: adminLogin.getUserAgreeInfo 
+			Description	: po 사용자 약관내역 조회
+			Writer		: 조은지
+			Date 		: 2021. 3. 3.
+		-->
+		SELECT	USR_NO
+				, TERMS_NO
+				, SYS_REGR_NO
+				, SYS_REG_DTM	
+		FROM	USER_AGREE_INFO
+		WHERE	USR_NO = #{usrNo}
+	</select>
+
+	<insert id="insertUserAgreeInfo" parameterType="biz.app.system.model.UserAgreeInfoPO">
+		INSERT INTO USER_AGREE_INFO (
+			USR_NO
+			, TERMS_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{usrNo}
+			, #{termsNo}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

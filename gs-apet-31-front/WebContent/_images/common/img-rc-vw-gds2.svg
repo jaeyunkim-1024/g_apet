@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="75px" height="75px" viewBox="0 0 75 75" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>home_ic_최근본상품</title>
+    <g id="home_ic_최근본상품" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#F2F5F9" x="0" y="0" width="75" height="75"></rect>
+        <g id="Group-5" transform="translate(23.000000, 24.000000)">
+            <path d="M27.1254929,13.8461538 C27.1254929,6.389786 21.0811264,0.346153846 13.625966,0.346153846 C6.16985951,0.346153846 0.125492943,6.389786 0.125492943,13.8461538 C0.125492943,21.3025217 6.16985951,27.3461538 13.625966,27.3461538 C16.5062184,27.3461538 19.1764129,26.4443875 21.3678269,24.9067482" id="Stroke-1" stroke="#1B1C1C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Stroke-1" stroke="#1B1C1C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" points="29.346624 11 27.5121162 14.7379226 24.346624 12.1513468"></polyline>
+            <polyline id="Path" stroke="#669AFF" stroke-width="1.5" stroke-linecap="round" transform="translate(12.754079, 10.325049) rotate(37.000000) translate(-12.754079, -10.325049) " points="14.5126307 2.92424272 16.1498071 12.608126 9.35835183 17.7258546"></polyline>
+            <circle id="Oval-Copy" stroke="#669AFF" stroke-width="1.2" fill="#669AFF" cx="13.7307692" cy="13.8461538" r="2"></circle>
+        </g>
+    </g>
+</svg>

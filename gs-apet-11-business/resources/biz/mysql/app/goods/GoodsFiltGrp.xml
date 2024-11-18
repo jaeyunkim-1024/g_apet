@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명	상품 필터 그룹
+	작성자  		yjs01
+	작성일자  	2020.12.07
+-->
+
+<mapper namespace="goodsFiltGrp">
+
+	<!-- 상품 그룹 조회 -->
+	<select id="getFiltGrpList" resultType="biz.app.goods.model.GoodsFiltGrpVO">
+		/* QUERYID(GoodsFiltGrp.getFiltGrpList) */
+		SELECT * FROM
+		(
+			<include refid="goodsFiltGrp.getFiltGrp" />
+
+			<if test="filtGrpNo != null">
+				AND FILT_GRP_NO = #{filtGrpNo}
+			</if>
+		) GRP
+		WHERE 1=1
+		<if test="filtGrpMngNm != null and filtGrpMngNm != ''">
+			AND	FILT_GRP_MNG_NM LIKE CONCAT('%', #{filtGrpMngNm}, '%')
+		</if>
+		<if test="filtGrpShowNm != null and filtGrpShowNm != ''">
+			AND	FILT_GRP_SHOW_NM LIKE CONCAT('%', #{filtGrpShowNm}, '%')
+		</if>
+
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="getFiltGrpInfo" resultType="biz.app.goods.model.GoodsFiltGrpVO">
+		/* QUERYID(GoodsFiltGrp.getFiltGrpInfo) */
+		SELECT * FROM
+		(
+			<include refid="goodsFiltGrp.getFiltGrp" />
+			AND FILT_GRP_NO = #{filtGrpNo}
+		) ATTR
+		WHERE 1=1
+
+	</select>
+
+	<sql id="getFiltGrp">
+		SELECT	/* QUERYID(GoodsFiltGrp.getFiltGrp) */
+			FILT_GRP_NO
+			, FILT_GRP_MNG_NM
+			, FILT_GRP_SHOW_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_FILT_GRP GRP
+		WHERE 1=1
+
+	</sql>
+
+	<insert id="filtGrpInsert" parameterType="biz.app.goods.model.GoodsFiltGrpPO" >
+		<!--
+			Query Name : GoodsFiltGrp.filtGrpInsert
+			Description : 상품 필터 그룹 등록
+		-->
+		<selectKey keyProperty="filtGrpNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_FILT_GRP_NO}') FROM DUAL
+		</selectKey>
+
+		INSERT INTO GOODS_FILT_GRP(filt_grp_no, filt_grp_mng_nm, filt_grp_show_nm, sys_regr_no, sys_reg_dtm)
+		VALUES(#{filtGrpNo}, #{filtGrpMngNm}, #{filtGrpShowNm}, #{sysRegrNo}, #{sysRegDtm})
+	</insert>
+	<update id="filtGrpUpdate" parameterType="biz.app.goods.model.GoodsFiltGrpPO" >
+		<!--
+			Query Name : GoodsFiltGrp.filtGrpUpdate
+			Description : 상품 필터 그룹 수정
+		-->
+		UPDATE	GOODS_FILT_GRP SET
+			FILT_GRP_MNG_NM = #{filtGrpMngNm},
+			FILT_GRP_SHOW_NM = #{filtGrpShowNm},
+			SYS_UPDR_NO = #{sysUpdrNo},
+			SYS_UPD_DTM = #{sysUpdDtm}
+		WHERE	FILT_GRP_NO = #{filtGrpNo}
+
+	</update>
+	<delete id="filtGrpDelete" parameterType="biz.app.goods.model.GoodsFiltGrpPO" >
+		<!--
+			Query Name : GoodsFiltGrp.filtGrpDelete
+			Description : 상품 필터 그룹 삭제
+		-->
+		DELETE FROM GOODS_FILT_GRP
+		WHERE	FILT_GRP_NO = #{filtGrpNo}
+	</delete>
+	
+	<resultMap type="biz.app.goods.model.GoodsFiltGrpVO" id="filtListMap">
+		<collection property="goodsFiltAttrList" column="{filtGrpNo=FILT_GRP_NO, goodsId=GOODS_ID}" javaType="java.util.ArrayList" ofType="biz.app.goods.model.GoodsFiltAttrVO" select="filtAttrMap.listFiltAttrMap" />
+	</resultMap>
+	<select id="listFilt" resultMap="filtListMap">
+		<!--
+			Query Name : GoodsFiltGrp.listFilt
+			Description : 전시에 매핑된 필터 조회
+		-->
+		SELECT T1.DISP_CLSF_NO 
+			, T2.FILT_GRP_NO
+			, T2.FILT_GRP_MNG_NM
+			, T2.FILT_GRP_SHOW_NM
+			, #{goodsId} AS GOODS_ID
+		FROM FILT_GRP_CTG T1
+        JOIN GOODS_FILT_GRP T2 ON (T1.FILT_GRP_NO = T2.FILT_GRP_NO)
+        WHERE 1 = 1
+        <if test="goodsId != null and goodsId != ''" >
+        	AND ( DISP_CLSF_NO IN (SELECT UP_DISP_CLSF_NO FROM DISPLAY_CATEGORY DC WHERE DC.DISP_CLSF_NO IN ( SELECT DISP_CLSF_NO FROM DISPLAY_GOODS WHERE GOODS_ID = #{goodsId} ))
+                OR DISP_CLSF_NO IN ( SELECT DISP_CLSF_NO FROM DISPLAY_GOODS WHERE GOODS_ID = #{goodsId} ) )
+        </if>
+		<if test="dispClsfNos != null">
+        	<foreach collection="dispClsfNos" item="dispClsfNo" separator=","
+				open="AND T1.DISP_CLSF_NO IN (" close=")">
+				#{dispClsfNo}
+			</foreach>
+		</if>
+		GROUP BY T1.FILT_GRP_NO
+        ORDER BY T2.SYS_REG_DTM
+	</select>
+</mapper>

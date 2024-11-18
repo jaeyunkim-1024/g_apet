@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="menu">
+
+	<select id="listMenuTree" resultType="biz.app.system.model.MenuTreeVO">
+		<!--
+			Query Name : menu.listMenuTree
+			Description : listMenuTree
+		-->
+		SELECT	/* QUERYID(menu.listMenuTree) */
+		A.MENU_NO		AS	ID									/* 메뉴 번호 */
+		, A.MENU_NM		AS	TEXT								/* 메뉴 명 */
+		, A.UP_MENU_NO	AS PARENT			/* 상위 메뉴 번호 */
+		FROM MENU_BASE A
+		WHERE	1 = 1
+		AND A.MENU_NO IN (
+		SELECT MENU_NO
+		FROM menu_authority
+		WHERE 1=1
+		<foreach collection="authNos" item="item" separator="," open="AND AUTH_NO IN (" close=")" >
+			#{item}
+		</foreach>
+		)
+		ORDER BY A.UP_MENU_NO,A.SORT_SEQ
+	</select>
+
+	<select id="getMenuBase" resultType="biz.app.system.model.MenuBaseVO">
+		<!--
+			Query Name : menu.getMenuBase
+			Description : pageMenuBase
+		-->
+		SELECT	/* QUERYID(menu.getMenuBase) */
+		MENU_NM			/* 메뉴 명 */
+		, SORT_SEQ			/* 정렬 순서 */
+		, USE_YN			/* 사용 여부 */
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		, MENU_NO			/* 메뉴 번호 */
+		, UP_MENU_NO		/* 상위 메뉴 번호 */
+		, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	MENU_BASE
+		WHERE	1 = 1
+		AND		MENU_NO = #{menuNo}
+	</select>
+
+	<select id="getCheckMenuBase" resultType="java.lang.Integer">
+		<!--
+			Query Name : menu.getMenuBase
+			Description : pageMenuBase
+		-->
+		SELECT	/* QUERYID(menu.getMenuBase) */
+		COUNT(*)
+		FROM	MENU_ACTION
+		WHERE	MENU_NO = #{menuNo}
+	</select>
+
+	<insert id="insertMenuBase" parameterType="biz.app.system.model.MenuBasePO">
+		<!--
+			Query Name : menu.insertMenuBase
+			Description : insertMenuBase
+		-->
+		<selectKey keyProperty="menuNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MENU_BASE_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO MENU_BASE (
+		MENU_NM			/* 메뉴 명 */
+		, MENU_NO			/* 메뉴 번호 */
+		, UP_MENU_NO		/* 상위 메뉴 번호 */
+		, SORT_SEQ			/* 정렬 순서 */
+		, USE_YN			/* 사용 여부 */
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+		#{menuNm}			/* 메뉴 명 */
+		, #{menuNo}			/* 메뉴 번호 */
+		, #{upMenuNo}		/* 상위 메뉴 번호 */
+		, #{sortSeq}		/* 정렬 순서 */
+		, #{useYn}			/* 사용 여부 */
+		, #{sysRegrNo}		/* 시스템 등록자 번호 */
+		, NOW()				/* 시스템 등록 일시 */
+		, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+		, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateMenuBase" parameterType="biz.app.system.model.MenuBasePO">
+		<!--
+			Query Name : menu.updateMenuBase
+			Description : updateMenuBase
+		-->
+		UPDATE	MENU_BASE SET
+		MENU_NM			= #{menuNm}			/* 메뉴 명 */
+		, SORT_SEQ			= #{sortSeq}		/* 정렬 순서 */
+		, USE_YN			= #{useYn}			/* 사용 여부 */
+		, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		MENU_NO			= #{menuNo}
+	</update>
+
+	<delete id="deleteMenuBase" parameterType="biz.app.system.model.MenuBasePO">
+		<!--
+			Query Name : menu.deleteMenuBase
+			Description : deleteMenuBase
+		-->
+		DELETE
+		FROM	MENU_BASE
+		WHERE	MENU_NO = #{menuNo}
+	</delete>
+
+	<delete id="deleteMenuAuth" parameterType="biz.app.system.model.MenuBasePO">
+		<!--
+			Query Name : auth.insertMenuAuth
+			Description : 권한 등록
+		-->
+		DELETE
+		FROM	MENU_AUTHORITY
+		WHERE	MENU_NO = #{menuNo}
+	</delete>
+
+
+	<select id="listMenuAction" resultType="biz.app.system.model.MenuActionVO">
+		<!--
+			Query Name : menu.listMenuAction
+			Description : listMenuAction
+		-->
+		SELECT	/* QUERYID(menu.listMenuAction) */
+		URL				/* URL */
+		, ACT_GB_CD			/* 기능 구분 코드 */
+		, ACT_NM			/* 기능 명 */
+		, USE_YN			/* 사용 여부 */
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		, MENU_NO			/* 메뉴 번호 */
+		, ACT_NO			/* 기능 번호 */
+		, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	MENU_ACTION
+		WHERE	MENU_NO		= #{menuNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="listMenuActionByUrlAndActGbCd" resultType="biz.app.system.model.MenuActionVO">
+		<!--
+			Query Name : menu.listMenuActionByUrlAndActGbCd
+			Description : listMenuActionByUrlAndActGbCd
+		-->
+		SELECT	/* QUERYID(menu.listMenuActionByUrlAndActGbCd) */
+			MA.URL				/* URL */
+		, MA.ACT_GB_CD			/* 기능 구분 코드 */
+		, MA.ACT_NM			/* 기능 명 */
+		, MA.USE_YN			/* 사용 여부 */
+		, MA.SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, MA.SYS_REG_DTM		/* 시스템 등록 일시 */
+		, MA.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, MA.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		, MA.MENU_NO			/* 메뉴 번호 */
+		, MA.ACT_NO			/* 기능 번호 */
+		, FN_GET_USER_NAME(MA.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(MA.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	MENU_ACTION MA
+		INNER JOIN MENU_BASE MB ON MA.MENU_NO = MB.MENU_NO
+		WHERE	MA.URL		= #{url}
+		AND		MA.ACT_GB_CD 	= #{actGbCd}
+		AND 	MB.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND		MA.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+
+	</select>
+
+	<select id="getMenuAction" resultType="biz.app.system.model.MenuActionVO">
+		<!--
+			Query Name : menu.getMenuAction
+			Description : getMenuAction
+		-->
+		SELECT	/* QUERYID(menu.getMenuAction) */
+		URL				/* URL */
+		, ACT_GB_CD			/* 기능 구분 코드 */
+		, ACT_NM			/* 기능 명 */
+		, USE_YN			/* 사용 여부 */
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		, MENU_NO			/* 메뉴 번호 */
+		, ACT_NO			/* 기능 번호 */
+		, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	MENU_ACTION
+		WHERE	ACT_NO		= #{actNo}
+		AND		MENU_NO		= #{menuNo}
+	</select>
+
+	<select id="getCheckMenuAction" resultType="java.lang.Integer">
+		<!--
+			Query Name : menu.listMenuAction
+			Description : listMenuAction
+		-->
+		SELECT	/* QUERYID(menu.getMenuAction) */
+		COUNT(*)
+		FROM	MENU_BASE
+		WHERE	UP_MENU_NO = #{menuNo}
+	</select>
+
+	<select id="getCheckMainMenuAction" resultType="java.lang.Integer">
+		<!--
+			Query Name : menu.listMenuAction
+			Description : listMenuAction
+		-->
+		SELECT	/* QUERYID(menu.getMenuAction) */
+		COUNT(*)
+		FROM	MENU_ACTION
+		WHERE	MENU_NO = #{menuNo}
+		AND		ACT_GB_CD = '${@framework.common.constants.CommonConstants@ACT_GB_10}'
+	</select>
+
+	<insert id="insertMenuAction" parameterType="biz.app.system.model.MenuActionPO">
+		<!--
+			Query Name : menu.insertMenuBase
+			Description : insertMenuBase
+		-->
+		<selectKey keyProperty="actNo" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MENU_ACTION_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO MENU_ACTION (
+		URL				/* URL */
+		, MENU_NO			/* 메뉴 번호 */
+		, ACT_NO			/* 기능 번호 */
+		, ACT_GB_CD			/* 기능 구분 코드 */
+		, ACT_NM			/* 기능 명 */
+		, USE_YN			/* 사용 여부 */
+		, SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, SYS_REG_DTM		/* 시스템 등록 일시 */
+		, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+		#{url}			/* URL */
+		, #{menuNo}			/* 메뉴 번호 */
+		, #{actNo}			/* 기능 번호 */
+		, #{actGbCd}		/* 기능 구분 코드 */
+		, #{actNm}			/* 기능 명 */
+		, #{useYn}			/* 사용 여부 */
+		, #{sysRegrNo}		/* 시스템 등록자 번호 */
+		, NOW()				/* 시스템 등록 일시 */
+		, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+		, NOW()				/* 시스템 수정 일시 */
+		)
+
+	</insert>
+
+	<update id="updateMenuAction" parameterType="biz.app.system.model.MenuActionPO">
+		<!--
+			Query Name : menu.updateMenuBase
+			Description : updateMenuBase
+		-->
+		UPDATE	MENU_ACTION SET
+		URL				= #{url}			/* URL */
+		, ACT_GB_CD			= #{actGbCd}		/* 기능 구분 코드 */
+		, ACT_NM			= #{actNm}			/* 기능 명 */
+		, USE_YN			= #{useYn}			/* 사용 여부 */
+		, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	ACT_NO			= #{actNo}
+		AND		MENU_NO			= #{menuNo}
+	</update>
+
+	<delete id="deleteMenuAction" parameterType="biz.app.system.model.MenuActionPO">
+		<!--
+			Query Name : menu.updateMenuBase
+			Description : updateMenuBase
+		-->
+		DELETE	FROM MENU_ACTION
+		WHERE	ACT_NO			= #{actNo}
+		AND		MENU_NO			= #{menuNo}
+	</delete>
+
+	<resultMap type="biz.app.system.model.MenuBaseVO" id="listCommonMenuMap">
+		<id     property="menuNo"			column="MENU_NO"/>			<!-- 메뉴 번호 -->
+		<result property="menuNm"			column="MENU_NM"/>			<!-- 메뉴 명 -->
+		<result property="menuPathNm"		column="MENU_PATH_NM"/>		<!-- 메뉴 경로 명 -->
+		<result property="mastMenuNo"		column="MAST_MENU_NO"/>		<!-- 마스터 메뉴 번호 -->
+		<result property="upMenuNo"			column="UP_MENU_NO"/>		<!-- 상위 메뉴 번호 -->
+		<result property="level"			column="LEVEL"/>		<!-- 상위 메뉴 번호 -->
+		<collection property="listMenuActionVO" ofType="biz.app.system.model.MenuActionVO">
+			<result property="url"			column="URL"/>
+			<result property="actNm"		column="ACT_NM"/>
+			<result property="actGbCd"		column="ACT_GB_CD"/>
+			<result property="actNo"		column="ACT_NO"/>
+		</collection>
+	</resultMap>
+
+	<select id="listCommonMenu" resultMap="listCommonMenuMap">
+		<!--
+			Query Name : menu.listMenuAction
+			Description : listMenuAction
+		-->
+		SELECT	/* QUERYID(menu.listCommonMenu) */
+		A.LEVEL
+		, A.MENU_PATH_NM
+		, A.MAST_MENU_NO
+		, B.MENU_NO
+		, B.MENU_NM
+		, B.UP_MENU_NO
+		, B.URL
+		, B.ACT_NM
+		, B.ACT_GB_CD
+		, B.ACT_NO
+		FROM	(
+			WITH RECURSIVE CTE_CTG AS
+				(
+				SELECT MENU_NO
+					   , MENU_NM
+					   , CAST(MENU_NM AS CHAR(512)) AS PATH_NM
+					   , CAST(MENU_NO AS CHAR(512)) AS PATH_NO
+					   , '1' as LVL
+					   , UP_MENU_NO
+					   , SORT_SEQ
+					   , CAST(CONCAT('1', LPAD(IFNULL(SORT_SEQ, 999),3,'0'), MENU_NO) AS CHAR(512)) AS SORT_STR
+				  FROM MENU_BASE
+				 WHERE USE_YN = 'Y'
+				   AND UP_MENU_NO = 0
+				UNION ALL
+				SELECT CTG.MENU_NO
+					   , CTG.MENU_NM
+					   , CONCAT(CTE.PATH_NM,' > ' ,CTG.MENU_NM) AS PATH_NM
+					   , CONCAT(CTE.PATH_NO,'>' ,CTG.MENU_NO) AS PATH_NO
+					   , CTE.LVL+1
+					   , CTG.UP_MENU_NO
+					   , CTG.SORT_SEQ
+					   , CONCAT(CTE.SORT_STR, '>', LPAD(IFNULL(CTG.SORT_SEQ,999),3,'0'), CTG.MENU_NO) AS SORT_STR
+				  FROM CTE_CTG CTE
+			INNER JOIN MENU_BASE CTG
+					ON CTG.UP_MENU_NO = CTE.MENU_NO
+				   AND CTG.UP_MENU_NO  <![CDATA[<>]]> CTG.MENU_NO
+				   AND USE_YN = 'Y'
+				)
+				SELECT MENU_NO AS ID
+					   , LVL AS LEVEL
+					   , PATH_NM AS MENU_PATH_NM
+					   , FN_SPLIT(PATH_NO,'>',1) as MAST_MENU_NO
+					   , SORT_STR AS ORDER_BY
+				  FROM CTE_CTG
+		) A
+		, (
+			SELECT	MB.MENU_NO
+			, MB.MENU_NM
+			, MB.UP_MENU_NO
+			, ACT.ACT_NO
+			, ACT.URL
+			, ACT.ACT_NM
+			, ACT.ACT_GB_CD
+			FROM USER_BASE UB
+			INNER JOIN USER_AUTH_MAP UAM ON UB.USR_NO = UAM.USR_NO
+			INNER JOIN MENU_AUTHORITY MA ON UAM.AUTH_NO = MA.AUTH_NO
+			INNER JOIN MENU_BASE MB ON MA.MENU_NO = MB.MENU_NO
+			LEFT JOIN MENU_ACTION ACT ON MB.MENU_NO = ACT.MENU_NO AND ACT.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+			WHERE UB.USR_NO = #{usrNo}
+		) B
+		WHERE A.ID = B.MENU_NO
+		ORDER BY A.ORDER_BY, B.ACT_NO
+	</select>
+
+	<select id="listMenuAuthTree" resultType="biz.app.system.model.MenuTreeVO">
+		<!--
+			Query Name : menu.listMenuTree
+			Description : listMenuTree
+		-->
+		SELECT	/* QUERYID(menu.listMenuTree) */
+		MENU_NO		AS	ID									/* 메뉴 번호 */
+		, MENU_NM		AS	TEXT								/* 메뉴 명 */
+		, UP_MENU_NO	AS PARENT			/* 상위 메뉴 번호 */
+		, (
+		SELECT	IF(COUNT(*) > 0, 'true', 'false')
+		FROM	MENU_BASE B
+		WHERE	B.UP_MENU_NO = A.MENU_NO
+		)				AS	CHILDREN
+		, (
+
+		)
+		SELECTED
+		FROM	MENU_BASE A
+		WHERE	1 = 1
+		AND		A.UP_MENU_NO = #{upMenuNo}
+		ORDER BY A.SORT_SEQ
+	</select>
+
+	<select id="getMastMenuNo" resultMap="listCommonMenuMap">
+		<!--
+			Query Name : menu.getMastMenuNo
+			Description : 선택한 메뉴의 제일 상위 메뉴 번호 조회
+		-->
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		@r AS ID,
+		(SELECT @r := UP_MENU_NO FROM MENU_BASE WHERE MENU_NO = ID) AS MAST_MENU_NO
+		FROM
+		(
+		SELECT
+		@_id := MB.MENU_NO AS MENU_NO,
+		@r := @_id
+		FROM
+		MENU_BASE MB
+		LEFT OUTER JOIN MENU_ACTION MA ON MA.MENU_NO = MB.MENU_NO
+		WHERE
+		MA.URL LIKE #{menuUrl} || '%'
+		AND MA.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		) AS vars,
+		(SELECT * FROM MENU_BASE WHERE MENU_NO <![CDATA[ < ]]> @_id) AS h
+		WHERE
+		@r <![CDATA[ <> ]]> 0
+		) MENU
+		WHERE
+		MENU.MAST_MENU_NO <![CDATA[ <> ]]> 0
+		ORDER BY ID
+		LIMIT 1
+	</select>
+	
+	<select id="getMenuUserAuth" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : menu.getMenuUserAuth
+			Description : 메뉴 접근 권한 조회
+		-->
+		SELECT
+		 	 A.GRP_CD
+		   , A.DTL_CD
+		   , A.DTL_NM
+		   , A.DTL_SHT_NM
+		   , A.SORT_SEQ
+		   , A.USE_YN
+		   , A.USR_DFN1_VAL
+		   , A.USR_DFN2_VAL
+		   , A.USR_DFN3_VAL
+		   , A.USR_DFN4_VAL
+		   , A.USR_DFN5_VAL
+		FROM CODE_DETAIL A
+		LEFT OUTER JOIN CODE_GROUP B
+		  ON A.GRP_CD = B.GRP_CD
+		WHERE A.GRP_CD = #{grpCd}
+		  AND A.DTL_CD = #{dtlCd}
+	</select>
+</mapper>

@@ -1,0 +1,4822 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="display">
+	<select id="listDisplayTemplateGrid" resultType="biz.app.display.model.DisplayTemplateVO">
+		<!--
+			Query Name : display.listDisplayTemplateGrid
+			Description : 전시 템플릿 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayTemplateGrid) */
+			  DT.TMPL_NO /* 템플릿 번호 */
+			, DT.ST_ID /* 사이트 아이디 */
+			, ST.ST_NM /* 사이트 명 */
+			, DT.PCWEB_URL /* PC웹 URL */
+			, DT.MOBILE_URL /* 모바일 URL */
+			, DT.TMPL_DSCRT /* 템플릿 설명 */
+			, DT.TMPL_NM /* 템플릿 명 */
+			, DT.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, DT.SYS_REG_DTM /* 시스템 등록 일시 */
+			, DT.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, DT.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(DT.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(DT.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM
+			display_template DT INNER JOIN st_std_info ST ON DT.ST_ID = ST.ST_ID
+		WHERE 1 = 1
+		<if test="stId != null and stId != ''">
+			AND DT.ST_ID = #{stId}
+		</if>
+		<if test="tmplNm != null and tmplNm != ''">
+			AND DT.TMPL_NM LIKE CONCAT('%', #{tmplNm }, '%')
+		</if>
+		<if test="strtDtm != null and endDtm != null">
+			AND DT.SYS_REG_DTM BETWEEN #{strtDtm} AND #{endDtm}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="listDisplayTemplateGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.listDisplayTemplateGridCount
+			Description : 전시 템플릿 리스트 카운트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayTemplateGridCount) */
+			COUNT(*)
+		FROM display_template
+		WHERE 1 = 1
+		<if test="stId != null and stId != ''">
+			AND ST_ID = #{stId}
+		</if>
+		<if test="tmplNm != null and tmplNm != ''">
+			AND TMPL_NM LIKE CONCAT('%', #{tmplNm }, '%')
+		</if>
+		<if test="strtDtm != null and endDtm != null">
+			AND SYS_REG_DTM BETWEEN #{strtDtm} AND #{endDtm}
+		</if>
+	</select>
+
+	<select id="getDisplayTemplateDetail" resultType="biz.app.display.model.DisplayTemplateVO">
+		<!--
+			Query Name : display.getDisplayTemplateDetail
+			Description : 전시 템플릿 상세
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayTemplateDetail) */
+			  DT.TMPL_NO /* 템플릿 번호 */
+			, DT.ST_ID /* 사이트 아이디 */
+			, ST.ST_NM /* 사이트 명 */
+			, DT.PCWEB_URL /* PC웹 URL */
+			, DT.MOBILE_URL /* 모바일 URL */
+			, DT.TMPL_DSCRT /* 템플릿 설명 */
+			, DT.TMPL_NM /* 템플릿 명 */
+			, DT.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, DT.SYS_REG_DTM /* 시스템 등록 일시 */
+			, DT.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, DT.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(DT.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(DT.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM display_template DT INNER JOIN st_std_info ST ON DT.ST_ID = ST.ST_ID
+		WHERE DT.TMPL_NO = #{tmplNo}
+	</select>
+
+	<insert id="insertDisplayTemplate" parameterType="biz.app.display.model.DisplayTemplatePO">
+		<!--
+			Query Name : display.insertDisplayTemplate
+			Description : 전시 템플릿 등록
+			- BO
+		-->
+		<selectKey keyProperty="tmplNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DISPLAY_TEMPLATE_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO display_template (
+			  TMPL_NO /* 템플릿 번호 */
+			, ST_ID /* 사이트 아이디 */
+			, PCWEB_URL /* PC웹 URL */
+			, MOBILE_URL /* 모바일 URL */
+			, TMPL_DSCRT /* 템플릿 설명 */
+			, TMPL_NM /* 템플릿 명 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{tmplNo} /* 템플릿 번호 */
+			, #{stId} /* 사이트 아이디 */
+			, #{pcwebUrl} /* PC웹 URL */
+			, #{mobileUrl} /* 모바일 URL */
+			, #{tmplDscrt} /* 템플릿 설명 */
+			, #{tmplNm} /* 템플릿 명 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayTemplate" parameterType="biz.app.display.model.DisplayTemplatePO">
+		<!--
+			Query Name : display.updateDisplayTemplate
+			Description : 전시 템플릿 수정
+			- BO
+		-->
+		UPDATE display_template SET
+			  ST_ID = #{stId} /* 사이트 아이디 */
+			, PCWEB_URL = #{pcwebUrl} /* PC웹 URL */
+			, MOBILE_URL = #{mobileUrl} /* 모바일 URL */
+			, TMPL_DSCRT = #{tmplDscrt} /* 템플릿 설명 */
+			, TMPL_NM = #{tmplNm} /* 템플릿 명 */
+			, SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE 1 = 1
+			AND TMPL_NO = #{tmplNo}
+	</update>
+
+	<delete id="deleteDisplayTemplate" parameterType="biz.app.display.model.DisplayTemplatePO">
+		<!--
+			Query Name : display.deleteDisplayTemplate
+			Description : 전시 템플릿 삭제
+			- BO
+		-->
+		DELETE FROM display_template
+		WHERE 1 = 1
+		AND TMPL_NO = #{tmplNo}
+	</delete>
+
+	<select id="listDisplayTemplate" resultType="biz.app.display.model.DisplayTemplateVO">
+		<!--
+			Query Name : display.listDisplayTemplate
+			Description : 템플릿 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayTemplate) */
+			  DT.TMPL_NO /* 템플릿 번호 */
+			, DT.PCWEB_URL /* PC웹 URL */
+			, DT.MOBILE_URL /* 모바일 URL */
+			, DT.TMPL_DSCRT /* 템플릿 설명 */
+			, DT.TMPL_NM /* 템플릿 명 */
+			, DT.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, DT.SYS_REG_DTM /* 시스템 등록 일시 */
+			, DT.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, DT.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(DT.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(DT.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM display_template DT
+			INNER JOIN st_std_info ST ON DT.ST_ID = ST.ST_ID
+		WHERE 1 = 1
+		<if test="stId != null">
+			AND DT.ST_ID = #{stId}
+		</if>
+	</select>
+
+	<select id="getDisplayCorner" resultType="biz.app.display.model.DisplayCornerVO">
+		<!--
+			Query Name : display.getDisplayCorner
+			Description : 전시 코너 상세
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayCorner) */
+			  DISP_CORN_NO /* 전시 코너 번호 */
+			, TMPL_NO /* 템플릿 번호 */
+			, DISP_CORN_DSCRT /* 전시 코너 설명 */
+			, SHOW_CNT /* 노출 개수 */
+			, DISP_CORN_TP_CD /* 전시 코너 타입 코드 */
+			, DISP_CORN_NM /* 전시 코너명 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM display_corner
+		WHERE 1 = 1
+			AND TMPL_NO = #{tmplNo}
+	</select>
+
+	<select id="listDisplayTree" resultType="biz.app.display.model.DisplayTreeVO">
+		<!--
+			Query Name : display.listDisplayTree
+			Description : 전시 관리 트리 리스트
+			- BO
+		-->
+		SELECT *	/* QUERYID(display.listDisplayTree) */
+		FROM (
+			SELECT
+				  DISP.ID
+				, DISP.TEXT
+				, DISP.PARENT
+				, DISP.DISP_CLSF_CD
+				, DISP.DISP_LVL
+				, FN_GET_DISP_CLSF_PATH( DISP.ID, DISP.DISP_CLSF_CD ) AS DISP_PATH /* 전시 경로 */
+				, ST_ID
+				, ST_NM
+				<!-- 상위 카테고리의 전시여부가 'N' 일 경우도 전시여부를 'N'으로 판단함 -->
+				, (SELECT
+						CASE WHEN IFNULL(DC1.DISP_YN, 'Y') = "N" THEN IFNULL(DC1.DISP_YN, 'Y')
+						ELSE
+						(
+					  		CASE WHEN IFNULL(DC2.DISP_YN, 'Y') = "N" THEN IFNULL(DC2.DISP_YN, 'Y')
+					   	   	ELSE IFNULL(DC3.DISP_YN, 'Y')
+				 			END
+				 		)
+				 		END AS UP_DISP_YN
+			   		FROM display_category DC1
+			   			LEFT JOIN display_category DC2 ON DC2.DISP_CLSF_NO = DC1.UP_DISP_CLSF_NO
+			   			LEFT JOIN display_category DC3 ON DC3.DISP_CLSF_NO = DC2.UP_DISP_CLSF_NO
+			   		WHERE DC1.DISP_CLSF_NO = DISP.ID
+			   	  ) AS UP_DISP_YN
+			   	  , DISP_PRIOR_RANK
+			FROM (
+				<!-- 기획전 제외한 카테고리 -->
+				SELECT
+					  DISP_CLSF_NO AS ID /* 전시 분류 번호 */
+					, DISP_CLSF_NM AS TEXT /* 전시 분류 명 */
+					, UP_DISP_CLSF_NO AS PARENT /* 상위 전시 분류 번호 */
+					, DISP_CLSF_CD /* 전시 분류 코드 */
+					, DISP_LVL /* 전시 레벨 */
+					, DISP_PRIOR_RANK
+					, A.ST_ID
+					, B.ST_NM
+				FROM display_category A
+					INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+				WHERE DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				<!-- 전시 목록 조회 레이어인 경우, -->
+				<if test="dispClsfCd != null and dispClsfCd != ''">
+					AND DISP_CLSF_CD = #{dispClsfCd}
+				</if>
+				<if test="stId != null">
+					AND B.ST_ID = #{stId}
+				</if>
+				<if test="arrDispClsfCd != null">
+					<foreach collection="arrDispClsfCd" item="no" separator=","
+						open="AND DISP_CLSF_CD IN (" close=")">
+						#{no}
+					</foreach>
+				</if>
+				<!-- 기획전 조회조건이 있는 경우, -->
+				<if test='searchPlan != null and searchPlan != ""'>
+					AND DISP_CLSF_CD NOT IN ('${@framework.common.constants.CommonConstants@DISP_CLSF_20}', '${@framework.common.constants.CommonConstants@DISP_CLSF_40}')
+
+				UNION ALL
+
+				<!-- 기획전 카테고리 1depth -->
+				SELECT
+					  DISP_CLSF_NO AS ID /* 전시 분류 번호 */
+					, DISP_CLSF_NM AS TEXT /* 전시 분류 명 */
+					, UP_DISP_CLSF_NO AS PARENT /* 상위 전시 분류 번호 */
+					, DISP_CLSF_CD /* 전시 분류 코드 */
+					, DISP_LVL /* 전시 레벨 */
+					, DISP_PRIOR_RANK
+					, A.ST_ID
+					, B.ST_NM
+				FROM display_category A
+					INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+				WHERE DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				<!-- 전시 목록 조회 레이어인 경우, -->
+				<if test="dispClsfCd != null and dispClsfCd != ''">
+					AND DISP_CLSF_CD = #{dispClsfCd}
+				</if>
+				<if test="stId != null">
+					AND B.ST_ID = #{stId}
+				</if>
+				<if test="arrDispClsfCd != null">
+					<foreach collection="arrDispClsfCd" item="no" separator=","
+						open="AND DISP_CLSF_CD IN (" close=")">
+						#{no}
+					</foreach>
+				</if>
+				<if test='searchPlan != null and searchPlan != ""'>
+					AND DISP_CLSF_CD IN ('${@framework.common.constants.CommonConstants@DISP_CLSF_20}', '${@framework.common.constants.CommonConstants@DISP_CLSF_40}')
+					AND DISP_LVL = 1
+					<choose>
+						<when test='searchPlan == "type01"'>    <!-- 종료 -->
+						AND NOW() &gt; DISP_ENDDT
+						</when>
+						<when test='searchPlan == "type02"'>    <!-- 진행 -->
+						AND NOW() BETWEEN DISP_STRTDT AND DISP_ENDDT
+						</when>
+						<when test='searchPlan == "type03"'>    <!-- 진행예정 -->
+						AND NOW() &lt; DISP_STRTDT
+						</when>
+					</choose>
+				</if>
+
+				UNION ALL
+
+				<!-- 기획전 카테고리 1depth 이상 -->
+				SELECT
+					  DISP_CLSF_NO AS ID /* 전시 분류 번호 */
+					, DISP_CLSF_NM AS TEXT /* 전시 분류 명 */
+					, UP_DISP_CLSF_NO AS PARENT /* 상위 전시 분류 번호 */
+					, DISP_CLSF_CD /* 전시 분류 코드 */
+					, DISP_LVL /* 전시 레벨 */
+					, DISP_PRIOR_RANK
+					, A.ST_ID
+					, B.ST_NM
+				FROM display_category A
+					INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+				WHERE DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				<!-- 전시 목록 조회 레이어인 경우, -->
+				<if test="dispClsfCd != null and dispClsfCd != ''">
+					AND DISP_CLSF_CD = #{dispClsfCd}
+				</if>
+				<if test="stId != null">
+					AND B.ST_ID = #{stId}
+				</if>
+				<if test="arrDispClsfCd != null">
+					<foreach collection="arrDispClsfCd" item="no" separator=","
+						open="AND DISP_CLSF_CD IN (" close=")">
+						#{no}
+					</foreach>
+				</if>
+				<if test='searchPlan != null and searchPlan != ""'>
+					AND DISP_CLSF_CD IN ('${@framework.common.constants.CommonConstants@DISP_CLSF_20}', '${@framework.common.constants.CommonConstants@DISP_CLSF_40}')
+					AND DISP_LVL = 2
+					AND UP_DISP_CLSF_NO IN (
+						SELECT
+							DISP_CLSF_NO /* 전시 분류 번호 */
+						FROM display_category A
+							INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+						WHERE DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+							AND DISP_CLSF_CD IN ('${@framework.common.constants.CommonConstants@DISP_CLSF_20}', '${@framework.common.constants.CommonConstants@DISP_CLSF_40}')
+							AND DISP_LVL = 1
+						<if test="stId != null">
+							AND B.ST_ID = #{stId}
+						</if>
+						<choose>
+							<when test='searchPlan == "type01"'>    <!-- 종료 -->
+							AND NOW() &gt; DISP_ENDDT
+							</when>
+							<when test='searchPlan == "type02"'>    <!-- 진행 -->
+							AND NOW() BETWEEN DISP_STRTDT AND DISP_ENDDT
+							</when>
+							<when test='searchPlan == "type03"'>    <!-- 진행예정 -->
+							AND NOW() &lt; DISP_STRTDT
+							</when>
+						</choose>
+					)
+				</if>
+
+				</if>	<!-- 기획전 조회조건이 있는 경우 end -->
+			) DISP
+		) DISP
+		WHERE 1=1
+		<if test="upDispYn != null and upDispYn != ''">
+			AND UP_DISP_YN = #{upDispYn}
+		</if>
+		<if test='exhibitionYn == "Y"'>
+			AND DISP.DISP_LVL != '${@framework.common.constants.CommonConstants@DISP_LVL_3}'
+		</if>
+		ORDER BY DISP.DISP_LVL, DISP.DISP_PRIOR_RANK, DISP.ID
+	</select>
+
+	<select id="listDisplayTreeFilter" resultType="biz.app.display.model.DisplayTreeVO">
+		<!--
+			Query Name : display.listDisplayTreeFilter
+			Description : 전시 관리 트리 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayTreeFilter) */
+			  DISP.ID
+			, DISP.TEXT
+			, DISP.PARENT
+			, DISP.DISP_CLSF_CD
+			, DISP.DISP_LVL
+			, FN_GET_DISP_CLSF_PATH( DISP.ID, #{dispClsfCd} ) AS DISP_PATH /* 전시 경로 */
+			, DISP.ST_ID
+			, ST_NM
+			, COMP_NO
+		FROM (
+			<!-- 기획전 제외한 카테고리 -->
+			SELECT
+				  A.DISP_CLSF_NO AS ID /* 전시 분류 번호 */
+				, DISP_CLSF_NM AS TEXT /* 전시 분류 명 */
+				, UP_DISP_CLSF_NO AS PARENT /* 상위 전시 분류 번호 */
+				, A.DISP_CLSF_CD /* 전시 분류 코드 */
+				, DISP_LVL /* 전시 레벨 */
+				, DISP_PRIOR_RANK
+				, A.ST_ID
+				, FN_GET_SITE_NAME(A.ST_ID) AS ST_NM /* 사이트명 */
+				, B.COMP_NO
+			FROM display_category A
+				INNER JOIN company_disp_map B ON (B.COMP_NO = A.COMP_NO AND B.DISP_CLSF_NO = A.DISP_CLSF_NO)
+			WHERE DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				AND A.ST_ID = #{stId}
+			<!-- 전시 목록 조회 레이어인 경우, -->
+			<if test="dispClsfCd != null and dispClsfCd != ''">
+				AND A.DISP_CLSF_CD = #{dispClsfCd}
+			</if>
+			<if test="compNo != null and ! compNo.equals('')">
+				AND B.COMP_NO = #{compNo}
+			</if>
+			<if test="arrDispClsfCd != null">
+				<foreach collection="arrDispClsfCd" item="no" separator=","
+					open="AND DISP_CLSF_CD IN (" close=")">
+					#{no}
+				</foreach>
+			</if>
+		) DISP
+		ORDER BY DISP.DISP_LVL, DISP.DISP_PRIOR_RANK, DISP.ID
+	</select>
+
+	<select id="listDisplayCategoryFO" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayCategoryFO
+			Description : 카테고리목록 출력
+			- BO
+		-->
+		SELECT *	/* QUERYID(display.listDisplayCategoryFO) */
+		FROM (
+			SELECT *
+			FROM
+			(
+				WITH RECURSIVE CTE_CTG AS
+				(
+				SELECT DISP_CLSF_NO
+					   , DISP_CLSF_NM
+					   , CAST(DISP_CLSF_NM AS CHAR(512)) AS PATH_NM
+					   , CAST(DISP_CLSF_NO AS CHAR(512)) AS PATH_NO
+					   , '1' as LVL
+					   , UP_DISP_CLSF_NO
+					   , DISP_PRIOR_RANK
+					   , CAST(CONCAT('1', LPAD(IFNULL(DISP_PRIOR_RANK,999),3,'0'), DISP_CLSF_NO) AS CHAR(512)) AS SORT_STR
+				  FROM DISPLAY_CATEGORY
+					  	WHERE DISP_YN = 'Y'
+				   		AND DEL_YN = 'N'
+				   		<choose>
+							<when test="dispClsfCd == null or dispClsfCd =='' ">
+							  	AND UP_DISP_CLSF_NO = 10
+							</when>
+							<otherwise>
+								AND UP_DISP_CLSF_NO = #{dispClsfCd}
+							</otherwise>
+						</choose>
+				UNION ALL
+				SELECT CTG.DISP_CLSF_NO
+					   , CTG.DISP_CLSF_NM
+					   , CONCAT(CTE.PATH_NM,'>' ,CTG.DISP_CLSF_NM) AS PATH_NM
+					   , CONCAT(CTE.PATH_NO,'>' ,CTG.DISP_CLSF_NO) AS PATH_NO
+					   , CTE.LVL+1
+					   , CTG.UP_DISP_CLSF_NO
+					   , CTG.DISP_PRIOR_RANK
+					   , CONCAT(CTE.SORT_STR, '>', LPAD(IFNULL(CTG.DISP_PRIOR_RANK,999),3,'0'), CTG.DISP_CLSF_NO) AS SORT_STR
+				  FROM CTE_CTG CTE
+			INNER JOIN DISPLAY_CATEGORY CTG
+					ON CTG.UP_DISP_CLSF_NO = CTE.DISP_CLSF_NO
+				   AND CTG.UP_DISP_CLSF_NO  <![CDATA[<>]]> CTG.DISP_CLSF_NO
+				   AND DISP_YN = 'Y'
+				   AND DEL_YN = 'N'
+				)
+				SELECT DISP_CLSF_NO AS CID
+					   , LVL AS LEVEL
+					   , PATH_NM AS PATH_NM
+					   , FN_SPLIT(PATH_NO,'>',1) as MAST_DISP_NO
+					   , SORT_STR AS ORDER_BY
+				  FROM CTE_CTG
+			) A
+			JOIN DISPLAY_CATEGORY B ON B.DISP_CLSF_NO = A.CID
+			ORDER BY A.ORDER_BY
+		) AA
+		WHERE AA.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND AA.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND AA.ST_ID = #{stId}
+	</select>
+
+	<select id="getDisplayBase" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.getDisplayBase
+			Description : 전시 기본정보
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayBase) */
+			  B.DISP_CLSF_NO /* 전시 분류 번호 */
+			, B.UP_DISP_CLSF_NO /* 상위 전시 분류 번호 */
+			, B.DISP_CLSF_NM /* 전시 분류 명 */
+			, B.PRMT_SHOW_NM /* 기획전 노출 명 */
+			, B.DISP_CLSF_CD /* 전시 분류 코드 */
+			, B.TN_IMG_PATH  /* 대카테고리 이미지 경로 */
+			, B.DISP_CLSF_TITLE_IMG_NM /* 전시 분류 타이틀 이미지 명 */
+			, B.DISP_CLSF_TITLE_IMG_PATH /* 전시 분류 타이틀 이미지 경로*/
+			, B.DISP_CLSF_TITLE_HTML /* 전시 분류 타이틀 HTML(PC) */
+			, B.DISP_CLSF_TITLE_HTML_MO /* 전시 분류 타이틀 HTML(MOBILE) */
+			, B.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, B.DISP_STRTDT /* 전시 시작일자 */
+			, B.DISP_ENDDT /* 전시 종료일자 */
+			, B.LEAF_YN /* 최하위 여부 */
+			, B.LIST_TP_CD /* 리스트 타입 코드 */
+			, B.DISP_YN /* 전시 여부 */
+			, B.LIVE_YN /* Live 여부 */
+			, B.DEL_YN /* 삭제 여부 */
+			, B.TMPL_NO /* 템플릿 번호 */
+			, B.DISP_LVL /* 전시 레벨 */
+			, B.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, B.SYS_REG_DTM /* 시스템 등록 일시 */
+			, B.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, B.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, B.BND_NO /* 브랜드 번호 */
+			, BB.BND_NM_KO /* 브랜드 명 국문 */
+			, BB.BND_NM_EN /* 브랜드 명 영문 */
+			, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+			, (SELECT IFNULL(COUNT(*), 0)
+				FROM display_category A
+				WHERE A.UP_DISP_CLSF_NO = B.DISP_CLSF_NO
+				AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			  ) AS LOWER_DISP_CNT /* 하위 전시 갯수 */
+			<!-- 전시 분류 코드 : 기획전 -->
+			<if test="dispClsfCd != null and dispClsfCd != '' ">
+				<if test="dispClsfCd == @framework.common.constants.CommonConstants@DISP_CLSF_20 or dispClsfCd == @framework.common.constants.CommonConstants@DISP_CLSF_40">
+				, C.DISP_BNR_NO /* 전시 배너 번호 */
+				, C.BNR_IMG_NM /* 배너 이미지 명 */
+				, C.BNR_IMG_PATH /* 배너 이미지 경로 */
+				, C.BNR_MOBILE_IMG_NM /* 배너 모바일 이미지 명 */
+				, C.BNR_MOBILE_IMG_PATH /* 배너 모바일 이미지 경로 */
+				, C.DFT_BNR_YN /* 기본 배너 여부 */
+				</if>
+			</if>
+			, ST.ST_ID /* 사이트 ID */
+			, ST.ST_NM /* 사이트 명 */
+			, B.SEO_INFO_NO
+		FROM display_category B
+		<if test="dispClsfCd != null and dispClsfCd != '' ">
+			<if test="dispClsfCd == @framework.common.constants.CommonConstants@DISP_CLSF_20 or dispClsfCd == @framework.common.constants.CommonConstants@DISP_CLSF_40">
+			LEFT OUTER JOIN display_banner C ON C.DISP_CLSF_NO = B.DISP_CLSF_NO
+			</if>
+		</if>
+			LEFT OUTER JOIN brand_base BB ON BB.BND_NO = B.BND_NO
+			INNER JOIN st_std_info ST ON (ST.ST_ID = B.ST_ID)
+		WHERE 1 = 1
+			AND B.DISP_CLSF_NO = #{dispClsfNo}
+			AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+
+	<insert id="insertDisplayBase" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name : display.insertDisplayBase
+			Description : 전시 기본정보 등록
+			- BO
+		-->
+		<selectKey keyProperty="dispClsfNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT CONCAT(#{dispClsfCd},
+			LPAD(FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DISPLAY_CATEGORY_SEQ}'), 7, 0))
+			FROM DUAL
+		</selectKey>
+		INSERT INTO display_category (
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, UP_DISP_CLSF_NO /* 상위 전시 분류 번호 */
+			, DISP_CLSF_NM /* 전시 분류 명 */
+			, PRMT_SHOW_NM /* 기획전 노출 명 */
+			, DISP_CLSF_CD /* 전시 분류 코드 */
+			, DISP_CLSF_TITLE_IMG_NM /* 전시 분류 타이틀 이미지 명 */
+			, DISP_CLSF_TITLE_IMG_PATH /* 전시 분류 타이틀 이미지 경로 */
+			, DISP_CLSF_TITLE_HTML /* 전시 분류 타이틀 HTML(PC) */
+			, DISP_CLSF_TITLE_HTML_MO /* 전시 분류 타이틀 HTML(MOBILE) */
+			, DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, DISP_LVL /* 전시 레벨 */
+			, DISP_STRTDT /* 전시 시작일자 */
+			, DISP_ENDDT /* 전시 종료일자 */
+			, LEAF_YN /* 최하위 여부 */
+			, LIST_TP_CD /* 리스트 타입 코드 */
+			, DISP_YN /* 전시 여부 */
+			, DEL_YN /* 삭제 여부 */
+			, TMPL_NO /* 템플릿 번호 */
+			, TN_IMG_PATH /* 대카테고리 이미지 경로 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+			, ST_ID /* 사이트 ID */
+		<if test="bndNo != null">
+			, BND_NO /* 브랜드 번호 */
+		</if>
+		) VALUES (
+			  #{dispClsfNo} /* 전시 분류 번호 */
+			, #{upDispClsfNo} /* 상위 전시 분류 번호 */
+			, #{dispClsfNm} /* 전시 분류 명 */
+			, #{prmtShowNm} /* 기획전 노출 명 */
+			, #{dispClsfCd} /* 전시 분류 코드 */
+			, #{dispClsfTitleImgNm} /* 전시 분류 타이틀 이미지 명 */
+			, #{dispClsfTitleImgPath} /* 전시 분류 타이틀 이미지 경로 */
+			, #{dispClsfTitleHtml} /* 전시 분류 타이틀 HTML(PC) */
+			, #{dispClsfTitleHtmlMo} /* 전시 분류 타이틀 HTML(MOBILE) */
+			, #{dispPriorRank} /* 전시 우선 순위 */
+			, #{dispLvl} /* 전시 레벨 */
+			, #{dispStrtdt} /* 전시 시작일자 */
+			, #{dispEnddt} /* 전시 종료일자 */
+			, #{leafYn} /* 최하위 여부 */
+			, #{listTpCd} /* 리스트 타입 코드 */
+			, #{dispYn} /* 전시 여부 */
+			, #{delYn} /* 삭제 여부 */
+			, #{tmplNo} /* 템플릿 번호 */
+			, #{tnImgPath} /* 대카테고리 이미지 경로 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+			, #{stId} /* 사이트 ID */
+		<if test="bndNo != null">
+			, #{bndNo} /* 브랜드 번호 */
+		</if>
+		)
+	</insert>
+
+	<update id="updateDisplayBase" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name : display.updateDisplayBase
+			Description : 전시 기본정보 수정
+			- BO
+		-->
+		UPDATE display_category SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="dispClsfNm != null and dispClsfNm != ''">
+			, DISP_CLSF_NM = #{dispClsfNm} /* 전시 분류 명 */
+		</if>
+		<if test="prmtShowNm != null and prmtShowNm != ''">
+			, PRMT_SHOW_NM = #{prmtShowNm} /* 기획전 노출 명 */
+		</if>
+		<if test="dispClsfCd != null and dispClsfCd != ''">
+			, DISP_CLSF_CD = #{dispClsfCd} /* 전시 분류 코드 */
+		</if>
+		<if test="dispClsfTitleImgNm != null and dispClsfTitleImgNm != ''">
+			, DISP_CLSF_TITLE_IMG_NM = #{dispClsfTitleImgNm} /* 전시 분류 타이틀 이미지 명 */
+		</if>
+		<if test="dispClsfTitleImgPath != null and dispClsfTitleImgPath != ''">
+			, DISP_CLSF_TITLE_IMG_PATH = #{dispClsfTitleImgPath} /* 전시 분류 타이틀 이미지 경로 */
+		</if>
+		<if test="dispClsfTitleHtml != null and dispClsfTitleHtml != ''">
+			, DISP_CLSF_TITLE_HTML = #{dispClsfTitleHtml} /* 전시 분류 타이틀 HTML(PC) */
+		</if>
+		<if test="dispClsfTitleHtmlMo != null and dispClsfTitleHtmlMo != ''">
+			, DISP_CLSF_TITLE_HTML_MO = #{dispClsfTitleHtmlMo} /* 전시 분류 타이틀 HTML(MOBILE) */
+		</if>
+		<if test="dispPriorRank != null">
+			, DISP_PRIOR_RANK = #{dispPriorRank} /* 전시 우선 순위 */
+		</if>
+		<if test="dispLvl != null">
+			, DISP_LVL = #{dispLvl} /* 전시 레벨 */
+		</if>
+		<if test="dispStrtdt != null">
+			, DISP_STRTDT = #{dispStrtdt} /* 전시 시작일자 */
+		</if>
+		<if test="dispEnddt != null">
+			, DISP_ENDDT = #{dispEnddt} /* 전시 종료일자 */
+		</if>
+		<if test="leafYn != null and leafYn != ''">
+			, LEAF_YN = #{leafYn} /* 최하위 여부 */
+		</if>
+		<if test="listTpCd != null">
+			, LIST_TP_CD = #{listTpCd} /* 리스트 타입 코드 */
+		</if>
+		<if test="dispYn != null and dispYn != ''">
+			, DISP_YN = #{dispYn} /* 전시 여부 */
+		</if>
+		<if test="liveYn != null and liveYn != ''">
+			, LIVE_YN = #{liveYn} /* LIVE_여부 */
+		</if>
+		<if test="delYn != null and delYn != ''">
+			, DEL_YN = #{delYn} /* 삭제 여부 */
+		</if>
+		<if test="tmplNo != null and tmplNo != ''">
+			, TMPL_NO = #{tmplNo} /* 템플릿 번호 */
+		</if>
+		<if test="bndNo != null">
+			, BND_NO = #{bndNo} /* 브랜드 번호 */
+		</if>
+        <if test="tnImgPath != null">
+            , TN_IMG_PATH = #{tnImgPath} /* 대카테고리 이미지 경로 */
+        </if>
+		<if test="seoInfoNo != null">
+			, SEO_INFO_NO = #{seoInfoNo} /* SEO 정보번호 */
+		</if>
+		WHERE 1 = 1
+			AND DISP_CLSF_NO = #{dispClsfNo}
+	</update>
+
+	<update id="deleteDisplayBase" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name : display.deleteDisplayBase
+			Description : 전시 기본 정보 삭제
+			- BO
+		-->
+		UPDATE display_category SET
+			  DEL_YN = #{delYn} /* 삭제 여부 */
+			, SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE 1 = 1
+			AND DISP_CLSF_NO = #{dispClsfNo}
+	</update>
+
+	<select id="getDisplayBaseLeafCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.getDisplayBaseLeafCheck
+			Description : 전시카테고리 최하위 여부 체크
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayBaseLeafCheck) */
+			SUM(CNT) AS CNT
+		FROM (
+			SELECT COUNT(*) AS CNT
+			FROM display_goods
+			WHERE DISP_CLSF_NO = #{dispClsfNo}
+			UNION ALL
+			SELECT COUNT(*) AS CNT
+			FROM display_brand
+			WHERE DISP_CLSF_NO = #{dispClsfNo}
+		) A
+	</select>
+
+	<select id="listDisplayCornerGrid" resultType="biz.app.display.model.DisplayCornerVO">
+		<!--
+			Query Name : display.listDisplayCornerGrid
+			Description : 전시 코너 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerGrid) */
+			  B.DISP_CORN_NO /* 전시 코너 번호 */
+			, B.TMPL_NO /* 템플릿 번호 */
+			, B.DISP_CORN_DSCRT /* 전시 코너 설명 */
+			, B.SHOW_CNT /* 노출 개수 */
+			, B.DISP_CORN_TP_CD /* 전시 코너 타입 코드 */
+			, B.DISP_CORN_NM /* 전시 코너명 */
+			, B.DISP_PRIOR_RANK /* 전시 우선 순위*/
+			, B.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, B.SYS_REG_DTM /* 시스템 등록 일시 */
+			, B.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, B.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, A.DISP_CLSF_NO /* 전시 분류 번호 */
+			, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM display_category A
+			INNER JOIN display_corner B ON B.TMPL_NO = A.TMPL_NO
+		WHERE A.DISP_CLSF_NO = #{dispClsfNo}
+			AND A.TMPL_NO = #{tmplNo}
+			AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		<if test="dispCornNo != null">
+			AND B.DISP_CORN_NO = #{dispCornNo}
+		</if>
+		<if test="dispCornNos != null">
+			<foreach collection="dispCornNos" item="item" separator="," open="AND B.DISP_CORN_NO IN (" close=")">
+				#{item }
+			</foreach>
+		</if>
+		<if test="dispCornNms != null">
+			<foreach collection="dispCornNms" item="item" separator="OR" open="AND (" close=")">
+				B.DISP_CORN_NM LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		<if test="dispCornTpCd != null and dispCornTpCd != ''">
+			AND B.DISP_CORN_TP_CD = #{dispCornTpCd}
+		</if>
+		ORDER BY B.DISP_PRIOR_RANK ASC
+	</select>
+
+	<insert id="insertDisplayCorner" parameterType="biz.app.display.model.DisplayCornerPO">
+		<!--
+			Query Name : display.insertDisplayBase
+			Description : 전시 코너 등록
+			- BO
+		-->
+		<selectKey keyProperty="dispCornNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DISPLAY_CORNER_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO display_corner (
+			  DISP_CORN_NO /* 전시 코너 번호 */
+			, TMPL_NO /* 템플릿 번호 */
+			, DISP_CORN_DSCRT /* 전시 코너 설명 */
+			, SHOW_CNT /* 노출 개수 */
+			, DISP_CORN_TP_CD /* 전시 코너 타입 코드 */
+			, DISP_CORN_NM /* 전시 코너명 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispCornNo} /* 전시 코너 번호 */
+			, #{tmplNo} /* 템플릿 번호 */
+			, #{dispCornDscrt} /* 전시 코너 설명 */
+			, #{showCnt} /* 노출 개수 */
+			, #{dispCornTpCd} /* 전시 코너 타입 코드 */
+			, #{dispCornNm} /* 전시 코너명 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayCorner" parameterType="biz.app.display.model.DisplayCornerPO">
+		<!--
+			Query Name : display.updateDisplayCorner
+			Description : 전시 코너 수정
+			- BO
+		-->
+		UPDATE display_corner SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="dispCornDscrt != null and dispCornDscrt != ''">
+			, DISP_CORN_DSCRT = #{dispCornDscrt} /* 전시 코너 설명 */
+		</if>
+		<if test="showCnt != null">
+			, SHOW_CNT = #{showCnt} /* 노출 개수 */
+		</if>
+		<if test="dispCornTpCd != null and dispCornTpCd != ''">
+			, DISP_CORN_TP_CD = #{dispCornTpCd} /* 전시 코너 타입 코드 */
+		</if>
+		<if test="dispCornNm != null and dispCornNm != ''">
+			, DISP_CORN_NM = #{dispCornNm} /* 전시 코너명 */
+		</if>
+		<if test="dispPriorRank != null and dispPriorRank != ''">
+			, DISP_PRIOR_RANK = #{dispPriorRank} /* 전시 우선 순위*/
+		</if>
+		WHERE 1 = 1
+			AND DISP_CORN_NO = #{dispCornNo}
+			AND TMPL_NO = #{tmplNo}
+	</update>
+
+	<delete id="deleteDisplayCorner" parameterType="biz.app.display.model.DisplayCornerPO">
+		<!--
+			Query Name : display.deleteDisplayCorner
+			Description : 전시 코너 삭제
+			- BO
+		-->
+		DELETE FROM display_corner
+		WHERE 1 = 1
+		AND DISP_CORN_NO = #{dispCornNo}
+	</delete>
+
+	<delete id="deleteDisplayCornerAllItem" parameterType="biz.app.display.model.DisplayCornerPO">
+		<!--
+			Query Name : display.deleteDisplayCornerAllItem
+			Description : 전시 코너에 속한 아이템 삭제
+			- BO
+		-->
+		DELETE FROM display_corner_item
+		WHERE 1 = 1
+			AND DISP_CLSF_CORN_NO IN (
+				SELECT DISP_CLSF_CORN_NO
+				FROM DISPLAY_CLSF_CORNER
+				WHERE 1 = 1
+				AND DISP_CORN_NO = #{dispCornNo})
+	</delete>
+
+	<select id="getDisplayCornerItem" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.getDisplayCornerItem
+			Description : 전시 코너 아이템 생성 여부 확인
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayCornerItem) */
+			  B.DISP_CLSF_CORN_NO 	/* 전시 분류 코너 번호 */
+			, B.GOODS_ESTM_NO		/* 상품평 번호 */
+			, B.GOODS_ID 			/* 상품 번호 */
+			, B.DISP_BNR_NO 		/* 전시 배너 번호 */
+			, B.VD_ID			 	/* 영상 번호 */
+			, B.TAG_NO			 	/* 태그 번호 */
+			, B.MBR_NO			 	/* 회원 번호 */
+			, B.PET_LOG_NO			/* 펫로그 번호 */
+		FROM display_corner_item B
+		WHERE 1 = 1
+			AND B.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		<if test="goodsId != null and goodsId != ''">
+			AND B.GOODS_ID = #{goodsId}
+		</if>
+		<if test="goodsEstmNo != null">
+			AND B.GOODS_ESTM_NO = #{goodsEstmNo}
+		</if>
+		<if test="dispBnrNo != null and dispBnrNo != ''">
+			AND B.DISP_BNR_NO = #{dispBnrNo}
+		</if>
+		<if test="vdId != null and vdId != ''">
+			AND B.VD_ID = #{vdId}
+		</if>
+		<if test="tagNo != null and tagNo != ''">
+			AND B.TAG_NO = #{tagNo}
+		</if>
+		<if test="mbrNo != null and mbrNo != ''">
+			AND B.MBR_NO = #{mbrNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != ''">
+			AND B.PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test="srisNo != null and srisNo != ''">
+			AND B.SRIS_NO = #{srisNo}
+		</if>
+		<if test="bnrNo != null and bnrNo != ''">
+			AND B.BNR_NO = #{bnrNo}
+		</if>
+	</select>
+
+	<insert id="insertDisplayCornerItem" parameterType="biz.app.display.model.DisplayCornerItemPO">
+		<!--
+			Query Name : display.insertDisplayCornerItem
+			Description : 전시 코너 아이템 등록
+			- BO
+		-->
+		<selectKey keyProperty="dispCnrItemNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DISPLAY_CORNER_ITEM_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO display_corner_item (
+			  DISP_CNR_ITEM_NO /* 아이템 번호 */
+			, DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, DISP_BNR_NO /* 전시 배너 번호 */
+			, GOODS_ESTM_NO /* 상품평 번호 */
+		<if test="goodsId != null and goodsId != ''">
+			, GOODS_ID /* 상품 번호 */
+		</if>
+		<if test="goodsText != null and goodsText != ''">
+			, GOODS_TEXT /* 상품 TEXT */
+		</if>
+			, DISP_STRTDT /* 전시 시작일자 */
+			, DISP_ENDDT /* 전시 종료일자 */
+			, DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, DEL_YN /* 삭제 여부 */
+		<if test="bndCntsNo != null">
+			, BND_CNTS_NO /* 브랜드 콘텐츠 번호 */
+		</if>
+		<if test="vdId != null and vdId != ''">
+			, VD_ID
+		</if>
+		<if test="tagNo != null and tagNo != ''">
+			, TAG_NO
+		</if>
+		<if test="mbrNo != null and mbrNo != ''">
+			, MBR_NO
+		</if>
+		<if test="petLogNo != null and petLogNo != ''">
+			, PET_LOG_NO
+		</if>
+		<if test="srisNo != null and srisNo != ''">
+			, SRIS_NO
+		</if>
+		<if test="bnrNo != null and bnrNo != ''">
+			, BNR_NO
+		</if>
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispCnrItemNo} /* 아이템 번호 */
+			, #{dispClsfCornNo} /* 전시 분류 코너 번호 */
+			, IFNULL(#{dispBnrNo}, 0) /* 전시 배너 번호 */
+			, IFNULL(#{goodsEstmNo}, 0) /* 상품평 번호 */
+		<if test="goodsId != null and goodsId != ''">
+			, #{goodsId} /* 상품 번호 */
+		</if>
+		<if test="goodsText != null and goodsText != ''">
+			, #{goodsText} /* 상품 TEXT */
+		</if>
+			, #{dispStrtdt}
+			, #{dispEnddt}
+			, #{dispPriorRank} /* 전시 우선 순위 */
+			, '${@framework.common.constants.CommonConstants@DEL_YN_N}' /* 삭제 여부 */
+		<if test="bndCntsNo != null and bndCntsNo != ''">
+			, #{bndCntsNo} /* 브랜드 콘텐츠 번호 */
+		</if>
+		<if test="vdId != null and vdId != ''">
+			, #{vdId}
+		</if>
+		<if test="tagNo != null and tagNo != ''">
+			, #{tagNo} /* 태그 번호 */
+		</if>
+		<if test="mbrNo != null and mbrNo != ''">
+			, #{mbrNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != ''">
+			, #{petLogNo}
+		</if>
+		<if test="srisNo != null and srisNo != ''">
+			, #{srisNo}
+		</if>
+		<if test="bnrNo != null and bnrNo != ''">
+			, #{bnrNo}
+		</if>
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayCornerItem" parameterType="biz.app.display.model.DisplayCornerItemPO">
+		<!--
+			Query Name : display.updateDisplayCornerItem
+			Description : 전시 코너 아이템 수정
+			- BO
+		-->
+		UPDATE display_corner_item SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="dispCornerItemStrtdt != null">
+			, DISP_STRTDT = #{dispCornerItemStrtdt} /* 전시 시작일자 */
+		</if>
+		<if test="dispCornerItemEnddt != null">
+			, DISP_ENDDT = #{dispCornerItemEnddt} /* 전시 종료일자 */
+		</if>
+		<if test="dispPriorRank != null">
+			, DISP_PRIOR_RANK = #{dispPriorRank} /* 전시 우선 순위 */
+		</if>
+		<if test="goodsText != null and goodsText != ''">
+			, GOODS_TEXT = #{goodsText} /* 상품 TEXT */
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+			, GOODS_ID = #{goodsId} /* 상품 번호 */
+		</if>
+		<if test="bndCntsNo != null">
+			, BND_CNTS_NO = #{bndCntsNo} /* 브랜드 콘텐츠 번호 */
+		</if>
+		<if test="vdId != null and vdId != ''">
+			, VD_ID = #{vdId} /* 영상 아이디 */
+		</if>
+		<if test="bnrNo != null and bnrNo != ''">
+			, BNR_NO = #{bnrNo} /* 배너 번호 */
+		</if>
+		WHERE 1 = 1
+			AND DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+	</update>
+
+	<update id="deleteDisplayCornerItem" parameterType="biz.app.display.model.DisplayCornerItemPO">
+		<!--
+			Query Name : display.deleteDisplayCornerItem
+			Description : 전시 코너 아이템 삭제
+			- BO
+		-->
+		UPDATE display_corner_item SET
+			  DEL_YN = #{delYn} /* 삭제 여부 */
+			, SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE 1 = 1
+			AND DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+	</update>
+	
+	<update id="deleteDisplayCornerItemAll" parameterType="biz.app.display.model.DisplayCornerItemPO">
+		<!--
+			Query Name : display.deleteDisplayCornerItemAll
+			Description : 전시 분류 코너에 속한 전시코너 아이템 삭제
+			- BO
+		-->
+		UPDATE display_corner_item SET
+			  DEL_YN = #{delYn} /* 삭제 여부 */
+			, SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE 1 = 1
+			AND DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+	</update>
+	
+	<insert id="insertDisplayBanner" parameterType="biz.app.display.model.DisplayBannerPO">
+		<!--
+			Query Name : display.insertDisplayBanner
+			Description : 전시 배너 등록
+			- BO
+		-->
+		INSERT INTO display_banner (
+			  DISP_BNR_NO /* 전시 배너 번호 */
+			, BNR_TEXT /* 배너 TEXT */
+			, BNR_HTML /* 배너 HTML */
+			, BNR_IMG_NM /* 배너 이미지 명 */
+			, BNR_IMG_PATH /* 배너 이미지 경로 */
+			, BNR_MOBILE_IMG_NM /* 배너 모바일 이미지 명 */
+			, BNR_MOBILE_IMG_PATH /* 배너 모바일 이미지 경로 */
+			, DFT_BNR_YN /* 기본 배너 여부 */
+			, BNR_LINK_URL /* 배너 LINK URL */
+			, BNR_MOBILE_LINK_URL /* 배너 모바일 LINK URL */
+			, DISP_CLSF_NO /* 전시 분류 번호 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+			, BNR_GB_CD /* 배너 구분 코드 */
+			, BNR_DSCRT /* 배너 설명 */
+		) VALUES (
+			  #{dispBnrNo} /* 전시 배너 번호 */
+			, #{bnrText} /* 배너 TEXT */
+			, #{bnrHtml} /* 배너 HTML */
+			, #{bnrImgNm} /* 배너 이미지 명 */
+			, #{bnrImgPath} /* 배너 이미지 경로 */
+			, #{bnrMobileImgNm} /* 배너 모바일 이미지 명 */
+			, #{bnrMobileImgPath} /* 배너 모바일 이미지 경로 */
+			, #{dftBnrYn} /* 기본 배너 여부 */
+			, #{bnrLinkUrl} /* 배너 LINK URL */
+			, #{bnrMobileLinkUrl} /* 배너 모바일 LINK URL */
+			, #{dispClsfNo} /* 전시 분류 번호 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+			, #{bnrGbCd} /* 배너 구분 코드 */
+			, #{bnrDscrt} /* 배너 설명 */
+		)
+	</insert>
+
+	<update id="updateDisplayBanner" parameterType="biz.app.display.model.DisplayBannerPO">
+		<!--
+			Query Name : display.updateDisplayBanner
+			Description : 전시 배너 수정
+			- BO
+		-->
+		UPDATE display_banner SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="bnrText != null and bnrText != ''">
+			, BNR_TEXT = #{bnrText} /* 배너 TEXT */
+		</if>
+		<if test="bnrHtml != null and bnrHtml != ''">
+			, BNR_HTML = #{bnrHtml} /* 배너 HTML */
+		</if>
+		<if test="(bnrImgNm != null and bnrImgNm !='') || (bnrImgPath != null and bnrImgPath !='') ">
+			, BNR_IMG_NM = #{bnrImgNm} /* 배너 이미지 명 */
+			, BNR_IMG_PATH = #{bnrImgPath} /* 배너 이미지 경로 */
+		</if>	
+		<if test="(bnrMobileImgNm != null and bnrMobileImgNm !='') || (bnrMobileImgPath != null and bnrMobileImgPath !='') ">
+			, BNR_MOBILE_IMG_NM = #{bnrMobileImgNm} /* 배너 모바일 이미지 명 */
+			, BNR_MOBILE_IMG_PATH = #{bnrMobileImgPath} /* 배너 모바일 이미지 경로 */
+		</if>	
+		<if test="dftBnrYn != null and dftBnrYn != ''">
+			, DFT_BNR_YN = #{dftBnrYn} /* 기본 배너 여부 */
+		</if>
+		<if test="bnrLinkUrl != null and bnrLinkUrl != ''">
+			, BNR_LINK_URL = #{bnrLinkUrl} /* 배너 LINK URL */
+		</if>
+		<if test="bnrMobileLinkUrl != null and bnrMobileLinkUrl != ''">
+			, BNR_MOBILE_LINK_URL = #{bnrMobileLinkUrl} /* 배너 모바일 LINK URL */
+		</if>
+		<if test="bnrGbCd != null and bnrGbCd != ''">
+			, BNR_GB_CD = #{bnrGbCd} /* 배너 구분 코드 */
+		</if>
+		<if test="bnrDscrt != null and bnrDscrt != ''">
+			, BNR_DSCRT = #{bnrDscrt} /* 배너 설명 */
+		</if>
+		WHERE 1 = 1
+			AND DISP_BNR_NO = #{dispBnrNo}
+	</update>
+
+	<delete id="deleteDisplayBanner" parameterType="biz.app.display.model.DisplayCornerItemPO">
+		<!--
+			Query Name : display.deleteDisplayBanner
+			Description : 전시 배너 삭제
+			- BO
+		-->
+		DELETE FROM display_banner
+		WHERE 1 = 1
+		AND DISP_BNR_NO = #{dispBnrNo}
+	</delete>
+
+	<select id="listDisplayCornerGoodsGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.listDisplayCornerGoodsGrid
+			Description : 전시 코너 아이템 리스트(상품)
+			- BO
+		-->
+		SELECT *	/* QUERYID(display.listDisplayCornerGoodsGrid) */
+		FROM (
+			SELECT
+				  F.DISP_PRIOR_RANK /* 전시 우선 순위 */
+				, F.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+				, F.DISP_STRTDT /* 전시 시작일자 */
+				, F.DISP_ENDDT /* 전시 종료일자 */
+				, F.DEL_YN /* 삭제 여부 */
+				, F.GOODS_TEXT /* 상품 TEXT */
+				, F.DISP_BNR_NO /* 전시 배너 번호 */
+				, A.GOODS_ID /* 상품 번호 */
+				, A.GOODS_NM /* 상품명 */
+				, A.GOODS_STAT_CD /* 상품 상태 코드 */
+				, B.COMP_NM /* 업체명 */
+				, C.BND_NM_KO /* 브랜드 명 국문 */
+				, A.MMFT /* 제조사 */
+				, A.SALE_STRT_DTM /* 판매 시작 일시 */
+				, A.SALE_END_DTM /* 판매 종료 일시 */
+				, A.SHOW_YN /* 노출 여부 */
+				, A.GOODS_TP_CD /* 상품 유형 코드 */
+				, D.SALE_AMT /* 판매가 */
+				, F.DISP_CNR_ITEM_NO /* 아이템 번호 */
+				, G.IMG_PATH /* 이미지경로 */
+			FROM GOODS_BASE A
+				LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+				LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+				LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND D.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}' AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+				LEFT OUTER JOIN display_corner_item F ON (F.GOODS_ID = A.GOODS_ID)
+				LEFT OUTER JOIN goods_img G ON (A.GOODS_ID = G.GOODS_ID AND  G.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+			WHERE 1 = 1
+				AND F.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+				AND F.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		) A
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="listDisplayCornerGoodsEstmGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.listDisplayCornerGoodsEstmGrid
+			Description : 전시 코너 아이템 리스트(상품평)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerGoodsEstmGrid) */
+			  A.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, A.DISP_STRTDT /* 전시 시작일자 */
+			, A.DISP_ENDDT /* 전시 종료일자 */
+			, A.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, A.DEL_YN /* 삭제 여부 */
+			, A.GOODS_ESTM_NO /* 상품평 번호 */
+			, A.GOODS_ID /* 상품 번호 */
+			, A.GOODS_TEXT /* 상품 TEXT */
+			, A.DISP_BNR_NO /* 전시 배너 번호 */
+			, A.SYS_REGR_NO /* 시스템 등록자 번호 */
+			, A.SYS_REG_DTM /* 시스템 등록 일시 */
+			, A.SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, A.SYS_UPD_DTM /* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+			, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+			, (SELECT GOODS_NM FROM goods_base WHERE GOODS_ID = A.GOODS_ID) AS GOODS_NM /* 상품명 */
+			, (SELECT TTL FROM goods_comment WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO) AS TTL /* 상품평 제목 */
+			, (SELECT LOGIN_ID FROM member_base
+				WHERE MBR_NO = (SELECT ESTM_MBR_NO FROM goods_comment WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO)
+			  ) AS ESTM_ID /* 회원 ID */
+			, (SELECT IMG_REG_YN FROM goods_comment WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO) AS IMG_REG_YN /* 이미지 여부 */
+			, (SELECT HITS FROM goods_comment WHERE GOODS_ESTM_NO = A.GOODS_ESTM_NO) AS HITS /* 조회수 */
+		FROM display_corner_item A
+		WHERE 1 = 1
+			AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+
+	<select id="listDisplayCornerBnrItemGrid" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.listDisplayCornerBnrItemGrid
+			Description : 전시 코너 아이템 리스트(배너 TEXT / 배너 HTML / 배너 이미지 / 배너 복합)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerBnrItemGrid) */
+			  A.BNR_TEXT /* 배너 TEXT */
+			, A.BNR_HTML /* 배너 HTML */
+			, A.BNR_IMG_NM /* 배너 이미지 명 */
+			, A.BNR_IMG_PATH /* 배너 이미지 경로 */
+			, A.BNR_MOBILE_IMG_NM /* 배너 모바일 이미지 명 */
+			, A.BNR_MOBILE_IMG_PATH /* 배너 모바일 이미지 경로 */
+			, A.DFT_BNR_YN /* 기본 배너 여부 */
+			, A.BNR_LINK_URL /* 배너 LINK URL */
+			, A.BNR_MOBILE_LINK_URL /* 배너 모바일 LINK URL */
+			, B.DISP_CNR_ITEM_NO /* 아이템 번호 */
+			, B.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, B.DISP_STRTDT /* 전시 시작일자 */
+			, B.DISP_ENDDT /* 전시 종료일자 */
+			, B.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, B.DEL_YN /* 삭제 여부 */
+			, B.GOODS_ESTM_NO /* 상품평 번호 */
+			, B.GOODS_ID /* 상품 번호 */
+			, B.GOODS_TEXT /* 상품 TEXT */
+			, B.DISP_BNR_NO /* 전시 배너 번호 */
+			, A.BNR_GB_CD /* 배너 구분 코드 */
+			, A.BNR_DSCRT /* 배너 설명 */
+			, GB.GOODS_NM /* 상품 명 */
+			, B.BND_CNTS_NO /* 브랜드 콘텐츠 번호 */
+			, BC.CNTS_TTL /* 콘텐츠 타이틀 */
+		FROM DISPLAY_BANNER A
+			INNER JOIN DISPLAY_CORNER_ITEM B ON B.DISP_BNR_NO = A.DISP_BNR_NO
+			LEFT OUTER JOIN GOODS_BASE GB ON GB.GOODS_ID = B.GOODS_ID
+			LEFT OUTER JOIN BRAND_CNTS BC ON BC.BND_CNTS_NO = B.BND_CNTS_NO
+		WHERE 1 = 1
+			AND B.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			<if test="dispBnrNo != null">
+			AND B.DISP_BNR_NO = #{dispBnrNo}
+			</if>
+			AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY B.DISP_PRIOR_RANK ASC
+	</select>
+
+	<select id="listDisplayGoodsGrid" resultType="biz.app.display.model.DisplayGoodsVO">
+		<!--
+			Query Name : display.listDisplayGoodsGrid
+			Description : 전시 상품 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayGoodsGrid) */
+			  F.DISP_CLSF_NO /* 전시 분류 번호 */
+			, F.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, F.DLGT_DISP_YN /* 대표 전시 여부 */
+			, A.GOODS_ID /* 상품 번호 */
+			, A.GOODS_NM /* 상품명 */
+			, A.GOODS_STAT_CD /* 상품 상태 코드 */
+			, B.COMP_NM /* 업체명 */
+			, C.BND_NM_KO /* 브랜드 명 국문 */
+			, A.MMFT /* 제조사 */
+			, A.SALE_STRT_DTM /* 판매 시작 일시 */
+			, A.SALE_END_DTM /* 판매 종료 일시 */
+			, A.SHOW_YN /* 노출 여부 */
+			, A.GOODS_TP_CD /* 상품 유형 코드 */
+			, D.SALE_AMT /* 판매가 */
+-- 			, (SELECT GROUP_CONCAT(SR_DISP_CLSF_NO) FROM display_goods_showroom
+-- 				WHERE DISP_CLSF_NO = F.DISP_CLSF_NO AND GOODS_ID = F.GOODS_ID) AS SHOW_ROOM_GB
+		FROM goods_base A
+			LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+			LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+			LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+			LEFT OUTER JOIN display_goods F ON (F.GOODS_ID = A.GOODS_ID)
+		WHERE F.DISP_CLSF_NO = #{dispClsfNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+	<select id="listDisplayGoodsGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.listDisplayGoodsGridCount
+			Description : 전시 상품 리스트 카운트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayGoodsGridCount) */
+			COUNT(*)
+		FROM GOODS_BASE A
+			LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+			LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+			LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+			LEFT OUTER JOIN display_goods F ON (F.GOODS_ID = A.GOODS_ID)
+		WHERE F.DISP_CLSF_NO = #{dispClsfNo}
+	</select>
+
+	<insert id="insertDisplayGoods" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.insertDisplayGoods
+			Description : 전시 상품 추가
+			- BO
+		-->
+		INSERT INTO display_goods (
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, GOODS_ID /* 상품 번호 */
+			, DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, DLGT_DISP_YN /* 대표 전시 여부 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfNo} /* 전시 분류 번호 */
+			, #{goodsId} /* 상품 번호 */
+			, #{dispPriorRank} /* 전시 우선 순위 */
+			, #{dlgtDispYn} /* 대표 전시 여부 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayGoods" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.updateDisplayGoods
+			Description : 전시 상품 수정
+			- BO
+		-->
+		UPDATE display_goods SET
+			  DISP_PRIOR_RANK = #{dispPriorRank}
+			, DLGT_DISP_YN = #{dlgtDispYn}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE DISP_CLSF_NO = #{dispClsfNo}
+			AND GOODS_ID = #{goodsId}
+	</update>
+
+	<delete id="deleteDisplayGoods" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.deleteDisplayGoods
+			Description : 전시 상품 삭제
+			- BO
+		-->
+		DELETE FROM display_goods
+		WHERE 1 = 1
+		AND DISP_CLSF_NO = #{dispClsfNo}
+		AND GOODS_ID = #{goodsId}
+	</delete>
+
+	<select id="getDisplyGoodsCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.getDisplyGoodsCheck
+			Description : 전시 상품 대표 존재 여부 체크
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplyGoodsCheck) */
+			COUNT(*)
+		FROM display_goods A
+		WHERE A.GOODS_ID = #{goodsId}
+			AND A.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+	</select>
+
+	<update id="updateAllDlgtDispN" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.updateAllDlgtDispN
+			Description : 전시 상품 대표 전시 여부 업데이트
+			- BO
+		-->
+		UPDATE display_goods SET
+		DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_N}'
+		WHERE GOODS_ID = #{goodsId}
+	</update>
+
+	<delete id="deleteDisplayGoodsAll" parameterType="java.lang.String">
+		<!--
+			Query Name : display.deleteDisplayGoodsAll
+			Description : 전시 상품 삭제
+			- BO
+		-->
+		DELETE FROM display_goods
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+
+	<insert id="insertDisplayGoodsShowroom" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.insertDisplayGoodsShowroom
+			Description : 전시 상품 쇼룸 저장
+			- BO
+		-->
+		INSERT INTO display_goods_showroom (
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, GOODS_ID /* 상품 번호 */
+			, SR_DISP_CLSF_NO /* 쇼룸 전시 분류 번호 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+		) VALUES (
+			  #{dispClsfNo} /* 전시 분류 번호 */
+			, #{goodsId} /* 상품 번호 */
+			, #{srDispClsfNo} /* 쇼룸 전시 분류 번호 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<delete id="deleteDisplayGoodsShowroom" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.deleteDisplayGoodsShowroom
+			Description : 전시 상품 쇼룸 삭제
+			- BO
+		-->
+		DELETE FROM display_goods_showroom
+		WHERE DISP_CLSF_NO = #{dispClsfNo}
+			AND GOODS_ID = #{goodsId}
+		<if test="srDispClsfNo != null and srDispClsfNo != ''">
+			AND SR_DISP_CLSF_NO = #{srDispClsfNo}
+		</if>
+	</delete>
+
+	<select id="listDisplayBrandGrid" resultType="biz.app.display.model.DisplayBrandVO">
+		<!--
+			Query Name : display.listDisplayBrandGrid
+			Description : 관련 브랜드 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayBrandGrid) */
+			  A.BND_NO /* 대표 브랜드 번호 */
+			, A.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, A.DISP_CLSF_NO /* 전시 분류 번호 */
+			, (SELECT BND_NM_KO FROM brand_base WHERE BND_NO = A.BND_NO) AS
+			BND_NM_KO /* 브랜드 명 국문 */
+		FROM display_brand A
+		WHERE A.DISP_CLSF_NO = #{dispClsfNo}
+	</select>
+
+	<insert id="insertDisplayBrand" parameterType="biz.app.display.model.DisplayBrandPO">
+		<!--
+			Query Name : display.insertDisplayBrand
+			Description : 관련 브랜드 추가
+			- BO
+		-->
+		INSERT INTO display_brand (
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, BND_NO /* 브랜드 번호 */
+			, DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfNo} /* 전시 분류 번호 */
+			, #{bndNo} /* 브랜드 번호 */
+			, #{dispPriorRank} /* 전시 우선 순위 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayBrand" parameterType="biz.app.display.model.DisplayBrandPO">
+		<!--
+			Query Name : display.updateDisplayBrand
+			Description : 관련 브랜드 저장
+			- BO
+		-->
+		UPDATE display_brand SET
+			  DISP_PRIOR_RANK = #{dispPriorRank} /* 전시 우선 순위 */
+			, SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE 1 = 1
+			AND BND_NO = #{bndNo}
+			AND DISP_CLSF_NO = #{dispClsfNo}
+	</update>
+
+	<delete id="deleteDisplayBrand" parameterType="biz.app.display.model.DisplayBrandPO">
+		<!--
+			Query Name : display.deleteDisplayBrand
+			Description : 관련 브랜드 삭제
+		-->
+		DELETE FROM display_brand
+		WHERE DISP_CLSF_NO = #{dispClsfNo}
+		AND BND_NO = #{bndNo}
+	</delete>
+
+	<select id="listDisplayShowRoomCategory" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayShowRoomCategory
+			Description : 쇼룸 카테고리 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayShowRoomCategory) */
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, DISP_CLSF_NM /* 전시 분류 명 */
+		FROM display_category
+		WHERE 1 = 1
+			AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DISP_LVL = 1
+	</select>
+
+	<select id="listDisplayShowRoomGoodsGrid" resultType="biz.app.display.model.DisplayGoodsVO">
+		<!--
+			Query Name : display.listDisplayShowRoomGoodsGrid
+			Description : 쇼룸 전시 상품 리스트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayShowRoomGoodsGrid) */
+			G.DISP_CLSF_NO /* 전시 분류 번호 */
+			, (SELECT DISP_CLSF_NM FROM display_category DC WHERE DC.DISP_CLSF_NO = G.DISP_CLSF_NO)DISP_CLSF_NM
+			, A.GOODS_ID /* 상품 번호 */
+			, A.GOODS_NM /* 상품명 */
+			, A.GOODS_STAT_CD /* 상품 상태 코드 */
+			, B.COMP_NM /* 업체명 */
+			, C.BND_NM_KO /* 브랜드 명 국문 */
+			, A.MMFT /* 제조사 */
+			, A.SALE_STRT_DTM /* 판매 시작 일시 */
+			, A.SALE_END_DTM /* 판매 종료 일시 */
+			, A.SHOW_YN /* 노출 여부 */
+			, A.GOODS_TP_CD /* 상품 유형 코드 */
+			, D.SALE_AMT /* 판매가 */
+		FROM display_goods_showroom G
+			LEFT OUTER JOIN goods_base A ON (G.GOODS_ID = A.GOODS_ID)
+			LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+			LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+			LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		WHERE G.SR_DISP_CLSF_NO = #{srDispClsfNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+	<select id="listDisplayShowRoomGoodsGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.listDisplayShowRoomGoodsGridCount
+			Description : 전시 상품 리스트 카운트
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayShowRoomGoodsGridCount) */
+			COUNT(*)
+		FROM display_goods_showroom G
+			LEFT OUTER JOIN goods_base A ON (G.GOODS_ID = A.GOODS_ID)
+			LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+			LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+			LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		WHERE G.SR_DISP_CLSF_NO = #{srDispClsfNo}
+	</select>
+
+	<insert id="insertDisplayShowRoomGoods" parameterType="biz.app.display.model.DisplayGoodsPO">
+		<!--
+			Query Name : display.insertDisplayShowRoomGoods
+			Description : 전시 상품 추가
+			- BO
+		-->
+		INSERT INTO display_goods_showroom (
+			  DISP_CLSF_NO /* 전시 분류 번호 */
+			, GOODS_ID /* 상품 번호 */
+			, SR_DISP_CLSF_NO /* 쇼룸 전시 분류 번호 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+		) VALUES (
+			  #{dispClsfNo} /* 전시 분류 번호 */
+			, #{goodsId} /* 상품 번호 */
+			, #{srDispClsfNo} /* 쇼룸 전시 분류 번호 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<select id="getDispClsfNo" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.getDispClsfNo
+			Description : 전시분류번호
+			- BO
+		-->
+		SELECT	/* QUERYID(display.getDisplayBase) */
+			DISP_CLSF_NO
+		FROM
+			display_goods
+		WHERE
+			GOODS_ID = #{goodsId}
+			AND DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		LIMIT 1
+	</select>
+
+	<select id="checkGoodsId" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.checkGoodsId
+			Description : 중복된 상품번호 검사
+			- BO
+		-->
+		SELECT	/* QUERYID(display.checkGoodsId) */
+			COUNT(*)
+		FROM display_goods A
+		WHERE A.DISP_CLSF_NO = #{dispClsfNo}
+			AND A.GOODS_ID = #{goodsId}
+	</select>
+
+	<select id="listStDisp" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+					Query Name : display.listStDisp
+					Description : 업체가 추가할수있는 카테고리
+					- BO
+				-->
+		SELECT	/* QUERYID(display.listStDisp) */
+			DISP_CLSF_NO
+			, COMP_NO
+		     , ST_ID
+			, FN_GET_SITE_NAME(ST_ID) AS ST_NM
+			, UP_DISP_CLSF_NO
+		FROM (
+			SELECT
+				 B.DISP_CLSF_NO
+				, #{compNo} COMP_NO
+				, B.UP_DISP_CLSF_NO
+				, B.ST_ID
+			FROM display_category B
+			WHERE B.ST_ID = #{stId}
+			AND B.DISP_CLSF_CD = #{dispClsfCd}
+		    AND DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		) T
+	</select>
+	<select id="listCompDisp" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listCompDisp
+			Description : 업체가 추가할수있는 카테고리
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listCompDisp) */
+			  DISP_CLSF_NO
+			, COMP_NO, ST_ID
+			, FN_GET_SITE_NAME(ST_ID) AS ST_NM
+			, UP_DISP_CLSF_NO
+		FROM (
+			SELECT
+				  A.DISP_CLSF_NO
+				, A.COMP_NO
+				, B.UP_DISP_CLSF_NO
+				, (SELECT ST_ID FROM st_comp_map WHERE COMP_NO = #{compNo} AND ST_ID= #{stId} ) AS ST_ID
+			FROM company_disp_map A
+				INNER JOIN display_category B ON A.DISP_CLSF_NO = B.DISP_CLSF_NO AND B.DISP_CLSF_CD = #{dispClsfCd}
+			WHERE A.COMP_NO=#{compNo} AND B.ST_ID=#{stId}
+		) AS D
+	</select>
+
+	<select id="listDisplayClsfCornerGrid" resultType="biz.app.display.model.DisplayClsfCornerVO">
+		<!--
+			Query Name : display.listDisplayClsfCornerGrid
+			Description : 전시 분류 코너 리스트(Code Set)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayClsfCornerGrid) */
+			  DCC.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, DCC.DISP_CLSF_NO /* 전시 분류 번호 */
+			, DCC.DISP_CORN_NO /* 전시 코너 번호 */
+			, DCC.DISP_SHOW_TP_CD /* 전시 노출 타입 코드 */
+			, DCC.DISP_PRD_SET_YN /* 전시 기간 설정 여부 */
+			, DCC.DISP_STRTDT /* 전시 시작일자 */
+			, DCC.DISP_ENDDT /* 전시 종료일자 */
+			, DCC.CNTS_TTL /* 콘텐츠 타이틀 */
+			, DCC.CNTS_DSCRT /* 콘텐츠 설명 */
+			, DCC.CORN_IMG_NM /* 코너 이미지 명 */
+			, DCC.CORN_IMG_PATH /* 코너 이미지 경로 */
+			, DCC.CORN_MOBILE_IMG_NM /* 코너 모바일 이미지 명 */
+			, DCC.CORN_MOBILE_IMG_PATH /* 코너 모바일 이미지 경로 */
+			, DCC.LINK_URL /* 코너 링크 경로 */
+			, DCC.MOBILE_LINK_URL /* 코너 모바일 링크 경로 */
+			, DCC.BG_COLOR /* 코너 BG 컬러값 */
+			, DCC.GOODS_AUTO_YN /* 상품 자동 여부 */
+			, DCC.DEL_YN /* 삭제 여부 */
+		FROM display_clsf_corner DCC
+		WHERE 1 = 1
+		<if test="dispClsfCornNo != null">
+			AND DCC.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+		</if>
+		<if test="dispCornNo != null">
+			AND DCC.DISP_CORN_NO = #{dispCornNo}
+		</if>
+		<if test="dispClsfNo != null">
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		</if>
+			AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+
+	<insert id="insertDisplayClsfCorner" parameterType="biz.app.display.model.DisplayClsfCornerPO">
+		<!--
+			Query Name : display.insertDisplayClsfCorner
+			Description : 전시 분류 코너 등록
+			- BO
+		-->
+		INSERT INTO display_clsf_corner (
+			  DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, DISP_CLSF_NO /* 전시 분류 번호 */
+			, DISP_CORN_NO /* 전시 코너 번호 */
+			, DISP_SHOW_TP_CD /* 전시 노출 타입 코드 */
+			, DISP_PRD_SET_YN /* 전시 기간 설정 여부 */
+			, DISP_STRTDT /* 전시 시작일자 */
+			, DISP_ENDDT /* 전시 종료일자 */
+			, CNTS_TTL /* 콘텐츠 타이틀 */
+			, CNTS_DSCRT /* 콘텐츠 설명 */
+			, CORN_IMG_NM /* 코너 이미지 명 */
+			, CORN_IMG_PATH /* 코너 이미지 경로 */
+			, CORN_MOBILE_IMG_NM /* 코너 모바일 이미지 명 */
+			, CORN_MOBILE_IMG_PATH /* 코너 모바일 이미지 경로 */
+	        , LINK_URL /* 코너 링크 경로 */
+	        , MOBILE_LINK_URL /* 코너 모바일 링크 경로 */
+	        , BG_COLOR /* 코너 BG 컬러값 */
+			, GOODS_AUTO_YN /* 상품 자동 여부 */
+			, DEL_YN /* 삭제 여부 */
+			, SYS_REGR_NO /* 시스템 등록자 번호 */
+			, SYS_REG_DTM /* 시스템 등록 일시 */
+			, SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM /* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfCornNo} /* 전시 분류 코너 번호 */
+			, #{dispClsfNo} /* 전시 분류 번호 */
+			, #{dispCornNo} /* 전시 코너 번호 */
+			, #{dispShowTpCd} /* 전시 노출 타입 코드 */
+			, #{dispPrdSetYn} /* 전시 기간 설정 여부 */
+			, #{dispClsfCornerStrtdt} /* 전시 시작일자 */
+			, #{dispClsfCornerEnddt} /* 전시 종료일자 */
+			, #{cntsTtl} /* 콘텐츠 타이틀 */
+			, #{cntsDscrt} /* 콘텐츠 설명 */
+			, #{cornImgNm} /* 코너 이미지 명 */
+			, #{cornImgPath} /* 코너 이미지 경로 */
+			, #{cornMobileImgNm} /* 코너 모바일 이미지 명 */
+			, #{cornMobileImgPath} /* 코너 모바일 이미지 경로 */
+	        , #{linkUrl} /* 코너 링크 경로 */
+	        , #{mobileLinkUrl} /* 코너 모바일 링크 경로 */
+	        , #{bgColor} /* 코너 BG 컬러값 */
+			, #{goodsAutoYn} /* 상품 자동 여부 */
+			, '${@framework.common.constants.CommonConstants@DEL_YN_N}' /* 삭제 여부 */
+			, #{sysRegrNo} /* 시스템 등록자 번호 */
+			, NOW() /* 시스템 등록 일시 */
+			, #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDisplayClsfCorner" parameterType="biz.app.display.model.DisplayClsfCornerPO">
+		<!--
+			Query Name : display.updateDisplayClsfCorner
+			Description : 전시 분류 코너 수정
+			- BO
+		-->
+		UPDATE display_clsf_corner SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="dispShowTpCd != null and dispShowTpCd != ''">
+			, DISP_SHOW_TP_CD = #{dispShowTpCd} /* 전시 노출 타입 코드 */
+		</if>
+		<if test="dispPrdSetYn != null and dispPrdSetYn != ''">
+			, DISP_PRD_SET_YN = #{dispPrdSetYn} /* 전시 기간 설정 여부 */
+		</if>
+		<if test="dispClsfCornerStrtdt != null">
+			, DISP_STRTDT = #{dispClsfCornerStrtdt} /* 전시 시작일자 */
+		</if>
+		<if test="dispClsfCornerEnddt != null">
+			, DISP_ENDDT = #{dispClsfCornerEnddt} /* 전시 종료일자 */
+		</if>
+		<if test="cntsTtl != null and cntsTtl != ''">
+			, CNTS_TTL = #{cntsTtl} /* 콘텐츠 타이틀 */
+		</if>
+			, CNTS_DSCRT = #{cntsDscrt} /* 콘텐츠 설명 */
+		<if test="cornImgNm != null and cornImgNm != ''">
+			, CORN_IMG_NM = #{cornImgNm} /* 코너 이미지 명 */
+		</if>
+		<if test="cornImgPath != null and cornImgPath != ''">
+			, CORN_IMG_PATH = #{cornImgPath} /* 코너 이미지 경로 */
+		</if>
+		<if test="cornMobileImgNm != null and cornMobileImgNm != ''">
+			, CORN_MOBILE_IMG_NM = #{cornMobileImgNm} /* 코너 모바일 이미지 명 */
+		</if>
+		<if test="cornMobileImgPath != null and cornMobileImgPath != ''">
+			, CORN_MOBILE_IMG_PATH = #{cornMobileImgPath} /* 코너 모바일 이미지 경로 */
+		</if>
+            , LINK_URL = #{linkUrl} /* 코너 링크 경로 */
+            , MOBILE_LINK_URL = #{mobileLinkUrl} /* 코너 모바일 링크 경로 */
+            , BG_COLOR = #{bgColor} /* 코너 BG 컬러값 */
+		<if test="goodsAutoYn != null and goodsAutoYn != ''">
+			, GOODS_AUTO_YN = #{goodsAutoYn} /* 상품 자동 여부 */
+		</if>
+		WHERE 1 = 1
+			AND DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+	</update>
+
+	<update id="deleteDisplayClsfCorner" parameterType="biz.app.display.model.DisplayClsfCornerPO">
+		<!--
+			Query Name : display.deleteDisplayClsfCorner
+			Description : 전시 분류 코너 삭제
+			- BO
+		-->
+		UPDATE display_clsf_corner SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+			, DEL_YN = #{delYn} /* 삭제 여부 */
+		WHERE 1 = 1
+			AND DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+	</update>
+
+	<delete id="deleteDisplayClsfCornerAll" parameterType="biz.app.display.model.DisplayCornerPO">
+		<!--
+			Query Name : display.deleteDisplayClsfCornerAll
+			Description : 전시 코너에 속한 전시 분류 코너 삭제
+			- BO
+		-->
+		DELETE FROM display_clsf_corner
+		WHERE 1 = 1
+		AND DISP_CORN_NO = #{dispCornNo}
+	</delete>
+
+	<select id="listDisplayCategory" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayCategory
+			Description : 전시 카테고리 조회
+			- BO
+		-->
+		SELECT  /* QUERYID(display.listDisplayCategory) */
+				A.*
+		FROM display_category A
+		INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+		WHERE 1=1
+			AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test="dispClsfCd != null and dispClsfCd != ''">
+			AND A.DISP_CLSF_CD = #{dispClsfCd}
+		</if>
+		<if test="upDispClsfNo != null">
+			AND A.UP_DISP_CLSF_NO = #{upDispClsfNo}
+		</if>
+		<if test="stId != null">
+			AND B.ST_ID = #{stId}
+		</if>
+		<if test="dispLvl != null">
+			AND A.DISP_LVL = #{dispLvl}
+		</if>
+		<if test="dispYn != null and dispYn != ''">
+			AND A.DISP_YN = #{dispYn}
+		</if>
+		<if test="estmYn != null and estmYn != ''">
+			AND ( A.PRMT_SHOW_NM IS NOT NULL AND A.PRMT_SHOW_NM != '' )
+		</if>
+		<if test="cfmYn != null and cfmYn != ''">
+			AND A.CFM_YN = #{cfmYn}
+		</if>
+		ORDER BY A.DISP_LVL, A.DISP_PRIOR_RANK
+	</select>
+
+	<select id="listCategory" parameterType="biz.app.display.model.DisplayCategorySO" statementType="CALLABLE" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listCategory
+			Description : Category List 가져오기
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.listCategory) */
+			 DISP_CLSF_NO		/* 전시 분류 번호 */
+			,DISP_CLSF_NM		/* 전시 분류 명 */
+			,DISP_LVL			/* 전시 레벨 */
+			,LIST_TP_CD			/* 리스트 타입 코드 */
+		FROM display_category
+		WHERE 1=1
+			AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND DISP_LVL = #{dispLvl}
+			AND NOW() BETWEEN DISP_STRTDT AND DISP_ENDDT
+		<if test="dispClsfCd != null">
+			AND DISP_CLSF_CD = #{dispClsfCd}
+		</if>
+		<if test="upDispClsfNo != null">
+			AND UP_DISP_CLSF_NO = #{upDispClsfNo}
+		</if>
+		<if test="dispClsfNo != null">
+			AND DISP_CLSF_NO = #{dispClsfNo}
+		</if>
+		ORDER BY DISP_PRIOR_RANK ASC
+	</select>
+
+	<select id="listAncestorCategory" parameterType="biz.app.display.model.DisplayCategorySO" statementType="CALLABLE" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listAncestorCategory
+			Description : 하위 카테고리(leaf)로 조상카테고리 리스트 가져오기
+			- FO (PC/MO)
+		-->
+		{ call SP_GET_ANCESTOR (${dispClsfNo}, ${upDispClsfNo}) }
+	</select>
+
+	<select id="listDescendantCategory" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDescendantCategory
+			Description :
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.listDescendantCategory) */
+			 c1.disp_clsf_no as dispCtgLvl1
+			,c2.disp_clsf_no as dispCtgLvl2
+			,c3.disp_clsf_no as dispCtgLvl3
+		FROM display_category c1
+			LEFT JOIN display_category c2 on c1.DISP_CLSF_NO = c2.UP_DISP_CLSF_NO
+			LEFT JOIN display_category c3 on c2.DISP_CLSF_NO = c3.UP_DISP_CLSF_NO
+		WHERE c1.disp_clsf_no = #{dispClsfNo}
+	</select>
+
+	<select id="getDisplayBaseNavigation" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.getDisplayBaseNavigation
+			Description : 전시 네비게이션용 조회
+			- FO (PC)
+		-->
+		SELECT	/* QUERYID(display.getDisplayBaseNavigation) */
+			 DISP_CLSF_NO		/* 전시 분류 번호 */
+			,DISP_CLSF_NM		/* 전시 분류 명 */
+			,UP_DISP_CLSF_NO	/* 상위 전시 분류 번호 */
+			,DISP_CLSF_CD		/* 전시 분류 코드 */
+		FROM display_category
+		WHERE 1=1
+		<if test='dispClsfNo != null'>
+			AND DISP_CLSF_NO = #{dispClsfNo}
+		</if>
+		<if test='upDispClsfNo != null'>
+			AND UP_DISP_CLSF_NO = #{upDispClsfNo}
+		</if>
+	</select>
+
+	<select id="listDisplayCategoryByDispYn" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayCategoryByDispYn
+			Description : 전시 카테고리 목록 조회
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.listDisplayCategoryByDispYn) */
+			AA.*,
+    		(SELECT count(*) FROM display_goods DG INNER JOIN goods_base GB ON GB.GOODS_ID = DG.GOODS_ID
+    			WHERE DG.DISP_CLSF_NO = AA.DISP_CLSF_NO
+    				AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+    				AND GB.GOODS_STAT_CD ='${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+    				AND GB.SHOW_YN='Y'
+    		) GOODS_CNT,
+    		( CASE WHEN best_filter.DISP_CLSF_NO IS NULL THEN 'N' ELSE 'Y' END ) as best_Category_Yn
+     	FROM (
+			SELECT *
+				FROM(
+					WITH RECURSIVE CTE_CTG AS
+					(
+					SELECT DISP_CLSF_NO
+						   , DISP_CLSF_NM
+						   , CAST(DISP_CLSF_NM AS CHAR(512)) AS PATH_NM
+						   , CAST(DISP_CLSF_NO AS CHAR(512)) AS PATH_NO
+						   , '1' as LVL
+						   , UP_DISP_CLSF_NO
+						   , DISP_PRIOR_RANK
+						   , CAST(CONCAT('1', LPAD(IFNULL(DISP_PRIOR_RANK,999),3,'0'), DISP_CLSF_NO) AS CHAR(512)) AS SORT_STR
+					  FROM DISPLAY_CATEGORY
+						  	WHERE DISP_YN = 'Y'
+					   		AND DEL_YN = 'N'
+						  	<choose>
+								<when test="dispClsfCd == null or dispClsfCd =='' ">
+								  	AND UP_DISP_CLSF_NO = 10
+								</when>
+								<otherwise>
+									AND UP_DISP_CLSF_NO = #{dispClsfCd}
+								</otherwise>
+							</choose>
+					UNION ALL
+					SELECT CTG.DISP_CLSF_NO
+						   , CTG.DISP_CLSF_NM
+						   , CONCAT(CTE.PATH_NM,'>' ,CTG.DISP_CLSF_NM) AS PATH_NM
+						   , CONCAT(CTE.PATH_NO,'>' ,CTG.DISP_CLSF_NO) AS PATH_NO
+						   , CTE.LVL+1
+						   , CTG.UP_DISP_CLSF_NO
+						   , CTG.DISP_PRIOR_RANK
+						   , CONCAT(CTE.SORT_STR, '>', LPAD(IFNULL(CTG.DISP_PRIOR_RANK,999),3,'0'), CTG.DISP_CLSF_NO) AS SORT_STR
+					  FROM CTE_CTG CTE
+				INNER JOIN DISPLAY_CATEGORY CTG
+						ON CTG.UP_DISP_CLSF_NO = CTE.DISP_CLSF_NO
+					   AND CTG.UP_DISP_CLSF_NO  <![CDATA[<>]]> CTG.DISP_CLSF_NO
+					   AND DISP_YN = 'Y'
+					   AND DEL_YN = 'N'
+					)
+					SELECT DISP_CLSF_NO AS CID
+						   , LVL AS LEVEL
+						   , PATH_NM AS PATH_NM
+						   , FN_SPLIT(PATH_NO,'>',1) as MAST_DISP_NO
+						   , SORT_STR AS ORDER_BY
+					  FROM CTE_CTG
+				  ) A
+			JOIN DISPLAY_CATEGORY B ON B.DISP_CLSF_NO = A.CID
+			ORDER BY A.ORDER_BY
+		) AA
+		left join display_category_best_batch best_filter on (best_filter.DISP_CLSF_NO = AA.DISP_CLSF_NO)
+		WHERE
+			AA.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND AA.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND AA.ST_ID = #{stId}
+	</select>
+
+	<select id="listDisplayCategoryByComp" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayCategoryByDispYn
+			Description : 스토어, 디자이너, 브랜드 샵 전시 카테고리 목록 조회
+			- FO (PC/MO)
+		-->
+		SELECT
+			 DC.DISP_CLSF_NO		/* 전시 분류 번호 */
+			,DC.UP_DISP_CLSF_NO 	/* 상위 전시 분류 번호 */
+			,DC.DISP_CLSF_NM 		/* 전시 분류 명 */
+			,DC.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			,DC.DISP_LVL 			/* 전시 레벨 */
+			,DC.LEAF_YN				/* 최하위 여부 */
+			,(SELECT FN_GET_DISP_CTG_PATH(DC.DISP_CLSF_NO)) AS PATH_NM		/* 카테고리 full 경로 명 */
+			,@ORDER_BY AS ORDER_BY	/* 전시 분류번호, 우선 순위에 따른 정렬 순서 */
+    	FROM
+			(SELECT @ORDER_BY := '') VARS,
+			display_category DC,
+			display_goods_total DGT
+		WHERE
+			DC.DISP_CLSF_NO = DGT.DISP_CLSF_NO
+			<if test="compNo != null and ! compNo.equals('') ">
+			AND DGT.DISP_TOTAL_GB_CD = '${@framework.common.constants.CommonConstants@DISP_TOTAL_GB_20}'
+			AND DGT.COMP_NO = #{compNo}
+			</if>
+			<if test="bndNo != null and ! bndNo.equals('') ">
+			AND DGT.DISP_TOTAL_GB_CD = '${@framework.common.constants.CommonConstants@DISP_TOTAL_GB_30}'
+			AND DGT.BND_NO = #{bndNo}
+			</if>
+			AND TOTAL_DAY = (SELECT MAX(TOTAL_DAY) FROM DISPLAY_GOODS_TOTAL)
+			AND DC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND DC.ST_ID = #{stId}
+    	ORDER BY ORDER_BY
+	</select>
+
+	<!-- pageDisplayCornerItemBnrFO where -->
+	<sql id="pageDisplayCornerItemBnrFOWhere">
+				DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		<choose>
+			<when test="previewDt != null and previewDt != ''">
+			AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			)
+			AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			</when>
+			<otherwise>
+			AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND NOW() BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			)
+			AND NOW() BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			</otherwise>
+		</choose>			
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+	</sql>
+
+	<select id="pageDisplayCornerItemBnrFO" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.pageDisplayCornerItemBnrFO
+			Description : FO 전시 코너 아이템 리스트(배너 HTML / 배너 TEXT / 배너 이미지 / 배너 리스트)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemBnrFO) */
+			DB.DISP_BNR_NO 				/* 배너 번호 */
+			,DB.BNR_GB_CD				/* 배너 구분 코드 */
+			,DB.BNR_TEXT				/* 배너 TEXT */
+			,DB.BNR_DSCRT				/* 배너 설명*/
+			,DB.BNR_HTML 				/* 배너 HTML */
+			,DB.BNR_IMG_NM 				/* 배너 이미지 명 */
+			,DB.BNR_IMG_PATH 			/* 배너 이미지 경로 */
+			,DB.BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명 */
+			,DB.BNR_MOBILE_IMG_PATH		/* 배너 모바일 이미지 경로 */
+			, (SELECT BNR_LINK_URL FROM BNR_MNG WHERE BNR_NO = DCI.BNR_NO) AS BNR_LINK_URL /* LINK URL */
+<!-- 			,DB.BNR_LINK_URL 			/* 배너 LINK URL */ -->
+<!-- 			,DB.BNR_MOBILE_LINK_URL 	/* 배너 모바일 LINK URL */ -->
+			,DCI.DISP_CNR_ITEM_NO		/* 아이템 번호 */
+			,DCI.DISP_STRTDT			/* 전시 시작일자 */
+			,DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			,DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			,DCC.DISP_CLSF_NO 			/* 전시 분류 번호 */
+			,DCC.DISP_CORN_NO 			/* 전시 코너 번호 */
+			,IFNULL(BM.USE_YN, 'N') AS USE_YN	/* 배너 사용 여부 */
+		FROM
+			DISPLAY_BANNER DB
+			INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			LEFT JOIN BNR_MNG BM ON BM.BNR_NO = DCI.BNR_NO
+		WHERE
+			<include refid="display.pageDisplayCornerItemBnrFOWhere" />
+		ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageDisplayCornerItemBnrFOCount" resultType="Integer">
+		<!--
+			Query Name : display.pageDisplayCornerItemBnrFOCount
+			Description : FO 전시 코너 아이템 리스트(배너 HTML / 배너 TEXT / 배너 이미지 / 배너 리스트)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemBnrFOCount) */
+			 COUNT(*)
+		FROM
+			display_banner DB
+			INNER JOIN display_corner_item DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+			INNER JOIN display_clsf_corner DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE
+			<include refid="display.pageDisplayCornerItemBnrFOWhere" />
+	</select>
+	
+	<select id="pageDisplayCornerItemMainBnrFO" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.pageDisplayCornerItemMainBnrFO
+			Description : FO 전시 코너 아이템 리스트(배너 HTML / 배너 TEXT / 배너 이미지 / 배너 리스트)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemMainBnrFO) */
+			 DB.BNR_GB_CD				/* 배너 구분 코드 */
+			,DCI.BNR_NO					/* 배너 번호 */
+            ,DCI.VD_ID					/* 영상 ID */
+			,DB.BNR_TEXT				/* 배너 TEXT */
+			,DB.BNR_DSCRT				/* 배너 설명*/
+			,DB.BNR_HTML 				/* 배너 HTML */
+			,DB.BNR_IMG_NM 				/* 배너 이미지 명 */
+			,DB.BNR_IMG_PATH 			/* 배너 이미지 경로 */
+			,DB.BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명 */
+			,DB.BNR_MOBILE_IMG_PATH		/* 배너 모바일 이미지 경로 */
+			,DB.DFT_BNR_YN 				/* 기본 배너 여부 */
+			,DB.BNR_LINK_URL 			/* 배너 LINK URL */
+			,DB.BNR_MOBILE_LINK_URL 	/* 배너 모바일 LINK URL */
+			,DCI.DISP_CNR_ITEM_NO				/* 아이템 번호 */
+			,DCI.DISP_STRTDT			/* 전시 시작일자 */
+			,DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			,DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			,DCC.DISP_CLSF_NO 			/* 전시 분류 번호 */
+			,DCC.DISP_CORN_NO 			/* 전시 코너 번호 */
+			,AC.DISP_YN					/* 영상 전시 여부 */
+            ,BM.USE_YN					/* 배너 사용 여부 */
+            ,SRIS.DISP_YN				/* 시리즈 전시 여부 */
+            ,SESN.DISP_YN				/* 시즌 전시 여부 */
+            ,AC.VD_GB_CD				/* 영상 구분 코드 */
+		FROM
+			DISPLAY_BANNER DB
+			LEFT OUTER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+			LEFT OUTER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+            LEFT OUTER JOIN BNR_MNG BM ON(BM.BNR_NO = DCI.BNR_NO)
+            LEFT OUTER JOIN APET_CONTENTS AC ON(AC.VD_ID = DCI.VD_ID)
+            LEFT OUTER JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+			LEFT OUTER JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO)
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND (AC.DISP_YN = 'Y' OR USE_YN = 'Y')
+            AND (SRIS.DISP_YN = 'Y' OR USE_YN = 'Y')
+            AND (SESN.DISP_YN = 'Y' OR USE_YN = 'Y')
+		ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageDisplayCornerItemMainBnrFOCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.pageDisplayCornerItemMainBnrFOCount
+			Description : FO 전시 코너 아이템 리스트(배너 HTML / 배너 TEXT / 배너 이미지 / 배너 리스트)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemMainBnrFOCount) */
+			 COUNT(*)
+		FROM
+			DISPLAY_BANNER DB
+			LEFT OUTER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+			LEFT OUTER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+            LEFT OUTER JOIN BNR_MNG BM ON(BM.BNR_NO = DCI.BNR_NO)
+            LEFT OUTER JOIN APET_CONTENTS AC ON(AC.VD_ID = DCI.VD_ID)
+            LEFT OUTER JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+			LEFT OUTER JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO)
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND (AC.DISP_YN = 'Y' OR USE_YN = 'Y')
+            AND (SRIS.DISP_YN = 'Y' OR USE_YN = 'Y')
+            AND (SESN.DISP_YN = 'Y' OR USE_YN = 'Y')
+		ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM DESC
+	</select>
+	
+	<select id="pageDisplayCornerTagListFO" resultType="biz.app.tag.model.TagBaseVO">
+		SELECT	/* QUERYID(display.pageDisplayCornerTagListFO) */
+			 TB.TAG_NO
+             , TB.TAG_NM
+             , TB.STAT_CD
+             , TB.SRC_CD
+             , TB.SYS_REGR_NO
+             , TB.SYS_REG_DTM
+             , TB.SYS_UPDR_NO
+             , TB.SYS_UPD_DTM
+             , DCI.DISP_PRIOR_RANK
+		FROM
+			TAG_BASE TB 
+			INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.TAG_NO = TB.TAG_NO
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+				(DCC.DISP_PRD_SET_YN = 'Y' AND NOW() BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR  DCC.DISP_PRD_SET_YN = 'N'
+			)
+			AND NOW() BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			<if test="listTag != null">
+			<foreach collection="listTag" item="tagNo" separator="," open="AND TB.TAG_NO NOT IN (" close=")">
+				#{tagNo}
+			</foreach>
+			</if>
+			ORDER BY DISP_PRIOR_RANK ASC
+			<if test="offset != null and offset != ''">
+			<include refid="bizCommon.pageSql" />
+			</if>
+	</select>
+	
+	<select id="listDisplayClsfCorner" resultType="biz.app.display.model.DisplayCornerTotalVO">
+		<!--
+			Query Name : display.listDisplayClsfCorner
+			Description : 전시 분류별 코너 정보 리스트
+			- FO (PC/MO)
+		-->
+		SELECT /* QUERYID(display.listDisplayClsfCorner) */
+			 DCO.DISP_CORN_NO				/* 전시 코너 번호 */
+			,DCO.DISP_CORN_TP_CD			/* 전시 코너 타입 코드 */
+			,DCO.SHOW_CNT					/* 노출 개수 */
+			,DCO.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			,DCC.DISP_CLSF_CORN_NO 			/* 전시 분류 코너 번호 */
+			,DCC.DISP_CLSF_NO 				/* 전시 분류 번호 */
+			,DCC.DISP_SHOW_TP_CD 			/* 전시 노출 타입 코드 */
+			,DCC.DISP_PRD_SET_YN 			/* 전시 기간 설정 여부 */
+			,DCC.DISP_STRTDT 				/* 전시 시작일자 */
+			,DCC.DISP_ENDDT 				/* 전시 종료일자 */
+			,DCC.CNTS_TTL 					/* 콘텐츠 타이틀 */
+			,DCC.CNTS_DSCRT 				/* 콘텐츠 설명 */
+			,DCC.CORN_IMG_NM 				/* 코너 이미지 명 */
+			,DCC.CORN_IMG_PATH 				/* 코너 이미지 경로 */
+			,DCC.CORN_MOBILE_IMG_NM 		/* 코너 모바일 이미지 명 */
+			,DCC.CORN_MOBILE_IMG_PATH 		/* 코너 모바일 이미지 경로 */
+			,DCC.LINK_URL 					/* 코너 링크 경로 */
+			,DCC.MOBILE_LINK_URL 			/* 코너 모바일 링크 경로 */
+			,DCC.BG_COLOR 					/* 코너 BG 컬러값 */
+			,DCC.GOODS_AUTO_YN 				/* 상품 자동 여부 */
+			,DCC.DEL_YN 					/* 삭제 여부 */
+			,DCC.BG_COLOR 					/* 배경 색상 */
+			,DCC.LINK_URL 					/* more 링크 */
+			,DCC.MOBILE_LINK_URL			/* 모바일 LINK URL */
+		FROM
+			DISPLAY_CORNER DCO
+   			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+		WHERE
+			DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY DCO.DISP_PRIOR_RANK
+	</select>
+
+	<select id="listDisplayClsfCornerDate" resultType="biz.app.display.model.DisplayCornerTotalVO">
+        <!--
+            Query Name : display.listDisplayClsfCorner
+            Description : 전시 분류별 코너 정보 리스트
+            - FO (PC/MO)
+        -->
+        SELECT /* QUERYID(display.listDisplayClsfCornerDate) */
+             DCO.DISP_CORN_NO                /* 전시 코너 번호 */
+            ,DCO.DISP_CORN_NM	             /* 전시 코너 명 */
+            ,DCO.DISP_CORN_TP_CD            /* 전시 코너 타입 코드 */
+            ,DCO.SHOW_CNT                    /* 노출 개수 */
+            ,DCO.DISP_PRIOR_RANK            /* 전시 우선 순위 */
+            ,DCC.DISP_CLSF_CORN_NO             /* 전시 분류 코너 번호 */
+            ,DCC.DISP_CLSF_NO                 /* 전시 분류 번호 */
+            ,DCC.DISP_SHOW_TP_CD             /* 전시 노출 타입 코드 */
+            ,DCC.DISP_PRD_SET_YN             /* 전시 기간 설정 여부 */
+            ,DCC.DISP_STRTDT                 /* 전시 시작일자 */
+            ,DCC.DISP_ENDDT                 /* 전시 종료일자 */
+            ,DCC.CNTS_TTL                     /* 콘텐츠 타이틀 */
+            ,DCC.CNTS_DSCRT                 /* 콘텐츠 설명 */
+            ,DCC.CORN_IMG_NM                 /* 코너 이미지 명 */
+            ,DCC.CORN_IMG_PATH                 /* 코너 이미지 경로 */
+            ,DCC.CORN_MOBILE_IMG_NM         /* 코너 모바일 이미지 명 */
+            ,DCC.CORN_MOBILE_IMG_PATH         /* 코너 모바일 이미지 경로 */
+            ,DCC.LINK_URL                     /* 코너 링크 경로 */
+            ,DCC.MOBILE_LINK_URL             /* 코너 모바일 링크 경로 */
+            ,DCC.BG_COLOR                     /* 코너 BG 컬러값 */
+            ,DCC.GOODS_AUTO_YN                 /* 상품 자동 여부 */
+            ,DCC.DEL_YN                     /* 삭제 여부 */
+            ,DCC.BG_COLOR                     /* 배경 색상 */
+            ,DCC.LINK_URL                     /* more 링크 */
+            ,DCC.MOBILE_LINK_URL            /* 모바일 LINK URL */
+            ,DC.SEO_INFO_NO 				/* SEO 번호 */	
+        FROM
+            DISPLAY_CORNER DCO
+            INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+            INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = DCC.DISP_CLSF_NO
+        WHERE
+            DCC.DISP_CLSF_NO = #{dispClsfNo}
+            AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+            AND (
+		        (DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt}
+		        BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+		        OR DCC.DISP_PRD_SET_YN = 'N'
+	        )
+        ORDER BY DCO.DISP_PRIOR_RANK
+    </select>
+	
+	<select id="listDisplayHopeCategory" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name : display.listDisplayHopeCategory
+			Description : 입점희망 카테고리 조회
+			- FO (PC/MO)
+		-->
+		SELECT  /* QUERYID(display.listDisplayHopeCategory) */
+			 DISP_CLSF_NO		/* 전시 분류 번호 */
+			,DISP_CLSF_NM		/* 전시 분류 명 */
+			,DISP_LVL			/* 전시 레벨 */
+			,DISP_PRIOR_RANK	/* 전시 우선 순위 */
+		FROM display_category
+		WHERE 1=1
+			AND ST_ID = #{stId}
+			AND DISP_LVL = #{dispLvl}
+			AND DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DISP_CLSF_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF_10}'
+		ORDER BY DISP_LVL, DISP_PRIOR_RANK
+	</select>
+
+	<select id="listMdRcomGoodsFO" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : display.listMdRcomGoodsFO
+			Description : FO 카테고리 별 MD 추천상품 조회
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.listMdRcomGoodsFO) */
+			<include refid="goods.pageGoodsFOSelect" />
+		FROM
+			(
+				SELECT
+					<include refid="goods.pageGoodsFOSelectSub" />
+				FROM
+					md_rcom_goods_total MRGT,
+					goods_base GB,
+					st_goods_map SGM,
+					goods_img GI,
+					brand_base BB
+				WHERE
+					MRGT.TOTAL_DAY = (SELECT TOTAL_DAY FROM MD_RCOM_GOODS_TOTAL ORDER BY TOTAL_DAY DESC LIMIT 1)
+					AND MRGT.DISP_CLSF_NO = #{dispClsfNo}
+					AND GB.GOODS_ID = SGM.GOODS_ID
+					AND SGM.ST_ID = #{stId}
+					AND GB.GOODS_ID = GI.GOODS_ID
+					AND GB.BND_NO = BB.BND_NO
+					AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+					AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					AND GB.GOODS_TP_CD <![CDATA[<>]]> '${@framework.common.constants.CommonConstants@GOODS_TP_30}'
+					AND GB.SHOW_YN = '${@framework.common.constants.CommonConstants@SHOW_YN_Y}'
+				ORDER BY MRGT.HITS DESC
+			) GBT
+	</select>
+
+	<select id="pageGroupBuyGoods" resultType="biz.app.display.model.DisplayGroupBuyVO">
+		<!--
+			Query Name : display.pageGroupBuyGoods
+			Description : FO 공동구매 리스트 조회
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageGroupBuyGoods) */
+			 GB.GOODS_ID			/* 상품 아이디 */
+	        ,GB.GOODS_NM 			/* 상품 명 */
+	        ,GI.IMG_SEQ 			/* 상품 이미지 번호 */
+	        ,GI.IMG_PATH 			/* 상품 이미지 경로 */
+	        ,GB.SYS_REG_DTM			/* 상품 등록일 */
+	        ,GP.ORG_SALE_AMT		/* 공동구매 시작가 */
+	        ,(GP.SALE_AMT - CAST(FN_SPLIT(FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}), '|', 3) AS UNSIGNED)) AS SALE_AMT	/* 할인 적용된 최종 판매가 */
+<!-- 	        ,GP.STRT_ORD_QTY		/* 초기 구매 수량 */ -->
+			,0 AS STRT_ORD_QTY		/* 초기 구매 수량  <!-- 에러로 인한 임시 조치 -->
+	        ,GP.TRGT_QTY			/* 목표 수량 */
+<!-- 	        ,GP.MIN_ORD_QTY			/* 최소 구매 수량 */ -->
+			,0 AS MIN_ORD_QTY		/* 최소 구매 수량   <!-- 에러로 인한 임시 조치 -->
+	        ,GP.BULK_ORD_END_YN AS GROUP_END_YN		/* 공동구매 종료 여부 */
+	        ,GP.SALE_STRT_DTM		/* 공동구매 시작일 */
+	        ,GP.SALE_END_DTM		/* 공동구매 종료일 */
+	        ,TIMESTAMPDIFF(SECOND, NOW(), GP.SALE_END_DTM) AS REMAIN_TIME	/* 공동구매 남은 시간 */
+	        ,(SELECT IFNULL(SUM(OD.RMN_ORD_QTY), 0)
+	            FROM order_base OB INNER JOIN order_detail OD ON OB.ORD_NO = OD.ORD_NO
+	            WHERE OB.ST_ID = 1
+	                AND OB.ORD_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_STAT_20}'
+	                AND OD.GOODS_PRC_NO = GP.GOODS_PRC_NO
+	         ) AS SALES_QTY
+			<if test='mbrNo != null'>
+	        ,IF((SELECT COUNT(*) AS CNT FROM member_interest_goods WHERE GOODS_ID=GB.GOODS_ID AND MBR_NO=#{mbrNo}) > 0, 'Y', 'N') AS INTEREST_YN
+	        </if>
+	        ,(SELECT COUNT(*) FROM goods_comment WHERE GOODS_ID=GB.GOODS_ID AND ST_ID=#{stId} AND SYS_DEL_YN='N') AS REVIEW_CNT
+			<if test='dispClsfCornNo != null and dispClsfCornNo != 0'>
+			,DCI.DISP_PRIOR_RANK
+			</if>
+		FROM
+	        goods_base GB
+	        <if test='sidx != null and sidx == "TOTAL_SCR"'>
+			LEFT OUTER JOIN best_goods_total BEST ON GB.GOODS_ID = BEST.GOODS_ID AND BEST.TOTAL_DT = (SELECT MAX(TOTAL_DT) FROM BEST_GOODS_TOTAL) AND ST_ID = #{stId}
+			</if>
+	        INNER JOIN st_goods_map SGM ON (SGM.GOODS_ID = GB.GOODS_ID AND SGM.ST_ID = #{stId})
+	        INNER JOIN goods_img GI ON (GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = 'Y')
+	        INNER JOIN goods_price GP ON GP.GOODS_ID = GB.GOODS_ID
+	        <if test='dispClsfCornNo != null and dispClsfCornNo != 0'>
+			INNER JOIN display_corner_item DCI ON DCI.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+						AND GB.GOODS_ID = DCI.GOODS_ID AND DCI.DEL_YN = 'N' AND NOW() BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			</if>
+	    WHERE
+	        now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+	        AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+	        AND GB.GOODS_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_TP_10}'
+	        AND GB.SHOW_YN = 'Y'
+	        <if test='webMobileGbCds != null'>
+				<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+					#{code}
+				</foreach>
+			</if>
+			<if test='goodsInYn != null and goodsInYn == "Y"'>
+				<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID IN (" close=")">
+					#{goods}
+				</foreach>
+			</if>
+			<if test='goodsInYn != null and goodsInYn == "N"'>
+				<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID NOT IN (" close=")">
+					#{goods}
+				</foreach>
+			</if>
+	        AND GP.DEL_YN = 'N'
+	        AND GP.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_30}'
+	        AND now() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+		<if test='sidx != null and sidx == "TOTAL_SCR"'>
+		ORDER BY TOTAL_SCR ASC, GB.SYS_REG_DTM DESC
+		</if>
+		<if test='sidx != null and sidx != "TOTAL_SCR"'>
+		ORDER BY ${sidx} ${sord}
+		</if>
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageGroupBuyGoodsCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : display.pageGroupBuyGoodsCount
+			Description : FO 공동구매 리스트 조회
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageGroupBuyGoodsCount) */
+			COUNT(*)
+		FROM
+	        goods_base GB
+	        INNER JOIN st_goods_map SGM ON (SGM.GOODS_ID = GB.GOODS_ID AND SGM.ST_ID = #{stId})
+	        INNER JOIN goods_img GI ON (GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = 'Y')
+	        INNER JOIN goods_price GP ON GP.GOODS_ID = GB.GOODS_ID
+	        <if test='dispClsfCornNo != null and dispClsfCornNo != 0'>
+			INNER JOIN display_corner_item DCI ON DCI.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+						AND GB.GOODS_ID = DCI.GOODS_ID AND DCI.DEL_YN = 'N' AND NOW() BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			</if>
+	    WHERE
+	        now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+	        AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+	        AND GB.GOODS_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_TP_10}'
+	        AND GB.SHOW_YN = 'Y'
+	        <if test='webMobileGbCds != null'>
+				<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+					#{code}
+				</foreach>
+			</if>
+			<if test='goodsInYn != null and goodsInYn == "Y"'>
+				<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID IN (" close=")">
+					#{goods}
+				</foreach>
+			</if>
+			<if test='goodsInYn != null and goodsInYn == "N"'>
+				<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID NOT IN (" close=")">
+					#{goods}
+				</foreach>
+			</if>
+	        AND GP.DEL_YN = 'N'
+	        AND GP.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_30}'
+	        AND now() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+	</select>
+
+	<select id="getGroupBuyGoodPage" resultType="biz.app.display.model.DisplayGroupBuySO">
+		<!--
+			Query Name : display.getGroupBuyGoodPage
+			Description : FO 공동구매 상품이 속한 페이지 번호 조회
+			- FO (PC/MO)
+		-->
+		SELECT
+			 P.GOODS_ID
+			,FLOOR(P.RNUM/20)+1 AS GOODS_PAGE
+		FROM
+		(
+			SELECT
+				 A.GOODS_ID
+				,@rownum:=@rownum+1 AS RNUM
+			FROM
+			(
+				SELECT	/* QUERYID(display.getGroupBuyGoodPage) */
+					 GB.GOODS_ID			/* 상품 아이디 */
+			        ,GB.SYS_REG_DTM			/* 상품 등록일 */
+				FROM
+					goods_base GB
+			        LEFT OUTER JOIN best_goods_total BEST ON GB.GOODS_ID = BEST.GOODS_ID AND BEST.TOTAL_DT = (SELECT MAX(TOTAL_DT) FROM best_goods_total) AND ST_ID = #{stId}
+					INNER JOIN st_goods_map SGM ON (SGM.GOODS_ID = GB.GOODS_ID AND SGM.ST_ID = #{stId})
+			        INNER JOIN goods_img GI ON (GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = 'Y')
+			        INNER JOIN goods_price GP ON GP.GOODS_ID = GB.GOODS_ID
+			    WHERE
+			    	now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+			        AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			        AND GB.GOODS_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_TP_10}'
+			        AND GB.SHOW_YN = 'Y'
+			        <if test='webMobileGbCds != null'>
+						<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+							#{code}
+						</foreach>
+					</if>
+					<if test='goodsInYn != null and goodsInYn == "N"'>
+						<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID NOT IN (" close=")">
+							#{goods}
+						</foreach>
+					</if>
+					AND GP.DEL_YN = 'N'
+			        AND GP.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_30}'
+			        AND now() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+				ORDER BY TOTAL_SCR ASC, GB.SYS_REG_DTM DESC
+			) A
+			,(SELECT @rownum:=-1) TMP
+		) P
+		WHERE P.GOODS_ID = #{goodsId}
+	</select>
+	
+	<select id="getDistinctDispClsfCds" resultType="biz.app.system.model.CodeDetailVO" parameterType="long">
+		SELECT
+		<!--
+			Query Name : display.getDistinctDispClsfCds
+			Description : 전시관리 트리 최상단 사용 중인 코드만 노출
+			- BO
+		-->
+				 A.DTL_CD		/*상세 코드*/
+				,A.DTL_NM		/*상세 명*/
+				,A.DTL_SHT_NM	/*상세 약어 명*/
+				,A.SORT_SEQ		/*정렬 순서*/
+				,A.USE_YN		/*사용 여부*/
+				,A.USR_DFN1_VAL	/*사용자 정의1 값*/
+				,A.USR_DFN2_VAL	/*사용자 정의2 값*/
+				,A.USR_DFN3_VAL	/*사용자 정의3 값*/
+				,A.GRP_CD 		/*그룹 코드*/
+				,A.USR_DFN4_VAL	/*사용자 정의4 값*/
+				,A.USR_DFN5_VAL	/*사용자 정의5 값*/
+				,A.SYS_REGR_NO	/*시스템 등록자 번호*/
+				,A.SYS_REG_DTM	/*시스템 등록 일시*/
+				,A.SYS_UPDR_NO	/*시스템 수정자 번호*/
+				,A.SYS_UPD_DTM	/*시스템 수정 일시*/
+				,A.SYS_DEL_YN	/*시스템 삭제 여부*/
+				,A.SYS_DELR_NO	/*시스템 삭제자 번호*/
+				,A.SYS_DEL_DTM	/*시스템 삭제 일시*/
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	code_detail A
+		WHERE	1=1
+		AND		A.GRP_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF}'
+		AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		AND		A.USR_DFN2_VAL LIKE '%,${value},%'
+	</select>
+
+	<select id="getCategoryFilterInfo" resultType="biz.app.goods.model.GoodsFiltGrpPO">
+		<!--
+			Query Name : display.getCategoryFilterInfo
+			Description : 카테고리 필터 조회
+		-->
+		SELECT
+			FILTGRP.FILT_GRP_NO
+			, FILTGRP.FILT_GRP_MNG_NM
+			, FILTGRP.FILT_GRP_SHOW_NM
+			, CTG.DISP_CLSF_NO
+		FROM
+			GOODS_FILT_GRP FILTGRP
+		LEFT JOIN
+			FILT_GRP_CTG CTG ON FILTGRP.FILT_GRP_NO = CTG.FILT_GRP_NO AND CTG.DISP_CLSF_NO = #{dispClsfNo}
+	</select>
+
+	<delete id="deleteCategoryFilter" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name : display.deleteCategoryFilter
+			Description : 카테고리 필터정보 삭제
+		-->
+		DELETE FROM FILT_GRP_CTG WHERE DISP_CLSF_NO = #{dispClsfNo}
+	</delete>
+
+	<insert id="insertCategoryFilter" parameterType="biz.app.display.model.DisplayCategoryPO" >
+		<!--
+			Query Name : display.saveFiltGrpCtg
+			Description : 카테고리 필터정보 저장
+		-->
+		INSERT INTO FILT_GRP_CTG (
+			FILT_GRP_NO			/* 필터그룹 번호 */
+			, DISP_CLSF_NO		/* 카테고리 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES
+			<foreach collection="categoryFilters" item="filter" separator=",">
+				(#{filter}, #{dispClsfNo}, #{sysRegrNo}, NOW())
+			</foreach>
+
+	</insert>
+	
+	<select id="listDisplayCornerBnrVdBnrGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		SELECT	/* QUERYID(display.listDisplayCornerBnrImgGrid) */
+			B.BNR_NO
+			, B.VD_ID
+			, A.BNR_TEXT /* 배너 TEXT */
+			, A.BNR_HTML /* 배너 HTML */
+			, A.BNR_IMG_NM /* 배너 이미지 명 */
+			, A.BNR_IMG_PATH /* 배너 이미지 경로 */
+			, A.BNR_MOBILE_IMG_NM /* 배너 모바일 이미지 명 */
+			, A.BNR_MOBILE_IMG_PATH /* 배너 모바일 이미지 경로 */
+			, A.DFT_BNR_YN /* 기본 배너 여부 */
+			, A.BNR_LINK_URL /* 배너 LINK URL */
+			, A.BNR_MOBILE_LINK_URL /* 배너 모바일 LINK URL */
+			, B.DISP_CNR_ITEM_NO /* 아이템 번호 */
+			, B.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, B.DISP_STRTDT /* 전시 시작일자 */
+			, B.DISP_ENDDT /* 전시 종료일자 */
+			, B.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, B.DEL_YN /* 삭제 여부 */
+			, B.GOODS_ESTM_NO /* 상품평 번호 */
+			, B.GOODS_ID /* 상품 번호 */
+			, B.GOODS_TEXT /* 상품 TEXT */
+			, B.DISP_BNR_NO /* 전시 배너 번호 */
+			, A.BNR_GB_CD /* 배너 구분 코드 */
+			, A.BNR_DSCRT /* 배너 설명 */
+			, GB.GOODS_NM /* 상품 명 */
+			, B.BND_CNTS_NO /* 브랜드 콘텐츠 번호 */
+			, BC.CNTS_TTL /* 콘텐츠 타이틀 */
+		FROM display_banner A
+			INNER JOIN display_corner_item B ON B.DISP_BNR_NO = A.DISP_BNR_NO
+			LEFT OUTER JOIN goods_base GB ON GB.GOODS_ID = B.GOODS_ID
+			LEFT OUTER JOIN brand_cnts BC ON BC.BND_CNTS_NO = B.BND_CNTS_NO
+		WHERE 1 = 1
+			AND B.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			<if test="dispBnrNo != null">
+			AND B.DISP_BNR_NO = #{dispBnrNo}
+			</if>
+			AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+	
+	<!-- yjy -->
+	<select id="listDisplayCornerTagsGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.listDisplayCornerTagsGrid
+			Description : 전시 코너 아이템 리스트(태그 리스트)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerTagsGrid) */
+			DCI.DISP_CNR_ITEM_NO
+			, DCI.DISP_CLSF_CORN_NO 	/* 전시 분류 코너 번호 */
+			, DCI.TAG_NO				/* 태그 번호 */
+			, TG.TAG_NM					/* 태그 명 */
+			, (SELECT COUNT(1)
+					FROM (
+						SELECT 1
+						FROM PET_LOG_BASE  C1
+						WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+									  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+									  AND C2.TAG_NO = TG.TAG_NO
+									  )
+						UNION ALL
+						SELECT 1
+						FROM APET_CONTENTS  C1
+						WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_TAG_MAP C2
+									  WHERE C1.VD_ID = C2.VD_ID
+									  AND C2.TAG_NO = TG.TAG_NO
+									  )
+						UNION ALL
+						SELECT 1
+						FROM APET_CONTENTS_SERIES  C1
+						WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_SERIES_TAG_MAP C2
+									  WHERE C1.SRIS_NO = C2.SRIS_NO
+									  AND C2.TAG_NO = TG.TAG_NO
+									  )
+						) C3				
+				) AS RLT_CNTS_CNT
+			, (SELECT COUNT(1)
+				FROM TAG_RELATION_MAP TT1
+                WHERE EXISTS (SELECT 1 FROM TAG_BASE TT2 
+                		WHERE TT1.TAG_NO = TG.TAG_NO
+                		GROUP BY TT1.TAG_NO) 
+            ) AS RLT_TAG_CNT
+			, DCI.DISP_STRTDT 			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, DCI.DEL_YN 				/* 삭제 여부 */
+	        , DCI.SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, DCI.SYS_REG_DTM 			/* 시스템 등록 일시 */
+			, DCI.SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, DCI.SYS_UPD_DTM 			/* 시스템 수정 일시 */
+		FROM DISPLAY_CORNER_ITEM DCI
+		JOIN TAG_BASE TG ON TG.TAG_NO = DCI.TAG_NO
+		WHERE 1 = 1
+			AND DCI.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY DCI.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="listDisplayCornerPetLogMemberGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.listDisplayCornerPetLogMemberGrid
+			Description : 전시 코너 아이템 리스트(펫로그 회원)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerPetLogMemberGrid) */
+			DCI.DISP_CNR_ITEM_NO
+			, DCI.DISP_CLSF_CORN_NO 	/* 전시 분류 코너 번호 */
+			, DCI.PET_LOG_NO 			/* 펫로그 번호 */
+			, MB.LOGIN_ID 				/* 로그인 아이디 */
+			, MB.MBR_NO 				/* 회원 번호 */
+			, MB.MBR_GB_CD 				/* 회원 구분 코드 */
+			, (SELECT COUNT(PLB.MBR_NO) FROM PET_LOG_BASE PLB WHERE PLB.MBR_NO = MB.MBR_NO) AS PET_LOG_CNT	/* 펫로그 수 */
+			, DCI.DISP_STRTDT 			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, DCI.DEL_YN 				/* 삭제 여부 */
+	        , DCI.SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, DCI.SYS_REG_DTM 			/* 시스템 등록 일시 */
+			, DCI.SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, DCI.SYS_UPD_DTM 			/* 시스템 수정 일시 */
+		FROM DISPLAY_CORNER_ITEM DCI
+		JOIN PET_LOG_BASE PLB ON PLB.MBR_NO = DCI.MBR_NO
+		JOIN MEMBER_BASE MB ON MB.MBR_NO = PLB.MBR_NO
+		WHERE 1 = 1
+			AND DCI.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		GROUP BY MB.MBR_NO
+		ORDER BY DCI.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="listDisplayCornerLogsGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : display.listDisplayCornerLogsGrid
+			Description : 전시 코너 아이템 리스트(로그 리스트)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerLogsGrid) */
+			DCI.DISP_CNR_ITEM_NO
+			, DCI.DISP_CLSF_CORN_NO 	/* 전시 분류 코너 번호 */
+			, DCI.PET_LOG_NO 			/* 펫로그 번호 */
+			, PLB.SRT_PATH				/* 단축 경로 */
+			, MB.LOGIN_ID 				/* 로그인 아이디 */
+			, MB.MBR_NO 				/* 회원 번호 */
+			, MB.MBR_GB_CD 				/* 회원 구분 코드 */
+			, MB.PET_LOG_URL 			/* 펫로그 URL */
+			, DCI.DISP_STRTDT 			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, DCI.DEL_YN 				/* 삭제 여부 */
+	        , DCI.SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, DCI.SYS_REG_DTM 			/* 시스템 등록 일시 */
+			, DCI.SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, DCI.SYS_UPD_DTM 			/* 시스템 수정 일시 */
+		FROM DISPLAY_CORNER_ITEM DCI
+		JOIN PET_LOG_BASE PLB ON PLB.PET_LOG_NO = DCI.PET_LOG_NO
+		JOIN MEMBER_BASE MB ON MB.MBR_NO = PLB.MBR_NO
+		WHERE 1 = 1
+			AND DCI.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY DCI.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="getBnrTextFO" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.getBnrTextFO
+			Description : 전시 코너 아이템 리스트(배너 TEXT)
+			- FO
+		-->
+		SELECT							/* QUERYID(display.getBnrTextFO) */
+			  DB.BNR_TEXT				/* 배너 TEXT */
+			, DB.BNR_HTML				/* 배너 HTML */
+			, DB.BNR_IMG_NM				/* 배너 이미지 명 */
+			, DB.BNR_DSCRT				/* 배너 설명 */
+			, DB.BNR_GB_CD				/* 배너 구분 코드 */
+			, DB.BNR_IMG_PATH			/* 배너 이미지 경로 */
+			, DB.BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명 */
+			, DB.BNR_MOBILE_IMG_PATH	/* 배너 모바일 이미지 경로 */
+			, DB.DFT_BNR_YN				/* 기본 배너 여부 */
+			, DB.BNR_LINK_URL			/* 배너 LINK URL */
+			, DB.BNR_MOBILE_LINK_URL	/* 배너 모바일 LINK URL */
+			, DCI.DISP_CNR_ITEM_NO		/* 아이템 번호 */
+			, DCI.DISP_CLSF_CORN_NO		/* 전시 분류 코너 번호 */
+			, DCI.DISP_BNR_NO			/* 전시 배너 번호 */
+			, DCI.DISP_STRTDT			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, DCI.DEL_YN				/* 삭제 여부 */
+		FROM DISPLAY_BANNER DB
+		INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		INNER JOIN DISPLAY_CORNER DCN ON DCN.DISP_CORN_NO = DCC.DISP_CORN_NO
+		INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = DCC.DISP_CLSF_NO
+		WHERE 1 = 1
+			<if test="dispClsfNo != null">
+			AND DC.DISP_CLSF_NO = #{dispClsfNo}
+			</if>
+			<if test="dispCornTpCd != null">
+			AND DCN.DISP_CORN_TP_CD = #{dispCornTpCd}
+			</if>
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND (DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}' OR DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			AND (DCI.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}' OR DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT)
+		ORDER BY DCI.DISP_PRIOR_RANK
+		LIMIT		1
+	</select>
+	
+	<select id="getBnrImgListFO" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.getBnrImgListFO
+			Description : 전시 코너 아이템 리스트(이미지 텍스트)
+			- FO
+		-->
+		SELECT							/* QUERYID(display.getBnrImgListFO) */
+			  DB.BNR_TEXT				/* 배너 TEXT */
+			, DB.BNR_HTML				/* 배너 HTML */
+			, DB.BNR_IMG_NM				/* 배너 이미지 명 */
+			, DB.BNR_DSCRT				/* 배너 설명 */
+			, DB.BNR_GB_CD				/* 배너 구분 코드 */
+			, DB.BNR_IMG_PATH			/* 배너 이미지 경로 */
+			, DB.BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명 */
+			, DB.BNR_MOBILE_IMG_PATH	/* 배너 모바일 이미지 경로 */
+			, DB.DFT_BNR_YN				/* 기본 배너 여부 */
+			, DB.BNR_LINK_URL			/* 배너 LINK URL */
+			, DB.BNR_MOBILE_LINK_URL	/* 배너 모바일 LINK URL */
+			, DCI.DISP_CNR_ITEM_NO		/* 아이템 번호 */
+			, DCI.DISP_CLSF_CORN_NO		/* 전시 분류 코너 번호 */
+			, DCI.DISP_BNR_NO			/* 전시 배너 번호 */
+			, DCI.DISP_STRTDT			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, DCI.DEL_YN				/* 삭제 여부 */
+			, DC.LIVE_YN 				/* 라이브 여부 */
+		FROM DISPLAY_BANNER DB
+		INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_BNR_NO = DB.DISP_BNR_NO
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		INNER JOIN DISPLAY_CORNER DCN ON DCN.DISP_CORN_NO = DCC.DISP_CORN_NO
+		INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = DCC.DISP_CLSF_NO
+		WHERE 1 = 1
+			<if test="dispClsfNo != null">
+			AND DC.DISP_CLSF_NO = #{dispClsfNo}
+			</if>
+			<if test="dispCornNo != null">
+			AND DCC.DISP_CORN_NO = #{dispCornNo}
+			</if>
+			<if test="dispCornTpCd != null">
+			AND DCN.DISP_CORN_TP_CD = #{dispCornTpCd}
+			</if>
+			<choose>
+				<when test="previewDt != null and previewDt != ''">
+				AND (
+					(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+					OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				)
+				AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+				</when>
+				<otherwise>
+				AND (
+					(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+					OR  DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				)
+				AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+				</otherwise>
+			</choose>			
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM DESC
+	</select>
+	<!-- yjy -->
+	
+	<select id="listDisplayCornerBannerGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		SELECT
+			A.DISP_CNR_ITEM_NO
+			, A.DISP_CLSF_CORN_NO
+			, A.DISP_BNR_NO
+			, (SELECT BNR_NO FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS BNR_NO 
+			, (SELECT BNR_TTL FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS BNR_TTL
+			, (SELECT BNR_MOBILE_IMG_PATH FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS BNR_MOBILE_IMG_PATH
+			, (SELECT BNR_IMG_PATH FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS BNR_IMG_PATH
+			, (SELECT BNR_ID FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS BNR_ID
+			, (SELECT ST_ID FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS ST_ID
+			, (SELECT USE_YN FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS USE_YN
+			, (SELECT SYS_REGR_NO FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_REGR_NO
+			, (SELECT SYS_REG_DTM FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_REG_DTM
+			, (SELECT FN_GET_USER_NAME(SYS_REGR_NO) FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_REGR_NM
+			, (SELECT SYS_UPDR_NO FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_UPDR_NO
+			, (SELECT SYS_UPD_DTM FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_UPD_DTM
+			, (SELECT FN_GET_USER_NAME(SYS_UPDR_NO) FROM BNR_MNG WHERE BNR_NO = A.BNR_NO) AS SYS_UPDR_NM
+			, A.DISP_STRTDT 			/* 전시 시작일자 */
+			, A.DISP_ENDDT 			/* 전시 종료일자 */
+			, A.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, A.DEL_YN 				/* 삭제 여부 */
+		FROM DISPLAY_CORNER_ITEM A LEFT JOIN BNR_MNG B ON(A.BNR_NO = B.BNR_NO)
+		WHERE 1 = 1 
+		AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+		<if test="dispCnrItemNo != null and dispCnrItemNo != ''">
+        AND A.DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+        </if>
+		AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY A.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="listDisplayCornerVdGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		SELECT	/* QUERYID(display.listDisplayCornerVdGrid) */
+				A.DISP_CNR_ITEM_NO
+				, A.DISP_CLSF_CORN_NO
+				, A.VD_ID 								/* 영상 ID */
+				, AC.SRIS_NO 							/* 시리즈 번호 */
+				, AC.SESN_NO 							/* 시즌 번호 */
+				, AC.TTL 									/* 제목 */
+				, AC.DISP_YN							/* 전시 여부 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '10') AS LIKE_CNT	/* 좋아요 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+				, HITS									/* 조회수 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '10')	AS THUM_PATH	/* 썸네일 이미지 */
+				, ACS.SRIS_NM							/* 시리즈 명 */
+				, ASS.SESN_NM							/* 시즌 명 */
+				, A.DISP_STRTDT 			/* 전시 시작일자 */
+				, A.DISP_ENDDT 			/* 전시 종료일자 */
+				, A.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+				, A.DEL_YN 				/* 삭제 여부 */
+				, AC.SYS_REG_DTM						/* 시스템 등록 일시 */
+				, AC.SYS_REGR_NO						/* 시스템 등록자 번호 */
+				, AC.SYS_UPD_DTM						/* 시스템 수정 일시  */
+				, AC.SYS_UPDR_NO						/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			FROM DISPLAY_CORNER_ITEM A
+		LEFT OUTER JOIN APET_CONTENTS AC ON A.VD_ID = AC.VD_ID
+		LEFT OUTER JOIN APET_CONTENTS_SERIES ACS ON ACS.SRIS_NO = AC.SRIS_NO
+		LEFT OUTER JOIN APET_CONTENTS_SEASON ASS ON ASS.SESN_NO = AC.SESN_NO AND ASS.SRIS_NO = ACS.SRIS_NO
+        WHERE 1 = 1
+        AND A.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+        <if test="dispCnrItemNo != null and dispCnrItemNo != ''">
+        AND A.DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+        </if>
+        AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+        ORDER BY A.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="listDisplayCornerSeriesGrid" resultType="biz.app.display.model.DisplayCornerItemVO">
+		SELECT 
+			B.DISP_CNR_ITEM_NO
+			, A.SRIS_NO
+			, B.DISP_CLSF_CORN_NO
+			, A.DISP_YN					/* 시리즈 전시여부 */
+			, A.SRIS_ID					/* 시리즈 아이디 */
+			, A.SRIS_NM					/* 시리즈명 */ 
+            , (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = A.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필이미지 경로 */
+            , (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'APET_TP' AND DTL_CD = A.TP_CD) AS TP_NM /* 시리즈 타입명 */	
+            , (SELECT COUNT(*) FROM APET_CONTENTS_SEASON WHERE SRIS_NO = A.SRIS_NO) AS SESN_CNT /* 시즌수 */			
+			, A.SRIS_DSCRT				/* 시리즈 설명 */
+			, B.DISP_STRTDT 			/* 전시 시작일자 */
+			, B.DISP_ENDDT 			/* 전시 종료일자 */
+			, B.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, B.DEL_YN 				/* 삭제 여부 */
+	        , B.SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, B.SYS_REG_DTM 			/* 시스템 등록 일시 */
+			, B.SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, B.SYS_UPD_DTM 			/* 시스템 수정 일시 */
+			, CONCAT(DATE_FORMAT(B.SYS_REG_DTM, '%Y.%m.%d'), '\n', '(', DATE_FORMAT(B.SYS_UPD_DTM, '%Y.%m.%d'), ')') AS REG_MOD_DTM 
+		FROM APET_CONTENTS_SERIES A
+		LEFT JOIN DISPLAY_CORNER_ITEM B ON A.SRIS_NO = B.SRIS_NO
+		WHERE 1 = 1 
+		AND B.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+		AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY B.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="pageDisplayCornerItemBannerFO" resultType="biz.app.banner.model.BannerVO">
+		<!-- Query Name : display.pageDisplayCornerItemBannerFO Description : FO 전시 
+			코너 아이템 리스트(배너) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemBannerFO) */
+		BM.BNR_NO /* 배너 번호*/
+		, BM.BNR_ID /* 배너 아이디*/
+		, BM.ST_ID /* 사이트 아이디*/
+		, BM.USE_YN /* 사용 여부*/
+		, BM.BNR_TTL /* 배너 제목*/
+		, BM.BNR_IMG_CD /* 이미지 코드*/
+		, BM.BNR_IMG_PATH /* 이미지 경로*/
+		, BM.BNR_IMG_URL /* 이미지 URL*/
+		, BM.BNR_MOBILE_IMG_CD /* 모바일 이미지 코드*/
+		, BM.BNR_MOBILE_IMG_NM /* 모바일 이미지 명*/
+		, BM.BNR_MOBILE_IMG_PATH /* 모바일 이미지 경로*/
+		, BM.BNR_MOBILE_IMG_URL /* 모바일 이미지 URLL*/
+		, BM.BNR_LINK_URL /* 링크 URL*/
+		, DCI.DISP_CNR_ITEM_NO /* 아이템 번호 */
+		, DCI.DISP_STRTDT /* 전시 시작일자 */
+		, DCI.DISP_ENDDT /* 전시 종료일자 */
+		, DCI.DISP_PRIOR_RANK /* 전시 우선 순위 */
+		, DCC.DISP_CLSF_NO /* 전시 분류 번호 */
+		, DCC.DISP_CORN_NO /* 전시 코너 번호 */
+		FROM
+		BNR_MNG BM
+		INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.BNR_NO = BM.BNR_NO
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND DATE_FORMAT(NOW(), '%Y-%m-%d')	BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			)
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCC.DEL_YN = 'N'
+			AND DCI.DEL_YN = 'N'
+			AND BM.USE_YN = 'Y'
+		ORDER BY DISP_PRIOR_RANK ASC
+		<if test="limit != null and limit != ''">
+		LIMIT ${limit}
+		</if>
+	</select>
+	<select id="pageDisplayCornerItemBannerFOCount" resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemBannerFOCount Description : 
+			FO 전시 코너 아이템 리스트(배너) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemBannerFOCount) */
+			COUNT(*)
+		FROM
+		BNR_MNG BM
+		INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.BNR_NO = BM.BNR_NO
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE
+		DCC.DISP_CORN_NO = #{dispCornNo}
+		AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		AND (
+		(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND NOW()
+		BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+		OR DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		)
+		AND NOW()
+		BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+		AND DCC.DEL_YN = 'N'
+		AND DCI.DEL_YN = 'N'
+		AND BM.USE_YN = 'Y'
+	</select>
+	
+	<select id="pageDisplayCornerItemTopVodFO" resultType="biz.app.contents.model.VodVO">
+		<!-- Query Name : display.pageDisplayCornerItemTopVodFO Description : FO 
+			전시 코너 아이템 리스트(인기 영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemVodFO) */
+		AC.VD_ID
+		, AC.VD_GB_CD
+		, AC.TP_CD
+		, AC.SRIS_NO
+		, AC.SESN_NO
+		, AC.FL_NO
+		, AC.DISP_YN
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}') AS THUM_PATH /* 썸네일 이미지 */
+		, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /* 좋아요 */
+		, AC.TTL
+		, AC.CONTENT
+		, AC.CRIT
+		, AC.VD_TP_CD
+		, AC.HITS
+		, AC.PET_GB_CD
+		, AC.EUD_CONTS_CTG_L_CD
+		, AC.EUD_CONTS_CTG_M_CD
+		, AC.EUD_CONTS_CTG_S_CD
+		, AC.LOD_CD
+		, AC.PRPM_CD
+		, DCI.DISP_CNR_ITEM_NO /* 아이템 번호 */
+		, DCI.DISP_STRTDT /* 전시 시작일자 */
+		, DCI.DISP_ENDDT /* 전시 종료일자 */
+		, DCI.DISP_PRIOR_RANK /* 전시 우선 순위 */
+		, DCC.DISP_CLSF_NO /* 전시 분류 번호 */
+		, DCC.DISP_CORN_NO /* 전시 코너 번호 */
+		FROM
+		APET_CONTENTS AC
+		INNER JOIN
+		DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+		INNER JOIN
+		DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE
+		DCC.DISP_CORN_NO = #{dispCornNo}
+		AND
+		DCC.DISP_CLSF_NO = #{dispClsfNo}
+		AND (
+		(DCC.DISP_PRD_SET_YN = 'Y' AND
+		NOW() BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+		OR
+		DCC.DISP_PRD_SET_YN = 'N'
+		)
+		AND DCI.DEL_YN = 'N'
+		AND DCC.DEL_YN = 'N'
+	</select>
+	
+	<select id="pageDisplayCornerItemTopVodFOCount"
+		resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemTopVodFOCount Description : 
+			FO 전시 코너 아이템 리스트(인기영상) - FO (PC/MO) -->
+		SELECT
+		COUNT(*)
+		FROM
+		APET_CONTENTS AC
+		INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO =
+		DCI.DISP_CLSF_CORN_NO
+		WHERE
+		DCC.DISP_CORN_NO = #{dispCornNo}
+		AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		AND (
+		(DCC.DISP_PRD_SET_YN = 'Y' AND NOW() BETWEEN DCC.DISP_STRTDT AND
+		DCC.DISP_ENDDT)
+		OR DCC.DISP_PRD_SET_YN = 'N'
+		)
+		AND CURRENT_DATE() - INTERVAL 1 DAY
+		AND
+		DCI.DEL_YN = 'N'
+		AND DCC.DEL_YN = 'N'
+	</select>
+	
+	<select id="pageDisplayCornerItemVodFO" resultType="biz.app.contents.model.VodVO">
+		<!-- Query Name : display.pageDisplayCornerItemVodFO Description : FO 전시 
+			코너 아이템 리스트(인기 영상) - FO (PC/MO) -->
+		 SELECT /* QUERYID(display.pageDisplayCornerItemVodFO) */
+		AC.VD_ID
+		, AC.VD_GB_CD
+		, AC.TP_CD
+		, AC.SRIS_NO
+		, AC.SESN_NO
+		, AC.FL_NO
+		, AC.DISP_YN
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}') AS THUM_PATH /* 썸네일 이미지 */
+		, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID) AS LIKE_CNT /* 좋아요 */
+		, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '10' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '20' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+		, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필 */
+		, AC.TTL
+		, AC.CONTENT
+		, AC.CRIT
+		, AC.VD_TP_CD
+		, AC.HITS
+		, AC.PET_GB_CD
+		, AC.EUD_CONTS_CTG_L_CD
+		, AC.EUD_CONTS_CTG_M_CD
+		, AC.EUD_CONTS_CTG_S_CD
+		, AC.LOD_CD
+		, AC.PRPM_CD
+		, SRIS.SRIS_NM
+		, T1.THUM_PATH
+        , T2.OUTSIDE_VD_ID
+		FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)     			
+        WHERE 1 = 1
+        AND CURRENT_DATE() - INTERVAL 1 DAY
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		AND AC.TP_CD = '${@framework.common.constants.CommonConstants@APET_TP_20}'
+        ORDER BY AC.HITS DESC
+		limit 3
+	</select>
+	
+	<select id="pageDisplayCornerItemVodFOCount"
+		resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemVodFOCount Description : 
+			FO 전시 코너 아이템 리스트(인기영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemVodFO) */
+			COUNT(*)
+		FROM APET_CONTENTS AC
+        WHERE 1 = 1
+        AND CURRENT_DATE() - INTERVAL 1 DAY
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		AND AC.TP_CD = '${@framework.common.constants.CommonConstants@APET_TP_20}'
+        ORDER BY AC.HITS DESC
+	</select>
+	
+	<select id="pageDisplayCornerItemVodNexFO" resultType="biz.app.contents.model.VodVO">
+		<!-- Query Name : display.pageDisplayCornerItemVodNexFO Description : FO 전시 
+			코너 아이템 리스트(인기 영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemVodNexFO) */
+		<include refid="display.petTvFOWhere" />
+		FROM
+		APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)     			
+		WHERE 1 = 1
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		AND AC.DISP_YN = 'Y'
+		<if test="tpCd != null and tpCd != ''">
+		AND AC.TP_CD = #{tpCd}
+		</if>
+		<if test="dupleVdIds != null">
+			<foreach collection="dupleVdIds" item="vdId" separator="," open="AND AC.VD_ID NOT IN (" close=")">
+				#{vdId}
+			</foreach>
+		</if>
+		<if test="vodList != null">
+		<foreach collection="vodList" item="vdId" separator="," open="AND AC.VD_ID NOT IN (" close=")">
+			#{vdId}
+		</foreach>
+		</if>
+		ORDER BY AC.HITS DESC
+		<if test="offset != null and offset != ''">
+		<include refid="bizCommon.pageSql" />
+		</if>
+	</select>
+	
+	<select id="pageDisplayCornerItemVodNexFOCount"
+		resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemVodNexFOCount Description 
+			: FO 전시 코너 아이템 리스트(인기영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemVodNexFOCount) */
+			COUNT(*)
+		FROM
+		APET_CONTENTS AC
+		WHERE 1 = 1
+		AND CURRENT_DATE() - INTERVAL 1 DAY
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		ORDER BY AC.HITS DESC
+	</select>
+	
+	<select id="pageDisplayCornerItemNewVodFO" resultType="biz.app.contents.model.VodVO">
+		<!-- Query Name : display.pageDisplayCornerItemNewVodFO Description : FO 
+			전시 코너 아이템 리스트(신규 영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemNewVodFO) */
+		<include refid="display.petTvFOWhere" />
+		FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)
+        WHERE 1 = 1
+        AND AC.DISP_YN = 'Y'
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		<if test="vodList != null">
+		<foreach collection="vodList" item="vdId" separator="," open="AND AC.VD_ID NOT IN (" close=")">
+			#{vdId}
+		</foreach>
+		</if>
+		ORDER BY AC.SYS_REG_DTM DESC
+		<if test="offset != null and offset != ''">
+		<include refid="bizCommon.pageSql" />
+		</if>
+			
+	</select>
+	<select id="pageDisplayCornerItemNewVodFOCount" resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemNewVodFOCount Description 
+			: FO 전시 코너 아이템 리스트(인기영상) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemNewVodFO) */
+		COUNT(*)
+		FROM APET_CONTENTS AC
+        WHERE 1 = 1
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		ORDER BY AC.SYS_REG_DTM DESC
+	</select>
+	
+	<select id="pageDisplayCornerItemNewVodFOList" resultType="biz.app.contents.model.VodVO">
+		<!-- 
+			Query Name : display.pageDisplayCornerItemNewVodFOList
+			Description : FO 전시 코너 아이템 리스트(신규 영상) - FO (PC/MO) 
+		-->
+		(SELECT 
+		<include refid="display.petTvSelectFO" />
+        FROM APET_CONTENTS AC
+	        INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)			
+		WHERE 1 = 1 
+	        AND DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+			(DCC.DISP_PRD_SET_YN = 'Y' 
+			AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			OR DCC.DISP_PRD_SET_YN = 'N'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND AC.DISP_YN = 'Y'
+        )
+        UNION
+        (
+        SELECT
+		<include refid="display.petTvSelectFO" />
+		FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)
+        WHERE 1 = 1
+        AND AC.DISP_YN = 'Y'
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+        )
+        ORDER BY SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageDisplayCornerItemNewVodFOListCount" resultType="Integer">
+		<!-- 
+			Query Name : display.pageDisplayCornerItemNewVodFOListCount
+			Description : FO 전시 코너 아이템 리스트(신규 영상) 카운트 - FO (PC/MO) 
+		-->
+		SELECT COUNT(*) FROM ( 
+		(SELECT 
+		<include refid="display.petTvSelectFO" />
+        FROM APET_CONTENTS AC
+	        INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)			
+		WHERE 1 = 1 
+	        AND DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+			(DCC.DISP_PRD_SET_YN = 'Y' 
+			AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			OR DCC.DISP_PRD_SET_YN = 'N'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND AC.DISP_YN = 'Y'
+        )
+        UNION
+        (
+        SELECT
+		<include refid="display.petTvSelectFO" />
+		FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+            LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+            LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+                        ) T1 ON ( T1.FL_NO = AC.FL_NO)
+        WHERE 1 = 1
+        AND AC.DISP_YN = 'Y'
+		AND AC.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+        )
+	) AS T
+	</select>
+	
+	<select id="pageDisplayCornerItemPopVodFOList" resultType="biz.app.contents.model.VodVO">
+		SELECT /* QUERYID(display.pageDisplayCornerItemPopVodFOList) */
+		<include refid="display.petTvFOWhere" />
+        FROM APET_CONTENTS AC
+	        INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+			LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+						) T2 ON ( T2.FL_NO = AC.FL_NO)
+			LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+						) T1 ON ( T1.FL_NO = AC.FL_NO)   			
+		WHERE 1 = 1 
+			<if test="dupleVdIds != null">
+				<foreach collection="dupleVdIds" item="vdId" separator="," open="AND AC.VD_ID NOT IN (" close=")">
+					#{vdId}
+				</foreach>
+			</if>
+        	AND DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+			(DCC.DISP_PRD_SET_YN = 'Y' 
+			AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			OR DCC.DISP_PRD_SET_YN = 'N'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND AC.DISP_YN = 'Y'
+        ORDER BY DCI.DISP_PRIOR_RANK
+        <include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageDisplayCornerItemPopVodFOListCount" resultType="Integer">
+		SELECT /* QUERYID(display.pageDisplayCornerItemPopVodFOListCount) */
+			COUNT(*)
+        FROM APET_CONTENTS AC
+	        INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.VD_ID = AC.VD_ID
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+			LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+						) T2 ON ( T2.FL_NO = AC.FL_NO)
+			LEFT JOIN (SELECT PHY_PATH AS THUM_PATH, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+						) T1 ON ( T1.FL_NO = AC.FL_NO)   			
+		WHERE 1 = 1 
+			<if test="dupleVdIds != null">
+				<foreach collection="dupleVdIds" item="vdId" separator="," open="AND AC.VD_ID NOT IN (" close=")">
+					#{vdId}
+				</foreach>
+			</if>
+        	AND DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND (
+			(DCC.DISP_PRD_SET_YN = 'Y'
+			AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			OR DCC.DISP_PRD_SET_YN = 'N'
+			)
+			AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN = 'N'
+			AND DCC.DEL_YN = 'N'
+			AND AC.DISP_YN = 'Y'
+        ORDER BY DCI.DISP_PRIOR_RANK
+	</select>
+	
+	<select id="pageDisplayCornerItemSeriesFO" resultType="biz.app.contents.model.SeriesVO">
+		<!-- Query Name : display.pageDisplayCornerItemSeriesFO Description : FO 전시 
+			코너 아이템 리스트(시리즈) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemSeriesFO) */
+			ACS.SRIS_NO
+			, ACS.SRIS_ID
+			, ACS.DISP_YN
+			, ACS.TP_CD
+			, ACS.FL_NO
+			, ACS.SRIS_NM
+			, ACS.SRIS_DSCRT
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH    /* 시리즈 프로필이미지 경로 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_20}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_IMG_PATH /* 시리즈 이미지 경로 */
+			, (SELECT HITS FROM APET_CONTENTS WHERE SRIS_NO = ACS.SRIS_NO AND FL_NO = ACS.FL_NO) AS HITS
+			, DCI.DISP_CNR_ITEM_NO /* 아이템 번호 */
+			, DCI.DISP_STRTDT /* 전시 시작일자 */
+			, DCI.DISP_ENDDT /* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, DCC.DISP_CLSF_NO /* 전시 분류 번호 */
+			, DCC.DISP_CORN_NO /* 전시 코너 번호 */
+		  FROM APET_CONTENTS_SERIES ACS
+			INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.SRIS_NO = ACS.SRIS_NO
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		 WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+		   AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		   AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' 
+				AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		   )
+		   AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+		   AND DCI.DEL_YN = 'N'
+		   AND DCC.DEL_YN = 'N'
+		   AND ACS.DISP_YN = 'Y'
+	   	<if test='dispCornTpCd != "132"'>
+		   AND ACS.TP_CD = '${@framework.common.constants.CommonConstants@APET_TP_20}'
+		</if>
+		ORDER BY DISP_PRIOR_RANK ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageDisplayCornerItemSeriesFOCount" resultType="Integer">
+		<!-- Query Name : display.pageDisplayCornerItemSeriesFOCount Description : 
+			FO 전시 코너 아이템 리스트(시리즈) - FO (PC/MO) -->
+		SELECT /* QUERYID(display.pageDisplayCornerItemSeriesFOCount) */
+			COUNT(*)
+		  FROM APET_CONTENTS_SERIES ACS
+			INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.SRIS_NO = ACS.SRIS_NO
+			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		 WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+		   AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		   AND (
+				(DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND NOW()
+				BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR DCC.DISP_PRD_SET_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		   )
+		   AND #{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+		   AND DCI.DEL_YN = 'N'
+		   AND DCC.DEL_YN = 'N'
+		   AND ACS.DISP_YN = 'Y'
+		<if test='dispCornTpCd != "132"'>
+		   AND ACS.TP_CD = '${@framework.common.constants.CommonConstants@APET_TP_20}'
+		</if>
+	</select>
+	
+	<select id="listDisplayCornerBnrVodTagGrid" resultType="biz.app.display.model.DisplayBannerVO">
+		<!--
+			Query Name : display.listDisplayCornerBnrItemGrid
+			Description : 전시 코너 아이템 리스트(배너 TEXT / 배너 HTML / 배너 이미지 / 배너 복합)
+			- BO
+		-->
+		SELECT	/* QUERYID(display.listDisplayCornerBnrVodTagGrid) */
+			B.BNR_NO
+			, B.VD_ID
+			, A.BNR_TEXT /* 배너 TEXT */
+			, A.BNR_HTML /* 배너 HTML */
+			, A.BNR_IMG_NM /* 배너 이미지 명 */
+			, A.BNR_IMG_PATH /* 배너 이미지 경로 */
+			, A.BNR_MOBILE_IMG_NM /* 배너 모바일 이미지 명 */
+			, A.BNR_MOBILE_IMG_PATH /* 배너 모바일 이미지 경로 */
+			, A.DFT_BNR_YN /* 기본 배너 여부 */
+			, A.BNR_LINK_URL /* 배너 LINK URL */
+			, A.BNR_MOBILE_LINK_URL /* 배너 모바일 LINK URL */
+			, B.DISP_CNR_ITEM_NO /* 아이템 번호 */
+			, B.DISP_CLSF_CORN_NO /* 전시 분류 코너 번호 */
+			, B.DISP_STRTDT /* 전시 시작일자 */
+			, B.DISP_ENDDT /* 전시 종료일자 */
+			, B.DISP_PRIOR_RANK /* 전시 우선 순위 */
+			, B.DEL_YN /* 삭제 여부 */
+			, B.GOODS_ESTM_NO /* 상품평 번호 */
+			, B.GOODS_ID /* 상품 번호 */
+			, B.GOODS_TEXT /* 상품 TEXT */
+			, B.DISP_BNR_NO /* 전시 배너 번호 */
+			, A.BNR_GB_CD /* 배너 구분 코드 */
+			, A.BNR_DSCRT /* 배너 설명 */
+			, GB.GOODS_NM /* 상품 명 */
+			, B.BND_CNTS_NO /* 브랜드 콘텐츠 번호 */
+			, BC.CNTS_TTL /* 콘텐츠 타이틀 */
+		FROM DISPLAY_BANNER A
+			INNER JOIN DISPLAY_CORNER_ITEM B ON B.DISP_BNR_NO = A.DISP_BNR_NO
+			LEFT OUTER JOIN GOODS_BASE GB ON GB.GOODS_ID = B.GOODS_ID
+			LEFT OUTER JOIN BRAND_CNTS BC ON BC.BND_CNTS_NO = B.BND_CNTS_NO
+		WHERE 1 = 1
+			AND B.DISP_CLSF_CORN_NO = #{dispClsfCornNo}
+			<if test="dispBnrNo != null">
+			AND B.DISP_BNR_NO = #{dispBnrNo}
+			</if>
+			<if test="dispCnrItemNo != null and dispCnrItemNo != ''">
+        	AND B.DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+        	</if>
+			AND B.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			ORDER BY B.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<select id="getTagList" resultType="biz.app.display.model.DisplayCornerItemVO"> 
+		SELECT 
+			A.DISP_CNR_ITEM_NO
+            , A.TAG_NO
+            , (SELECT TAG_NM FROM TAG_BASE TB WHERE A.TAG_NO = TB.TAG_NO) AS TAG_NM
+        FROM
+            DISP_CORNER_ITEM_TAG_MAP A
+            INNER JOIN DISPLAY_CORNER_ITEM B ON(A.DISP_CNR_ITEM_NO = B.DISP_CNR_ITEM_NO)
+            INNER JOIN DISPLAY_BANNER C ON(C.DISP_BNR_NO = B.DISP_BNR_NO)
+            WHERE 1 = 1 
+            AND B.DISP_BNR_NO = #{dispBnrNo}
+	</select>
+	
+	<select id="apetEducationHist" resultType="biz.app.contents.model.VodVO">
+		SELECT /* QUERYID(display.apetEducationHist) */
+			T.*
+    		, CASE WHEN T.VD_GB_CD = '10' THEN
+						CASE WHEN T.STEP_NO = T.TOT_STEP_CNT THEN 100 ELSE TRUNCATE(((T.STEP_NO+1)/T.TOT_STEP_CNT) * 100, 0) END
+				   ELSE CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0)    >    100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END
+			  END  AS STEP_PROGRESS /*시청길이 프로그래스바*/
+		FROM (
+			SELECT
+				C.VD_ID 											/* 영상 ID */
+				, C.TTL 											/* 제목 */
+				, IFNULL((SELECT MAX(STEP_NO) FROM APET_CONTENTS_DETAIL ACD WHERE ACD.VD_ID = C.VD_ID ),0) AS STEP /* 스텝 */
+				, C.LOD_CD 										/* 난이도 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE C.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+				, C.HITS											/* 조회수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE C.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '10' AND ACI.VD_ID = C.VD_ID ) AS LIKE_CNT	/* 좋아요 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = C.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = C.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')	AS OUTSIDE_VD_ID	/* 외부 영상 */
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = C.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, C.PET_GB_CD
+				, C.EUD_CONTS_CTG_L_CD
+				, C.EUD_CONTS_CTG_M_CD
+				, C.EUD_CONTS_CTG_S_CD
+				, A.VD_LNTH AS AC_PLAY_TIME /*영상시청길이*/
+				, A.STEP_NO /*단계번호*/
+				, C.VD_GB_CD
+				, (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL E WHERE E.VD_ID = A.VD_ID) AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = C.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = C.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, (SELECT DTL_SHT_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = C.EUD_CONTS_CTG_M_CD) AS CTG_SHT_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, IFNULL((SELECT AAF.VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = C.FL_NO AND AAF.CONTS_TP_CD = '60'), 0) AS TOTAL_LNTH
+	            , IFNULL((SELECT ACWH.VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = C.VD_ID AND ACWH.MBR_NO = #{mbrNo}), 0) AS HIST_LNTH
+				, C.DISP_YN										/* 전시 여부 */
+				, C.SYS_REG_DTM									/* 시스템 등록 일시 */
+				, C.SYS_REGR_NO									/* 시스템 등록자 번호 */
+				, A.SYS_UPD_DTM									/* 시스템 수정 일시  */
+				, C.SYS_UPDR_NO									/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(C.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(C.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+	        FROM APET_CONTENTS_WATCH_HIST A
+		        INNER JOIN MEMBER_BASE B ON(A.MBR_NO = B.MBR_NO)
+		        INNER JOIN APET_CONTENTS C ON(C.VD_ID = A.VD_ID)
+		        INNER JOIN APET_ATTACH_FILE D ON(D.FL_NO = C.FL_NO)
+	        WHERE 1 = 1
+	          AND A.MBR_NO = #{mbrNo}
+	          AND C.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+	          AND C.EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}'
+	          AND C.DISP_YN = 'Y'
+		) T
+        ORDER BY T.SYS_UPD_DTM DESC
+        LIMIT 1
+	</select>
+	
+	<select id="eduNextVod" resultType="biz.app.contents.model.VodVO">
+	 SELECT /* QUERYID(display.eduNextVod) */
+	 	T.*
+    , CASE WHEN T.VD_GB_CD = '10' THEN
+						CASE WHEN T.STEP_NO = T.TOT_STEP_CNT THEN 100 ELSE TRUNCATE(((T.STEP_NO+1)/T.TOT_STEP_CNT) * 100, 0) END
+				   ELSE CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0)    >    100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END
+			  END  AS STEP_PROGRESS /*시청길이 프로그래스바*/
+              FROM (
+              SELECT
+         A.VD_ID 											/* 영상 ID */
+			, A.TTL 											/* 제목 */
+			, IFNULL((SELECT MAX(STEP_NO) FROM APET_CONTENTS_DETAIL ACD WHERE ACD.VD_ID = A.VD_ID ),0) AS STEP /* 스텝 */
+			, A.LOD_CD 										/* 난이도 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE A.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+			, A.HITS											/* 조회수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE A.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '10' AND ACI.VD_ID = A.VD_ID ) AS LIKE_CNT	/* 좋아요 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = A.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+			, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = A.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')	AS OUTSIDE_VD_ID	/* 외부 영상 */
+			, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = A.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+			, (SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = A.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AC_PLAY_TIME
+			, (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL E WHERE E.VD_ID = A.VD_ID) AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+			, (SELECT STEP_NO FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = A.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AS STEP_NO
+			, A.VD_GB_CD
+			, A.PET_GB_CD
+			, A.EUD_CONTS_CTG_L_CD
+			, A.EUD_CONTS_CTG_M_CD
+			, A.EUD_CONTS_CTG_S_CD
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = A.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+			, (SELECT DTL_SHT_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = A.EUD_CONTS_CTG_M_CD) AS CTG_SHT_MNM /*교육용컨텐츠카테고리_M_코드약어명*/
+            , IFNULL((SELECT AAF.VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = A.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'), 0) AS TOTAL_LNTH
+            , IFNULL((SELECT ACWH.VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = A.VD_ID AND ACWH.MBR_NO = #{mbrNo}), 0) AS HIST_LNTH
+			, A.DISP_YN										/* 전시 여부 */
+			, A.SYS_REG_DTM									/* 시스템 등록 일시 */
+			, A.SYS_REGR_NO									/* 시스템 등록자 번호 */
+			, A.SYS_UPD_DTM									/* 시스템 수정 일시  */
+			, A.SYS_UPDR_NO									/* 시스템 수정자 번호 */
+			, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+        FROM APET_CONTENTS A
+        WHERE A.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}' 
+        AND A.PET_GB_CD = #{petGbCd}
+        AND A.EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}'
+        <if test="eudContsCtgMCd != null and eudContsCtgMCd != ''">
+        AND A.EUD_CONTS_CTG_M_CD = #{eudContsCtgMCd}
+        </if>
+        AND A.DISP_YN = 'Y'
+        <if test="vodList != null">
+		<foreach collection="vodList" item="vdId" separator="," open="AND A.VD_ID NOT IN (" close=")">
+			#{vdId}
+		</foreach>
+		</if>
+		) T
+		ORDER BY SYS_REG_DTM DESC
+		<if test="limit != null and limit != ''">
+		LIMIT ${limit}
+		</if>
+    </select>
+	
+	<select id="baseEduVod" resultType="biz.app.contents.model.VodVO">
+		SELECT	/* QUERYID(eduConts.pageEduConts) */
+				AC.VD_ID 											/* 영상 ID */
+				, AC.TTL 											/* 제목 */
+				, IFNULL((SELECT MAX(STEP_NO) FROM APET_CONTENTS_DETAIL ACD WHERE ACD.VD_ID = AC.VD_ID ),0) AS STEP /* 스텝 */
+				, CONCAT_WS(">",
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND DTL_CD = AC.PET_GB_CD),		
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_L' AND DTL_CD = AC.EUD_CONTS_CTG_L_CD), 
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD),
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_S' AND DTL_CD = AC.EUD_CONTS_CTG_S_CD) 
+				  ) AS CATEGORY 									/* 카테고리 */
+				, AC.LOD_CD 		
+				, AC.EUD_CONTS_CTG_L_CD
+				, AC.EUD_CONTS_CTG_M_CD
+				, AC.EUD_CONTS_CTG_S_CD								/* 난이도 */
+				, AC.PET_GB_CD
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, (SELECT DTL_SHT_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD) AS CTG_SHT_MNM /*교육용컨텐츠카테고리_M_코드약어명*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')	AS OUTSIDE_VD_ID	/* 외부 영상 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+				, AC.HITS											/* 조회수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '10' AND ACI.VD_ID = AC.VD_ID ) AS LIKE_CNT	/* 좋아요 */
+				, AC.DISP_YN										/* 전시 여부 */
+				, AC.SYS_REG_DTM									/* 시스템 등록 일시 */
+				, AC.SYS_REGR_NO									/* 시스템 등록자 번호 */
+				, AC.SYS_UPD_DTM									/* 시스템 수정 일시  */
+				, AC.SYS_UPDR_NO									/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM APET_CONTENTS AC 
+		WHERE 	AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		<if test="petGbCd != null and petGbCd != ''">
+		  AND PET_GB_CD = #{petGbCd}
+		</if>
+		<if test="petGbCd == null or petGbCd == ''">
+		  AND PET_GB_CD = '${@framework.common.constants.CommonConstants@PET_GB_10}'
+		</if>
+		  AND EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}'
+		  AND AC.DISP_YN = 'Y'
+		ORDER BY EUD_CONTS_CTG_M_CD ASC, SYS_REG_DTM ASC
+		<if test="limit != null and limit != ''">
+		LIMIT ${limit}
+		</if>
+	</select>
+	
+	<select id="schoolEduVod" resultType="biz.app.contents.model.VodVO">
+		SELECT	/* QUERYID(eduConts.schoolEduVod) */
+        	T.*
+    , CASE WHEN T.VD_GB_CD = '10' THEN
+						CASE WHEN T.STEP_NO = T.TOT_STEP_CNT THEN 100 ELSE TRUNCATE(((T.STEP_NO+1)/T.TOT_STEP_CNT) * 100, 0) END
+				   ELSE CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0)    >    100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END
+			  END  AS STEP_PROGRESS /*시청길이 프로그래스바*/
+              FROM (
+              SELECT
+				AC.VD_ID 											/* 영상 ID */
+				, AC.TTL 											/* 제목 */
+                , AC.VD_GB_CD
+                , (SELECT STEP_NO FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = AC.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AS STEP_NO
+                , (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL E WHERE E.VD_ID = AC.VD_ID) AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+                , (SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = AC.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AC_PLAY_TIME
+                , (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, IFNULL((SELECT MAX(STEP_NO) FROM APET_CONTENTS_DETAIL ACD WHERE ACD.VD_ID = AC.VD_ID ),0) AS STEP /* 스텝 */
+				, CONCAT_WS(">",
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND DTL_CD = AC.PET_GB_CD),		
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_L' AND DTL_CD = AC.EUD_CONTS_CTG_L_CD), 
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD),
+					(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_S' AND DTL_CD = AC.EUD_CONTS_CTG_S_CD) 
+					) AS CATEGORY 									/* 카테고리 */
+				, IFNULL(AC.LOD_CD, 0) AS LOD_CD 										/* 난이도 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = ACD.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS OUTSIDE_VD_ID /*컨텐츠상세외부영상ID*/
+				, IFNULL((SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = AC.VD_ID AND ACWH.MBR_NO = #{mbrNo}), 0) AS HIST_LNTH
+				, IFNULL((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'), 0) AS TOTAL_LNTH
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+				, AC.HITS											/* 조회수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '10' AND ACI.VD_ID = AC.VD_ID ) AS LIKE_CNT	/* 좋아요 */
+				, CASE WHEN AC.SYS_REG_DTM >= DATE_SUB(NOW(), INTERVAL 1 DAY) THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+				, ((SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD)) AS CTG_M_NM 									/* 카테고리 */
+                , ((SELECT DTL_CD FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD)) AS EUD_CONTS_CTG_M_CD
+				, AC.DISP_YN										/* 전시 여부 */
+				, AC.SYS_REG_DTM									/* 시스템 등록 일시 */
+				, AC.SYS_REGR_NO									/* 시스템 등록자 번호 */
+				, AC.SYS_UPD_DTM									/* 시스템 수정 일시  */
+				, AC.SYS_UPDR_NO									/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM APET_CONTENTS AC 
+		LEFT OUTER JOIN APET_CONTENTS_DETAIL ACD
+					ON AC.VD_ID = ACD.VD_ID
+					AND ACD.STEP_NO = 0
+		WHERE 	AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+			AND AC.DISP_YN = 'Y'
+			<if test="petGbCd != null and petGbCd != ''">
+			AND PET_GB_CD = #{petGbCd}
+			</if>
+			AND EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}'
+			<if test="eudContsCtgMCd != null and eudContsCtgMCd != ''">
+			AND EUD_CONTS_CTG_M_CD = #{eudContsCtgMCd}
+			</if>
+			<if test="eudContsCtgSCd != null and eudContsCtgSCd != ''">
+			AND EUD_CONTS_CTG_S_CD = #{eudContsCtgSCd}
+			</if>
+            ) T
+			ORDER BY SYS_REG_DTM DESC
+	</select>
+	
+	<select id="schoolMainBanner" resultType="biz.app.contents.model.VodVO">
+		SELECT	/* QUERYID(display.schoolMainBanner) */
+			VD_ID
+			, (SELECT AAF.PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '40') AS BNR_IMG_PATH_L
+            , (SELECT AAF.PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '50') AS BNR_IMG_PATH_S
+            , (SELECT AAF.PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '80') AS BNR_IMG_PATH_PC
+		FROM APET_CONTENTS AC 
+		WHERE 	AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_10}'
+		<if test="petGbCd != null and petGbCd != ''">
+		AND PET_GB_CD = #{petGbCd}
+		</if>
+		AND EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_20}'
+		AND DISP_YN = 'Y'
+	</select>
+	
+	<select id="tagVodList" resultType="biz.app.contents.model.VodVO">
+		SELECT /* QUERYID(display.tagVodList) */
+		B.VD_ID
+		, B.VD_GB_CD
+		, B.TP_CD
+		, B.SRIS_NO
+		, SRIS.SRIS_NM
+		, B.SESN_NO
+		, B.FL_NO
+		, B.DISP_YN
+		, TB.TAG_NM
+		, A.TAG_NO
+		, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND B.VD_ID = ACI.VD_ID) AS LIKE_CNT /* 좋아요 */
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND B.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND B.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = B.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}') AS THUM_PATH /* 썸네일 이미지 */
+		, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = B.FL_NO AND AAF.CONTS_TP_CD = '60')	AS OUTSIDE_VD_ID	/* 외부 영상 */
+		, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = B.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH
+		, CASE WHEN B.SYS_REG_DTM >= DATE_SUB(NOW(), INTERVAL 1 DAY) THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필 */
+		, B.TTL
+		, B.CONTENT
+		, B.VD_TP_CD
+		, B.HITS
+		, B.SYS_REG_DTM
+		, B.SRT_URL /*단축URL*/
+		FROM APET_CONTENTS_TAG_MAP A
+	        INNER JOIN APET_CONTENTS B ON(A.VD_ID = B.VD_ID)
+	        INNER JOIN APET_ATTACH_FILE C ON(C.FL_NO = B.FL_NO)
+	       	INNER JOIN TAG_BASE TB ON (TB.TAG_NO = A.TAG_NO)
+	        JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = B.SRIS_NO AND SRIS.DISP_YN = 'Y')
+			JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = B.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+        WHERE 1 = 1
+        <if test="dupleVdIds != null">
+			<foreach collection="dupleVdIds" item="vdId" separator="," open="AND A.VD_ID NOT IN (" close=")">
+				#{vdId}
+			</foreach>
+		</if>
+        AND C.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+        AND B.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+        AND A.TAG_NO = #{tagNo}
+        AND B.DISP_YN='Y'
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="tagVodListCount" resultType="java.lang.Integer">
+		/* QUERYID(display.tagVodListCount) */
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_TAG_MAP A
+        INNER JOIN APET_CONTENTS B ON(A.VD_ID = B.VD_ID)
+        INNER JOIN APET_ATTACH_FILE C ON(C.FL_NO = B.FL_NO)
+        JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = B.SRIS_NO AND SRIS.DISP_YN = 'Y')
+		JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = B.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+        WHERE 1 = 1
+        AND C.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+        AND B.VD_GB_CD != '${@framework.common.constants.CommonConstants@VD_GB_10}'
+        AND A.TAG_NO = #{tagNo}
+        AND B.DISP_YN='Y'
+	</select>
+	
+	<select id="maxDispItemNo" resultType="java.lang.Long">
+		SELECT
+			MAX(DISP_CNR_ITEM_NO)
+		FROM 
+			DISPLAY_CORNER_ITEM
+	</select>
+	
+	<select id="bannerTagList" resultType="biz.app.tag.model.TagBaseVO">
+	SELECT C.TAG_NM
+		, C.TAG_NO
+        FROM DISP_CORNER_ITEM_TAG_MAP A 
+        INNER JOIN DISPLAY_CORNER_ITEM B ON(A.DISP_CNR_ITEM_NO = B.DISP_CNR_ITEM_NO) 
+        INNER JOIN TAG_BASE C ON(C.TAG_NO = A.TAG_NO)
+        WHERE 1 = 1 
+        <if test="dispCnrItemNo != null and dispCnrItemNo != ''">
+        AND B.DISP_CNR_ITEM_NO = #{dispCnrItemNo}
+        </if>
+	</select>
+	
+	<select id="pageDisplayCornerItemGoodsFO" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : display.pageDisplayCornerItemGoodsFO
+			Description : FO 전시 코너 아이템(상품)
+			- FO
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemGoodsFO) */
+			  GB.GOODS_ID			/* 상품 아이디 */
+			, GB.GOODS_NM 			/* 상품명 */
+			, GB.MD_RCOM_WDS 		/* MD 추천 뮨구 */
+			, GI.IMG_PATH			/* 이미지 */
+			, DG.DISP_CLSF_NO 		/* 전시 카테고리 번호 */
+			, IF(DC.DISP_LVL > 2 , (SELECT DISP_PRIOR_RANK FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DC.UP_DISP_CLSF_NO), DC.DISP_PRIOR_RANK) AS DISP_PRIOR_RANK
+			, IF(DC.DISP_LVL > 2 , (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DC.UP_DISP_CLSF_NO), DC.DISP_CLSF_NM) AS DISP_CLSF_NM 	/* 전시 카테고리 명 */
+<!-- 			, FN_SEC_GOODS_PRC_INFO(#{stId}, GB.GOODS_ID, #{mbrNo}, NULL, NULL) AS GOODS_PRICE_INFO	/* 상품 가격 정보 */ -->
+<!-- 			, FN_SEC_GOODS_SALE_PRC(#{stId}, GB.GOODS_ID, #{mbrNo}) AS SALE_PRICE -->
+<!-- 			, FN_GET_GOODS_PATH(GB.GOODS_ID) AS URL -->
+<!-- 			, FN_GET_GOODS_FLAG(GB.GOODS_ID) AS FLAG_STR -->
+<!--             , FN_SEC_GOODS_ACTIVE_STAT_CD(#{stId}, GB.GOODS_ID) AS SALE_STAT_CD -->
+		FROM	DISPLAY_CORNER_ITEM DCI
+			INNER JOIN DISPLAY_CLSF_CORNER DCC 
+				ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			INNER JOIN GOODS_BASE AS GB
+				ON (GB.GOODS_ID = DCI.GOODS_ID AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+			INNER JOIN DISPLAY_GOODS AS DG
+				ON (GB.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+			INNER JOIN DISPLAY_CATEGORY DC
+				ON DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+			LEFT OUTER JOIN GOODS_IMG AS GI
+				ON (GI.GOODS_ID = GB.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND DCC.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageDisplayCornerItemGoodsFOCount" resultType="Integer">
+		<!--
+			Query Name : display.pageDisplayCornerItemGoodsFO
+			Description : FO 전시 코너 아이템(상품)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemGoodsFOCount) */
+			 COUNT(*)
+		FROM	DISPLAY_CORNER_ITEM DCI
+			INNER JOIN DISPLAY_CLSF_CORNER DCC 
+				ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			INNER JOIN GOODS_BASE AS GB
+				ON (GB.GOODS_ID = DCI.GOODS_ID AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+			INNER JOIN DISPLAY_GOODS AS DG
+				ON (GB.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN ='${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+			INNER JOIN DISPLAY_CATEGORY DC
+				ON DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+			LEFT OUTER JOIN GOODS_IMG AS GI
+				ON (GI.GOODS_ID = GB.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND DCC.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+	
+	<select id="pageDisplayCornerItemBestGoodsFO" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : display.pageDisplayCornerItemBestGoodsFOCount
+			Description : FO 전시 코너 아이템(BEST상품)
+			- FO
+		-->
+		SELECT
+			GBT.*
+			,CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT		/* 판매 금액 */
+			,CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_AMT	/* 원 판매 금액 */
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			 END AS DC_AMT
+			,CASE
+				WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0 THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+			 END AS FO_SALE_AMT			/* 최종판매가 */
+		FROM (
+				SELECT
+					(@RN := @RN + 1) AS RANKER
+					, GB.GOODS_ID				/* 상품 아이디 */
+					, GB.GOODS_NM 				/* 상품명 */
+					, DC.UP_DISP_CLSF_NO 		/* 상위 전시 카테고리 번호 */
+					, DG.DISP_CLSF_NO AS DISP_CLSF_NO			/* 전시 카테고리 번호 */
+					, DCC.DISP_CLSF_NO AS DISP_CLSF_NO2	 			/* 전시 카테고리 번호 */
+					, GI.IMG_SEQ				/* 이미지 순번 */
+					, GI.IMG_PATH				/* 이미지 경로 */
+					, FN_GET_GOODS_PRICE(GB.GOODS_ID,#{stId},NULL) AS GOODS_PRICE_INFO	/* 상품 가격정보*/
+					, DCI.DISP_PRIOR_RANK
+				FROM
+					(SELECT @RN := 0) R
+					, DISPLAY_CORNER_ITEM DCI
+					INNER JOIN DISPLAY_CLSF_CORNER DCC 
+						ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+					INNER JOIN GOODS_BASE AS GB
+						ON (GB.GOODS_ID = DCI.GOODS_ID AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+					INNER JOIN DISPLAY_GOODS AS DG
+						ON (GB.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+					INNER JOIN DISPLAY_CATEGORY DC
+						ON DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+					LEFT OUTER JOIN GOODS_IMG AS GI
+						ON (GI.GOODS_ID = GB.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+				WHERE
+					DCC.DISP_CORN_NO = #{dispCornNo}
+					AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+					<if test="upDispClsfNo != null and upDispClsfNo!= ''">
+					AND DC.UP_DISP_CLSF_NO = #{upDispClsfNo}
+					</if>
+					AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+					AND DCI.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					AND DCC.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				ORDER BY DCI.DISP_PRIOR_RANK ASC, DCI.SYS_REG_DTM ASC
+			) GBT
+		ORDER BY GBT.DISP_PRIOR_RANK
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageDisplayCornerItemBestGoodsFOCount" resultType="Integer">
+		<!--
+			Query Name : display.pageDisplayCornerItemBestGoodsFOCount
+			Description : FO 전시 코너 아이템(BEST 상품)
+			- FO (PC/MO)
+		-->
+		SELECT	/* QUERYID(display.pageDisplayCornerItemBestGoodsFOCount) */
+			 COUNT(*)
+		FROM	DISPLAY_CORNER_ITEM DCI
+			INNER JOIN DISPLAY_CLSF_CORNER DCC 
+				ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			INNER JOIN GOODS_BASE AS GB
+				ON (GB.GOODS_ID = DCI.GOODS_ID AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+			INNER JOIN DISPLAY_GOODS AS DG
+				ON (GB.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN ='${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+			INNER JOIN DISPLAY_CATEGORY DC
+				ON DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+			LEFT OUTER JOIN GOODS_IMG AS GI
+				ON (GI.GOODS_ID = GB.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND DCC.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+	
+	<select id="getDisplayCornerItemGoodsCategoryFO" resultType="biz.app.goods.model.GoodsListVO">
+		<!--
+			Query Name : display.getDisplayCornerItemGoodsCategoryFO
+			Description : FO 전시 코너 아이템(상품 카테고리)
+			- FO
+		-->
+		SELECT	/* QUERYID(display.getDisplayCornerItemGoodsCategoryFO) */
+			DC.UP_DISP_CLSF_NO 		/* 전시 카테고리 번호 */
+			, IF(DC.DISP_LVL > 2 , (SELECT DISP_PRIOR_RANK FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DC.UP_DISP_CLSF_NO), DC.DISP_PRIOR_RANK) AS DISP_PRIOR_RANK
+			, IF(DC.DISP_LVL > 2 , (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = DC.UP_DISP_CLSF_NO), DC.DISP_CLSF_NM) AS DISP_CLSF_NM 	/* 전시 카테고리 명 */
+		FROM	DISPLAY_CORNER_ITEM DCI
+			INNER JOIN DISPLAY_CLSF_CORNER DCC 
+				ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+			INNER JOIN GOODS_BASE AS GB
+				ON (GB.GOODS_ID = DCI.GOODS_ID AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+			INNER JOIN DISPLAY_GOODS AS DG
+				ON (GB.GOODS_ID = DG.GOODS_ID and DG.DLGT_DISP_YN ='${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+			INNER JOIN DISPLAY_CATEGORY DC
+				ON DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+			LEFT OUTER JOIN GOODS_IMG AS GI
+				ON (GI.GOODS_ID = GB.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+		WHERE
+			DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			AND DCI.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND DCC.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			<if test="dispClsfNo == @framework.common.constants.CommonConstants@PETSHOP_MAIN_CAT_DISP_CLSF_NO">
+			AND DC.DISP_PRIOR_RANK NOT IN (12, 13)
+			</if>
+		GROUP BY UP_DISP_CLSF_NO
+		ORDER BY DISP_PRIOR_RANK ASC
+	</select>
+	
+	<update id="updateDisplayBaseLiveYn" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name : display.updateDisplayBase
+			Description : 전시 기본정보 수정(라이브 여부)
+			- FO
+		-->
+		UPDATE DISPLAY_CATEGORY SET
+			  SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="liveYn != null and liveYn != ''">
+			, LIVE_YN = #{liveYn} /* Live 여부 */
+		</if>
+		WHERE 1 = 1
+			AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND DISP_LVL = #{dispLvl}
+			AND DISP_CLSF_CD = #{dispClsfCd}
+			AND UP_DISP_CLSF_NO = #{upDispClsfNo}
+	</update>
+	
+	<resultMap type="biz.app.goods.model.GoodsFiltGrpVO" id="foGetCategoryFilterInfo">
+		<collection property="goodsFiltAttrList" column="filtGrpNo=FILT_GRP_NO" javaType="java.util.ArrayList" ofType="biz.app.goods.model.GoodsFiltAttrVO" select="display.foGetFiltAttr" />
+	</resultMap>
+	<select id="foCategoryFilterInfo" resultMap="foGetCategoryFilterInfo">
+		<!--
+			Query Name : display.foCategoryFilterInfo
+			Description : 카테고리 필터 조회
+		-->
+		SELECT	/* QUERYID(display.foCategoryFilterInfo) */
+			GRP.FILT_GRP_NO
+			, GRP.FILT_GRP_MNG_NM
+			, GRP.FILT_GRP_SHOW_NM
+		FROM	GOODS_FILT_GRP GRP
+		<if test="dispClsfNo != null">
+			LEFT JOIN FILT_GRP_CTG CTG ON GRP.FILT_GRP_NO = CTG.FILT_GRP_NO 
+			WHERE 1=1
+            AND CTG.DISP_CLSF_NO = #{dispClsfNo}
+		</if>
+	</select>
+	
+	<select id="foSearchFilterInfo" resultMap="foGetCategoryFilterInfo">
+		<!--
+			Query Name : display.foSearchFilterInfo
+			Description : 검색 필터 조회
+		-->
+		SELECT	/* QUERYID(display.foSearchFilterInfo) */
+			GRP.FILT_GRP_NO
+			, GRP.FILT_GRP_MNG_NM
+			, GRP.FILT_GRP_SHOW_NM
+		FROM GOODS_FILT_GRP GRP
+		WHERE SRCH_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+	
+	<select id="foGetFiltAttr" resultType="biz.app.goods.model.GoodsFiltAttrVO">
+		<!--
+			Query Name : display.foGetFiltAttr
+			Description : 카테고리 필터 속성 조회
+		-->	
+		SELECT * FROM
+			(
+			SELECT	/* QUERYID(display.foGetFiltAttr) */
+				FILT_GRP_NO
+				, FILT_ATTR_SEQ
+				, FILT_ATTR_NM
+				, USE_YN
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			FROM	GOODS_FILT_ATTR ATTR
+			WHERE	FILT_GRP_NO	 = #{filtGrpNo}
+			) ATTR
+			WHERE 1=1
+			AND USE_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			ORDER BY	FILT_GRP_NO DESC
+	</select>
+	
+	<select id="getCornList" resultType="biz.app.display.model.DisplayCornerTotalVO">
+		<!--
+			Query Name : display.getCornList
+			Description : 코너 조회
+			- BO
+		-->
+		SELECT /* QUERYID(display.getCornList) */
+			DCO.DISP_CORN_NO				/* 전시 코너 번호 */
+			, DCO.DISP_CORN_NM				/* 전시 코너명 */ 
+			, DCO.SHOW_CNT					/* 노출 개수 */
+			, DCO.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			, DCC.DISP_CLSF_CORN_NO 		/* 전시 분류 코너 번호 */
+			, DCC.DISP_CLSF_NO 				/* 전시 분류 번호 */
+			, DCC.DISP_PRD_SET_YN 			/* 전시 기간 설정 여부 */
+			, DCC.DISP_STRTDT 				/* 전시 시작일자 */
+            , DCC.DISP_ENDDT 				/* 전시 종료일자 */
+            , DCO.DISP_CORN_TP_CD			/* 전시 코너 타입 코드 */
+		  FROM DISPLAY_CORNER DCO
+   			INNER JOIN DISPLAY_CLSF_CORNER DCC
+   				ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+		 WHERE DCC.DISP_CLSF_NO = #{dispClsfNo}
+		   AND DCC.DEL_YN = 'N'
+           AND DCO.DISP_CORN_NO = #{dispCornNo}
+           AND (
+				(DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt} BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+				OR
+				DCC.DISP_PRD_SET_YN = 'N'
+		   )
+		ORDER BY DCO.DISP_PRIOR_RANK
+	</select>
+	
+	<sql id="petTvFOWhere">
+		AC.VD_ID
+		, AC.VD_GB_CD
+		, AC.TP_CD
+		, AC.SRIS_NO
+		, AC.SESN_NO
+		, AC.FL_NO
+		, AC.DISP_YN
+		, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID) AS LIKE_CNT /* 좋아요 */
+		, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+		, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필 */
+		, AC.TTL
+		, AC.CONTENT
+		, AC.CRIT
+		, AC.VD_TP_CD
+		, AC.HITS
+		, AC.PET_GB_CD
+		, AC.EUD_CONTS_CTG_L_CD
+		, AC.EUD_CONTS_CTG_M_CD
+		, AC.EUD_CONTS_CTG_S_CD
+		, AC.LOD_CD
+		, AC.PRPM_CD
+		, SRIS.SRIS_NM
+		, T1.THUM_PATH
+        , T2.OUTSIDE_VD_ID
+        , AC.SRT_URL /* 단축URL */
+	</sql>
+	
+	<sql id="petTvSelectFO">
+		AC.VD_ID
+		, AC.VD_GB_CD
+		, AC.VD_TP_CD
+		, AC.TP_CD
+		, AC.SRIS_NO
+		, AC.SESN_NO
+		, AC.FL_NO
+		, AC.DISP_YN
+		, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID) AS LIKE_CNT /* 좋아요 */
+		, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+		, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  	FROM APET_CONTENTS_INTEREST ACI 
+			WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+		, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필 */
+		, CASE WHEN AC.SYS_REG_DTM >= DATE_SUB(NOW(), INTERVAL 1 DAY) THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+		, AC.TTL
+		, AC.HITS
+		, SRIS.SRIS_NM
+		, T1.THUM_PATH
+        , T2.OUTSIDE_VD_ID
+        , AC.SRT_URL /* 단축URL */
+        , AC.SYS_REG_DTM
+	</sql>
+	
+	<select id="getOriginSeries"  resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name : display.getOriginSeries
+			Description : 인기 시리즈 배너 조회
+		-->
+		SELECT  /* QUERYID(display.getOriginSeries) */ 
+			 SRIS_NO				/* 시리즈 번호 */
+			, SRIS_ID				/* 시리즈 아이디 */
+			, DISP_YN				/* 시리즈 전시여부 */
+			, TP_CD					/* 시리즈 타입코드 */
+			, FL_NO					/* 시리즈 파일번호 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필이미지 경로 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO AND CONTS_TP_CD = '20' ORDER BY SEQ DESC LIMIT 1) AS SRIS_IMG_PATH	/* 시리즈 이미지 경로 */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'APET_TP' AND DTL_CD = T1.TP_CD) AS TP_NM /* 시리즈 타입명 */			
+			, SRIS_NM				/* 시리즈명 */ 
+			, SRIS_DSCRT			/* 시리즈 설명 */
+			, (SELECT COUNT(*) FROM APET_CONTENTS_SEASON WHERE SRIS_NO = T1.SRIS_NO) AS SESN_CNT /* 시즌수 */
+			, (SELECT SUM(HITS) FROM APET_CONTENTS AC WHERE AC.SRIS_NO = T1.SRIS_NO) AS VD_SUM_HITS /* 총 영상 조회수 합*/
+			, CONCAT(DATE_FORMAT(SYS_REG_DTM, '%Y.%m.%d'), '\n', '(', DATE_FORMAT(SYS_UPD_DTM, '%Y.%m.%d'), ')') AS REG_MOD_DTM 
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */	
+			, AD_YN					/* 광고 노출 여부 */		
+			, (SELECT COUNT(*) FROM APET_CONTENTS WHERE SRIS_NO = T1.SRIS_NO) AS VD_CNT	/* 영상건수 */
+		FROM
+			APET_CONTENTS_SERIES T1	
+		WHERE 1=1
+		  AND T1.DISP_YN = 'Y'
+		  AND T1.TP_CD = '${@framework.common.constants.CommonConstants@APET_TP_20}'
+		  <if test="seriesList != null">
+		  <foreach collection="seriesList" item="srisNo" separator="," open="AND T1.SRIS_NO NOT IN (" close=")">
+				#{srisNo}
+		  </foreach>
+		  </if>
+		ORDER BY VD_SUM_HITS DESC
+		<if test="offset != null and offset != ''">
+		<include refid="bizCommon.pageSql" />
+		</if>
+	</select>
+	
+	<select id="getVodDetail" resultType="biz.app.contents.model.VodVO">
+	<!-- Query Name : vod.getVod
+		Description : 영상 상세
+	 -->
+	 SELECT	/* QUERYID(vod.getVodDetail) */
+			AC.VD_ID 								/* 영상 ID */
+			, AC.SRIS_NO 							/* 시리즈 번호 */
+			, SRIS.SRIS_NM
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH /* 시리즈 이미지 경로 */
+			, AC.SESN_NO 							/* 시즌 번호 */
+			, AC.VD_GB_CD							/* 영상 구분 */
+			, AC.TP_CD 								/* 타입 코드 */
+			, AC.FL_NO 								/* 파일 번호 */
+			, AC.TTL 								/* 제목 */
+			, AC.VD_TP_CD 							/* 영상 타입 코드 */
+			, AC.HITS 								/* 조회수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE AC.VD_ID = ACI.VD_ID AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT	/* 좋아요 */
+			, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH /* 영상 길이*/
+			, T2.OUTSIDE_VD_ID
+			, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+			  	FROM APET_CONTENTS_INTEREST ACI 
+				WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+			, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+			  	FROM APET_CONTENTS_INTEREST ACI 
+				WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+			, AC.SRT_URL 							/* 단축URL */
+		FROM APET_CONTENTS AC
+			INNER JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+			INNER JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+		WHERE VD_ID = #{vdId}
+	</select>
+	
+	<select id="filterBrand" resultType="biz.app.brand.model.BrandBaseVO">
+		<!--
+			Query Name	: display.filterBrand
+			Description	: 브랜드 필터 목록
+		-->
+		SELECT /* QUERYID(display.filterBrand) */
+			B.BND_NO
+		    ,COUNT(B.BND_NO) AS BND_GOODS_CNT
+		    ,B.BND_NM_KO
+		    ,COUNT(MB.BND_NO) AS MB_BRAND_CNT
+		FROM BRAND_BASE B
+			LEFT OUTER JOIN BRAND_GOODS G ON ( B.BND_NO = G.BND_NO)
+			LEFT OUTER JOIN MEMBER_INTEREST_BRAND MB ON (MB.BND_NO = B.BND_NO)
+		WHERE 1=1
+			AND B.BND_SHOW_YN = 'Y'
+			AND B.USE_YN = 'Y'
+		GROUP BY B.BND_NO
+		<if test="sortSeq == null || sortSeq == ''">
+			ORDER BY B.BND_NM_KO
+		</if>
+		<if test="sortSeq == 10">
+			ORDER BY MB_BRAND_CNT DESC, B.BND_NM_KO
+		</if>		
+	</select>
+	
+	<select id="myWishListTv" resultType="biz.app.contents.model.VodVO">
+		SELECT 
+		T.*
+	    , CASE WHEN T.VD_GB_CD = '10' THEN
+							CASE WHEN T.STEP_NO = T.TOT_STEP_CNT THEN 100 ELSE TRUNCATE(((T.STEP_NO+1)/T.TOT_STEP_CNT) * 100, 0) END
+					   ELSE CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0)    >    100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END
+				  END  AS STEP_PROGRESS /*시청길이 프로그래스바*/
+		FROM (
+			SELECT 
+				AC.VD_ID 								/* 영상 ID */
+				, AC.SESN_NO 							/* 시즌 번호 */
+				, AC.TP_CD 								/* 타입 코드 */
+				, AC.FL_NO 								/* 파일 번호 */
+				, AC.THUM_AUTO_YN						/* 썸네일 자동추출 여부 */
+				, AC.DISP_YN 							/* 전시 여부 */
+				, AC.TTL 								/* 제목 */
+				, AC.CONTENT 							/* 내용 */
+				, AC.CRIT 								/* 음악 저작권 */
+				, AC.VD_TP_CD 							/* 영상 타입 코드 */
+				, AC.HITS 								/* 조회수 */
+	            , AC.VD_GB_CD							/* 영상 구분 */
+	            , ACI.MBR_NO							/* 회원 번호*/
+	            , (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL E WHERE E.VD_ID = AC.VD_ID) AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+	            , (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+	            , (SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = AC.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AC_PLAY_TIME
+	            , (SELECT STEP_NO FROM APET_CONTENTS_WATCH_HIST ACWH WHERE ACWH.VD_ID = AC.VD_ID AND ACWH.MBR_NO = #{mbrNo}) AS STEP_NO
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE AC.VD_ID = ACI.VD_ID AND INTR_GB_CD = '10') AS LIKE_CNT	/* 좋아요 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '10')	AS THUM_PATH	/* 썸네일 이미지 */
+				, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH /* 영상 길이*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, ACI.SYS_REG_DTM 						/* 시스템 등록 일시 */
+				, AC.SYS_REGR_NO 						/* 시스템 등록자 번호 */
+				, AC.SYS_UPD_DTM 						/* 시스템 수정 일시 */
+				, AC.SYS_UPDR_NO 						/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			FROM 
+				APET_CONTENTS AC
+				INNER JOIN APET_CONTENTS_INTEREST ACI ON(AC.VD_ID = ACI.VD_ID)
+				WHERE 1 = 1 
+				AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}'
+				AND DISP_YN = 'Y'
+				<if test="mbrNo != null and mbrNo != ''">
+				AND MBR_NO = #{mbrNo}
+				</if>
+				ORDER BY ACI.SYS_REG_DTM DESC
+	            ) T
+	</select>
+	
+	<select id="myWishListLog" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name : petLog.pageTagPetLog
+			Description : 인기태그 게시물
+		-->
+		SELECT /* QUERYID(petLog.myWishListLog) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT										/* 펫로그 내용 */
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */
+			, T1.VD_PATH 									/* 펫로그 영상 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+			, T1.CONTS_STAT_CD									/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN					/* 펫로그 후기여부 */
+			, IFNULL(T1.SNCT_YN, 'N') AS SNCT_YN				/* 펫로그 제재여부 */
+			, T2.SYS_REG_DTM
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '10') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+            , T2.INTS_PET_LOG_NO
+		FROM
+			PET_LOG_BASE T1
+            INNER JOIN PET_LOG_INTEREST T2 ON(T2.PET_LOG_NO = T1.PET_LOG_NO)
+            INNER JOIN MEMBER_BASE MB ON(MB.MBR_NO = T1.MBR_NO)
+		WHERE 1=1
+		<if test="mbrNo != null and mbrNo != 0">			
+        AND T2.MBR_NO = #{mbrNo}
+        </if>
+        AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+        AND T2.INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}'
+		AND IFNULL(T1.SNCT_YN, 'N') = 'N'
+		ORDER BY T2.SYS_REG_DTM DESC
+	</select>
+	
+	<delete id="noFavorites" parameterType="biz.app.tv.model.TvDetailPO">
+		DELETE FROM APET_CONTENTS_INTEREST
+		WHERE 1 = 1 
+		AND MBR_NO = #{mbrNo}
+		AND VD_ID = #{vdId}
+		AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}'
+	</delete>
+	
+	<select id="interestBrand" resultType="biz.app.brand.model.BrandBaseVO">
+		SELECT 
+			A.BND_NO
+            , A.MBR_NO
+            , B.BND_NM_KO
+            , B.BND_TP_CD
+            , B.BND_CNTS_TP_CD
+            , B.BND_ITRDC
+            , B.BND_MO_ITRDC
+            , B.TN_IMG_PATH
+            , B.TN_MO_IMG_PATH
+            , B.SORT_SEQ
+            , B.USE_YN
+        FROM 
+        	MEMBER_INTEREST_BRAND A INNER JOIN BRAND_BASE B ON(A.BND_NO = B.BND_NO) 
+        	WHERE 1 = 1 
+        	AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+        	<if test="mbrNo != null and mbrNo != 0"> 
+        	AND A.MBR_NO = #{mbrNo}
+        	</if>
+	</select>
+	
+	<select id="getCornerInfoToDispCornType" resultType="biz.app.display.model.DisplayCornerTotalVO">
+        <!--
+            Query Name : display.getCornerInfoToDispCornType
+            Description : 비정형 전시분류 번호로 코너 정보 조회
+            - FO (PC/MO)
+        -->
+        SELECT /* QUERYID(display.getCornerInfoToDispCornType) */
+             DCO.DISP_CORN_NO                /* 전시 코너 번호 */
+            ,DCO.DISP_CORN_TP_CD            /* 전시 코너 타입 코드 */
+            ,DCO.DISP_PRIOR_RANK            /* 전시 우선 순위 */
+            ,DCC.DISP_CLSF_CORN_NO             /* 전시 분류 코너 번호 */
+            ,DCC.DISP_CLSF_NO                 /* 전시 분류 번호 */
+            ,DC.SEO_INFO_NO 				/* SEO 번호 */	
+        FROM
+            DISPLAY_CORNER DCO
+            INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+            INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = DCC.DISP_CLSF_NO
+        WHERE
+            DCC.DISP_CLSF_NO = #{dispClsfNo}
+            AND DCC.DISP_CORN_NO in (
+            <choose>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_BANNER">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_TOP_BANNER}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_TOP_BANNER}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_TOP_BANNER}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_TOP_BANNER}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_RCOM">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_RECOMMEND_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_RECOMMEND_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_RECOMMEND_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_RECOMMEND_GOODS}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_OFFEN">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_OFFEN_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_OFFEN_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_OFFEN_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_OFFEN_GOODS}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_DEAL">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_TIME_DEAL}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_TIME_DEAL}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_TIME_DEAL}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_TIME_DEAL}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_STOCK">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_STOCK_IMMINENT}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_STOCK_IMMINENT}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_STOCK_IMMINENT}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_STOCK_IMMINENT}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_EXPIRATION">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_EXPIRATION_DATE}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_EXPIRATION_DATE}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_EXPIRATION_DATE}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_EXPIRATION_DATE}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_MD">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_MD_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_MD_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_MD_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_MD_GOODS}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_BEST">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_BEST}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_BEST}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_BEST}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_BEST}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_PETSHOP">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_ONLY_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_ONLY_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_ONLY_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_ONLY_GOODS}'
+            	</when>
+            	<when test="dispCornType eq @framework.common.constants.CommonConstants@GOODS_MAIN_DISP_TYPE_PACKAGE">
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_PACKAGE_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_PACKAGE_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_PACKAGE_GOODS}',
+					'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_PACKAGE_GOODS}'
+            	</when>
+            </choose>
+            )
+            AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+            AND (
+		        (DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt}
+		        BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+		        OR DCC.DISP_PRD_SET_YN = 'N'
+		    )
+	        ORDER BY DCO.DISP_PRIOR_RANK
+    </select>
+    
+    <select id="getBestManual" resultType="biz.app.display.model.DisplayCornerTotalVO">
+        <!--
+            Query Name : display.getBestManual
+            Description : 베스트 수동 상품  확인
+            - FO (PC/MO)
+        -->
+        SELECT /* QUERYID(display.getBestManual) */
+             DCO.DISP_CORN_NO                /* 전시 코너 번호 */
+             , DCC.DISP_CLSF_CORN_NO             /* 전시 분류 코너 번호 */
+        FROM
+            DISPLAY_CORNER DCO
+            INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+            INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = DCC.DISP_CLSF_NO
+           	INNER JOIN DISPLAY_CORNER_ITEM DCI ON DCI.DISP_CLSF_CORN_NO = DCC.DISP_CLSF_CORN_NO
+        WHERE
+            DCC.DISP_CLSF_NO = #{dispClsfNo}
+            AND DCC.DISP_CORN_NO in (
+				'${@framework.common.constants.CommonConstants@DISP_CORN_NO_DOG_BEST}',
+				'${@framework.common.constants.CommonConstants@DISP_CORN_NO_CAT_BEST}',
+				'${@framework.common.constants.CommonConstants@DISP_CORN_NO_FISH_BEST}',
+				'${@framework.common.constants.CommonConstants@DISP_CORN_NO_ANIMAL_BEST}'
+            )
+            AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+            AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+            AND (
+		        (DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt}
+		        BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+		        OR DCC.DISP_PRD_SET_YN = 'N'
+	        )
+        	AND ( 
+        		#{previewDt} BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			)
+    </select>
+    
+    <select id="selectEduWatchCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : display.selectEduWatchCount
+			Description : 펫스쿨 메인 > 시청이력의 교육Intro, 교육영상 5초이상 시청한 갯수
+		-->
+		SELECT COUNT(*) /* QUERYID(display.selectEduWatchCount) */
+		  FROM APET_CONTENTS_WATCH_HIST ACWH
+		  	INNER JOIN APET_CONTENTS AC
+		  		ON ACWH.VD_ID = AC.VD_ID
+		 WHERE MBR_NO = #{mbrNo}
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   <!--AND VD_LNTH <![CDATA[ >= ]]> 5-->
+	</select>
+	
+	<select id="selectSeriesTagList"  resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name : display.selectSeriesTagList
+			Description : 시리즈 TAG 목록 조회
+		-->
+		SELECT /* QUERYID(display.selectSeriesTagList) */
+			A.SRIS_NO
+			, A.SRIS_NM
+			, A.SRIS_PRFL_IMG_PATH
+			, A.SRIS_IMG_PATH
+			, A.TAG_NO
+			, A.TAG_NM
+		  FROM(
+			SELECT
+			 	ACS.SRIS_NO
+			 	, ACS.SRIS_NM
+			 	, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH    /* 시리즈 프로필이미지 경로 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_20}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_IMG_PATH    /* 시리즈 이미지 경로 */
+				, GROUP_CONCAT(TB.TAG_NO) AS TAG_NO
+				, GROUP_CONCAT(TB.TAG_NM) AS TAG_NM
+			  FROM APET_CONTENTS_SERIES ACS
+				INNER JOIN APET_CONTENTS_SERIES_TAG_MAP TM
+					ON ACS.SRIS_NO = TM.SRIS_NO
+				INNER JOIN TAG_BASE TB
+					ON TM.TAG_NO = TB.TAG_NO
+			 WHERE ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			   AND TB.STAT_CD = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+			GROUP BY ACS.SRIS_NO
+		  ) A
+		 WHERE 1=1
+		<if test="cornTagNoList != null">
+			<foreach collection="cornTagNoList" item="tagNo" separator="AND A.TAG_NO REGEXP" open="AND A.TAG_NO REGEXP" close="">
+				#{tagNo}
+			</foreach>
+		</if>
+		<if test="offset != null and offset != ''">
+			<include refid="bizCommon.pageSql" />
+		</if>
+	</select>
+	
+	<select id="selectPopLayerEventList" resultType="biz.app.display.model.EventPopupVO" >
+ 		<!--
+			Query Name : display.selectPopLayerEventList
+			Description : 공통 > 이벤트팝업 목록 조회
+		-->
+		SELECT
+			EVTPOP_NO /*이벤트팝업 번호*/
+			, FL_NO /*이벤트팝업 파일번호*/
+			, EVTPOP_GB_CD /*이벤트팝업 구분코드*/
+			, EVTPOP_LOC_CD /*이벤트팝업 게시위치코드*/
+			, EVTPOP_TTL /*이벤트팝업 제목*/
+			, EVTPOP_IMG_PATH /*이벤트팝업 이미지경로*/
+			, EVTPOP_LINK_URL /*이벤트팝업 연결화면경로*/
+			, DISPLAY_STRT_DTM /*이벤트팝업 게시시작일시*/
+			, DISPLAY_END_DTM /*이벤트팝업 게시종료일시*/
+			, EVTPOP_STAT_CD /*이벤트팝업 상태코드*/
+			, EVTPOP_SORT_SEQ /*이벤트팝업 정렬순서*/
+			, SYS_REGR_NO /*시스템 등록자번호*/
+			, SYS_REG_DTM /*시스템 등록일시*/
+			, SYS_UPDR_NO /*시스템 수정자번호*/
+			, SYS_UPD_DTM /*시스템 수정일시*/
+		  FROM EVTPOP_BASE
+		 WHERE EVTPOP_STAT_CD = '10'
+		   AND (EVTPOP_GB_CD = '30' OR EVTPOP_GB_CD = #{evtpopGbCd})
+		   AND (
+		   		(DISPLAY_END_DTM IS NULL AND NOW() > DISPLAY_STRT_DTM)
+		   		OR
+		   		(DISPLAY_END_DTM IS NOT NULL AND NOW() BETWEEN DISPLAY_STRT_DTM AND DISPLAY_END_DTM)
+		   )
+		ORDER BY EVTPOP_SORT_SEQ, SYS_REG_DTM DESC
+ 	</select>
+	
+	<resultMap type="biz.app.goods.model.GoodsDispVO" id="petShopRecoMap">
+    	<result property="goodsId" 		column="GOODS_ID"/>
+		<result property="goodsNm" 		column="GOODS_NM"/>
+   		<result property="imgPath" 		column="IMG_PATH"/>
+		<result property="interestYn" 	column="INTEREST_YN"/>
+		<result property="saleAmt" 	column="SALE_AMT"/>
+		<collection property="goodsTagList" column="{goodsId=GOODS_ID}" javaType="java.util.ArrayList" ofType="biz.app.tag.model.TagBaseVO" select="tag.listTagGoodsId"/>
+    </resultMap>
+    
+	<select id="selectRecommendTotalGoodsList" resultMap="petShopRecoMap" >
+ 		<!--
+			Query Name : display.selectRecommendTotalGoodsList
+			Description : petshop 사용자 맞춤 추천상품
+		-->
+		SELECT 	/* QUERYID(display.selectRecommendTotalGoodsList) */
+        	CASE WHEN CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0
+					THEN CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+					ELSE CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+					END AS SALE_AMT	/* 최종판매가 */
+        	, T1.*
+        FROM
+		(
+			SELECT 
+				GB.GOODS_ID
+	        	, GB.GOODS_NM
+	        	, IMG_PATH
+				, FN_GET_GOODS_PRICE(GB.GOODS_ID,1, 
+					<choose>
+						<when test="webMobileGbCd eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+							'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+						</when>
+						<otherwise>'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+					</choose>
+				) AS GOODS_PRICE_INFO
+				, IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID = GB.GOODS_ID AND MBR_NO = #{mbrNo}) > 0, 'Y', 'N') AS INTEREST_YN
+			FROM GOODS_BASE  GB 
+				LEFT JOIN  GOODS_IMG GI ON GB.GOODS_ID =GI.GOODS_ID AND  GI.IMG_TP_CD = '10' AND GI.DLGT_YN = 'Y'
+		  	WHERE  
+			<foreach collection="goodsIds" item="goodsId" separator="," open="GB.GOODS_ID IN (" close=")">#{goodsId}</foreach>
+			<foreach collection="goodsIds" item="goodsId" separator="," open="ORDER BY FIELD(GB.GOODS_ID, " close=")">#{goodsId}</foreach>
+ 		) T1
+ 	</select>
+</mapper>

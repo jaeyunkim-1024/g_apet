@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 버튼 클릭 시  */
+			$(".btn").click(function(){
+				ui.selAc.open('.acSelect');
+			});
+			ui.selAc.open('.acSelect');
+			var today = new Date();
+			var target = new Date(today.getFullYear(),(today.getMonth() + 1),0);
+			var target2 = new Date(today.getFullYear(),(today.getMonth() + 0),0);
+			var max2 = ((target2.getDay() + 1) < 8)?target2.getDay() + 1:7;
+			var html = "";
+			console.log("day : " + target.getDay());
+			console.log("day2 : " + target2.getDay());
+			for(var i=0; i<max2; i++){
+				html += "<li><span>"+(i + 1)+"</span></li>"
+			}
+			for(var i=0; i<target.getDate(); i++){
+				html += "<li><span>"+(i + 1)+"</span></li>"
+			};
+			var m = ((target.getMonth() + 1) < 10)?"0" + (target.getMonth() + 1):(target.getMonth() + 1);
+			$(".week-date").html(html)
+			$(".cal-tit .y").text(target.getFullYear())
+			$(".cal-tit .m").text(m)
+			console.log(target.getFullYear() + " - " + target.getMonth() + " - " + target.getDate());
+			console.log(target.getDay());
+		});
+	</script>
+</head>
+<body style="background:rgba(0,0,0,0.5)">
+	<div class="btnSet" style="width:80%;">
+		<a href="javascript:;" class="btn lg a">팝업 OPEN</a>
+	</div>
+	<!-- 레이어 팝업 -->
+	<div class="acSelect">
+		<input type="text" class="acSelInput" readonly />
+		<div class="head bnone">
+			<div class="con">
+				<div class="tit">캘린더타이틀</div>
+				<a href="javascript:;" class="close" onClick="ui.selAc.close(this)"></a>
+			</div>
+		</div>
+		<div class="con">
+			<section class="calendar-pop-style">
+				<div class="had">
+					<button class="cal-btn-y p"></button>
+					<button class="cal-btn-m p"></button>
+					<div class="cal-tit">
+						<span class="y">2021</span>
+						년
+						<span class="m">01</span>
+						일
+					</div>
+					<button class="cal-btn-m n"></button>
+					<button class="cal-btn-y n"></button>
+				</div>
+				<div class="body">
+					<ul class="week-name">
+						<li>일</li>
+						<li>월</li>
+						<li>화</li>
+						<li>수</li>
+						<li>목</li>
+						<li>금</li>
+						<li>토</li>
+					</ul>
+					<ul class="week-date">
+						<li class="p"><span>24</span></li>
+						<li class="p"><span>25</span></li>
+						<li class="p"><span>26</span></li>
+						<li class="p"><span>27</span></li>
+						<li class="p"><span>28</span></li>
+						<li class="p"><span>29</span></li>
+						<li class="n"><span>30</span></li>
+						<li><span>1</span></li>
+						<li class="today"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="checked"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="today"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="checked"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="today"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="checked"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="today"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+						<li class="checked"><span>1</span></li>
+						<li><span>1</span></li>
+						<li><span>1</span></li>
+					</ul>
+				</div>
+			</section>
+		</div>
+	</div>
+	<!-- //레이어 팝업 -->
+</body>
+</html>

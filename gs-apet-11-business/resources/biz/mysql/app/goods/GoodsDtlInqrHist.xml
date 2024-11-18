@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	최근 본 상품
+	작성자  	valueFactory
+	작성일자  2021.03.09
+-->
+
+<mapper namespace="goodsDtlInqrHist">
+
+	<insert id="insertGoodsDtlInqrHist">
+		<!--
+			Query Name : goods.GoodsInqrHist
+			Description : 최근본 상품 등록
+		-->
+		/* QUERYID(goods.insertGoodsDtlInqrHist) */
+		INSERT INTO GOODS_DTL_INQR_HIST(GOODS_ID, MBR_NO, HITS, SYS_REGR_NO, SYS_REG_DTM, SYS_UPD_DTM)
+		VALUES(#{goodsId}, #{mbrNo}, IFNULL(#{hits}, 0) + 1, #{sysRegrNo}, #{sysRegDtm}, #{sysUpdDtm})
+		ON DUPLICATE KEY UPDATE
+		HITS = IFNULL(HITS, 0) + 1
+		, SYS_UPDR_NO = #{sysUpdrNo}
+		, SYS_UPD_DTM = #{sysUpdDtm};
+	</insert>
+
+	<update id="updateGoodsDtlInqrHist">
+		<!--
+			Query Name : goods.GoodsInqrHist
+			Description : 최근본 상품 수정
+		-->
+		/* QUERYID(goods.updateGoodsDtlInqrHist) */
+		UPDATE	GOODS_DTL_INQR_HIST SET
+		SYS_UPDR_NO = #{sysUpdrNo}
+		, SYS_UPD_DTM = now()
+		<if test="hits != null">
+			, HITS = #{hits}
+		</if>
+		WHERE	GOODS_ID = #{goodsId}
+		AND	MBR_NO = #{mbrNo}
+
+	</update>
+
+	<delete id="deleteGoodsDtlInqrHist">
+		<!--
+			Query Name : goods.GoodsInqrHist
+			Description : 최근본 상품 삭제
+		-->
+		/* QUERYID(goods.deleteGoodsDtlInqrHist) */
+		DELETE FROM GOODS_DTL_INQR_HIST
+		WHERE	GOODS_ID = #{goodsId}
+		AND	MBR_NO = #{mbrNo}
+	</delete>
+
+	<delete id="deleteOldGoodsDtlInqrHist">
+		<!--
+			Query Name : goods.GoodsInqrHist
+			Description : 최근본 상품 삭제
+		-->
+		/* QUERYID(goods.deleteOldGoodsDtlInqrHist) */
+		DELETE FROM GOODS_DTL_INQR_HIST
+		WHERE	1=1
+		AND	MBR_NO = #{mbrNo}
+		AND SYS_UPD_DTM <![CDATA[<]]> DATE_ADD(now(), INTERVAL - 7 DAY)
+	</delete>
+
+
+
+	<select id="getGoodsDtlInqrHist" resultType="biz.app.goods.model.GoodsDtlInqrHistVO">
+		<!--
+			Query Name : goods.GoodsInqrHist
+			Description : 최근본 상품 조회
+		-->
+		/* QUERYID(goods.getGoodsDtlInqrHist) */
+		SELECT	GOODS_ID
+		, MBR_NO
+		, HITS
+		, SYS_REGR_NO
+		, SYS_REG_DTM
+		, SYS_UPDR_NO
+		, SYS_UPD_DTM
+		FROM	GOODS_DTL_INQR_HIST
+		WHERE	GOODS_ID = #{goodsId}
+		AND	MBR_NO = #{mbrNo}
+
+	</select>
+
+	<select id="listGoodsDtlInqrHist" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : goodsDtlInqrHist.listGoodsDtlInqrHist
+			Description : 상품 상세 이력 조회
+		-->
+		<include refid="baseGoodsDtlInqrHist" />
+	</select>
+	
+	<sql id="baseGoodsDtlInqrHist">
+		SELECT A.*
+			, CAST(FN_SPLIT(A.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT
+			, CAST(FN_SPLIT(A.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) AS DC_AMT
+			, CAST(FN_SPLIT(A.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_AMT	/* 상품원판매가 */
+		FROM
+		(
+			SELECT GB.GOODS_ID
+				, GB.GOODS_NM
+				, GI.IMG_SEQ
+				, GI.IMG_PATH
+				, FN_GET_GOODS_PRICE(GB.GOODS_ID , 1 , #{webMobileGbCd}) GOODS_PRICE_INFO
+		        , CASE 
+		      		  WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND GB.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                        	  THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                  	  WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                      		  THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */          
+		              WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+		                      THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'               /* 상품 판매 종료 : 판매종료 */
+		              WHEN GB.SALE_STRT_DTM  <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM  <![CDATA[<]]>  SYSDATE()
+		                      THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'               /* 상품 판매 기간 : 판매종료 */
+		              WHEN GB.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+		                      THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'             /* 기타 상품 상태 : 판매 종료 */
+		              WHEN FN_GET_GOODS_STOCK(GB.GOODS_ID,NULL)   <![CDATA[<=]]>  0
+		                      THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'               /* 단품 재고 오류 ; 품절 */
+		              ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 	                                                               /* 정상 */
+		        END AS SALE_PSB_CD                                            /* 판매가능상태코드 */
+				<if test="cookieYn == null or cookieYn == '' or !cookieYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)" >
+				, IF(MIG.SYS_REG_DTM IS NULL, '${@framework.front.constants.FrontConstants@COMM_YN_N}', '${@framework.front.constants.FrontConstants@COMM_YN_Y}') AS INTEREST_YN
+                , GD.SYS_REG_DTM
+                , GD.SYS_UPD_DTM
+                </if>
+			<choose>
+				<when test="cookieYn == null or cookieYn == '' or !cookieYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)" >
+					<include refid="fromBaseGoodsDtlInqrHist" />
+				</when>
+				<otherwise>
+					<include refid="fromGoodsBase" />
+				</otherwise>
+			</choose>   
+		) A
+		<choose>
+			<when test="cookieYn == null or cookieYn == '' or !cookieYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)" >
+				ORDER BY SYS_UPD_DTM DESC, SYS_REG_DTM DESC
+			</when>
+			<otherwise>
+			<foreach collection="goodsIds" item="goodsId" separator="," open="ORDER BY FIELD(A.GOODS_ID, " close=")">
+				#{goodsId}
+			</foreach>
+			</otherwise>
+		</choose>
+		
+	</sql>
+	
+	<sql id="fromBaseGoodsDtlInqrHist">
+		FROM GOODS_DTL_INQR_HIST GD
+		INNER JOIN GOODS_BASE GB ON GD.GOODS_ID = GB.GOODS_ID
+		INNER JOIN GOODS_IMG GI ON GI.GOODS_ID = GB.GOODS_ID
+		AND GI.DLGT_YN = 'Y'
+		LEFT JOIN MEMBER_INTEREST_GOODS MIG
+		ON GD.MBR_NO = MIG.MBR_NO
+		AND GD.GOODS_ID = MIG.GOODS_ID
+		WHERE GD.MBR_NO = #{mbrNo, jdbcType=INTEGER}
+		AND GD.SYS_UPD_DTM <![CDATA[>=]]> DATE_ADD(now(), INTERVAL - 7 DAY)
+	</sql>
+	
+	<sql id="fromGoodsBase">
+		FROM GOODS_BASE GB
+		INNER JOIN GOODS_IMG GI ON GI.GOODS_ID = GB.GOODS_ID
+		AND GI.DLGT_YN = 'Y'
+		<foreach collection="goodsIds" item="goods" separator="," open="AND GB.GOODS_ID IN (" close=")">
+			#{goods}
+		</foreach>
+	</sql>
+	
+	<select id="pageGoodsDtlInqrHist" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : goodsDtlInqrHist.pageGoodsDtlInqrHist
+			Description : 상품 상세 이력 조회 페이징
+		-->
+		/* QUERYID(goods.pageGoodsDtlInqrHist) */
+		<include refid="baseGoodsDtlInqrHist" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageGoodsDtlInqrHistCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsDtlInqrHist.pageGoodsDtlInqrHistCount
+			Description : 상품 상세 이력 조회 카운트
+		-->
+		/* QUERYID(goods.pageGoodsDtlInqrHistCount) */
+		SELECT COUNT(1)
+		<choose>
+			<when test="cookieYn != null and cookieYn != '' and cookieYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)">
+				<include refid="fromGoodsBase" />
+			</when>
+			<otherwise>
+				<include refid="fromBaseGoodsDtlInqrHist" />
+			</otherwise>
+		</choose> 
+	</select>
+</mapper>

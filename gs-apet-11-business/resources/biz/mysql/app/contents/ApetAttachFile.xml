@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="apetAttachFile">
+	<insert id="insertApetAttachFile" parameterType="biz.app.contents.model.ApetAttachFilePO">
+		<!--
+			Query Name	: apetAttachFile.insertApetAttachFile
+			Description	: Apet 첨부파일 등록
+		-->
+		INSERT INTO APET_ATTACH_FILE (	/* QUERYID(apetAttachFile.insertApetAttachFile) */
+			FL_NO				/* 파일번호 */
+			, SEQ				/* 순번 */
+			, CONTS_TP_CD		/* 컨텐츠 유형 코드 */
+			, PHY_PATH			/* 물리경로 */
+			, ORG_FL_NM			/* 원 파일명 */
+			, FL_SZ				/* 파일 크기 */
+			, VD_LNTH			/* 영상 길이 */
+			, OUTSIDE_VD_ID		/* 외부 영상 ID */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{flNo}				
+			, #{seq}			
+			, #{contsTpCd}		
+			, #{phyPath}		
+			, #{orgFlNm}		
+			, #{flSz}
+			, #{vdLnth}
+			, #{outsideVdId}		
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+
+	<update id="updateApetAttachFile" parameterType="biz.app.contents.model.ApetAttachFilePO">
+		<!-- Query Name : apetAttachFile.updateApetAttachFile
+			Description : Apet 첨부파일 수정
+		 -->
+		UPDATE APET_ATTACH_FILE SET /* QUERYID(apetAttachFile.updateApetAttachFile) */
+			PHY_PATH 		= #{phyPath } 	/* 파일 경로 */
+			, ORG_FL_NM 	= #{orgFlNm } 	/* 파일 명 */
+			, FL_SZ 		= #{flSz } 		/* 파일 사이즈 */
+			, VD_LNTH		= #{vdLnth }
+			, OUTSIDE_VD_ID = #{outsideVdId }
+		WHERE FL_NO = #{flNo}
+		<if test='contsTpCd != null and contsTpCd != ""'>
+			AND CONTS_TP_CD = #{contsTpCd}
+		</if>
+		<if test='seq != null'>
+			AND SEQ = #{seq}
+		</if>
+	</update>
+
+	<delete id="deleteApetAttatchFile" parameterType="biz.app.banner.model.BannerTagMapPO">
+		<!--
+			Query Name : apetAttachFile.deleteApetAttatchFile
+			Description : Apet 첨부파일 삭제
+		-->	
+		DELETE /* QUERYID(apetAttachFile.updateApetAttachFile) */
+		FROM	APET_ATTACH_FILE
+		WHERE 	FL_NO = #{flNo}
+		<if test='contsTpCd != null and contsTpCd != ""'>
+			AND CONTS_TP_CD = #{contsTpCd}
+		</if>
+		<if test='seq != null'>
+			AND SEQ = #{seq}
+		</if>
+	</delete>
+	
+	<insert id="insertApetAttachFileHist" parameterType="biz.app.contents.model.ApetAttachFileVO">
+		<!--
+			Query Name	: apetAttachFile.insertApetAttachFileHist
+			Description	: Apet 첨부파일 이력 등록
+		-->
+		INSERT INTO APET_ATTACH_FILE_HIST (	/* QUERYID(apetAttachFile.insertApetAttachFileHist) */
+			HIST_NO				/* 이력 번호 */
+			, FL_NO				/* 파일번호 */
+			, SEQ				/* 순번 */
+			, CONTS_TP_CD		/* 컨텐츠 유형 코드 */
+			, PHY_PATH			/* 물리경로 */
+			, ORG_FL_NM			/* 원 파일명 */
+			, FL_SZ				/* 파일 크기 */
+			, VD_LNTH			/* 영상 길이 */
+			, OUTSIDE_VD_ID		/* 외부 영상 ID */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{histNo}
+			, #{flNo}				
+			, #{seq}			
+			, #{contsTpCd}		
+			, #{phyPath}		
+			, #{orgFlNm}		
+			, #{flSz}
+			, #{vdLnth}
+			, #{outsideVdId}		
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

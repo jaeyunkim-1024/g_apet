@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 묶음 구성
+	작성자  	valueFactory
+	작성일자  	2020.01.15
+-->
+<mapper namespace="goodsCstrtPak">
+
+	<select id="listGoodsCstrtPak" resultType="biz.app.goods.model.GoodsCstrtPakVO" >
+		<!--
+			Query Name : goodsCstrtPak.listGoodsCstrtPak
+			Description : 상품 묶음 구성 리스트(이미지 추가)
+		-->
+		/* QUERYID(GoodsCstrtPak.listGoodsCstrtPak) */
+		
+		SELECT @ROWNUM := @ROWNUM + 1 ROWNUM
+			, item.ITEM_NO
+			, T1.GOODS_ID
+			, T2.BND_NO /* 브랜드 번호 */
+			, FN_GET_BRAND_NAME(T2.BND_NO) AS BND_NM_KO /* 브랜드 명*/
+			, T1.SUB_GOODS_ID
+			, T1.CSTRT_SHOW_NM
+			, T1.DISP_PRIOR_RANK
+			, T1.SHOW_YN
+            , T2.GOODS_NM
+			, T1.SYS_REG_DTM
+            , T1.SYS_UPD_DTM
+            , T1.SYS_REGR_NO
+            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+	        , T1.SYS_UPDR_NO
+            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+            , T3.SALE_AMT
+            , ATTR1_NO, ATTR1_NM, ATTR1_VAL
+			, ATTR2_NO, ATTR2_NM, ATTR2_VAL
+			, ATTR3_NO, ATTR3_NM, ATTR3_VAL
+			, ATTR4_NO, ATTR4_NM, ATTR4_VAL
+			, ATTR5_NO, ATTR5_NM, ATTR5_VAL
+			, GI.IMG_PATH
+			, IFNULL(T2.MIN_ORD_QTY, 1) MIN_ORD_QTY /* 최소 주문 수량 */
+			, IFNULL(T2.MAX_ORD_QTY, '') MAX_ORD_QTY /* 최대 주문 수량(null은 제한없이 구매가능.) */
+			, IFNULL(T2.ORDMKI_YN, 'N') as ORDMKI_YN /* 주문제작 여부 */
+			, T2.IO_ALM_YN
+			, CASE					
+					WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T2.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                    	THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                  	WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    	THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */     			
+					WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+					WHEN T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN T2.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+					WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+				  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+			, FN_GET_GOODS_STOCK(T1.SUB_GOODS_ID, NULL) AS WEB_STK_QTY  
+		FROM (SELECT @ROWNUM := 0 ) VAR, GOODS_CSTRT_PAK T1
+        JOIN GOODS_BASE T2 ON( T2.GOODS_ID = T1.SUB_GOODS_ID )
+		LEFT JOIN ITEM item ON t2.GOODS_ID  = item.GOODS_ID
+		JOIN GOODS_PRICE T3 ON (T2.GOODS_ID = T3.GOODS_ID AND NOW() BETWEEN T3.SALE_STRT_DTM AND T3.SALE_END_DTM AND T3.DEL_YN= '${@framework.common.constants.CommonConstants@COMM_YN_N}')
+        LEFT OUTER JOIN ITEM I ON (I.GOODS_ID = T2.GOODS_ID)
+		LEFT OUTER JOIN ITEM_ATTR_HIST ATTR 
+			ON ( ATTR.ITEM_NO = I.ITEM_NO 
+				AND ATTR.ITEM_ATTR_HIST_NO = ( SELECT MAX(ITEM_ATTR_HIST_NO) FROM ITEM_ATTR_HIST TT 
+												WHERE TT.ITEM_NO = I.ITEM_NO AND ( TT.USE_YN IS NULL OR TT.USE_YN = 'Y' )))
+		LEFT OUTER JOIN GOODS_IMG GI ON GI.GOODS_ID = T2.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		WHERE 1 = 1
+		AND T1.GOODS_ID = #{goodsId}
+		ORDER BY T1.DISP_PRIOR_RANK
+	</select>
+	
+	<select id="getMainDlvrcPlcNo" resultType="Integer" >
+		SELECT A.DLVRC_PLC_NO
+			FROM (	
+			
+				SELECT @ROWNUM := @ROWNUM + 1 ROWNUM
+					, item.ITEM_NO
+					, T1.GOODS_ID
+					, T2.BND_NO /* 브랜드 번호 */
+					, FN_GET_BRAND_NAME(T2.BND_NO) AS BND_NM_KO /* 브랜드 명*/
+					, T1.SUB_GOODS_ID
+					, T1.CSTRT_SHOW_NM
+					, T1.DISP_PRIOR_RANK
+					, T1.SHOW_YN
+		            , T2.GOODS_NM
+					, T1.SYS_REG_DTM
+		            , T1.SYS_UPD_DTM
+		            , T1.SYS_REGR_NO
+		            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+			        , T1.SYS_UPDR_NO
+		            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+		            , T3.SALE_AMT
+		            , ATTR1_NO, ATTR1_NM, ATTR1_VAL
+					, ATTR2_NO, ATTR2_NM, ATTR2_VAL
+					, ATTR3_NO, ATTR3_NM, ATTR3_VAL
+					, ATTR4_NO, ATTR4_NM, ATTR4_VAL
+					, ATTR5_NO, ATTR5_NM, ATTR5_VAL
+					, GI.IMG_PATH
+					, IFNULL(T2.MIN_ORD_QTY, 1) MIN_ORD_QTY /* 최소 주문 수량 */
+					, IFNULL(T2.MAX_ORD_QTY, '') MAX_ORD_QTY /* 최대 주문 수량(null은 제한없이 구매가능.) */
+					, IFNULL(T2.ORDMKI_YN, 'N') as ORDMKI_YN /* 주문제작 여부 */
+					, T2.IO_ALM_YN
+					, CASE
+							WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T2.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                    			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                  			WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */    
+							WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+							WHEN T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+							WHEN T2.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+							WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+							ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+						  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+					, FN_GET_GOODS_STOCK(T1.SUB_GOODS_ID, NULL) AS WEB_STK_QTY
+					, T2.DLVRC_PLC_NO  
+				FROM (SELECT @ROWNUM := 0 ) VAR, GOODS_CSTRT_PAK T1
+		        JOIN GOODS_BASE T2 ON( T2.GOODS_ID = T1.SUB_GOODS_ID )
+				LEFT JOIN ITEM item ON t2.GOODS_ID  = item.GOODS_ID
+				JOIN GOODS_PRICE T3 ON (T2.GOODS_ID = T3.GOODS_ID AND NOW() BETWEEN T3.SALE_STRT_DTM AND T3.SALE_END_DTM AND T3.DEL_YN= '${@framework.common.constants.CommonConstants@COMM_YN_N}')
+		        LEFT OUTER JOIN ITEM I ON (I.GOODS_ID = T2.GOODS_ID)
+				LEFT OUTER JOIN ITEM_ATTR_HIST ATTR 
+					ON ( ATTR.ITEM_NO = I.ITEM_NO 
+						AND ATTR.ITEM_ATTR_HIST_NO = ( SELECT MAX(ITEM_ATTR_HIST_NO) FROM ITEM_ATTR_HIST TT 
+														WHERE TT.ITEM_NO = I.ITEM_NO AND ( TT.USE_YN IS NULL OR TT.USE_YN = 'Y' )))
+				LEFT OUTER JOIN GOODS_IMG GI ON GI.GOODS_ID = T2.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				WHERE 1 = 1
+				AND T1.GOODS_ID = #{goodsId}
+				ORDER BY T1.DISP_PRIOR_RANK
+				) A
+		LEFT JOIN DELIVERY_CHARGE_POLICY D
+		    ON (A.DLVRC_PLC_NO =  D.DLVRC_PLC_NO)
+		WHERE a.WEB_STK_QTY != 0
+		LIMIT 1
+	</select>
+	
+	<select id="getDlvrcPlcNo" resultType="Integer" >
+		SELECT DLVRC_PLC_NO
+		  FROM GOODS_BASE
+		  WHERE GOODS_ID = #{goodsId}
+	</select>
+	
+	<select id="listPakGoodsCstrtPak" resultType="biz.app.goods.model.GoodsCstrtPakVO" >
+		<!--
+			Query Name : goodsCstrtPak.listPakGoodsCstrtPak
+			Description : 상품 묶음 구성 리스트(이미지 추가)
+		-->
+		/* QUERYID(GoodsCstrtPak.listPakGoodsCstrtPak) */
+		SELECT 	@ROWNUM := @ROWNUM + 1 ROWNUM
+				, X.* 
+		FROM (SELECT @ROWNUM := 0 ) VAR, (
+			SELECT item.ITEM_NO
+				, T1.GOODS_ID
+				, T2.BND_NO /* 브랜드 번호 */
+				, FN_GET_BRAND_NAME(T2.BND_NO) AS BND_NM_KO /* 브랜드 명*/
+				, T1.SUB_GOODS_ID
+				, T1.CSTRT_SHOW_NM
+				, T1.DISP_PRIOR_RANK
+				, T1.SHOW_YN
+	            , T2.GOODS_NM
+				, T1.SYS_REG_DTM
+	            , T1.SYS_UPD_DTM
+	            , T1.SYS_REGR_NO
+	            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+		        , T1.SYS_UPDR_NO
+	            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+	            , T3.SALE_AMT
+	            , ATTR1_NO, ATTR1_NM, ATTR1_VAL
+				, ATTR2_NO, ATTR2_NM, ATTR2_VAL
+				, ATTR3_NO, ATTR3_NM, ATTR3_VAL
+				, ATTR4_NO, ATTR4_NM, ATTR4_VAL
+				, ATTR5_NO, ATTR5_NM, ATTR5_VAL
+				, GI.IMG_PATH
+				, IFNULL(T2.MIN_ORD_QTY, 1) MIN_ORD_QTY /* 최소 주문 수량 */
+				, IFNULL(T2.MAX_ORD_QTY, '') MAX_ORD_QTY /* 최대 주문 수량(null은 제한없이 구매가능.) */
+				, IFNULL(T2.ORDMKI_YN, 'N') as ORDMKI_YN /* 주문제작 여부 */
+				, T2.IO_ALM_YN
+				, IFNULL(T2.OSTK_GOODS_SHOW_YN, 'Y') AS OSTK_GOODS_SHOW_YN 
+				, T2.GOODS_STAT_CD
+				, CASE						
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T2.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                    		THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                  		WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    		THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */    
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+						WHEN T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+						WHEN T2.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+						WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+						ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+					  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+				, CASE WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 THEN 'Y' ELSE 'N' END AS SOLD_OUT_YN
+			FROM GOODS_CSTRT_PAK T1
+	        JOIN GOODS_BASE T2 ON( T2.GOODS_ID = T1.SUB_GOODS_ID )
+			LEFT JOIN ITEM item ON t2.GOODS_ID  = item.GOODS_ID
+			JOIN GOODS_PRICE T3 ON (T2.GOODS_ID = T3.GOODS_ID AND NOW() BETWEEN T3.SALE_STRT_DTM AND T3.SALE_END_DTM AND T3.DEL_YN= '${@framework.common.constants.CommonConstants@COMM_YN_N}')
+	        LEFT OUTER JOIN ITEM I ON (I.GOODS_ID = T2.GOODS_ID)
+			LEFT OUTER JOIN ITEM_ATTR_HIST ATTR 
+				ON ( ATTR.ITEM_NO = I.ITEM_NO 
+					AND ATTR.ITEM_ATTR_HIST_NO = ( SELECT MAX(ITEM_ATTR_HIST_NO) FROM ITEM_ATTR_HIST TT 
+													WHERE TT.ITEM_NO = I.ITEM_NO AND ( TT.USE_YN IS NULL OR TT.USE_YN = 'Y' )))
+			LEFT OUTER JOIN GOODS_IMG GI ON GI.GOODS_ID = T2.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			WHERE 1 = 1
+			AND T1.GOODS_ID = #{goodsId}
+			AND T1.SHOW_YN = 'Y'
+		) X
+		WHERE 1 = 1
+		AND (X.SOLD_OUT_YN = 'N' OR X.OSTK_GOODS_SHOW_YN = 'Y') 
+		AND X.GOODS_STAT_CD <![CDATA[<>]]> '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+		<if test='soldOutExceptYn == "Y"'> 
+		AND X.SOLD_OUT_YN = 'N' 
+		</if>
+		ORDER BY X.DISP_PRIOR_RANK
+	</select>
+	
+	<select id="listOptionGoodsCstrtPak" resultType="biz.app.goods.model.GoodsCstrtPakVO" >
+		<!--
+			Query Name : goodsCstrtPak.listOptionGoodsCstrtPak
+			Description : 옵션상품 옵션 구성 리스트
+		-->
+		/* QUERYID(GoodsCstrtPak.listOptionGoodsCstrtPak) */
+
+		SELECT 	@ROWNUM := @ROWNUM + 1 ROWNUM
+				, X.* 
+		FROM (SELECT @ROWNUM := 0 ) VAR, (
+			SELECT item.ITEM_NO
+				, T1.GOODS_ID
+				, T2.BND_NO /* 브랜드 번호 */
+				, FN_GET_BRAND_NAME(T2.BND_NO) AS BND_NM_KO /* 브랜드 명*/
+				, T1.SUB_GOODS_ID
+				, T1.CSTRT_SHOW_NM
+				, T1.DISP_PRIOR_RANK
+				, T1.SHOW_YN
+	            , T2.GOODS_NM
+	            , max(if(a.ATTR_NO = #{attr1No}, concat(a.attr_no, '-', iav.ATTR_VAL_NO) , 0)) as ATTR1_NO
+	            , max(if(a.ATTR_NO = #{attr2No}, concat(a.attr_no, '-', iav.ATTR_VAL_NO), 0)) as ATTR2_NO
+	            , max(if(a.ATTR_NO = #{attr3No}, concat(a.attr_no, '-', iav.ATTR_VAL_NO), 0)) as ATTR3_NO
+	            , max(if(a.ATTR_NO = #{attr4No}, concat(a.attr_no, '-', iav.ATTR_VAL_NO), 0)) as ATTR4_NO
+	            , max(if(a.ATTR_NO = #{attr5No}, concat(a.attr_no, '-', iav.ATTR_VAL_NO), 0)) as ATTR5_NO
+	            , a.ATTR_NO
+	            , a.ATTR_NM
+	            , av.ATTR_VAL_NO
+	            , av.ATTR_VAL 
+				, T1.SYS_REG_DTM
+	            , T1.SYS_UPD_DTM
+	            , T1.SYS_REGR_NO
+	            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+		        , T1.SYS_UPDR_NO
+	            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+	            , T3.SALE_AMT
+				, GI.IMG_PATH
+				, IFNULL(T2.MIN_ORD_QTY, 1) MIN_ORD_QTY /* 최소 주문 수량 */
+				, IFNULL(T2.MAX_ORD_QTY, '') MAX_ORD_QTY /* 최대 주문 수량(null은 제한없이 구매가능.) */
+				, IFNULL(T2.ORDMKI_YN, 'N') as ORDMKI_YN /* 주문제작 여부 */
+				, T2.IO_ALM_YN
+				, IFNULL(T2.OSTK_GOODS_SHOW_YN, 'Y') AS OSTK_GOODS_SHOW_YN 
+				, CASE							
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T2.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                    		THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                  		WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    		THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */    
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+						WHEN T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+						WHEN T2.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+						WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+						ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+					  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+				, CASE WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, item.ITEM_NO)  <![CDATA[<=]]> 0 THEN 'Y' ELSE 'N' END AS SOLD_OUT_YN
+			FROM GOODS_CSTRT_PAK T1
+	        JOIN GOODS_BASE T2 ON( T2.GOODS_ID = T1.SUB_GOODS_ID )
+			LEFT JOIN ITEM item ON t2.GOODS_ID  = item.GOODS_ID
+			JOIN GOODS_PRICE T3 ON (T2.GOODS_ID = T3.GOODS_ID AND NOW() BETWEEN T3.SALE_STRT_DTM AND T3.SALE_END_DTM AND T3.DEL_YN= 'N')
+			left outer join item_attribute_value iav on item.ITEM_NO = iav.ITEM_NO
+			left outer join `attribute` a on a.ATTR_NO = iav.ATTR_NO 
+			left outer join attribute_value av on av.ATTR_NO = iav.ATTR_NO and av.ATTR_VAL_NO = iav.ATTR_VAL_NO 
+			LEFT OUTER JOIN GOODS_IMG GI ON GI.GOODS_ID = T2.GOODS_ID AND GI.DLGT_YN = 'Y'
+			WHERE 1 = 1
+	 		AND T2.GOODS_ID = #{subGoodsId}
+			group by item.ITEM_NO
+			ORDER BY a.ATTR_NO 
+		) X
+		WHERE 1=1
+		AND (X.SOLD_OUT_YN = 'N' OR X.OSTK_GOODS_SHOW_YN = 'Y') 
+		<if test="attr1No != null and attr1No != ''">
+			AND ATTR1_NO = CONCAT(#{attr1No}, '-', #{attr1ValNo}) 
+		</if>
+		<if test="attr2No != null and attr2No != ''">
+			AND ATTR2_NO = CONCAT(#{attr2No}, '-', #{attr2ValNo}) 
+		</if>
+		<if test="attr3No != null and attr3No != ''">
+			AND ATTR3_NO = CONCAT(#{attr3No}, '-', #{attr3ValNo}) 
+		</if>
+		<if test="attr4No != null and attr4No != ''">
+			AND ATTR4_NO = CONCAT(#{attr4No}, '-', #{attr4ValNo}) 
+		</if>
+		<if test="attr5No != null and attr5No != ''">
+			AND ATTR5_NO = CONCAT(#{attr5No}, '-', #{attr5ValNo}) 
+		</if>
+		<if test='soldOutExceptYn == "Y"'> 
+			AND X.SOLD_OUT_YN = 'N' 
+		</if>
+	</select>
+	
+	<insert id="insertGoodsCstrtPak" parameterType="biz.app.goods.model.GoodsCstrtPakPO" >
+		<!--
+			Query Name : goodsCstrtPak.insertGoodsCstrtPak
+			Description : 상품 묶음 구성 등록
+		-->
+		/* QUERYID(GoodsCstrtPak.insertGoodsCstrtPak) */
+		
+		INSERT INTO GOODS_CSTRT_PAK (
+			GOODS_ID
+			, SUB_GOODS_ID
+			, CSTRT_SHOW_NM
+			, DISP_PRIOR_RANK
+			, SHOW_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{goodsId}
+			, #{subGoodsId}
+			, #{cstrtShowNm}
+			, #{dispPriorRank}
+			, #{showYn}
+			, #{sysRegrNo}
+			, now() 
+			, #{sysUpdrNo}
+			, now() 
+		)ON DUPLICATE KEY UPDATE
+			SHOW_YN = VALUES(SHOW_YN)
+			, SYS_UPDR_NO = VALUES(SYS_UPDR_NO)
+			, SYS_UPD_DTM = VALUES(SYS_UPD_DTM)
+	</insert>
+	
+	<delete id="deleteGoodsCstrtPak" parameterType="biz.app.goods.model.GoodsCstrtPakPO" >
+		<!--
+			Query Name : goodsCstrtPak.deleteGoodsCstrtPak
+			Description : 상품 묶음 구성 삭제
+		-->
+		/* QUERYID(goodsCstrtPak.deleteGoodsCstrtPak) */
+		
+		DELETE FROM GOODS_CSTRT_PAK
+		WHERE 1=1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+	
+	<select id="getCommentCstrtList" resultType="biz.app.goods.model.GoodsBaseVO" >
+		SELECT GCP.SUB_GOODS_ID AS GOODS_ID 
+			, GB2.GOODS_NM
+		FROM GOODS_BASE GB 
+		JOIN GOODS_CSTRT_PAK GCP ON GCP.GOODS_ID = GB.GOODS_ID
+		JOIN GOODS_BASE GB2 ON GB2.GOODS_ID = GCP.SUB_GOODS_ID
+		WHERE 1 = 1
+		AND GB.GOODS_ID = #{goodsId}
+		AND (GCP.SHOW_YN = 'Y' OR GCP.SHOW_YN IS NULL) 
+		AND GB.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND GB2.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND (GCP.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			OR GCP.SHOW_YN IS NULL)
+		AND (GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			OR GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}')
+		AND (GB2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			OR GB2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}')
+		ORDER BY GCP.DISP_PRIOR_RANK ASC 
+	</select>
+</mapper>

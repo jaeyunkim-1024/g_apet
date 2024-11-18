@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO
+		<include class="header mo" data-include-html="../inc/header_mo_shop.html"></include>
+		 -->
+		<!-- 헤더 PC
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+		-->
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page changeBb" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- log head-->
+					<div class="log_hanBoxTop b">
+						<a href="javascript:;" class="lhbt_btn l icon_al"></a>
+						<div class="tit">사진 편집</div>
+						<a href="javascript:;" class="lhbt_btn r active_color">완료</a><!-- 파란색 color 'active_color' class 추가-->
+					</div>
+					<!-- //log head-->
+					<!-- 사진편집 content-->
+					<div class="log_editPicWrap">
+
+					</div>
+					<!-- // 사진편집 content-->
+					<!-- 하단 안내 문구-->
+					<div class="log_bothInfoEditPicTxt">
+						<span class="log_iconRecPhoto"></span>사진의 영역을 지정해주세요.
+					</div>
+					<!-- // 하단 안내 문구-->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

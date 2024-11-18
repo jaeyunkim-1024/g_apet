@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"프로필 편집","logo":"log","btr":"만들기"}'></include>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page " id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log my" id="contents">
+					<!-- align wrap-->
+					<div class="logProfileAalignWrap head_f">
+						<div class="pc-tit">
+							<h2>프로필 편집</h2>
+						</div>
+						<!-- 프로필 사진 -->
+						<div class="my-picture big bg1"><!-- 2021.03.23 : bg1 클래스 추가 -->
+							<p class="picture">
+								<!-- <img src="../../_images/_temp/temp_logDogImg02.png" alt="img"> -->
+							</p>
+							<button class="btn edit"></button>
+						</div>
+						<!-- // 프로필 사진 -->
+						<!-- 정보 입력 -->
+						<div class="member-input">
+							<ul class="list">
+								<li style="margin-bottom:0;">
+									<strong class="tit">한줄 소개</strong>
+									<div class="input">
+										<!-- <div class="input del coms"><input type="text" placeholder="텍스트 입력" value="텍스트"><button type="button" class="btnDel" tabindex="-1">삭제</button></div> -->
+										<!-- APET-1104 210611 lju02 -->
+										<div class="textarea">
+											<textarea id="text" class="introduction" placeholder="MY 로그를 소개해주세요."></textarea>	<!-- APET-1250 210721 lju02 - 샵 서비스명 변경 -->
+											<button type="button" class="btn_del" tabindex="-1">삭제</button>
+										</div>
+										<!-- //APET-1104 210611 lju02 -->
+									</div>
+									<p class="validation-check">50자 이내로 입력해주세요.</p>	<!-- APET-1104 210610 lju03 30자에서 50자로 변경 -->
+								</li>
+							</ul>
+						</div>
+						
+						<!-- // 정보 입력 -->
+						<div class="btnSet moBtn">
+							<a href="javascript:;" class="btn lg a">저장</a>
+						</div>
+						<!-- 버튼 -->
+						<div class="btnSet logPosition">
+							<a href="javascript:;" class="btn lg b">취소</a>
+							<a href="javascript:;" class="btn lg a">저장</a>
+						</div>
+						<!-- // 버튼 -->
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+        <include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"hide","talk_mo":"hide","foot_pc":"","talk_pc":""}'></include>
+	</div>
+	<!-- APET-1104 210611 lju02 -->
+	<script>
+		$('.introduction').on('keyup', function() {
+			if($(this).val().length > 0) {
+				$(".btn_del").css({'display':'block'});
+			}else{
+				$(".btn_del").css({'display':'none'});
+			}
+		});
+
+		$(".btn_del").click(function(event){
+			$( ".introduction" ).val('');
+			$(this).css({'display':'none'});
+		});
+	</script>
+	<!-- //APET-1104 210611 lju02 -->
+</body>
+</html>

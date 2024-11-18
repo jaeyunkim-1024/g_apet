@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	주문 배송지
+	일자 : 2017. 01. 23
+	작성자 : snw
+-->
+
+<mapper namespace="orderDlvra">
+
+	<insert id="insertOrderDlvra">
+		<!--
+			Query Name : orderDlvra.insertOrderDlvra
+			Description : 주문 배송지 등록
+		-->
+		INSERT INTO ORDER_DLVRA 
+		(
+			ORD_DLVRA_NO			/* 주문 배송지 번호 */
+			, ORD_NO				/* 주문 번호 */
+			, CLM_NO				/* 클레임 번호 */
+			, GB_NM					/* 배송지 명*/
+			, ADRS_NM				/* 수취인 명 */
+			, TEL						/* 전화 */
+			, MOBILE					/* 휴대폰 */
+			, POST_NO_OLD			/* 우편 번호 구 */
+			, PRCL_ADDR				/* 지번 주소 */
+			, PRCL_DTL_ADDR		/* 지번 상세 주소 */
+			, POST_NO_NEW		/* 우편 번호 신 */
+			, ROAD_ADDR			/* 도로명 주소 */
+			, ROAD_DTL_ADDR		/* 도로명 상세 주소 */
+			, DLVR_MEMO			/* 배송 매모 */
+			, GOODS_RCV_PST_CD		/* 상품 수령 위치 코드 */
+			, GOODS_RCV_PST_ETC		/* 상품 수령 위치 기타 */
+			, DLVR_DEMAND_YN		/* 배송 요청사항 여부 */
+			, PBL_GATE_ENT_MTD_CD	/* 공동 현관 출입 방법 코드 */
+			, PBL_GATE_PSWD			/* 공동 현관 비밀번호 */
+			, DLVR_DEMAND			/* 배송 요청사항 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{ordDlvraNo}			/* 주문 배송지 번호 */
+			, #{ordNo}				/* 주문 번호 */
+			, #{clmNo}				/* 클레임 번호 */
+			, #{gbNm}				/* 배송지 명 */
+			, #{adrsNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 수취인 명 */
+			, #{tel, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}						/* 전화 */
+			, #{mobile, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 휴대폰 */
+			, #{postNoOld}			/* 우편 번호 구 */
+			, #{prclAddr}				/* 지번 주소 */
+			, #{prclDtlAddr, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 지번 상세 주소 */
+			, #{postNoNew}			/* 우편 번호 신 */
+			, #{roadAddr}			/* 도로명 주소 */
+			, #{roadDtlAddr, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 도로명 상세 주소 */
+			, IFNULL(#{dlvrDemand}, #{dlvrMemo})	/* 배송 매모 */
+			, #{goodsRcvPstCd}		/* 상품 수령 위치 코드 */
+			, #{goodsRcvPstEtc}		/* 상품 수령 위치 기타 */
+			, #{dlvrDemandYn}		/* 배송 요청사항 여부 */
+			, #{pblGateEntMtdCd}	/* 공동 현관 출입 방법 코드 */
+			, #{pblGatePswd, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 공동 현관 비밀번호 */
+			, IFNULL(#{dlvrDemand}, #{dlvrMemo})		/* 배송 요청사항 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<select id="listOrderDlvra" resultType="biz.app.order.model.OrderDlvraVO">
+		<!--
+			Query Name : orderDlvra..listOrderDlvra
+			Description : 주문 배송지 목록 조회
+		-->
+		SELECT	/* QUERYID(orderDlvra..listOrderDlvra) */
+					ORD_DLVRA_NO
+					, GB_NM
+					, ADRS_NM
+					, TEL
+					, MOBILE
+					, POST_NO_OLD
+					, PRCL_ADDR
+					, PRCL_DTL_ADDR
+					, CONCAT_WS(' ', PRCL_ADDR, PRCL_DTL_ADDR) AS  FULL_PRCL_ADDR
+					, POST_NO_NEW
+					, ROAD_ADDR
+					, ROAD_DTL_ADDR
+					, CONCAT_WS(' ', ROAD_ADDR, ROAD_DTL_ADDR) AS  FULL_ROAD_ADDR
+					, DLVR_MEMO
+					, GOODS_RCV_PST_CD		/* 상품 수령 위치 코드 */
+					, GOODS_RCV_PST_ETC		/* 상품 수령 위치 기타 */
+					, DLVR_DEMAND_YN		/* 배송 요청사항 여부 */
+					, PBL_GATE_ENT_MTD_CD	/* 공동 현관 출입 방법 코드 */
+					, PBL_GATE_PSWD			/* 공동 현관 비밀번호 */
+					, DLVR_DEMAND			/* 배송 요청사항 */
+					, SYS_REGR_NO
+					, SYS_REG_DTM
+					, SYS_UPDR_NO
+					, SYS_UPD_DTM
+		FROM		ORDER_DLVRA ODA
+		WHERE	1 = 1
+		<if test="clmNo != null and clmNo != ''">
+		AND    	(ORD_DLVRA_NO  IN (SELECT DLVRA_NO FROM CLAIM_DETAIL WHERE CLM_NO = #{clmNo}) 
+					OR ORD_DLVRA_NO IN (SELECT RTRNA_NO FROM CLAIM_DETAIL WHERE CLM_NO = #{clmNo}) 
+					)
+		</if>
+		<if test="arrOrdDlvraNo != null and arrOrdDlvraNo.length > 0">
+		AND		ORD_DLVRA_NO IN (
+			<foreach collection="arrOrdDlvraNo" item="arrOrdDlvraNo" separator=",">
+				#{arrOrdDlvraNo}
+			</foreach>
+		)
+		</if>
+	</select>	
+		
+	<select id="getOrderDlvra" resultType="biz.app.order.model.OrderDlvraVO">
+		<!--
+			Query Name : orderDlvra..getOrderDlvra
+			Description : 주문 배송지 단건 조회
+		-->
+		SELECT	/* QUERYID(orderDlvra.getOrderDlvra) */
+			OD.ORD_DLVRA_NO
+			, OD.ADRS_NM
+			, OD.GB_NM
+			, OD.TEL
+			, OD.MOBILE
+			, OD.POST_NO_OLD
+			, OD.PRCL_ADDR
+			, OD.PRCL_DTL_ADDR
+			, OD.POST_NO_NEW
+			, OD.ROAD_ADDR
+			, OD.ROAD_DTL_ADDR
+			, OD.DLVR_MEMO
+			, OD.GOODS_RCV_PST_CD		/* 상품 수령 위치 코드 */
+			, OD.GOODS_RCV_PST_ETC		/* 상품 수령 위치 기타 */
+			/*, OD.DLVR_DEMAND_YN		 배송 요청사항 여부 */
+			, OD.PBL_GATE_ENT_MTD_CD	/* 공동 현관 출입 방법 코드 */
+			, OD.PBL_GATE_PSWD			/* 공동 현관 비밀번호 */
+			, OD.DLVR_DEMAND			/* 배송 요청사항 */
+			,case GOODS_RCV_PST_CD 
+				when '10' then		/*문앞*/
+				(
+					case OD.PBL_GATE_ENT_MTD_CD when '10' then 'Y'
+						when '30' then 'Y'
+						else'N'
+					end 					
+				)
+				when '20' then	
+				(
+					case OD.PBL_GATE_ENT_MTD_CD when '20' then 'Y'
+						when '30' then 'Y'
+						else'N'
+					end 	
+				)	
+				when '30' then 'Y'				 
+				when '40' then
+				(
+					case IFNULL(OD.GOODS_RCV_PST_ETC, '') when '' then 'N'						
+						else 'Y'
+					end
+				)
+				else
+					'N'
+			end as DLVR_DEMAND_YN
+			, OD.SYS_REGR_NO
+			, OD.SYS_REG_DTM
+			, OD.SYS_UPDR_NO
+			, OD.SYS_UPD_DTM
+			, OD.GB_NM
+			, DAI.DLVR_AREA_CD
+			<!-- , DAI.DLVR_AREA_NM  //2021.04.12 by kek01 주석처리 -->
+			, DAPM.DLVR_AREA_NM
+			, DAI.DLVR_CNTR_CD
+			, DAI.DLVR_CNTR_NM
+			, DAI.DLVR_PRCS_TP_CD
+			, DAPM.SIDO
+			, DAPM.GUGUN
+			, DAPM.DONG
+			, ORD.DLVR_CPLT_PIC_URL
+			, ORD.DLVR_SMS
+			, ORD.DLVR_CPLT_YN
+		FROM
+		    ORDER_DLVRA OD
+	LEFT OUTER JOIN ORD_DLVR_AREA_MAP ODAM
+				 ON OD.ORD_NO = ODAM.ORD_NO
+				AND ODAM.DEL_YN = 'N'
+	LEFT OUTER JOIN DLVR_AREA_INFO DAI
+				 ON DAI.DLVR_AREA_NO = ODAM.DLVR_AREA_NO
+	LEFT OUTER JOIN DLVR_AREA_POST_MAP DAPM
+			  	 ON DAPM.DLVR_AREA_NO = DAI.DLVR_AREA_NO
+			  	AND DAPM.POST_NO = OD.POST_NO_NEW
+	LEFT OUTER JOIN ORDER_DETAIL ORD
+				 ON ORD.ORD_NO = OD.ORD_NO
+				AND ORD.ORD_DTL_SEQ = (SELECT ORD_DTL_SEQ FROM ORDER_DETAIL WHERE ORD_NO = OD.ORD_NO ORDER BY ORD_DTL_SEQ LIMIT 1)
+		WHERE	1 = 1
+		<if test="ordDlvraNo != null and ordDlvraNo != ''">
+		AND		OD.ORD_DLVRA_NO = #{ordDlvraNo}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND    OD.ORD_DLVRA_NO  IN (SELECT ORD_DLVRA_NO FROM ORDER_DETAIL WHERE ORD_NO = #{ordNo}) 
+		</if>
+	</select>	
+	
+</mapper>

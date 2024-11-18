@@ -1,0 +1,116 @@
+﻿@charset "utf-8";
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 100;
+	src: url('../../_font/NotoSansKR-Thin.eot');
+	src: url('../../_font/NotoSansKR-Thin.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Thin.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Thin.woff') format('woff');
+}
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 300;
+	src: url('../../_font/NotoSansKR-Light.eot');
+	src: url('../../_font/NotoSansKR-Light.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Light.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Light.woff') format('woff');
+}
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 400;
+	src: url('../../_font/NotoSansKR-Regular.eot');
+	src: url('../../_font/NotoSansKR-Regular.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Regular.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Regular.woff') format('woff');
+}
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 500;
+	src: url('../../_font/NotoSansKR-Medium.eot');
+	src: url('../../_font/NotoSansKR-Medium.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Medium.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Medium.woff') format('woff');
+}
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 700;
+	src: url('../../_font/NotoSansKR-Bold.eot');
+	src: url('../../_font/NotoSansKR-Bold.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Bold.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Bold.woff') format('woff');
+}
+@font-face {font-family: 'NotoSansKR';font-style: normal;font-weight: 900;
+	src: url('../../_font/NotoSansKR-Black.eot');
+	src: url('../../_font/NotoSansKR-Black.eot?#iefix') format('embedded-opentype'),
+		 url('../../_font/NotoSansKR-Black.woff2') format('woff2'),
+		 url('../../_font/NotoSansKR-Black.woff') format('woff');
+}
+
+
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 100;
+    src: url('../../_font/roboto-v20-latin-100.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Thin'), local('Roboto-Thin'),
+         url('../../_font/roboto-v20-latin-100.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-100.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-100.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-100.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-100.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-300 - latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 300;
+    src: url('../../_font/roboto-v20-latin-300.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Light'), local('Roboto-Light'),
+         url('../../_font/roboto-v20-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-300.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-300.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-regular - latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../../_font/roboto-v20-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local('Roboto'), local('Roboto-Regular'),
+         url('../../_font/roboto-v20-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-500 - latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    src: url('../../_font/roboto-v20-latin-500.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Medium'), local('Roboto-Medium'),
+         url('../../_font/roboto-v20-latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-500.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-500.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-700 - latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../../_font/roboto-v20-latin-700.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Bold'), local('Roboto-Bold'),
+         url('../../_font/roboto-v20-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-700.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-900 - latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 900;
+    src: url('../../_font/roboto-v20-latin-900.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Black'), local('Roboto-Black'),
+         url('../../_font/roboto-v20-latin-900.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../../_font/roboto-v20-latin-900.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../../_font/roboto-v20-latin-900.woff') format('woff'), /* Modern Browsers */
+         url('../../_font/roboto-v20-latin-900.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../../_font/roboto-v20-latin-900.svg#Roboto') format('svg'); /* Legacy iOS */
+  }

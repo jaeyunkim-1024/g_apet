@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pntInfo">
+
+	<select id="pagePntInfo" resultType="biz.app.system.model.PntInfoVO">
+		<!--
+			Query Name : pntInfo.pagePntInfo
+			Description : pagePntInfo
+		-->
+		SELECT	/* QUERYID(pntInfo.pagePntInfo) */
+				  PNT_NO 		 /* 포인트 번호 */
+				, PNT_TP_CD 	 /* 포인트 유형 코드 */
+				, SAVE_RATE 	 /* 적립률 */
+				, ADD_SAVE_RATE 	 /* 추가 적립률 */
+				, USE_RATE 		 /* 사용율 */
+				, IF_GOODS_CD 	 /* 상품 코드 */
+				, ALT_IF_GOODS_CD /* 대체 상품 코드 */
+				, PNT_PRMT_GB_CD /* 포인트 프로모션 구분 코드 */
+				, MAX_SAVE_PNT 	 /* 최대 적립 포인트 */
+				, APL_STRT_DTM	 /* 적용 시작 일시 */
+				, APL_END_DTM	 /* 적용 종료 일시 */
+				, USE_YN		 /* 사용 여부 */
+				, SYS_REGR_NO 	 /* 시스템 등록자 번호 */
+				, SYS_REG_DTM 	 /* 시스템 등록 일시 */
+				, SYS_UPDR_NO 	 /* 시스템 수정자 번호 */
+				, SYS_UPD_DTM 	 /* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	PNT_INFO
+		WHERE	1=1
+		<if test="pntTpCd != null and pntTpCd != ''">
+		AND		PNT_TP_CD = #{pntTpCd}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pagePntInfoCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pntInfo.pagePntInfoCount
+			Description : pagePntInfoCount
+		-->
+		SELECT /* QUERYID(pntInfo.pagePntInfoCount) */
+				COUNT(*)
+		FROM	PNT_INFO
+		WHERE	1 = 1
+		<if test="pntTpCd != null and pntTpCd != ''">
+		AND		PNT_TP_CD = #{pntTpCd}
+		</if>
+	</select>
+
+	<select id="getPntInfo" resultType="biz.app.system.model.PntInfoVO">
+		<!--
+			Query Name : pntInfo.getPntInfo
+			Description : getPntInfo
+		-->
+		SELECT	/* QUERYID(pntInfo.getPntInfo) */
+				  PNT_NO 		 /* 포인트 번호 */
+				, PNT_TP_CD 	 /* 포인트 구분 코드 */
+				, SAVE_RATE 	 /* 적립률 */
+				, ADD_SAVE_RATE 	 /* 추가 적립률 */
+				, USE_RATE 		 /* 사용율 */
+				, IF_GOODS_CD 	 /* 상품 코드 */
+				, ALT_IF_GOODS_CD /* 대체 상품 코드 */
+				, PNT_PRMT_GB_CD /* 포인트 프로모션 구분 코드 */
+				, MAX_SAVE_PNT 	 /* 최대 적립 포인트 */
+				, APL_STRT_DTM	 /* 적용 시작 일시 */
+				, APL_END_DTM	 /* 적용 종료 일시 */
+				, USE_YN		 /* 사용 여부 */
+				<if test="mbrNo != null and mbrNo != ''">
+				, (SELECT CARD_NO FROM MP_CARD_INFO WHERE USE_YN = 'Y' AND MBR_NO = #{mbrNo} ORDER BY SYS_REG_DTM DESC LIMIT 1) AS CARD_NO
+				</if>
+				, SYS_REGR_NO 	 /* 시스템 등록자 번호 */
+				, SYS_REG_DTM 	 /* 시스템 등록 일시 */
+				, SYS_UPDR_NO 	 /* 시스템 수정자 번호 */
+				, SYS_UPD_DTM 	 /* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	PNT_INFO
+		WHERE	1=1
+		<if test="pntNo != null and pntNo != ''">
+		AND		PNT_NO = #{pntNo}
+		</if>
+		<if test="pntTpCd != null and pntTpCd != ''">
+		AND PNT_TP_CD = #{pntTpCd} 
+		AND NOW() <![CDATA[>=]]> APL_STRT_DTM  
+		AND NOW() <![CDATA[<=]]> APL_END_DTM 
+		AND USE_YN = 'Y'
+		<!-- 부스트업 우선조회 -->
+		AND CASE WHEN EXISTS(SELECT 1 FROM PNT_INFO 
+		 					  WHERE PNT_PRMT_GB_CD = '${@framework.common.constants.CommonConstants@PNT_PRMT_GB_20}'
+							    AND PNT_TP_CD = #{pntTpCd} 
+							    AND NOW() <![CDATA[>=]]> APL_STRT_DTM  
+							    AND NOW() <![CDATA[<=]]> APL_END_DTM 
+							    AND USE_YN = 'Y'  
+					   )
+		 		 THEN PNT_PRMT_GB_CD = '${@framework.common.constants.CommonConstants@PNT_PRMT_GB_20}'
+		 		 ELSE PNT_PRMT_GB_CD = '${@framework.common.constants.CommonConstants@PNT_PRMT_GB_10}'
+		 	END
+		 </if>
+		 LIMIT 1
+	</select>
+
+	<insert id="insertPntInfo" parameterType="biz.app.system.model.PntInfoPO">
+		INSERT INTO /* QUERYID(pntInfo.insertPntInfo) */ PNT_INFO (
+			  PNT_NO 		 /* 포인트 번호 */
+			, PNT_TP_CD 	 /* 포인트 구분 코드 */
+			, SAVE_RATE 	 /* 적립률 */
+			, ADD_SAVE_RATE 	 /* 추가 적립률 */
+			, USE_RATE 		 /* 사용율 */
+			, IF_GOODS_CD 	 /* 상품 코드 */
+			, ALT_IF_GOODS_CD /* 대체 상품 코드 */
+			, PNT_PRMT_GB_CD /* 포인트 프로모션 구분 코드 */
+			, MAX_SAVE_PNT 	 /* 최대 적립 포인트 */
+			, APL_STRT_DTM	 /* 적용 시작 일시 */
+			, APL_END_DTM	 /* 적용 종료 일시 */
+			, USE_YN		 /* 사용 여부 */
+			, SYS_REGR_NO 	 /* 시스템 등록자 번호 */
+			, SYS_REG_DTM 	 /* 시스템 등록 일시 */
+			, SYS_UPDR_NO 	 /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM 	 /* 시스템 수정 일시 */
+		) VALUES (
+			  #{pntNo} 		 /* 포인트 번호 */
+			, #{pntTpCd} 	 /* 포인트 구분 코드 */
+			, #{saveRate} 	 /* 적립률 */
+			, #{addSaveRate} 	 /* 추가 적립률 */
+			, #{useRate} 		 /* 사용율 */
+			, #{ifGoodsCd} 	 /* 상품 코드 */
+			, #{altIfGoodsCd} /* 대체 상품 코드 */
+			, #{pntPrmtGbCd} /* 포인트 프로모션 구분 코드 */
+			, #{maxSavePnt} 	 /* 최대 적립 포인트 */
+			, #{aplStrtDtm}	 /* 적용 시작 일시 */
+			, #{aplEndDtm}	 /* 적용 종료 일시 */
+			, #{useYn}		 /* 사용 여부 */
+			, #{sysRegrNo} 	 /* 시스템 등록자 번호 */
+			, NOW()		 	 /* 시스템 등록 일시 */
+			, #{sysUpdrNo} 	 /* 시스템 수정자 번호 */
+			, NOW()		 	 /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updatePntInfo" parameterType="biz.app.system.model.PntInfoPO">
+		UPDATE	/* QUERYID(pntInfo.updatePntInfo) */ PNT_INFO SET
+				SAVE_RATE 	 = #{saveRate}	/* 적립률 */
+				, ADD_SAVE_RATE = #{addSaveRate}	 /* 추가 적립률 */
+				, USE_RATE 		 = #{useRate}	/* 사용율 */
+				, MAX_SAVE_PNT 	 = #{maxSavePnt}	/* 최대 적립 포인트 */
+				, APL_STRT_DTM	 = #{aplStrtDtm}	/* 적용 시작 일시 */
+				, APL_END_DTM	 = #{aplEndDtm}	/* 적용 종료 일시 */
+				, USE_YN		 = #{useYn}		/* 사용 여부 */
+				, SYS_UPDR_NO 	 = #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM 	 = NOW()	/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		PNT_NO				= #{pntNo}
+	</update>
+
+
+
+	<select id="getValidCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pntInfo.getValidCount
+			Description : getValidCount
+		-->
+		SELECT	/* QUERYID(pntInfo.getValidCount) */
+				COUNT(*)
+		FROM	PNT_INFO 
+		WHERE	1 = 1
+		AND		USE_YN = 'Y'
+		AND 	PNT_TP_CD = #{pntTpCd}
+		AND		PNT_PRMT_GB_CD = #{pntPrmtGbCd}
+		AND ( ( #{aplEndDtm}  <![CDATA[>=]]> APL_END_DTM AND APL_END_DTM BETWEEN #{aplStrtDtm} AND  #{aplEndDtm}) OR
+		( #{aplEndDtm}  <![CDATA[<=]]> APL_END_DTM AND APL_STRT_DTM <![CDATA[<=]]> #{aplEndDtm}) )
+		<if test="pntNo != null and pntNo != ''">
+		AND		PNT_NO NOT IN(#{pntNo})
+		</if>
+	</select>
+
+</mapper>

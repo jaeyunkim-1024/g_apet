@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<title>veci</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="stylesheet" type="text/css" href="css/design.css">
+	<script type="text/javascript"  src="js/jquery-1.11.3.min.js" ></script>
+	<script type="text/javascript"  src="js/jquery-ui.min.js" ></script>
+	<script type="text/javascript"  src="js/design-ui.js" ></script>
+	
+</head>
+<body class="admin">
+	<a id="skip_nav" href="#contents">본문 바로가기</a>
+
+	<div id="wrap">
+		<!-- header -->
+		<div id="header">
+			<h1 class="h_ci"><a href="#"><img src="images/h_ci.gif" alt="DODOT" /></a></h1>
+			<div class="login_info_box">
+				<span class="login_user"> 회원님, 반갑습니다.</span>
+				<a href="#" class="btn_h23_type1">로그아웃</a>
+				<a href="#" class="btn_h23_type1">정보변경</a>
+			</div>
+
+			<div class="gnb">
+				<ul>
+					<li><a href="#">상품관리</a></li>
+					<li><a href="#" class="on">주문관리</a></li>
+					<li><a href="#">전시관리</a></li>
+					<li><a href="#">마케팅관리</a></li>
+					<li><a href="#">정산관리</a></li>
+					<li><a href="#">WMS관리</a></li>
+					<li><a href="#">회원</a></li>
+					<li><a href="#">기본관리</a></li>
+					<li><a href="#">공통</a></li>
+				</ul>
+			</div>
+		</div>
+		<!-- //header -->
+
+		<!-- menu -->
+		<div id="side">
+			<ul class="lnb_tree">
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="tree_depth1">상품관리</a>
+					<ul class="tree_depth2">
+						<li><a href="#">상품조회</a></li>
+						<li><a href="#">상품등록</a></li>
+						<li><a href="#">상품일괄등록</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!-- //menu -->
+
+		<!-- contents -->
+		<div id="container">
+			<div id="contents">
+				
+				<div class="breadcrumb">
+					<p><a href="#">홈</a> &gt; <a href="#">주문관리</a> &gt; 매장관리</p>
+				</div>
+				
+				<hr/>
+				
+				<p class="description">메인 타이틀</p>
+				<!-- 메인 타이틀 -->
+				<div class="mTitle">
+					<h1>거래처 기본정보 관리거래처 기본정보 관리</h1>
+				</div>
+				
+				<hr/>
+				
+				
+				<p class="description">가이드 설명 : 일반 검색</p>
+				<!-- 일반검색 -->
+				<div class="table_type1">
+					<table summary="">
+						<caption>정보 검색</caption>
+						<colgroup>
+							<col style="width:15%;">
+							<col style="width:auto;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">검색</th>
+								<td>
+									<select class="input_select w93" title="선택상자">
+										<option>선택</option>
+									</select>
+									<input type="text" class="input_text mgl7 w175" title="입력상자">
+									<a href="#" class="btn_h25_type1 mgl7">조회</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr/>
+				
+				<p class="description">가이드 설명 : 조건 검색</p>
+				<div class="table_type1">
+					<table summary="">
+						<caption>정보 검색</caption>
+						<colgroup>
+							<col style="width:15%;">
+							<col style="width:auto;">
+							<col style="width:15%;">
+							<col style="width:35%;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">검색</th>
+								<td colspan="3">
+										<select class="input_select w93" title="선택상자">
+											<option>선택</option>
+										</select>
+										<input type="text" class="input_text mgl7 w175" title="입력상자">
+										<!--a href="#" class="btn_h25_type1 mgl7">조회</a-->
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">기간</th>
+								<td colspan="3">
+									<div class="mCalendar typeLayer">
+										<label><img src="images/calendar_icon.png" alt="달력선택" title="달력선택"> <input type="text" class="w175 input_text mgl7"> </label>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00시</option>
+									        <option>01시</option>
+									        <option>02시</option>
+									    </select>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00분</option>
+									        <option>01분</option>
+									        <option>02분</option>
+									    </select>
+									</div>
+									&nbsp;-&nbsp;
+									<div class="mCalendar typeLayer">
+										<label><img src="images/calendar_icon.png" alt="달력선택" title="달력선택"> <input type="text" class="w175 input_text mgl7"> </label>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00시</option>
+									        <option>01시</option>
+									        <option>02시</option>
+									    </select>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00분</option>
+									        <option>01분</option>
+									        <option>02분</option>
+									    </select>
+									</div>
+									<input type="checkbox" /> <span>종료 7일 이내 기획전</span>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">전시여부</th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>전시</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>전시안함</span></label>
+								</td>
+								<th scope="row">구분자 우선순위</th>
+								<td>
+									<input type="text" class="w50" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">댓글사용여부</th>
+								<td>
+								    <select class="w93 input_select">
+								        <option selected="selected">선택</option>
+								        <option>의료비용</option>
+								        <option>비용상담</option>
+								        <option>전화상담</option>
+								        <option>예약</option>
+								    </select>
+								</td>
+								<th scope="row">조회조건</th>
+								<td>
+								    <select class="w93 input_select">
+								        <option selected="selected">선택</option>
+								        <option>의료비용</option>
+								        <option>비용상담</option>
+								        <option>전화상담</option>
+								        <option>예약</option>
+								    </select>
+									<input type="text" class="w175 mgl7" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div class="btn_area_center">
+					<a href="#" class="btn_type1">검색</a>
+					<a href="#" class="btn_type2">초기화</a>
+				</div>
+				
+				<hr />
+				
+				
+				<p class="description">가이드 설명 : 몰 정보 검색</p>
+				<div class="table_type1">
+					<table summary="">
+						<caption>정보 검색</caption>
+						<colgroup>
+							<col style="width:15%;">
+							<col style="width:20%;">
+							<col style="width:15%;">
+							<col style="width:20%;">
+							<col style="width:auto;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">몰 명 <strong>*</strong></th>
+								<td>
+									<input type="text" title="입력" class="w121" />
+								</td>
+								<th scope="row">몰 번호</th>
+								<td>1234</td>
+								<td rowspan="3" class="rowspan">
+									<select class="input_select w93">
+										<option selected="selected">선택</option>
+										<option>의료비용</option>
+										<option>비용상담</option>
+										<option>전화상담</option>
+										<option>예약</option>
+									</select>
+									<div class="fTextarea gFull">
+										<textarea rows="50" cols="100"></textarea>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">전시여부</th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>전시</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>전시안함</span></label>
+								</td>
+								<th scope="row">사용여부</th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>사용</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>사용안함</span></label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">출력유형</th>
+								<td>
+								    <select class="input_select w93">
+								        <option selected="selected">선택</option>
+								        <option>의료비용</option>
+								        <option>비용상담</option>
+								        <option>전화상담</option>
+								        <option>예약</option>
+								    </select>
+								</td>
+								<th scope="row">전시코너</th>
+								<td>5개</td>
+							</tr>
+							<tr>
+								<th scope="row">출력유형</th>
+								<td colspan="4">
+									<input type="text" title="입력" class="input_text w121" />
+									<input type="text" title="입력" class="input_text w246 mgl7" />
+									<a href="#" class="btn_h25_type1 mgl7">검색</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div class="btn_area_center">
+					<a href="#" class="btn_type1">저장</a>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 구분자 템플릿</p>
+				<div class="table_type1">
+					<table summary="">
+						<caption>정보 검색</caption>
+						<colgroup>
+							<col style="width:15%;">
+							<col style="width:auto;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">구분자 템플릿 <strong>*</strong></th>
+								<td>
+								    <select>
+								        <option selected="selected">고정 구분자</option>
+								        <option>의료비용</option>
+								    </select>
+									<span class="desc">이동구분자 선택 시 구분자는 4개 이상, 6개 이하로 등록 가능합니다.</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr />
+				
+				<div class="table_type1">
+					<table summary="">
+						<caption>정보 검색</caption>
+						<colgroup>
+							<col style="width:15%;">
+							<col style="width:auto;">
+							<col style="width:15%;">
+							<col style="width:35%;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">구분자명 <strong>*</strong></th>
+								<td>
+									<input type="text" title="입력">
+								</td>
+								<th scope="row">전시여부 <strong>*</strong></th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>전시</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>전시안함</span></label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">구분자 전시대상 <strong>*</strong></th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>상품</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>HTML</span></label>
+								</td>
+								<th scope="row">구분자 우선순위 <strong class=>*</strong></th>
+								<td>
+									<input type="text" class="w93" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">전시상품수 <strong class="compulsory">*</strong></th>
+								<td>
+									희망 전시상품수
+									<input type="text" class="w93" />
+									/ 잔여 전시 가능 상품수 <strong>500</strong> 
+								</td>
+								<th scope="row">상품전시 템플릿 <strong>*</strong></th>
+								<td>
+								    <select>
+								        <option selected="selected">선택</option>
+								        <option>의료비용</option>
+								        <option>비용상담</option>
+								        <option>전화상담</option>
+								        <option>예약</option>
+								    </select>
+									<a href="#" class="btn_h25_type1 mgl7">미리보기</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 서브 타이틀</p>
+				<div class="mTitle gTitle">
+					<h2>관리거래처</h2>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 서브 타이틀 + 버튼</p>
+				<div class="mTitle typeButton gTitle">
+					<h2>관리거래처</h2>
+					<div class="buttonArea">
+						<a href="#" class="btn_exel">엑셀 다운로드</a>
+						<a href="#" class="btn_h25_type1 mgl7">추가</a>
+						<a href="#" class="btn_h25_type1 mgl7">저장</a>
+					</div>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 그리드 추가 저장 버튼 + 좌측 셀렉터(그리드 상단에 붙여 주세요)</p>
+				<div class="mButton typeBorad">
+					<div class="leftInner">
+						<a href="#" class="btn_h25_type1">추가</a>
+						<a href="#" class="btn_h25_type1 mgl7">삭제</a>
+					</div>
+					<div class="rightInner">
+					    <select>
+					        <option selected="selected">선택</option>
+					        <option>의료비용</option>
+					        <option>비용상담</option>
+					        <option>전화상담</option>
+					        <option>예약</option>
+					    </select>
+					    <select class="mgl7">
+					        <option selected="selected">선택</option>
+					        <option>의료비용</option>
+					        <option>비용상담</option>
+					        <option>전화상담</option>
+					        <option>예약</option>
+					    </select>
+						<a href="#" class="btn_exel mgl7">엑셀 다운로드</a>
+					</div>
+				</div>
+				
+				<div class="mBorad typeCol">
+					<table summary="">
+						<caption>게시판 목록</caption>
+						<colgroup>
+							<col style="width:8%;">
+							<col style="width:auto;">
+							<col style="width:12%;">
+							<col style="width:18%;">
+							<col style="width:12%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col">번호</th>
+								<th scope="col">제목</th>
+								<th scope="col">등록자</th>
+								<th scope="col">등록일</th>
+								<th scope="col">조회</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>10</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>9</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>8</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>7</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="mSum typeBorad">
+					<p>total : 100</p>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 그리드 추가 저장 버튼(그리드 상단에 붙여 주세요)</p>
+				<div class="mButton typeBorad">
+					<div class="leftInner">
+						<a href="#" class="btn_h25_type1">추가</a>
+						<a href="#" class="btn_h25_type1 mgl7">삭제</a>
+					</div>
+				</div>
+				
+				<div class="mBorad typeCol">
+					<table summary="">
+						<caption>게시판 목록</caption>
+						<colgroup>
+							<col style="width:8%;">
+							<col style="width:auto;">
+							<col style="width:12%;">
+							<col style="width:18%;">
+							<col style="width:12%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col">번호</th>
+								<th scope="col">제목</th>
+								<th scope="col">등록자</th>
+								<th scope="col">등록일</th>
+								<th scope="col">조회</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>10</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>9</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>8</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>7</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+								<td>홍길동</td>
+								<td>2013.10.07</td>
+								<td>2103</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="mSum typeBorad">
+					<p>total : 100</p>
+				</div>				
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 테이블 페이징</p>
+				<div class="mPaging">
+					<a href="#"><img src="images/btn_paging_prev.png" alt="이전 페이지"></a><span><a href="#" class="selected">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a></span><a href="#"><img src="images/btn_paging_next.png" alt="다음 페이지"></a>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 등록 폼 테이블</p>
+				<div class="table_type1">
+					<table summary="">
+						<caption>글 정보보기</caption>
+						<colgroup>
+							<col style="width:20%;">
+							<col style="width:auto;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">분류</th>
+								<td>
+								    <select>
+								        <option selected="selected">선택</option>
+								        <option>의료비용</option>
+								        <option>비용상담</option>
+								        <option>전화상담</option>
+								        <option>예약</option>
+								    </select>
+									<input type="text" class="w175 mgl7" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">사용하기</th>
+								<td>
+									<label class="fRadio"><input type="radio" /> <span>Yes</span></label>
+	    							<label class="fRadio"><input type="radio" /> <span>No</span></label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="vtop">등록일</th>
+								<td>
+									<div class="mCalendar typeLayer">
+										<label><img src="images/calendar_icon.png" alt="달력선택" title="달력선택"> <input type="text" class="w175 input_text mgl7"> </label>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00시</option>
+									        <option>01시</option>
+									        <option>02시</option>
+									    </select>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00분</option>
+									        <option>01분</option>
+									        <option>02분</option>
+									    </select>
+									</div>
+									&nbsp;-&nbsp;
+									<div class="mCalendar typeLayer">
+										<label><img src="images/calendar_icon.png" alt="달력선택" title="달력선택"> <input type="text" class="w175 input_text mgl7"> </label>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00시</option>
+									        <option>01시</option>
+									        <option>02시</option>
+									    </select>
+									    <select class="input_select mgl7">
+									        <option selected="selected">00분</option>
+									        <option>01분</option>
+									        <option>02분</option>
+									    </select>
+									</div>
+									<label><input type="checkbox" /> <span>종료 7일 이내 기획전</span></label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">메인이미지등록</th>
+								<td>
+									<!-- File -->
+									<span class="fFile">
+										<input type="file" title="파일 찾기" />
+									</span>
+									<!-- //File -->
+									<a href="#" class="btn_h25_type1 mgl7">HTML 이미지 업로드</a>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">제목 <strong>*</strong></th>
+								<td>
+									<input type="text" class="input_text w65" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">인쇄용 파일등록 <strong class="compulsory">*</strong></th>
+								<td>
+									<!-- File -->
+									<span class="fFile">
+										<label><input type="file" title="파일 찾기" /></label>
+									</span>
+									<!-- //File -->
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">댓글사용여부 <strong>*</strong></th>
+								<td>
+									<label><input type="radio" /> <span>사용</span></label>
+								    <select class="mgl7">
+								        <option selected="selected">전체</option>
+								        <option>01분</option>
+								        <option>02분</option>
+								    </select>
+	    							<label><input type="radio" class="mgl7" /> <span>사용안함</span></label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">템플릿 설정 <strong>*</strong></th>
+								<td>
+									<input type="text" title="입력" class="w93" />
+									<input type="text" title="입력" class="w175  mgl7"/>
+									<a href="#" class="btn_h25_type1 mgl7">템플릿 검색</a> 
+									<input type="checkbox" class="mgl7"> <span>상품평 노출여부</span>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">템플릿 설정 <strong>*</strong></th>
+								<td>
+									<input type="text" title="입력" class="w93" />
+									<span class="desc">*0, 1, 2, 3 순서지정 (0은 노출 안 함 표시)</span>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">팝업창 사이즈 <strong>*</strong></th>
+								<td>
+									가로 
+									<input type="text" class="w55" />
+									Pixel / 세로
+									<input type="text" class="w55" />
+									 Pixel
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">팝업창 위치(좌표) <strong>*</strong></th>
+								<td>
+									X :  
+									<input type="text" class="w55" />
+									</span>
+									Y : 
+									<input type="text" class="w55" />
+									 최소 X=100, Y=100 이상
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="vtop">내용 <strong class="compulsory">*</strong></th>
+								<td>
+									<div class="fTextarea gFull h197">
+										<textarea></textarea>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">내용 <strong>*</strong></th>
+								<td>
+									<input type="text" title="입력" class="w175" />
+									<div class="infoDesc mgt10">
+										* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄<br>
+										* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄<br>
+										* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄<br>
+										* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄* 영역을 나타냄
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 등록 폼 버튼</p>
+				<div class="mSubmit typeSubmit">
+					<a href="#" class="btn_type1">저장하기</a>
+					<a href="#" class="btn_type1 mgl7">등록하기</a>
+					<a href="#" class="btn_type2 mgl7">취소하기</a>
+					<a href="#" class="btn_type2 mgl7">삭제하기</a>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 뷰 페이지 테이블</p>
+				<div class="table_type1">
+					<table summary="">
+						<caption>글 정보보기</caption>
+						<colgroup>
+							<col style="width:20%;">
+							<col style="width:auto;">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row" class="vtop">분류</th>
+								<td>
+									텍스트 표출<br>텍스트 표출
+									텍스트 표출<br>텍스트 표출
+									텍스트 표출<br>텍스트 표출
+									텍스트 표출<br>텍스트 표출
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">제목</th>
+								<td>
+									텍스트 표출
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">등록</th>
+								<td>
+									텍스트 표출
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 뷰페이지 버튼</p>
+				<div class="mSubmit typeSubmit">
+					<a href="#" class="btn_type1">저장하기</a>
+					<a href="#" class="btn_type2 mgl7">취소하기</a>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 기본 탭</p>
+				<div class="mTab typePage">
+					<ul class="tabMenu">
+						<li class="active"><a href="#">기획전 기본정보</a></li>
+						<li><a href="#">구분자 정보</a></li>
+						<li><a href="#">기획전 상품정보</a></li>
+						<li><a href="#">기획전 HTML 정보</a></li>
+					</ul>
+				</div>
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 2단 그리드 형태</p>
+				<div class="mModule type2Grid">
+					<div class="rowWrap">
+						<div class="Inner">
+							<div class="innerContent">
+								<!-- 코드  넣는곳 -->
+								<!-- SubTitle -->
+								<div class="mTitle gTitle">
+									<ul>
+										<li><a href="#n">거래처</a></li>
+										<li><a href="#n">기본정보</a></li>
+										<li><a href="#n">관리거래처</a></li>
+										<li><a href="#n">기본정보 관리</a></li>
+									</ul>
+								</div>
+								<!-- //SubTitle -->
+								<div class="mButton typeBorad">
+									<div class="leftInner">
+										<a href="#" class="btn_h25_type1">추가</a>
+										<a href="#" class="btn_h25_type1 mgl7">삭제</a>
+									</div>
+								</div>
+								<div class="mBorad typeCol">
+									<table summary="">
+										<caption>게시판 목록</caption>
+										<colgroup>
+											<col style="width:8%;">
+											<col style="width:auto;">
+											<col style="width:12%;">
+											<col style="width:18%;">
+											<col style="width:12%;">
+										</colgroup>
+										<thead>
+											<tr>
+												<th scope="col">번호</th>
+												<th scope="col">제목</th>
+												<th scope="col">등록자</th>
+												<th scope="col">등록일</th>
+												<th scope="col">조회</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>10</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>9</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>8</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>7</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>6</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>5</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>4</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>3</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>2</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>1</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="mSum typeBorad brdnone">
+									<p>total : 100</p>
+								</div>
+								<!-- //코드  넣는곳 -->
+							</div>
+						</div>
+						<div class="Inner">
+							<div class="innerContent">
+								<!-- 코드  넣는곳 -->
+								<!-- SubTitle -->
+								<div class="mTitle gTitle">
+									<ul>
+										<li><a href="#n">거래처</a></li>
+										<li><a href="#n">기본정보</a></li>
+										<li><a href="#n">관리거래처</a></li>
+										<li><a href="#n">기본정보 관리</a></li>
+									</ul>
+								</div>
+								<!-- //SubTitle -->
+								<div class="mButton typeBorad">
+									<div class="leftInner">
+										<a href="#" class="btn_h25_type1">추가</a>
+										<a href="#" class="btn_h25_type1 mgl7">삭제</a>
+									</div>
+								</div>
+								<div class="mBorad typeCol">
+									<table summary="">
+										<caption>게시판 목록</caption>
+										<colgroup>
+											<col style="width:8%;">
+											<col style="width:auto;">
+											<col style="width:12%;">
+											<col style="width:18%;">
+											<col style="width:12%;">
+										</colgroup>
+										<thead>
+											<tr>
+												<th scope="col">번호</th>
+												<th scope="col">제목</th>
+												<th scope="col">등록자</th>
+												<th scope="col">등록일</th>
+												<th scope="col">조회</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>10</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>9</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>8</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>7</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>6</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>5</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>4</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>3</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>2</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+											<tr>
+												<td>1</td>
+												<td class="alignLeft"><a href="#">정말 기분이 가뿐합니다....</a></td>
+												<td>홍길동</td>
+												<td>2013.10.07</td>
+												<td>2103</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="mSum typeBorad brdnone">
+									<p>total : 100</p>
+								</div>
+								<!-- //코드  넣는곳 -->
+							</div>
+						</div>
+					</div>
+					<div class="rowWrap">
+						<div class="Inner">
+							<div class="innerContent">
+								<!-- 코드  넣는곳 -->
+								코드 적용부
+								<!-- //코드  넣는곳 -->
+							</div>
+						</div>
+						<div class="Inner">
+							<div class="innerContent">
+								<!-- 코드  넣는곳 -->
+								코드 적용부
+								<!-- //코드  넣는곳 -->
+							</div>
+						</div>
+					</div>
+				</div>				
+				
+				<hr />
+				
+				<p class="description">가이드 설명 : 리스트 스타일</p>
+				<div class="mListBox">
+					<div class="boxArea">
+						<p class="listTitle">타이틀</p>
+						<div class="listBox w250 h100">
+							<ul class="uiSelect">
+								<li class="active"><a href="#"><em>자동</em>완성겸용</a></li>
+								<li><a href="#"><em>검색어</em>리스트</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="boxArea">
+						<p class="listTitle">타이틀</p>
+						<div class="listBox w250 h100">
+							<ul class="uiSelect">
+								<li class="active"><a href="#"><em>자동</em>완성겸용</a></li>
+								<li><a href="#"><em>검색어</em>리스트</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+								<li><a href="#">UL 리스트임</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<!-- //contents -->
+
+	</div>
+</body>
+</html>

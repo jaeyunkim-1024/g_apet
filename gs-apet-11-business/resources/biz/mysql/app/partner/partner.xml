@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="partner">
+
+	<select id="getPartnerIdCheck" resultType="int">
+		<!--
+			Query Name	: partner.getPartnerIdCheck
+			Description	: 파트너 아이디 중복체크
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		
+		SELECT	COUNT(*)
+		FROM	MEMBER_BASE A
+		WHERE	1=1
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+			AND	LOGIN_ID = #{loginId}
+	</select>
+	
+	<insert id="insertPartner" parameterType="biz.app.partner.model.PartnerInfoPO">
+		<!-- <selectKey keyProperty="mbrNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_BASE_SEQ}') FROM DUAL
+		</selectKey> -->
+		<!--
+			Query Name	: partner.insertPartner
+			Description	: 파트너 등록
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		INSERT INTO MEMBER_BASE (
+			MBR_NO				/* 회원번호 */
+			, ST_ID				/* 사이트 아이디 */
+			, MBR_NM			/* 회원명 */
+			, LOGIN_ID			/* 로그인 아이디 */	
+			, MBR_GB_CD			/* 회원 구분 코드 */
+			, MBR_STAT_CD		/* 회원 상태 코드 */
+			, MBR_GRD_CD		/* 회원 등급 코드 */
+			, EMAIL				/* 이메일 */
+			, SYS_REGR_NO		
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, NICK_NM			/* 닉네임 */
+			, PRFL_IMG			/* 프로필 이미지 */
+			, PET_LOG_ITRDC		/* 펫로그 소개 */
+			, PET_LOG_URL		
+			, GSPT_STATE_CD		
+			, GSPT_USE_YN		
+		) VALUES (
+			#{mbrNo}
+			, 1		<!--  TODO 조은지 : 일단 1(펫츠비)로 하드코딩 -->
+			, #{mbrNm}
+			, #{loginId}
+			, #{mbrGbCd}
+			, '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+			, #{mbrGrdCd}
+			, #{email}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+			, #{nickNm}
+			, #{prflImg}
+			, #{petLogItrdc}
+			, FN_PET_LOG_URL_RANDOM()
+			, '30'
+			, 'N'
+		)
+	</insert>
+	
+	<insert id="insertPartnerBizInfo" parameterType="biz.app.partner.model.PartnerInfoPO">
+		<!--
+			Query Name	: partner.insertPartnerBizInfo
+			Description	: 파트너 업체 등록
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		<selectKey keyProperty="bizNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_BIZ_INFO_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO MEMBER_BIZ_INFO (
+			MBR_NO
+			, BIZ_NO
+			, BIZ_ID
+			, BIZ_NM
+			, POST_NO_OLD
+			, POST_NO_NEW
+			, ROAD_ADDR
+			, ROAD_DTL_ADDR
+			, PRCL_ADDR
+			, PRCL_DTL_ADDR
+			, EMAIL
+			, PTN_DATE
+			, STAT_CD
+			, CEO_NM
+			, BIZ_LIC_NO
+			, BIZ_LIC_IMG_PATH
+			, BIZ_CDTS
+			, BIZ_TP
+			, DLGT_NO
+			, REL_POST_NO_OLD
+			, REL_POST_NO_NEW
+			, REL_ROAD_ADDR
+			, REL_ROAD_DTL_ADDR
+			, REL_PRCL_ADDR
+			, REL_PRCL_DTL_ADDR
+			, RE_POST_NO_OLD
+			, RE_POST_NO_NEW
+			, RE_ROAD_ADDR
+			, RE_ROAD_DTL_ADDR
+			, RE_PRCL_ADDR
+			, RE_PRCL_DTL_ADDR
+			, CHRG_PART
+			, CHRG_NM
+			, CHRG_TEL
+			, CHRG_MOBILE
+			, CHRG_EMAIL
+			, BANK_CD
+			, ACCT_NO
+			, OOA_NM
+			, MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{mbrNo}
+			, #{bizNo}
+			, #{bizId}
+			, #{bizNm}
+			, #{postNoOld}
+			, #{postNoNew}
+			, #{roadAddr}
+			, #{roadDtlAddr}
+			, #{prclAddr}
+			, #{prclDtlAddr}
+			, #{email}
+			, #{ptnDate}
+			, #{statCd}
+			, #{ceoNm}
+			, #{bizLicNo}
+			, #{bizLicImgPath}
+			, #{bizCdts}
+			, #{bizTp}
+			, #{dlgtNo}
+			, #{relPostNoOld}
+			, #{relPostNoNew}
+			, #{relRoadAddr}
+			, #{relRoadDtlAddr}
+			, #{relPrclAddr}
+			, #{relPrclDtlAddr}
+			, #{rePostNoOld}
+			, #{rePostNoNew}
+			, #{reRoadAddr}
+			, #{reRoadDtlAddr}
+			, #{rePrclAddr}
+			, #{rePrclDtlAddr}
+			, #{chrgPart}
+			, #{chrgNm}
+			, #{chrgTel}
+			, #{chrgMobile}
+			, #{chrgEmail}
+			, #{bankCd}
+			, #{acctNo}
+			, #{ooaNm}
+			, #{memo}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<select id="pagePartnerList" resultType="biz.app.partner.model.PartnerInfoVO">
+		<!--
+			Query Name	: partner.pagePartnerList
+			Description	: 파트너 조회
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		SELECT	A.MBR_NO 
+				, A.ST_ID 
+				, B.BIZ_NM 
+				, B.EMAIL
+				, A.MBR_STAT_CD 
+				, A.LAST_LOGIN_DTM 
+				, B.PTN_DATE 
+				, A.LOGIN_ID
+				, B.BIZ_NO
+				, A.NICK_NM				/* 닉네임 */
+				, A.PRFL_IMG			/* 프로필 이미지 */
+				, A.PET_LOG_ITRDC		/* 펫로그 소개 */
+				, A.UPDR_IP
+				, B.STAT_CD
+		FROM 	MEMBER_BASE A JOIN MEMBER_BIZ_INFO B ON(A.MBR_NO = B.MBR_NO)
+		WHERE	1=1
+			<if test='mbrGbCd != null and mbrGbCd != ""'>
+				AND A.MBR_GB_CD = #{mbrGbCd}
+			</if>
+			<if test='dateOption != null and dateOption != ""'>
+				<if test='dateOption.equals("10")'>
+					<if test='searchStDate != null and searchStDate != ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND B.PTN_DATE >= #{searchStDate} AND B.PTN_DATE <= #{searchEnDate} ]]>
+						</if>
+						<if test='searchEnDate == null or searchEnDate == ""'>
+							<![CDATA[ AND B.PTN_DATE >= #{searchStDate} ]]>
+						</if>
+					</if>
+					<if test='searchStDate == null or searchStDate == ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND B.PTN_DATE <= #{searchEnDate} ]]>
+						</if>
+					</if>
+				</if>
+				<if test='dateOption.equals("20")'>
+					<if test='searchStDate != null and searchStDate != ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND A.LAST_LOGIN_DTM >= #{searchStDate} AND A.LAST_LOGIN_DTM <= #{searchEnDate} ]]>
+						</if>
+						<if test='searchEnDate == null or searchEnDate == ""'>
+							<![CDATA[ A.LAST_LOGIN_DTM >= #{searchStDate} ]]>
+						</if>
+					</if>
+					<if test='searchStDate == null or searchStDate == ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ A.LAST_LOGIN_DTM <= #{searchEnDate} ]]>
+						</if>
+					</if>
+				</if>
+			</if>
+			<if test='loginId != null and loginId != ""'>
+				AND A.LOGIN_ID LIKE CONCAT('%', #{loginId}, '%')
+			</if>
+			<if test='bizNm != null and bizNm != ""'>
+				AND B.BIZ_NM LIKE CONCAT('%', #{bizNm}, '%')
+			</if>
+			<if test='email != null and email != ""'>
+				AND B.EMAIL LIKE CONCAT('%', #{email}, '%')
+			</if>
+			<if test='mbrStatCd != null and mbrStatCd != ""'>
+				AND A.MBR_STAT_CD = #{mbrStatCd}
+			</if>
+	</select>
+	
+	<select id="pagePartnerListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: partner.pagePartnerListCount 
+			Description	: 파트너 페이지 리스트 카운트
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		SELECT	COUNT(*)
+		FROM 	MEMBER_BASE A JOIN MEMBER_BIZ_INFO B ON(A.MBR_NO = B.MBR_NO)
+		WHERE	1=1
+			<if test='mbrGbCd != null and mbrGbCd != ""'>
+				AND A.MBR_GB_CD = #{mbrGbCd}
+			</if>
+			<if test='dateOption != null and dateOption != ""'>
+				<if test='dateOption.equals("10")'>
+					<if test='searchStDate != null and searchStDate != ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND B.PTN_DATE >= #{searchStDate} AND B.PTN_DATE <= #{searchEnDate} ]]>
+						</if>
+						<if test='searchEnDate == null or searchEnDate == ""'>
+							<![CDATA[ AND B.PTN_DATE >= #{searchStDate} ]]>
+						</if>
+					</if>
+					<if test='searchStDate == null or searchStDate == ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND B.PTN_DATE <= #{searchEnDate} ]]>
+						</if>
+					</if>
+				</if>
+				<if test='dateOption.equals("20")'>
+					<if test='searchStDate != null and searchStDate != ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ AND A.LAST_LOGIN_DTM >= #{searchStDate} AND A.LAST_LOGIN_DTM <= #{searchEnDate} ]]>
+						</if>
+						<if test='searchEnDate == null or searchEnDate == ""'>
+							<![CDATA[ A.LAST_LOGIN_DTM >= #{searchStDate} ]]>
+						</if>
+					</if>
+					<if test='searchStDate == null or searchStDate == ""'>
+						<if test='searchEnDate != null and searchEnDate != ""'>
+							<![CDATA[ A.LAST_LOGIN_DTM <= #{searchEnDate} ]]>
+						</if>
+					</if>
+				</if>
+			</if>
+			<if test='loginId != null and loginId != ""'>
+				AND A.LOGIN_ID LIKE CONCAT('%', #{loginId}, '%')
+			</if>
+			<if test='bizNm != null and bizNm != ""'>
+				AND B.BIZ_NM LIKE CONCAT('%', #{bizNm}, '%')
+			</if>
+			<if test='email != null and email != ""'>
+				AND B.EMAIL LIKE CONCAT('%', #{email}, '%')
+			</if>
+			<if test='mbrStatCd != null and mbrStatCd != ""'>
+				AND A.MBR_STAT_CD = #{mbrStatCd}
+			</if>
+	</select>
+	
+	<select id="getPartner" resultType="biz.app.partner.model.PartnerInfoVO">
+		<!--
+			Query Name	: partner.getPartner 
+			Description	: 파트너 조회
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		SELECT	A.MBR_NO 
+				, A.ST_ID 
+				, A.MBR_GB_CD
+				, B.BIZ_NO
+				, B.BIZ_NM 
+				, B.EMAIL
+				, B.STAT_CD
+				, A.LAST_LOGIN_DTM 
+				, B.PTN_DATE 
+				, A.LOGIN_ID
+				, B.POST_NO_NEW
+				, B.ROAD_ADDR
+				, B.ROAD_DTL_ADDR
+				, A.SYS_REG_DTM
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, A.SYS_UPD_DTM
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, A.NICK_NM				/* 닉네임 */
+				, A.PRFL_IMG			/* 프로필 이미지 */
+				, A.PET_LOG_ITRDC		/* 펫로그 소개 */
+				, A.UPDR_IP
+		FROM 	MEMBER_BASE A JOIN MEMBER_BIZ_INFO B ON(A.MBR_NO = B.MBR_NO)
+		WHERE	1=1	
+			AND	A.MBR_NO = #{mbrNo}
+	</select>
+	
+	<update id="updatePartner" parameterType="biz.app.partner.model.PartnerInfoPO">
+		<!--
+			Query Name	: partner.updatePartner
+			Description	: 파트너 수정
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		UPDATE MEMBER_BASE SET
+			MBR_NM 			= #{mbrNm}
+			, NICK_NM		= #{nickNm}
+			, PRFL_IMG		= #{prflImg}
+			, PET_LOG_ITRDC	= #{petLogItrdc}
+			, EMAIL 		= #{email}
+			, UPDR_IP		= #{updrIp}
+			, SYS_UPDR_NO 	= #{sysUpdrNo}
+			, SYS_UPD_DTM 	= NOW()
+		WHERE	MBR_NO = #{mbrNo}
+	</update>
+	
+	<update id="updatePartnerBizInfo" parameterType="biz.app.partner.model.PartnerInfoPO">
+		<!--
+			Query Name	: partner.updatePartnerBizInfo
+			Description	: 파트너 회사 수정
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		UPDATE MEMBER_BIZ_INFO SET
+			BIZ_ID            = #{bizId}
+			, BIZ_NM            = #{bizNm}
+			, POST_NO_OLD       = #{postNoOld}
+			, POST_NO_NEW       = #{postNoNew}
+			, ROAD_ADDR         = #{roadAddr}
+			, ROAD_DTL_ADDR     = #{roadDtlAddr}
+			, PRCL_ADDR         = #{prclAddr}
+			, PRCL_DTL_ADDR     = #{prclDtlAddr}
+			, EMAIL             = #{email}
+			, PTN_DATE          = #{ptnDate}
+			, STAT_CD           = #{statCd}
+			, CEO_NM            = #{ceoNm}
+			, BIZ_LIC_NO        = #{bizLicNo}
+			, BIZ_LIC_IMG_PATH  = #{bizLicImgPath}
+			, BIZ_CDTS          = #{bizCdts}
+			, BIZ_TP            = #{bizTp}
+			, DLGT_NO           = #{dlgtNo}
+			, REL_POST_NO_OLD   = #{relPostNoOld}
+			, REL_POST_NO_NEW   = #{relPostNoNew}
+			, REL_ROAD_ADDR     = #{relRoadAddr}
+			, REL_ROAD_DTL_ADDR = #{relRoadDtlAddr}
+			, REL_PRCL_ADDR     = #{relPrclAddr}
+			, REL_PRCL_DTL_ADDR = #{relPrclDtlAddr}
+			, RE_POST_NO_OLD    = #{rePostNoOld}
+			, RE_POST_NO_NEW    = #{rePostNoNew}
+			, RE_ROAD_ADDR      = #{reRoadAddr}
+			, RE_ROAD_DTL_ADDR  = #{reRoadDtlAddr}
+			, RE_PRCL_ADDR      = #{rePrclAddr}
+			, RE_PRCL_DTL_ADDR  = #{rePrclDtlAddr}
+			, CHRG_PART         = #{chrgPart}
+			, CHRG_NM           = #{chrgNm}
+			, CHRG_TEL          = #{chrgTel}
+			, CHRG_MOBILE       = #{chrgMobile}
+			, CHRG_EMAIL        = #{chrgEmail}
+			, BANK_CD           = #{bankCd}
+			, ACCT_NO           = #{acctNo}
+			, OOA_NM            = #{ooaNm}
+			, MEMO              = #{memo}
+			, SYS_UPDR_NO       = #{sysUpdrNo}
+			, SYS_UPD_DTM       = NOW()
+		WHERE	1=1
+			AND	MBR_NO = #{mbrNo}
+			AND	BIZ_NO = #{bizNo}		
+	</update>
+	
+	<delete id="deleteImage" parameterType="biz.app.partner.model.PartnerInfoPO">
+		UPDATE MEMBER_BASE SET
+			PRFL_IMG = NULL
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+			, UPDR_IP = #{updrIp}
+		WHERE	1=1
+			AND	MBR_NO = #{mbrNo}
+	</delete>
+	
+	<select id="getPartnerEmailCheck" resultType="int">
+		<!--
+			Query Name	: partner.getPartnerEmailCheck
+			Description	: 파트너 이메일 중복체크
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		
+		SELECT	COUNT(*)
+		FROM	MEMBER_BASE A
+		WHERE	1=1
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+			AND	EMAIL = #{email}
+			<if test='mbrNo != null and mbrNo != ""'>
+				AND MBR_NO != #{mbrNo}
+			</if>
+	</select>
+	
+	<select id="getPartnerNickNmCheck" resultType="int">
+		<!--
+			Query Name	: partner.getPartnerNickNmCheck
+			Description	: 파트너 닉네임 중복체크
+			Writer		: 조은지
+			Date 		: 2021. 2. 23.
+		-->
+		
+		SELECT	COUNT(*)
+		FROM	MEMBER_BASE A
+		WHERE	1=1
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+			AND	NICK_NM = #{nickNm}
+			<if test='mbrNo != null and mbrNo != ""'>
+				AND MBR_NO != #{mbrNo}
+			</if>
+	</select>
+	
+</mapper>

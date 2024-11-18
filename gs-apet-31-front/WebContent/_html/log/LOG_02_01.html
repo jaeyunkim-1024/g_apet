@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 스크롤 이벤트 : share 아이콘 이동 모바일만 적용  */
+			scrollEvent();
+			$(window).scroll(scrollEvent);
+			function scrollEvent(){
+				var check = ($(".mylog_area.info").css("float") == "none")?true:false;
+				if(check){
+					var $hbox = $(".pageHead .mdt");
+					var $wrap = $(".mylog_userInfo .profile .pro_btn");
+					var h = $(window).scrollTop();
+					var $share = ($(".mylog_user .profile .logBtnBasic.btn-share").length)?$(".mylog_user .profile .logBtnBasic.btn-share"):$(".pageHead .mdt .logBtnBasic.btn-share");
+					var top = $wrap.offset().top + $wrap.height() - $(".pageHead .inr").height();
+					if(h >= top){
+						$hbox.prepend($share);
+					}else{
+						$wrap.append($share);
+					};
+				};
+			};
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set8","tit":"","logo":"log","btr":"만들기","class":"noneAc logHeaderAc"}'></include><!-- 04.08 : noneAc logHeaderAc클래스 추가 -->
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log my" id="contents">
+					<div class="mylog_area info">
+						<div class="mylog_area_innerWrap">
+						<!-- 사용자 정보 -->
+						<div class="mylog_userInfo">
+							<!-- 사용자 -->
+							<div class="mylog_user">
+								<div class="pic">
+									<a href="javascript:;">
+										<img src="../../_images/_temp/temp_logDogImg03.png" alt="">
+									</a>
+								</div>
+								<div class="profile">
+									<div class="nick scroll_tit_ac">gs_aboutpet</div><!-- 2021.03.19 : scroll_tit_ac 클래스 추가 -->
+									<div class="txt">내가 우주 최고 기엽다규</div>
+									<div class="pro_btn scroll_move_wrap">
+										<a href="javascript:;" class="btn b">프로필 asdf편집</a><!-- btn b : 클래스 일때 비 활성화 // btn a : 클래스 일때 활성화  -->
+										<button class="logBtnBasic btn-share scroll_move_ac"></button>
+									</div>
+								</div>
+							</div>
+						</div>	
+						<!-- // 사용자 정보 -->
+						<!-- 게시물 -->
+						<div class="mylog_contents">
+							<ul>
+								<li>
+									<div class="tit">게시물</div>
+									<div class="num">0</div>
+								</li>
+								<li>
+									<div class="tit">팔로워</div>
+									<div class="num">0</div>
+								</li>
+								<li>
+									<div class="tit">팔로잉</div>
+									<div class="num">0</div>
+								</li>
+							</ul>
+						</div>
+						<!-- // 게시물 -->
+						</div>
+					</div>
+					<div class="mylog_area con">
+						<div class="logPicMetric only3">
+							<ul>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+							</ul>
+						</div>
+						<!-- 위치추천을 위해 서비스를 활성화해주세요. -->
+						<div class="noneBoxPoint" style="height:calc(100vh - 310px); display:none;"><!-- 2021.02.15 : height 인라인 추가 -->
+							<div>
+								<span class="noneBoxPoint_img"></span>
+								<div class="noneBoxPoint_infoTxt">위치추천을 위해<br />서비스를 활성화해주세요.</div>
+								<!-- button class="button_round4_blue">위치서비스 설정</button -->
+								<!-- 2021.01.21 : 수정-->
+								<a href="javascript:;" class="btn lg a">위치서비스 설정</a>
+								<!-- // 2021.01.21 : 수정-->
+							</div>
+						</div>
+						<!-- // 위치추천을 위해 서비스를 활성화해주세요 -->
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+        <include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"","talk_mo":"hide","foot_pc":"","talk_pc":"","zindex":10}'></include>
+		
+	</div>
+</body>
+</html>

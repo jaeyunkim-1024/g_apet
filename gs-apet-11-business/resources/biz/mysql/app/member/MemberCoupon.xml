@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 쿠폰 Mapper
+	작성자  	snw
+	작성일자  	2016.02.16
+-->
+
+<mapper namespace="memberCoupon">
+
+	<update id="updateMemberCouponUse">
+		<!--
+			Query Name : memberCoupon.updateMemberCouponUse
+			Description : 회원 쿠폰 사용 처리
+		-->
+		UPDATE  MEMBER_COUPON
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+					, USE_YN			= '${@framework.common.constants.CommonConstants@USE_YN_Y}'					/* 사용 여부 */
+					, USE_DTM		= NOW()				/* 사용 일시 */
+					, ORD_NO		= #{ordNo}			/* 주문 번호 */
+		WHERE	1 = 1
+		AND		MBR_CP_NO = #{mbrCpNo}
+	</update>
+
+	<update id="updateMemberCouponUseCancel">
+		<!--
+			Query Name : memberCoupon.updateMemberCouponUseCancel
+			Description : 회원 쿠폰 복원 처리
+		-->
+		UPDATE  MEMBER_COUPON
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+					, USE_YN			= '${@framework.common.constants.CommonConstants@USE_YN_N}'					/* 사용 여부 */
+					, USE_DTM		= NULL				/* 사용 일시 */
+					, ORD_NO		= NULL				/* 주문 번호 */
+		WHERE	1 = 1
+		AND		MBR_CP_NO = #{mbrCpNo}
+	</update>
+	
+	<select id="getMemberCoupon" resultType="biz.app.member.model.MemberCouponVO">
+		<!--
+			Query Name : memberCoupon.getMemberCoupon
+			Description : 회원 쿠폰 상세 조회
+		-->
+		SELECT		 MC.MBR_CP_NO
+		     		,(SELECT CB.CP_NM FROM COUPON_BASE CB WHERE CB.CP_NO = MC.CP_NO) AS CP_NM
+					,MC.CP_NO
+					,MC.MBR_NO
+					,MC.USE_YN
+					,MC.USE_DTM
+					,MC.ORD_NO
+					,MC.ISU_TP_CD
+					,MC.USE_STRT_DTM
+					,MC.USE_END_DTM
+					,( DATEDIFF(MC.USE_END_DTM,NOW()) ) AS LEFT_DAYS
+					,CASE WHEN MC.USE_STRT_DTM <![CDATA[<=]]> NOW() AND MC.USE_END_DTM <![CDATA[>=]]> NOW() THEN '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+					        ELSE '${@framework.common.constants.CommonConstants@USE_YN_N}'
+					 END AS USE_PSB_YN
+					,MC.SYS_REGR_NO
+					,MC.SYS_REG_DTM
+					,MC.SYS_UPDR_NO
+					,MC.SYS_UPD_DTM
+		FROM		MEMBER_COUPON MC
+		WHERE	1=1
+		<if test='mbrCpNo != null and mbrCpNo != ""'>
+		AND		MBR_CP_NO = #{mbrCpNo}
+		</if>
+	</select>
+
+	<!-- 회원 쿠폰 발급 -->
+	<insert id="insertMemberCoupon">
+		<selectKey keyProperty="mbrCpNo" order="BEFORE" resultType="java.lang.Long">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_COUPON_SEQ}') FROM DUAL
+		</selectKey>
+		<!--
+			Query Name : memberCoupon.insertMemberCoupon
+			Description :  회원 쿠폰 발급
+			Writter 	: 김재윤
+		-->
+		INSERT /* QUERYID(memberCoupon.insertMemberCoupon) */ INTO MEMBER_COUPON
+			(
+				MBR_CP_NO
+				,CP_NO
+				,MBR_NO
+				,USE_YN
+				,ISU_TP_CD /* 발급유형코드 */
+				,USE_STRT_DTM /* 사용시작일시 */
+				,USE_END_DTM /* 사용종료일시 */
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+			)
+			VALUES
+			(
+				#{mbrCpNo}
+				,#{cpNo}
+				,#{mbrNo}
+				,#{useYn}
+				,#{isuTpCd}
+				,#{useStrtDtm}
+				,#{useEndDtm}
+				,#{sysRegrNo}
+				,sysdate()
+				,#{sysUpdrNo}
+				,sysdate()
+			)
+	</insert>
+
+	<!-- 회원별 쿠폰 목록-->
+	 <select id="pageMemberCoupon" resultType="biz.app.member.model.MemberCouponVO">
+		SELECT MC.CP_NO
+              ,CB.CP_NM
+              ,CB.CP_DSCRT
+              ,MC.USE_YN
+              ,MC.MBR_CP_NO
+              ,MC.MBR_NO
+              ,MC.SYS_REGR_NO
+              ,FN_GET_USER_NAME(MC.SYS_REGR_NO) AS SYS_REGR_NM
+              ,MC.SYS_REG_DTM
+              ,MC.SYS_UPDR_NO
+              ,FN_GET_USER_NAME(MC.SYS_UPDR_NO) AS SYS_UPDR_NM
+              ,MC.SYS_UPD_DTM
+              ,MC.USE_DTM
+              ,CB.VLD_PRD_DAY
+              ,CB.VLD_PRD_STRT_DTM
+              ,CB.VLD_PRD_END_DTM
+              ,CB.CP_KIND_CD
+              ,CB.CP_STAT_CD
+              ,CB.CP_APL_CD
+              ,CB.CP_TG_CD
+              ,CB.VLD_PRD_CD
+              ,CB.CP_PVD_MTH_CD
+              ,CB.DUPLE_USE_YN
+              ,CB.ISU_HOST_CD
+	          ,CB.CP_ISU_CD
+	          ,CB.CP_ISU_QTY
+              ,CB.APL_VAL
+              ,CB.CP_IMG_FLNM
+              ,CB.CP_IMG_PATHNM
+              ,CB.APL_STRT_DTM
+              ,CB.APL_END_DTM
+              ,MC.ORD_NO
+              ,MC.USE_STRT_DTM				/* 사용시작일시 */
+              ,MC.USE_END_DTM				/* 사용종료일시 */
+              ,CB.WEB_MOBILE_GB_CD			/* 웹 모바일 구분 코드 */
+		      ,CB.MIN_BUY_AMT				/* 최소 구매 금액 */
+		      ,CB.MAX_DC_AMT				/* 최대 할인 금액 */
+         FROM COUPON_BASE CB,
+              MEMBER_COUPON MC
+        WHERE 1=1
+		<include refid="pageMemberCouponCondition" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+    </select>
+
+    <!-- 회원별 쿠폰 count-->
+    <select id="getMemberCouponCountMyPage" resultType="Integer">
+    	<!--
+			Query Name : memberCoupon.getMemberCouponCountMyPage
+			Description : 회원별 사용가능한 쿠폰 count
+			Writer : 이지희
+			Date : 2021.03.08.
+ 		-->
+		SELECT COUNT(*)
+         FROM COUPON_BASE CB,
+              MEMBER_COUPON MC
+        WHERE 1=1
+		AND CB.CP_NO=MC.CP_NO
+        AND MC.MBR_NO = ${mbrNo}
+		AND CB.CP_STAT_CD = '20' /* 진행중 */
+        AND MC.USE_YN = 'N'
+        AND MC.USE_STRT_DTM <![CDATA[<=]]> SYSDATE() 
+        AND MC.USE_END_DTM <![CDATA[>=]]> SYSDATE()  
+		AND CB.WEB_MOBILE_GB_CD =  '00';      
+    </select>
+    
+    <!-- 회원별 쿠폰 count-->
+    <select id="pageMemberCouponCount" resultType="Integer">
+		SELECT COUNT(*)
+         FROM COUPON_BASE CB,
+              MEMBER_COUPON MC
+        WHERE 1=1
+		<include refid="pageMemberCouponCondition" />
+    </select>
+
+    <sql id="pageMemberCouponCondition">
+		AND CB.CP_NO=MC.CP_NO
+		AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}' /* 진행중 */
+		<if test='useYn.equals("N")'>
+		AND ((CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_20}' AND (CB.VLD_PRD_STRT_DTM &lt;= SYSDATE() AND DATE_ADD(CB.VLD_PRD_END_DTM, INTERVAL 1 DAY) &gt;= SYSDATE())  AND MC.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}' )  /*일자지정*/
+		    OR (CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_10}' AND (DATE_ADD(MC.SYS_REG_DTM, INTERVAL CB.VLD_PRD_DAY DAY) &gt;= SYSDATE() AND SYSDATE() &gt;= MC.SYS_REG_DTM )) /* 발급일*/
+		    AND MC.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}')
+		</if>
+		<if test='useYn.equals("Y")'>
+		AND (((CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_20}' AND (CB.VLD_PRD_STRT_DTM &gt; SYSDATE() OR DATE_ADD(CB.VLD_PRD_END_DTM, INTERVAL 1 DAY) &lt; SYSDATE()) ) /*일자지정*/
+               OR (CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_10}' AND (DATE_ADD(MC.SYS_REG_DTM, INTERVAL CB.VLD_PRD_DAY DAY) &lt; SYSDATE() OR SYSDATE() &lt; MC.SYS_REG_DTM )) /* 발급일*/
+            AND MC.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}')
+        	OR MC.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}')
+		</if>
+		AND MC.MBR_NO = #{mbrNo}
+		<choose>
+		<when test="webMobileGbCd != null and webMobileGbCd != '' ">
+		AND CB.WEB_MOBILE_GB_CD IN ( #{webMobileGbCd},  '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}' )
+		</when>
+		<otherwise>
+		<!--  
+			AND CB.WEB_MOBILE_GB_CD =  '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}'
+		-->
+		</otherwise>
+		</choose>
+		<if test="cpPvdMthCd != null and cpPvdMthCd !='' ">
+		AND CB.CP_PVD_MTH_CD = #{cpPvdMthCd} /* 다운로드 지급 방식 */
+		</if>
+	</sql>
+
+	<!-- 유효 쿠폰 체크-->
+	<select id="getMemberCouponCnt" resultType="Integer">
+	SELECT	count(*)
+	FROM MEMBER_COUPON
+	WHERE CP_NO  = #{cpNo} AND MBR_NO = #{mbrNo}
+	<if test='useYn != null and useYn == "Y"'>
+		AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</if>
+	<if test='useYn != null and useYn == "N"'>
+		AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		AND NOW() BETWEEN USE_STRT_DTM AND USE_END_DTM
+	</if>
+	</select>
+	<!-- 난수 쿠폰 발급 체크-->
+	<select id="getMemberIsuCouponCnt" resultType="Integer">
+		SELECT	count(*)
+		FROM COUPON_ISSUE
+		WHERE ISU_SRL_NO = #{isuSrlNo} AND MBR_CP_NO IS NOT NULL
+	</select>
+
+	<!-- 해당 쿠폰발급 수량-->
+	<select id="getCouponBaseIsuQty" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM	MEMBER_COUPON
+		WHERE	CP_NO = #{cpNo}
+	</select>
+
+
+	<select id="listMemberCoupon" resultType="biz.app.member.model.MemberCouponVO">
+		<!--
+			Query Name : memberCoupon.listMemberCoupon
+			Description : 회원별 사용가능한 쿠폰
+			Writer : 김재윤
+			Date : 2021.03.09.
+		-->
+			SELECT 		/* QUERYID(memberCoupon.listMemberCoupon) */
+						MB.MBR_NM
+					,	MB.MBR_NO
+					,	CB.CP_NO
+					,	CB.CP_NM
+			     	,	CB.CP_KIND_CD
+			     	,	FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@CP_KIND}',CB.CP_KIND_CD,'') AS CP_KIND_NM
+			     	,	CB.CP_STAT_CD
+			     	,	CB.CP_APL_CD
+			     	,	CEIL(CB.APL_VAL) AS APL_VAL
+			     	,	IF(CB.CP_APL_CD = '${@framework.common.constants.CommonConstants@CP_APL_10}',CONCAT(CB.APL_VAL,'%'),CONCAT(CB.APL_VAL,'원')) AS APL_VAL_UNIT		/* 적용 코드 값 + 단위 */
+					, 	IF(LENGTH(CB.CP_NM) > 95,CONCAT(SUBSTR(CB.CP_NM,1,24),'...'),CB.CP_NM) AS CP_SHT_NM																	/* 쿠폰 약어 */
+			     	,	CB.CP_TG_CD
+			     	,	CB.RVS_MRG_PMT_YN
+			     	,	CB.CP_PVD_MTH_CD
+			     	,	CB.EXPR_ITDC_YN
+			     	,	CB.OUTSIDE_CP_YN
+			     	,	CB.OUTSIDE_CP_CD
+			     	,	IFNULL(CB.MIN_BUY_AMT,0) AS MIN_BUY_AMT
+			     	,	IFNULL(CB.MAX_DC_AMT,0) AS MAX_DC_AMT
+			     	,	CB.NOTICE
+					,	MC.USE_YN
+					,	MC.USE_DTM
+					,	MC.ORD_NO
+					,	MC.ISU_TP_CD
+					,	MC.USE_STRT_DTM
+					,	MC.USE_END_DTM
+			     	,	MC.USE_DTM
+			     	,	( DATEDIFF(MC.USE_END_DTM,NOW()) ) AS LEFT_DAYS
+					,	MC.SYS_REGR_NO
+					,	MC.SYS_REG_DTM
+					,	MC.SYS_UPDR_NO
+					,	MC.SYS_UPD_DTM
+			FROM MEMBER_COUPON MC
+			INNER JOIN COUPON_BASE CB ON MC.CP_NO = CB.CP_NO
+			INNER JOIN MEMBER_BASE MB ON MC.MBR_NO = MB.MBR_NO
+			LEFT JOIN COUPON_ISSUE CI ON MC.MBR_CP_NO = CI.MBR_CP_NO
+			<include refid="listMemberCouponWhere" />
+			<include refid="bizCommon.sortSql" />
+			<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="listMemberCouponCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM MEMBER_COUPON MC
+		INNER JOIN COUPON_BASE CB ON MC.CP_NO = CB.CP_NO
+		INNER JOIN MEMBER_BASE MB ON MC.MBR_NO = MB.MBR_NO
+		LEFT JOIN COUPON_ISSUE CI ON MC.MBR_CP_NO = CI.MBR_CP_NO
+		<include refid="listMemberCouponWhere" />
+	</select>
+
+	<sql id="listMemberCouponWhere">
+		WHERE 	MC.MBR_NO = #{mbrNo}
+		<if test="useYn != '' and useYn != null">
+			AND ( MC.USE_YN = #{useYn}
+			<choose>
+				<when test="useYn eq @framework.common.constants.CommonConstants@USE_YN_Y"> <!-- 사용 한 쿠폰 혹은 기간 만료(사용 종료 일시가 오늘보다 이전) 된 쿠폰 -->
+					OR  MC.USE_END_DTM &lt;= CURDATE()
+					OR  CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_40}'
+					)
+				</when>
+				<otherwise>
+					AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+					AND (
+							( CURDATE() &lt;= MC.USE_END_DTM AND CURDATE() &gt;= MC.USE_STRT_DTM )
+							OR 	CURDATE() &lt;= MC.USE_STRT_DTM
+						)
+					)
+				</otherwise>
+			</choose>
+		</if>
+		<if test="cpKindCd != '' and cpKindCd != null">
+			AND MC.USE_YN = #{cpKindCd}
+		</if>
+		<if test="cpAplCd != '' and cpAplCd != null">
+			AND CB.CP_APL_CD = #{cpAplCd}
+		</if>
+		<if test="vldPrdCd != '' and vldPrdCd != null">
+			AND CB.VLD_PRD_CD = #{vldPrdCd}
+		</if>
+		<if test="cpPvdMthCd != '' and cpPvdMthCd != null">
+			AND CB.CP_PVD_MTH_CD = #{cpPvdMthCd}
+		</if>
+		<if test="dupleUseYn != '' and dupleUseYn != null">
+			AND CB.DUPLE_USE_YN = #{dupleUseYn}
+		</if>
+		<if test="isuHostCd != '' and isuHostCd != null">
+			AND CB.ISU_HOST_CD = #{isuHostCd}
+		</if>
+		<if test="cpIsuCd != '' and cpIsuCd != null">
+			AND CB.CP_ISU_CD = #{cpIsuCd}
+		</if>
+		<if test="exprItdcYn != '' and exprItdcYn != null">
+			AND CB.EXPR_ITDC_YN = #{exprItdcYn}
+		</if>
+		<if test="outsideCpYn != '' and outsideCpYn != null">
+			AND CB.OUTSIDE_CP_YN = #{outsideCpYn}
+		</if>
+		<if test="isuSrlNo != '' and isuSrlNo != null">
+			AND CI.ISU_SRL_NO = #{isuSrlNo}
+		</if>
+	</sql>
+    
+	<!-- 회원별 쿠폰 목록-->
+	<select id="getMemberCouponDetail" resultType="biz.app.member.model.MemberCouponVO">
+		SELECT MC.CP_NO								/* 쿠폰번호 */
+              ,CB.CP_IMG_PATHNM						/* 쿠폰이미지경로명 */
+              ,CB.CP_NM								/* 쿠폰명 */
+              ,CB.CP_DSCRT							/* 쿠폰설명 */
+              ,CB.APL_STRT_DTM						/* 적용시작일시 */
+              ,CB.APL_END_DTM						/* 적용종료일시 */
+              ,CB.DUPLE_USE_YN						/* 중복사용여부 */
+              ,CB.CP_TG_CD							/* 쿠폰대상코드 */
+              ,CB.CP_KIND_CD						/* 쿠폰종류코드 */
+              ,CB.CP_APL_CD							/* 쿠폰적용코드 */
+              ,CB.APL_VAL							/* 적용값 */
+              ,MC.USE_YN AS CP_USE_YN				/* 쿠폰사용여부 */
+              ,'${@framework.common.constants.CommonConstants@COMM_YN_Y}' AS CP_DW_YN		/* 쿠폰다운여부 */
+              ,MC.USE_STRT_DTM						/* 사용시작일시 */
+              ,MC.USE_END_DTM						/* 사용종료일시 */
+		  FROM COUPON_BASE CB
+              ,MEMBER_COUPON MC
+		 WHERE 1=1
+		 AND CB.CP_NO = #{cpNo}
+		 AND CB.CP_NO = MC.CP_NO
+		 AND MC.MBR_NO = #{mbrNo}
+    </select>
+    
+     <insert id="insertWelcomeEventCoupon" parameterType="biz.app.member.model.MemberCouponPO">
+        <!--
+            Query Name : memberCoupon.insertWelcomeEventCoupon
+            Description : insertWelcomeEventCoupon
+        -->
+        <selectKey keyProperty="mbrCpNo" order="BEFORE" resultType="java.lang.Long">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_COUPON_SEQ}') FROM DUAL
+		</selectKey>
+         INSERT INTO MEMBER_COUPON(
+		        MBR_CP_NO
+		      , CP_NO
+		      , MBR_NO
+		      , USE_YN
+		      , ISU_TP_CD /* 발급유형코드 */
+		      , USE_STRT_DTM /* 사용시작일시 */
+		      , USE_END_DTM /* 사용종료일시 */
+		      , SYS_REGR_NO
+		      , SYS_REG_DTM
+		      , SYS_UPDR_NO
+		      , SYS_UPD_DTM
+		)
+		 SELECT      
+		 			#{mbrCpNo}
+		        ,    CP_NO 		
+		        ,   #{mbrNo}
+		        ,   'N' 
+		        ,   '${@framework.common.constants.CommonConstants@ISU_TP_10}' 
+		        ,   DATE_FORMAT(CURRENT_DATE(),'%Y-%m-%d %H:%i:%s') 
+		        ,   IF(VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_10}' , DATE_FORMAT(DATE_ADD(CURRENT_DATE(), INTERVAL VLD_PRD_DAY DAY) ,'%Y-%m-%d 23:59:59'), VLD_PRD_END_DTM )
+		        ,   #{sysRegrNo} 
+		        ,   NOW()
+		        ,   #{sysRegrNo} 
+		        ,   NOW() 
+		FROM COUPON_BASE CB 
+		WHERE CB.CP_PVD_MTH_CD != '${@framework.common.constants.CommonConstants@CP_PVD_MTH_20}'
+		AND  CB.CP_NO = #{cpNo}
+    </insert>
+
+	<!-- 쿠폰 대기 등록 -->
+	<insert id="insertCouponIsuStb">
+		<!--
+			Query Name : memberCoupon.insertCouponIsuStb
+			Description :  쿠폰 대기 등록
+			Writter 	: cjw01
+		-->
+		INSERT /* QUERYID(memberCoupon.insertCouponIsuStb) */ INTO COUPON_ISU_STB
+			(
+				CP_NO
+				,MBR_NO
+				,USE_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+			)
+			VALUES
+			(
+				#{cpNo}
+				,#{mbrNo}
+				,#{useYn}
+				,#{sysRegrNo}
+				,sysdate()
+				,#{sysUpdrNo}
+				,sysdate()
+			)
+	</insert>
+
+	<update id="updateCouponIsuStbUse">
+		<!--
+			Query Name : memberCoupon.updateCouponIsuStbUse
+			Description : 회원 쿠폰 발급 대기 대상 발급 처리
+		-->
+		UPDATE COUPON_ISU_STB
+		   SET SYS_UPDR_NO	= '${@framework.common.constants.CommonConstants@COMMON_BATCH_USR_NO}'		/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+			 , USE_YN		= '${@framework.common.constants.CommonConstants@USE_YN_Y}'			/* 사용 여부 */
+		 WHERE 1 = 1
+		   AND CP_NO = #{cpNo}
+		   AND MBR_NO = #{mbrNo}
+	</update>
+	
+	<delete id="deleteCouponIsuStbUse">
+		<!--
+			Query Name : CouponIssue.deleteCouponIsuStbUse
+			Description :  쿠폰발급대기  처리 삭제
+			Writter 	: cjw01
+		-->
+		DELETE FROM COUPON_ISU_STB 
+		 WHERE 1=1
+		   AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</delete>
+	
+	<select id="getWelcomeLimitCouponCount" resultType="Integer">
+    	<!--
+			Query Name : memberCoupon.getWelcomeLimitCouponCount
+			Description : 신규가입 선착순 쿠폰 이벤트. 당일 쿠폰 지급 개수. 			
+ 		-->
+		SELECT COUNT(*)
+        FROM MEMBER_COUPON MC
+        	 INNER JOIN COUPON_BASE CB
+             ON (MC.CP_NO=CB.CP_NO)
+        WHERE MC.CP_NO = #{cpNo}
+          AND DATE(MC.SYS_REG_DTM) = DATE(NOW())
+      
+    </select>
+</mapper>

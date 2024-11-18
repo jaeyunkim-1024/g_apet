@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="emma">
+
+	<insert id="insertSmtTran">
+		<!--
+			Query Name : emma.insertSmtTran
+			Description : SMS 전송테이블(em_smt_tran) 등록
+		-->
+		INSERT INTO em_smt_tran
+		(
+			date_client_req,
+			content,
+			callback,
+			service_type,
+			broadcast_yn,
+			msg_status,
+			recipient_num)
+			VALUES
+		(
+			IFNULL(STR_TO_DATE(#{dateClientReq}, '%Y%m%d%H%i%s'), SYSDATE())
+			,#{content}		
+			,#{callback}
+			,#{serviceType}
+			,#{broadcastYn}
+			,#{msgStatus}
+			,#{recipientNum}
+		)
+	</insert>
+
+	<insert id="insertSmtClient">
+		<!--
+			Query Name : emma.insertSmtClient
+			Description : 수신자 번호 리스트 테이블(em_smt_client) 등록
+		-->
+		INSERT INTO em_smt_client
+		(
+			mt_pr,
+			mt_seq,
+			msg_status,
+			recipient_num)
+			VALUES
+		(
+			#{mtPr}
+			,#{mtSeq}		
+			,#{msgStatus}
+			,#{recipientNum}
+		)
+	</insert>
+
+	<select id="getMaxSmtPr" resultType="java.lang.Integer">
+		<!--
+			Query Name : emma.getMaxSmtPr
+			Description : 동보 메세지 Key getting
+		-->
+		SELECT 
+		    MAX(mt_pr)
+		FROM
+		    em_smt_tran
+		WHERE
+		    msg_status = '${@framework.common.constants.CommonConstants@MSG_STATUS_TEMP}' 
+		    AND broadcast_yn = '${@framework.common.constants.CommonConstants@BROADCAST_YN_Y}'
+	</select>
+
+	<update id="updateSmtTran">
+		<!--
+			Query Name : emma.updateSmtTran
+			Description : SMS 전송테이블(em_smt_tran) 상태 Update
+		-->
+		UPDATE em_smt_tran 
+		SET 
+		    msg_status = '${@framework.common.constants.CommonConstants@MSG_STATUS_READY}'
+		WHERE
+		    mt_pr = #{mtPr}
+	</update>
+
+	<insert id="insertMmtTran">
+		<!--
+			Query Name : emma.insertMmtTran
+			Description : MMS 전송테이블(em_mmt_tran) 등록
+		-->
+		INSERT INTO em_mmt_tran
+		(
+			date_client_req,
+			subject,
+			content,
+			callback,
+			service_type,
+			broadcast_yn,
+			msg_status,
+			recipient_num)
+			VALUES
+		(
+			IFNULL(STR_TO_DATE(#{dateClientReq}, '%Y%m%d%H%i%s'), SYSDATE())
+			,#{subject}
+			,#{content}		
+			,#{callback}
+			,#{serviceType}
+			,#{broadcastYn}
+			,#{msgStatus}
+			,#{recipientNum}
+		)
+	</insert>
+
+	<insert id="insertMmtClient">
+		<!--
+			Query Name : emma.insertMmtClient
+			Description : 수신자 번호 리스트 테이블(em_mmt_client) 등록
+		-->
+		INSERT INTO em_mmt_client
+		(
+			mt_pr,
+			mt_seq,
+			msg_status,
+			recipient_num)
+			VALUES
+		(
+			#{mtPr}
+			,#{mtSeq}		
+			,#{msgStatus}
+			,#{recipientNum}
+		)
+	</insert>
+
+	<select id="getMaxMmtPr" resultType="java.lang.Integer">
+		<!--
+			Query Name : emma.getMaxMmtPr
+			Description : 동보 메세지 Key getting
+		-->
+		SELECT 
+		    MAX(mt_pr)
+		FROM
+		    em_mmt_tran
+		WHERE
+		    msg_status = '${@framework.common.constants.CommonConstants@MSG_STATUS_TEMP}' 
+		    AND broadcast_yn = '${@framework.common.constants.CommonConstants@BROADCAST_YN_Y}'
+	</select>
+
+	<update id="updateMmtTran">
+		<!--
+			Query Name : emma.updateMmtTran
+			Description : SMS 전송테이블(em_smt_tran) 상태 Update
+		-->
+		UPDATE em_mmt_tran 
+		SET 
+		    msg_status = '${@framework.common.constants.CommonConstants@MSG_STATUS_READY}'
+		WHERE
+		    mt_pr = #{mtPr}
+	</update>			
+</mapper>

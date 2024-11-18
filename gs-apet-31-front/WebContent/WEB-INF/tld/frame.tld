@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+    
+  <description>Frame Tag Library</description>
+  <display-name>Frame</display-name>
+  <tlib-version>1.0</tlib-version>
+  <short-name>frame</short-name>
+  <uri>frame.tag</uri>
+
+	<tag>
+		<name>useConstants</name>
+		<tag-class>framework.front.tags.UseConstantsTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>var</name>
+			<required>yes</required>
+			<rtexprvalue>no</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>className</name>
+			<required>yes</required>
+			<rtexprvalue>no</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>scope</name>
+			<required>no</required>
+			<rtexprvalue>no</rtexprvalue>
+		</attribute>
+	</tag>
+   <tag>
+    <description>Select Option Tag</description> 
+    <name>selectOption</name>
+    <tag-class>front.web.config.tags.SelectOptionTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>Code Data (java.util.List)</description>
+        <name>items</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>All Data Display</description>
+        <name>all</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+	<attribute>
+		<name>selectKey</name>
+		<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+	<attribute>
+		<name>defaultName</name>
+		<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+  </tag>
+
+  <tag>
+    <description>공통코드의 명칭 출력하는 테그</description> 
+    <name>codeValue</name>
+    <tag-class>front.web.config.tags.CodeValueTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>Code Data (java.util.List)</description>
+        <name>items</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Detail Code</description>
+        <name>dtlCd</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Detail Name Type(S : 약어명, null or D : 상세 명 , U1 : 사용자정의 1값)</description>
+        <name>type</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>
+  
+   <tag>
+    <description>List Paging Tag</description> 
+    <name>listPage</name>
+    <tag-class>framework.front.tags.ListPagingTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>Page ID(페이지 ID)</description>
+        <name>id</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+     <attribute>
+        <description>Total Record(전체데이터수)</description>
+        <name>totalRecord</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Record Per Page(페이지 당 데이터 수)</description>
+        <name>recordPerPage</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Current Page(현재 페이지)</description>
+        <name>currentPage</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Index Per Page(한화면에 출력되는 페이지 수)</description>
+        <name>indexPerPage</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+    
+  </tag>
+  
+  <tag>
+    <description>Goods Image Tag</description> 
+    <name>goodsImage</name>
+    <tag-class>framework.front.tags.GoodsImageTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>상품 이미지 경로</description>
+        <name>imgPath</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>Goods ID(상품ID)</description>
+        <name>goodsId</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>이미지 순번</description>
+        <name>seq</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>이미지 구분 (반전일경우 R)</description>
+        <name>gb</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Image Size(이미지 사이즈)</description>
+        <name>size</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Class</description>
+        <name>cls</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>Alt</description>
+        <name>alt</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>NoImg</description>
+        <name>noImg</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+  </tag>
+
+  <tag>
+    <description>
+    	Date Format Tag(VARCHAR타입의 일자)
+    </description> 
+    <name>date</name>
+    <tag-class>framework.front.tags.DateFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>
+        	데이터 : yyyyMMdd
+        </description>
+        <name>date</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>
+        	타입  (default:false)  
+        	1. K : xxxx년 xx월 xx일
+        	2. H : xxxx-xx-xx
+        	3. S : xxxx/xx/xx
+        	4. C : xxxx.xx.xx
+        </description>
+        <name>type</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+  </tag>
+
+  <tag>
+    <description>
+    	Timestamp Format Tag
+    </description> 
+    <name>timestamp</name>
+    <tag-class>framework.front.tags.TimestampFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>
+        	데이터 : yyyy-MM-dd hh:mm:ss.s
+        </description>
+        <name>date</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>
+        	일자 타입  (default:H)  
+        	1. K : xxxx년 xx월 xx일
+        	2. H : xxxx-xx-xx
+        	4. C : xxxx.xx.xx
+        	5. S : xxxx/xx/xx
+        </description>
+        <name>dType</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>
+        	시간 타입  (default:"")  
+        	1. KM : xx시 xx분
+        	1. KS : xx시 xx분 xx초
+        	2. HM : xx:xx
+        	2. HS : xx:xx:xx
+        	4. CM : xx.xx
+        	4. CS : xxxx.xx.xx
+        </description>
+        <name>tType</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <description>
+    	초단위의 데이터를 시간으로 표시
+    </description> 
+    <name>timeCalculation</name>
+    <tag-class>framework.front.tags.TimeCalculationTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>
+        	초단위 시간
+        </description>
+        <name>time</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>
+        	타입  (default:M)  
+        	1. H : 시간으로 표시
+        	2. M : 시분으로 표시
+        	3. S : 시분초로 표시
+        </description>
+        <name>type</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>    
+  
+  <tag>
+    <description>Post Format Tag(우편번호_구)</description> 
+    <name>post</name>
+    <tag-class>framework.front.tags.PostFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>우편번호</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <description>Tel Format Tag(전화번호)</description> 
+    <name>tel</name>
+    <tag-class>framework.front.tags.TelFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+    
+  <tag>
+    <description>Mobile Format Tag(휴대폰번호)</description> 
+    <name>mobile</name>
+    <tag-class>framework.front.tags.MobileFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Content Tag(본문내용)</description> 
+    <name>content</name>
+    <tag-class>framework.front.tags.ContentTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+    
+  <tag>
+    <description>
+    	Secret Format Tag
+    	문자열 일부 비노출 처리
+    </description> 
+    <name>secret</name>
+    <tag-class>framework.front.tags.SecretFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>  
+
+  <tag>
+    <description>
+    	Numeric Format Tag
+    	숫자 3자리 콤마 찍기 
+    </description> 
+    <name>num</name>
+    <tag-class>framework.front.tags.NumericFormatTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag> 
+
+  <tag>
+    <description>
+    	Content Length Tag
+    	내용을 지정 길이로 자르기
+    </description> 
+    <name>sscontent</name>
+    <tag-class>framework.front.tags.SubStrContentTag</tag-class>
+    <body-content>JSP</body-content>
+     <attribute>
+        <description>데이터</description>
+        <name>data</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+        <description>길이</description>
+        <name>length</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>             
+           
+	<function>
+		<name>getAuthKey</name>
+		<function-class>framework.common.util.SgrCryptoUtil</function-class>
+		<function-signature>java.lang.String getAuthKey()</function-signature>
+	</function>
+	
+	<function>
+		<name>optImagePath</name>
+		<function-class>front.web.config.util.ImagePathUtil</function-class>
+		<function-signature>java.lang.String imagePath(java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>imagePath</name>
+		<function-class>front.web.config.util.ImagePathUtil</function-class>
+		<function-signature>java.lang.String imagePath(java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>optImagePathSgr</name>
+		<function-class>front.web.config.util.ImagePathUtil</function-class>
+		<function-signature>java.lang.String imagePathSgr(java.lang.String, java.lang.String)</function-signature>
+	</function>
+</taglib>

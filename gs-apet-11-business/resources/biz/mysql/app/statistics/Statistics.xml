@@ -1,0 +1,1440 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="statistics">
+
+	<select id="orderDailyReportListGrid" resultType="biz.app.statistics.model.OrderDailyReportVO">
+		<!--
+			Query Name : statistics.orderDailyReportListGrid
+			Description : 일 주문 현황
+		-->
+		SELECT ODR.1ST_DISP_CLSF_NO AS DISP_CLSF_NO_1ST
+		      	, DC1.DISP_CLSF_NM AS DISP_CLSF_NM_1ST
+		      	, ODR.2ND_DISP_CLSF_NO AS DISP_CLSF_NO_2ND
+		      	, DC2.DISP_CLSF_NM AS DISP_CLSF_NM_2ND
+		      	, ODR.DISP_CLSF_NO
+		      	, DC3.DISP_CLSF_NM AS DISP_CLSF_NM
+		      	, SUM(ODR.02_SALE_AMT)+SUM(ODR.04_SALE_AMT)+SUM(ODR.06_SALE_AMT)+SUM(ODR.08_SALE_AMT)
+		      	 +SUM(ODR.10_SALE_AMT)+SUM(ODR.12_SALE_AMT)+SUM(ODR.14_SALE_AMT)+SUM(ODR.16_SALE_AMT)
+		      	 +SUM(ODR.18_SALE_AMT)+SUM(ODR.20_SALE_AMT)+SUM(ODR.22_SALE_AMT)+SUM(ODR.24_SALE_AMT) AS SALE_AMT_TOT
+		      	, SUM(ODR.02_SALE_AMT) AS SALE_AMT_02
+		      	, SUM(ODR.04_SALE_AMT) AS SALE_AMT_04
+		      	, SUM(ODR.06_SALE_AMT) AS SALE_AMT_06
+		      	, SUM(ODR.08_SALE_AMT) AS SALE_AMT_08
+		      	, SUM(ODR.10_SALE_AMT) AS SALE_AMT_10
+		      	, SUM(ODR.12_SALE_AMT) AS SALE_AMT_12
+		      	, SUM(ODR.14_SALE_AMT) AS SALE_AMT_14
+		      	, SUM(ODR.16_SALE_AMT) AS SALE_AMT_16
+		      	, SUM(ODR.18_SALE_AMT) AS SALE_AMT_18
+		      	, SUM(ODR.20_SALE_AMT) AS SALE_AMT_20
+		      	, SUM(ODR.22_SALE_AMT) AS SALE_AMT_22
+		      	, SUM(ODR.24_SALE_AMT) AS SALE_AMT_24
+		FROM ORDER_DAILY_REPORT ODR
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC1 ON (DC1.DISP_CLSF_NO = ODR.1ST_DISP_CLSF_NO)
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC2 ON (DC2.DISP_CLSF_NO = ODR.2ND_DISP_CLSF_NO)
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC3 ON (DC3.DISP_CLSF_NO = ODR.DISP_CLSF_NO)
+		WHERE 1=1
+		<if test='totalDt != null and totalDt != ""' >
+			AND ODR.TOTAL_DT = #{totalDt}
+		</if>
+		<if test='ordMdaCd != null and ordMdaCd != ""' >
+			AND ODR.ORD_MDA_CD = #{ordMdaCd}
+		</if>
+		<if test='dispClsfNo != null and dispClsfNo != ""' >
+			AND #{dispClsfNo} IN (ODR.1ST_DISP_CLSF_NO, ODR.2ND_DISP_CLSF_NO, ODR.DISP_CLSF_NO)
+		</if>
+		<if test='stId != null' >
+			AND #{stId} = DC1.ST_ID
+			AND #{stId} = DC2.ST_ID
+			AND #{stId} = DC3.ST_ID
+		</if>
+<!-- 		AND (ODR.02_SALE_AMT+ODR.04_SALE_AMT+ODR.06_SALE_AMT+ODR.08_SALE_AMT -->
+<!-- 		      	 +ODR.10_SALE_AMT+ODR.12_SALE_AMT+ODR.14_SALE_AMT+ODR.16_SALE_AMT -->
+<!-- 		      	 +ODR.18_SALE_AMT+ODR.20_SALE_AMT+ODR.22_SALE_AMT+ODR.24_SALE_AMT) > 0 -->
+		GROUP BY ODR.1ST_DISP_CLSF_NO, ODR.2ND_DISP_CLSF_NO, ODR.DISP_CLSF_NO
+		ORDER BY DC1.DISP_PRIOR_RANK, ODR.1ST_DISP_CLSF_NO, DC2.DISP_PRIOR_RANK, ODR.2ND_DISP_CLSF_NO, DC3.DISP_PRIOR_RANK, ODR.DISP_CLSF_NO
+	</select>
+
+	<select id="orderCategoryReportListGrid" resultType="biz.app.statistics.model.OrderCategoryReportVO">
+		<!--
+			Query Name : statistics.orderCategoryReportListGrid
+			Description : 카테고리 별 판매 실적 리스트
+		-->
+		SELECT OCR.1ST_DISP_CLSF_NO AS DISP_CLSF_NO_1ST
+		      	, DC1.DISP_CLSF_NM AS DISP_CLSF_NM_1ST
+		      	, OCR.2ND_DISP_CLSF_NO AS DISP_CLSF_NO_2ND
+		      	, DC2.DISP_CLSF_NM AS DISP_CLSF_NM_2ND
+		      	, OCR.DISP_CLSF_NO
+		      	, DC3.DISP_CLSF_NM AS DISP_CLSF_NM
+		      	, SUM(OCR.ORD_QTY) AS ORD_QTY
+		      	, SUM(OCR.ORD_AMT) AS ORD_AMT
+		      	, SUM(OCR.CNC_QTY) AS CNC_QTY
+		      	, SUM(OCR.CNC_AMT) AS CNC_AMT
+		      	, SUM(OCR.RTN_QTY) AS RTN_QTY
+		      	, SUM(OCR.RTN_AMT) AS RTN_AMT
+		      	, SUM(OCR.ORD_AMT) - SUM(OCR.CNC_AMT) - SUM(OCR.RTN_AMT) AS TOT_AMT
+		FROM ORDER_CATEGORY_REPORT OCR
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC1 ON (DC1.DISP_CLSF_NO = OCR.1ST_DISP_CLSF_NO)
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC2 ON (DC2.DISP_CLSF_NO = OCR.2ND_DISP_CLSF_NO)
+		LEFT OUTER JOIN DISPLAY_CATEGORY DC3 ON (DC3.DISP_CLSF_NO = OCR.DISP_CLSF_NO)
+		WHERE 1=1
+		<if test='totalDtStart != null and totalDtStart != "" and totalDtEnd != null and totalDtEnd != ""' >
+			AND OCR.TOTAL_DT BETWEEN #{totalDtStart} AND #{totalDtEnd}
+		</if>
+		<if test='ordMdaCd != null and ordMdaCd != ""' >
+			AND OCR.ORD_MDA_CD = #{ordMdaCd}
+		</if>
+		<if test='dispClsfNo != null and dispClsfNo != ""' >
+			AND #{dispClsfNo} IN (OCR.1ST_DISP_CLSF_NO, OCR.2ND_DISP_CLSF_NO, OCR.DISP_CLSF_NO)
+		</if>
+		<if test='stId != null' >
+			AND #{stId} = DC1.ST_ID
+			AND #{stId} = DC2.ST_ID
+			AND #{stId} = DC3.ST_ID
+		</if>
+<!-- 		AND (OCR.ORD_AMT+OCR.CNC_AMT+OCR.RTN_AMT) > 0 -->
+		GROUP BY OCR.1ST_DISP_CLSF_NO, OCR.2ND_DISP_CLSF_NO, OCR.DISP_CLSF_NO
+		ORDER BY DC1.DISP_PRIOR_RANK, OCR.1ST_DISP_CLSF_NO, DC2.DISP_PRIOR_RANK, OCR.2ND_DISP_CLSF_NO, DC3.DISP_PRIOR_RANK, OCR.DISP_CLSF_NO
+	</select>
+
+	<select id="planningTeamByAreaListGrid" resultType="biz.app.statistics.model.StatsByAreaVO">
+		<!--
+			Query Name : statistics.planningTeamByAreaListGrid
+			Description : 지역별 / 상품주문 통계
+		-->
+		SELECT
+		  RS.ORDER_AREA
+		  , RS.PC_MEM_AMT
+		  , RS.PC_NOMEM_AMT
+		  , RS.PC_TOT_AMT
+		  , RS.MOBILE_MEM_AMT
+		  , RS.MOBILE_NOMEM_AMT
+		  , RS.MOBILE_TOT_AMT
+		  , RS.PC_TOT_AMT + RS.MOBILE_TOT_AMT AS TOT_AMT
+		  , RS.PC_MEM_QTY
+		  , RS.PC_NOMEM_QTY
+		  , RS.PC_TOT_QTY
+		  , RS.MOBILE_MEM_QTY
+		  , RS.MOBILE_NOMEM_QTY
+		  , RS.MOBILE_TOT_QTY
+		  , RS.PC_TOT_QTY + RS.MOBILE_TOT_QTY AS TOT_QTY
+		FROM (
+		  SELECT
+		    RS.ORDER_AREA
+		    , SUM(PC_MEM_AMT) AS PC_MEM_AMT
+		    , SUM(PC_NOMEM_AMT) AS PC_NOMEM_AMT
+		    , CASE WHEN @AREA = RS.ORDER_AREA THEN @PC_AMT := @PC_AMT + SUM(PC_MEM_AMT) + SUM(PC_NOMEM_AMT) ELSE @PC_AMT := SUM(PC_MEM_AMT) + SUM(PC_NOMEM_AMT) END PC_TOT_AMT
+		    , SUM(MOBILE_MEM_AMT) AS MOBILE_MEM_AMT
+		    , SUM(MOBILE_NOMEM_AMT) AS MOBILE_NOMEM_AMT
+		    , CASE WHEN @AREA = RS.ORDER_AREA THEN @PC_AMT := @PC_AMT + SUM(MOBILE_MEM_AMT) + SUM(MOBILE_NOMEM_AMT) ELSE @PC_AMT := SUM(MOBILE_MEM_AMT) + SUM(MOBILE_NOMEM_AMT) END MOBILE_TOT_AMT
+		    , SUM(PC_MEM_QTY) AS PC_MEM_QTY
+		    , SUM(PC_NOMEM_QTY) AS PC_NOMEM_QTY
+		    , CASE WHEN @AREA = RS.ORDER_AREA THEN @PC_AMT := @PC_AMT + SUM(PC_MEM_QTY) + SUM(PC_NOMEM_QTY) ELSE @PC_AMT := SUM(PC_MEM_QTY) + SUM(PC_NOMEM_QTY) END PC_TOT_QTY
+		    , SUM(MOBILE_MEM_QTY) AS MOBILE_MEM_QTY
+		    , SUM(MOBILE_NOMEM_QTY) AS MOBILE_NOMEM_QTY
+		    , CASE WHEN @AREA = RS.ORDER_AREA THEN @PC_AMT := @PC_AMT + SUM(MOBILE_MEM_QTY) + SUM(MOBILE_NOMEM_QTY) ELSE @PC_AMT := SUM(MOBILE_MEM_QTY) + SUM(MOBILE_NOMEM_QTY) END MOBILE_TOT_QTY
+		    , @AREA := RS.ORDER_AREA
+		  FROM (
+		  SELECT
+		    A.ORDER_AREA
+		    , CASE WHEN A.ORD_MDA_CD = '01' AND A.MEMBER_YN = 'Y' THEN A.SALE_AMT ELSE 0 END AS PC_MEM_AMT
+		    , CASE WHEN A.ORD_MDA_CD = '01' AND A.MEMBER_YN = 'N' THEN A.SALE_AMT ELSE 0 END AS PC_NOMEM_AMT
+		    , CASE WHEN A.ORD_MDA_CD = '02' AND A.MEMBER_YN = 'Y' THEN A.SALE_AMT ELSE 0 END AS MOBILE_MEM_AMT
+		    , CASE WHEN A.ORD_MDA_CD = '02' AND A.MEMBER_YN = 'N' THEN A.SALE_AMT ELSE 0 END AS MOBILE_NOMEM_AMT
+		    , CASE WHEN A.ORD_MDA_CD = '01' AND A.MEMBER_YN = 'Y' THEN A.ORD_QTY ELSE 0 END AS PC_MEM_QTY
+		    , CASE WHEN A.ORD_MDA_CD = '01' AND A.MEMBER_YN = 'N' THEN A.ORD_QTY ELSE 0 END AS PC_NOMEM_QTY
+		    , CASE WHEN A.ORD_MDA_CD = '02' AND A.MEMBER_YN = 'Y' THEN A.ORD_QTY ELSE 0 END AS MOBILE_MEM_QTY
+		    , CASE WHEN A.ORD_MDA_CD = '02' AND A.MEMBER_YN = 'N' THEN A.ORD_QTY ELSE 0 END AS MOBILE_NOMEM_QTY
+		  FROM SALE_SUM_STATS A, (SELECT @PC_AMT := 0, @MO_AMT := 0, @PC_QTY := 0, @MO_QTY := 0, @AREA := '' ) VAR
+		  WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND A.SUM_MONTH &gt;= #{startDtm }
+				AND A.SUM_MONTH &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND A.SUM_YEAR &gt;= #{startDtm }
+				AND A.SUM_YEAR &lt;= #{endDtm }
+			</if>
+
+			<if test='pageCheck != null and pageCheck.equals("01")' >
+				AND A.PAGE_GB_CD_DTL1 = '04'
+			</if>
+			<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+				AND A.PAGE_GB_CD = #{pageGbCd }
+			</if>
+
+			<if test='ordMdaCd != null and ordMdaCd !=""' >
+				AND A.ORD_MDA_CD = #{ordMdaCd }
+			</if>
+
+			<if test='memberYn != null and memberYn !=""' >
+				AND A.MEMBER_YN = #{memberYn }
+			</if>
+
+			<if test="orderArea != null" >
+				<foreach collection="orderArea" item="area" separator="OR" open="AND (" close=")" >
+					A.ORDER_AREA = #{area }
+				</foreach>
+			</if>
+
+		  ) RS
+		  GROUP BY RS.ORDER_AREA
+		) RS
+	</select>
+
+	<select id="planningTeamByGoodsListGrid" resultType="biz.app.statistics.model.StatsByGoodsVO" >
+		<!--
+			Query Name : statistics.planningTeamByGoodsListGrid
+			Description : 상품별 판매 통계 & 판매 순위
+		-->
+		SELECT
+			RS.GOODS_ID
+			, RS.GOODS_NM
+			, RS.ORD_QTY
+			, RS.SALE_AMT
+			, FN_GET_DISP_CTG_PATH(RS.DISP_CLSF_NO_DEPTH3 ) AS DISP_CLSF_NM
+			, RS.BND_NM
+			, RS.SERIES_NM
+			, RS.ORD_MDA_CD
+			, RS.PAGE_GB_CD
+			, RS.MEMBER_YN
+			, RS.ORDER_AREA
+		FROM (
+		  SELECT
+		  A.GOODS_ID
+		  , A.GOODS_NM
+		  , SUM(A.ORD_QTY) AS ORD_QTY
+		  , SUM(A.SALE_AMT) AS SALE_AMT
+		  , A.DISP_CLSF_NO_DEPTH3
+		  , A.BND_NM
+		  , A.SERIES_NM
+		  , A.ORD_MDA_CD
+		  , A.PAGE_GB_CD
+		  , A.MEMBER_YN
+		  , A.ORDER_AREA
+		  FROM SALE_SUM_STATS A
+		  WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND A.SUM_MONTH &gt;= #{startDtm }
+				AND A.SUM_MONTH &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND A.SUM_YEAR &gt;= #{startDtm }
+				AND A.SUM_YEAR &lt;= #{endDtm }
+			</if>
+
+			<if test='pageCheck != null and pageCheck.equals("01")' >
+				AND A.PAGE_GB_CD_DTL1 = '04'
+			</if>
+			<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+				AND A.PAGE_GB_CD = #{pageGbCd }
+			</if>
+
+			<if test='ordMdaCd != null and ordMdaCd !=""' >
+				AND A.ORD_MDA_CD = #{ordMdaCd }
+			</if>
+
+			<if test='memberYn != null and memberYn !=""' >
+				AND A.MEMBER_YN = #{memberYn }
+			</if>
+
+			<if test="orderArea != null" >
+				<foreach collection="orderArea" item="area" separator="OR" open="AND (" close=")" >
+					A.ORDER_AREA = #{area }
+				</foreach>
+			</if>
+
+			<if test='goodsCheck != null and goodsCheck.equals("bomCd") and searchGoodsValue != null and searchGoodsValue != ""'>
+				AND (A.GOODS_BOM_CD = #{searchGoodsValue } OR A.ITEM_BOM_CD = #{searchGoodsValue } )
+			</if>
+			<if test='goodsCheck != null and goodsCheck.equals("bomNm") and searchGoodsValue != null and searchGoodsValue != ""'>
+				AND (A.GOODS_BOM_NM LIKE CONCAT('%', #{searchGoodsValue }, '%') OR A.ITEM_BOM_NM LIKE CONCAT('%', #{searchGoodsValue }, '%') )
+			</if>
+			<if test='goodsCheck != null and goodsCheck.equals("goodsNm") and searchGoodsValue != null and searchGoodsValue != ""'>
+				AND (A.GOODS_NM LIKE CONCAT('%', #{searchGoodsValue }, '%') )
+			</if>
+
+		  GROUP BY A.GOODS_ID, A.GOODS_NM, A.DISP_CLSF_NO_DEPTH3, A.BND_NM, A.SERIES_NM, A.ORD_MDA_CD, A.PAGE_GB_CD, A.MEMBER_YN, A.ORDER_AREA
+		) RS
+		ORDER BY RS.SALE_AMT DESC
+
+	</select>
+
+	<select id="ebizMiddleSalesListGrid" resultType="biz.app.statistics.model.StatsByMCtgVO">
+		<!--
+			Query Name : statistics.ebizMiddleSalesListGrid
+			Description : 중카테고리별 매출현황
+		-->
+		SELECT
+		  RS1.DISP_CLSF_NO_DEPTH1
+		  , RS1.DISP_CLSF_NM_DEPTH1
+		  , RS1.DISP_CLSF_NO_DEPTH2
+		  , RS1.DISP_CLSF_NM_DEPTH2
+		  , RS1.ORD_QTY
+		  , RS1.SALE_AMT
+		  , @TOT_AMT AS TOT_AMT
+		  , ROUND(RS1.SALE_AMT / @TOT_AMT * 100, 3 ) AS SALE_RATE
+		FROM (
+		  SELECT
+		    RS.DISP_CLSF_NO_DEPTH1
+		    , RS.DISP_CLSF_NM_DEPTH1
+		    , RS.DISP_CLSF_NO_DEPTH2
+		    , RS.DISP_CLSF_NM_DEPTH2
+		    , RS.ORD_QTY
+		    , RS.SALE_AMT
+		    , @TOT_AMT := @TOT_AMT + RS.SALE_AMT
+		  FROM (
+		    SELECT
+		      A.DISP_CLSF_NO_DEPTH1
+		      , A.DISP_CLSF_NM_DEPTH1
+		      , A.DISP_CLSF_NO_DEPTH2
+		      , A.DISP_CLSF_NM_DEPTH2
+		      , SUM(A.ORD_QTY) AS ORD_QTY
+		      , SUM(A.SALE_AMT) AS SALE_AMT
+		    FROM SALE_SUM_STATS A
+		    WHERE 1 = 1
+		    	AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+				<if test='pageCheck != null and pageCheck.equals("01")' >
+					AND A.PAGE_GB_CD_DTL1 = '04'
+				</if>
+				<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+					AND A.PAGE_GB_CD = #{pageGbCd }
+				</if>
+		    GROUP BY A.DISP_CLSF_NO_DEPTH1, A.DISP_CLSF_NM_DEPTH1, A.DISP_CLSF_NO_DEPTH2, A.DISP_CLSF_NM_DEPTH2
+		  ) RS, (SELECT @TOT_AMT := 0 ) VAR
+		) RS1
+		ORDER BY RS1.SALE_AMT DESC
+	</select>
+
+	<select id="ebizLargeSalesListGrid" resultType="biz.app.statistics.model.StatsByLCtgVO">
+		<!--
+			Query Name : statistics.ebizLargeSalesListGrid
+			Description : 대카테고리별 매출현황
+		-->
+		SELECT
+		  RS2.SUM_REF
+		  , RS2.DISP_CLSF_NM
+		  , RS2.SALE_AMT
+		  , RS2.TOT_AMT
+		  , ROUND(RS2.SALE_AMT / RS2.TOT_AMT * 100, 3 ) AS SALE_RATE
+		FROM (
+		  SELECT
+		    RS1.SUM_REF
+		    , RS1.DISP_CLSF_NM
+		    , RS1.SALE_AMT
+		    , CASE WHEN @TMP_REF1 = RS1.SUM_REF AND @SUM_MAX &lt; RS1.TOT_AMT THEN @SUM_MAX := RS1.TOT_AMT
+		           WHEN @TMP_REF1 = RS1.SUM_REF AND @SUM_MAX &gt;= RS1.TOT_AMT THEN @SUM_MAX
+		      ELSE @SUM_MAX := RS1.TOT_AMT END TOT_AMT
+		    , @TMP_REF1 := RS1.SUM_REF
+		  FROM (
+		    SELECT
+		      RS.SUM_REF
+		      , RS.DISP_CLSF_NO_DEPTH1
+		      , RS.DISP_CLSF_NM_DEPTH1 AS DISP_CLSF_NM
+		      , RS.SALE_AMT
+		      , CASE WHEN @TMP_REF = RS.SUM_REF THEN @SUM_TMP := @SUM_TMP + RS.SALE_AMT ELSE @SUM_TMP := RS.SALE_AMT END TOT_AMT
+		      , @TMP_REF := RS.SUM_REF
+		    FROM (
+		      SELECT
+		        A.DISP_CLSF_NO_DEPTH1
+		        , A.DISP_CLSF_NM_DEPTH1
+		        , SUM(A.SALE_AMT) AS SALE_AMT
+		        <if test='dateCheck != null and dateCheck.equals("03")' >
+		        , A.SUM_YEAR AS SUM_REF
+		        </if>
+		        <if test='dateCheck != null and dateCheck.equals("02")' >
+		        , A.SUM_MONTH AS SUM_REF
+		        </if>
+		        <if test='dateCheck != null and dateCheck.equals("04")' >
+		        , A.SUM_WEEK AS SUM_REF
+		        </if>
+		        <if test='dateCheck != null and dateCheck.equals("01")' >
+		        , A.SUM_DAY AS SUM_REF
+		        </if>
+		      FROM SALE_SUM_STATS A
+		      WHERE 1 = 1
+				<if test='dateCheck != null and dateCheck.equals("01")' >
+					AND A.SUM_DAY &gt;= #{startDtm }
+					AND A.SUM_DAY &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					AND A.SUM_MONTH &gt;= #{startDtm }
+					AND A.SUM_MONTH &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					AND A.SUM_YEAR &gt;= #{startDtm }
+					AND A.SUM_YEAR &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("04")' >
+					AND A.SUM_WEEK &gt;= #{startDtm }
+					AND A.SUM_WEEK &lt;= #{endDtm }
+				</if>
+				<if test='pageCheck != null and pageCheck.equals("01")' >
+					AND A.PAGE_GB_CD_DTL1 = '04'
+				</if>
+				<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+					AND A.PAGE_GB_CD = #{pageGbCd }
+				</if>
+		      GROUP BY
+		      <if test='dateCheck != null and dateCheck.equals("01")' >
+		      	A.SUM_DAY
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("02")' >
+		      	A.SUM_MONTH
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("03")' >
+		      	AND A.SUM_YEAR
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("04")' >
+		      	A.SUM_WEEK
+		      </if>
+		      , A.DISP_CLSF_NO_DEPTH1, A.DISP_CLSF_NM_DEPTH1
+		    ) RS, (SELECT @SUM_TMP := 0, @TMP_REF := null ) VAR
+		  ) RS1, (SELECT @SUM_MAX := 0, @TMP_REF1 := null  ) VAR
+		  ORDER BY RS1.SUM_REF DESC, RS1.TOT_AMT DESC
+		) RS2
+	</select>
+
+
+	<select id="ebizSeriesSalesListGrid" resultType="biz.app.statistics.model.StatsBySeriesVO">
+		<!--
+			Query Name : statistics.ebizSeriesSalesListGrid
+			Description : 시리즈별 매출현황
+		-->
+		SELECT
+		    @ROWNUM := @ROWNUM + 1 ROWNUM
+		  , RS1.SUM_REF
+		  , RS1.SERIES_NO
+		  , RS1.SERIES_NM
+		  , RS1.PC_QTY
+		  , RS1.PC_AMT
+		  , RS1.MO_QTY
+		  , RS1.MO_AMT
+		  , RS1.TOT_QTY
+		  , RS1.TOT_AMT
+		  , ROUND(RS1.TOT_AMT / RS1.TMP_TOT_AMT * 100, 3 ) AS SALE_RATE
+		FROM (
+		  SELECT
+		    CONCAT(#{startDtm }, '~', #{endDtm }) SUM_REF
+		    , RS.SERIES_NO
+		    , RS.SERIES_NM
+		    , SUM(RS.PC_QTY) AS PC_QTY
+		    , SUM(RS.PC_AMT) AS PC_AMT
+		    , SUM(RS.MO_QTY) AS MO_QTY
+		    , SUM(RS.MO_AMT) AS MO_AMT
+		    , SUM(RS.PC_QTY) + SUM(RS.MO_QTY) AS TOT_QTY
+		    , SUM(RS.PC_AMT) + SUM(RS.MO_AMT) AS TOT_AMT
+		    , @TOT_AMT AS TMP_TOT_AMT
+		  FROM (
+		    SELECT
+		      A.SERIES_NO
+		      , A.SERIES_NM
+		      , A.ORD_MDA_CD
+		      , CASE WHEN A.ORD_MDA_CD = '01' THEN A.ORD_QTY ELSE 0 END AS PC_QTY /*PC */
+		      , CASE WHEN A.ORD_MDA_CD = '01' THEN A.SALE_AMT ELSE 0 END AS PC_AMT /*PC */
+		      , CASE WHEN A.ORD_MDA_CD = '02' THEN A.ORD_QTY ELSE 0 END AS MO_QTY /*MOBILE */
+		      , CASE WHEN A.ORD_MDA_CD = '02' THEN A.SALE_AMT ELSE 0 END AS MO_AMT /*MOBILE */
+		      , @TOT_AMT := @TOT_AMT + A.SALE_AMT
+		    FROM SALE_SUM_STATS A, (SELECT @TOT_AMT := 0 ) VAR1
+		    WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND A.SUM_MONTH &gt;= #{startDtm }
+				AND A.SUM_MONTH &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND A.SUM_YEAR &gt;= #{startDtm }
+				AND A.SUM_YEAR &lt;= #{endDtm }
+			</if>
+			<if test='pageCheck != null and pageCheck.equals("01")' >
+				AND A.PAGE_GB_CD_DTL1 = '04'
+			</if>
+			<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+				AND A.PAGE_GB_CD = #{pageGbCd }
+			</if>
+		    AND A.SERIES_NO IS NOT NULL
+		    <if test='seriesNo != null and seriesNo > 0'>
+		    	AND A.SERIES_NO = #{seriesNo }
+		    </if>
+		  ) RS
+		  GROUP BY RS.SERIES_NO, RS.SERIES_NM
+		) RS1, (SELECT @ROWNUM := 0 ) VAR
+		ORDER BY RS1.TOT_AMT DESC
+	</select>
+
+
+	<select id="ebizSalesRankListGrid" resultType="biz.app.statistics.model.StatsBySaleRankVO">
+		<!--
+			Query Name : statistics.ebizSalesRankListGrid
+			Description : 시리즈별 매출현황
+		-->
+		SELECT
+		  @ROWNUM AS ROWNUM
+		  , CONCAT(#{startDtm }, '~', #{endDtm }) SUM_REF
+		  , RS.GOODS_ID
+		  , RS.GOODS_NM
+		  , RS.ORD_QTY
+		  , RS.SALE_AMT
+		  , @ROWNUM := @ROWNUM + 1
+		FROM (
+		  SELECT
+		    A.GOODS_ID
+		    , A.GOODS_NM
+		    , SUM(A.ORD_QTY) AS ORD_QTY
+		    , SUM(A.SALE_AMT) AS SALE_AMT
+		  FROM SALE_SUM_STATS A
+		  WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND A.SUM_MONTH &gt;= #{startDtm }
+				AND A.SUM_MONTH &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND A.SUM_YEAR &gt;= #{startDtm }
+				AND A.SUM_YEAR &lt;= #{endDtm }
+			</if>
+			<if test='pageCheck != null and pageCheck.equals("01")' >
+				AND A.PAGE_GB_CD_DTL1 = '04'
+			</if>
+			<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+				AND A.PAGE_GB_CD = #{pageGbCd }
+			</if>
+			<if test="compNo != null">
+				AND A.COMP_NO = #{compNo }
+			</if>
+			<if test="compTpCd != null and compTpCd != ''">
+				AND A.COMP_TP_CD = #{compTpCd }
+			</if>
+		  GROUP BY A.GOODS_ID, A.GOODS_NM
+		) RS, (SELECT @ROWNUM := 1 ) VAR
+		ORDER BY RS.SALE_AMT DESC
+		<if test="searchRank != null">
+		LIMIT #{searchRank }
+		</if>
+	</select>
+
+
+	<select id="ebizSalesListGrid" resultType="biz.app.statistics.model.StatsByCompVO" >
+		<!--
+			Query Name : statistics.ebizSalesListGrid
+			Description : 업체별 매출현황
+		-->
+		SELECT
+		  @ROWNUM AS ROWNUM
+		   , CONCAT(#{startDtm }, '~', #{endDtm }) SUM_REF
+		   , RS1.COMP_NO
+		   , RS1.COMP_NM
+		   , RS1.COMP_TP_CD
+		   , RS1.PC_QTY
+		   , RS1.PC_AMT
+		   , RS1.MO_QTY
+		   , RS1.MO_AMT
+		   , RS1.TOT_QTY
+		   , RS1.TOT_AMT
+		   , @ROWNUM := @ROWNUM + 1
+		FROM (
+		  SELECT
+		   RS.COMP_NO
+		   , RS.COMP_NM
+		   , RS.COMP_TP_CD
+		   , SUM(RS.PC_QTY) AS PC_QTY
+		   , SUM(RS.PC_AMT) AS PC_AMT
+		   , SUM(RS.MO_QTY) AS MO_QTY
+		   , SUM(RS.MO_AMT) AS MO_AMT
+		   , SUM(RS.PC_QTY) + SUM(RS.MO_QTY) AS TOT_QTY
+		   , SUM(RS.PC_AMT) + SUM(RS.MO_AMT) AS TOT_AMT
+		  FROM (
+		    SELECT
+		      A.COMP_NO
+		      , A.COMP_NM
+		      , A.COMP_TP_CD
+		      , CASE WHEN A.ORD_MDA_CD = '01' THEN A.ORD_QTY ELSE 0 END AS PC_QTY
+		      , CASE WHEN A.ORD_MDA_CD = '01' THEN A.SALE_AMT ELSE 0 END AS PC_AMT
+		      , CASE WHEN A.ORD_MDA_CD = '02' THEN A.ORD_QTY ELSE 0 END AS MO_QTY
+		      , CASE WHEN A.ORD_MDA_CD = '02' THEN A.SALE_AMT ELSE 0 END AS MO_AMT
+		    FROM SALE_SUM_STATS A
+		    WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND A.SUM_MONTH &gt;= #{startDtm }
+				AND A.SUM_MONTH &lt;= #{endDtm }
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND A.SUM_YEAR &gt;= #{startDtm }
+				AND A.SUM_YEAR &lt;= #{endDtm }
+			</if>
+			<if test='pageCheck != null and pageCheck.equals("01")' >
+				AND A.PAGE_GB_CD_DTL1 = '04'
+			</if>
+			<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+				AND A.PAGE_GB_CD = #{pageGbCd }
+			</if>
+			<if test="compNo != null">
+				AND A.COMP_NO = #{compNo }
+			</if>
+			<if test="compTpCd != null and compTpCd != ''">
+				AND A.COMP_TP_CD = #{compTpCd }
+			</if>
+		  ) RS
+		  GROUP BY RS.COMP_NO, RS.COMP_NM, RS.COMP_TP_CD
+		) RS1, (SELECT @ROWNUM := 1 ) VAR
+		ORDER BY RS1.TOT_AMT DESC
+	</select>
+
+	<select id="ebizClassSalesListGrid" resultType="biz.app.statistics.model.StatsByClassVO" >
+		<!--
+			Query Name : statistics.ebizClassSalesListGrid
+			Description : 판매유형별 매출현황
+		-->
+		SELECT
+		  RS.SUM_REF
+		  , SUM(RS.O_QTY_1) AS STP_O_QTY
+		  , SUM(RS.O_AMT_1) AS STP_O_AMT
+		  , SUM(RS.A_QTY_1) AS STP_A_QTY
+		  , SUM(RS.A_AMT_1) AS STP_A_AMT
+		  , SUM(RS.I_QTY_1) AS STP_I_QTY
+		  , SUM(RS.I_AMT_1) AS STP_I_AMT
+		  , SUM(RS.O_AMT_1) + SUM(RS.I_AMT_1) + SUM(RS.A_AMT_1) AS DODOT_AMT
+		  , SUM(RS.O_QTY_2) AS STT_O_QTY
+		  , SUM(RS.O_AMT_2) AS STT_O_AMT
+		  , SUM(RS.A_QTY_2) AS STT_A_QTY
+		  , SUM(RS.A_AMT_2) AS STT_A_AMT
+		  , SUM(RS.O_AMT_2) + SUM(RS.A_AMT_2) AS OUT_AMT
+		  , SUM(RS.O_QTY_1) + SUM(RS.O_QTY_2) AS TOT_O_QTY
+		  , SUM(RS.O_AMT_1) + SUM(RS.O_AMT_2) AS TOT_O_AMT
+		  , SUM(RS.A_QTY_1) + SUM(RS.A_QTY_2) AS TOT_A_QTY
+		  , SUM(RS.A_AMT_1) + SUM(RS.A_AMT_2) AS TOT_A_AMT
+		  , SUM(RS.I_QTY_1) AS TOT_I_QTY
+		  , SUM(RS.I_AMT_1) AS TOT_I_AMT
+		  , SUM(RS.O_AMT_1) + SUM(RS.O_AMT_2) + SUM(RS.A_AMT_1) + SUM(RS.A_AMT_2) + SUM(RS.I_AMT_1) AS TOT_AMT
+
+		FROM (
+		  SELECT
+		  	  <if test='dateCheck != null and dateCheck.equals("01")' >
+		      	A.SUM_DAY AS SUM_REF
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("02")' >
+		      	A.SUM_MONTH AS SUM_REF
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("03")' >
+		      	AND A.SUM_YEAR AS SUM_REF
+		      </if>
+		      <if test='dateCheck != null and dateCheck.equals("04")' >
+		      	A.SUM_WEEK AS SUM_REF
+		      </if>
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '10' AND A.COMP_NO = 1 THEN A.ORD_QTY ELSE 0 END AS O_QTY_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '10' AND A.COMP_NO = 1 THEN A.SALE_AMT ELSE 0 END AS O_AMT_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '10' AND A.COMP_NO &lt;&gt; 1 THEN A.ORD_QTY ELSE 0 END AS I_QTY_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '10' AND A.COMP_NO &lt;&gt; 1 THEN A.SALE_AMT ELSE 0 END AS I_AMT_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '20' THEN A.ORD_QTY ELSE 0 END AS A_QTY_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 &lt;&gt; '03' AND A.COMP_TP_CD = '20' THEN A.SALE_AMT ELSE 0 END AS A_AMT_1
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 = '03' AND A.COMP_TP_CD = '10' THEN A.ORD_QTY ELSE 0 END AS O_QTY_2
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 = '03' AND A.COMP_TP_CD = '10' THEN A.SALE_AMT ELSE 0 END AS O_AMT_2
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 = '03' AND A.COMP_TP_CD = '20' THEN A.ORD_QTY ELSE 0 END AS A_QTY_2
+		   , CASE WHEN A.PAGE_GB_CD_DTL1 = '03' AND A.COMP_TP_CD = '20' THEN A.SALE_AMT ELSE 0 END AS A_AMT_2
+		  FROM SALE_SUM_STATS A
+		  WHERE 1 = 1
+				<if test='dateCheck != null and dateCheck.equals("01")' >
+					AND A.SUM_DAY &gt;= #{startDtm }
+					AND A.SUM_DAY &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					AND A.SUM_MONTH &gt;= #{startDtm }
+					AND A.SUM_MONTH &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					AND A.SUM_YEAR &gt;= #{startDtm }
+					AND A.SUM_YEAR &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("04")' >
+					AND A.SUM_WEEK &gt;= #{startDtm }
+					AND A.SUM_WEEK &lt;= #{endDtm }
+				</if>
+				<if test='pageCheck != null and pageCheck.equals("01")' >
+					AND A.PAGE_GB_CD_DTL1 = '04'
+				</if>
+				<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+					AND A.PAGE_GB_CD = #{pageGbCd }
+				</if>
+		) RS
+		GROUP BY RS.SUM_REF
+		ORDER BY RS.SUM_REF DESC
+	</select>
+
+	<select id="ebizPeriodSalesListGrid" resultType="biz.app.statistics.model.StatsByPeriodVO" >
+		<!--
+			Query Name : statistics.ebizPeriodSalesListGrid
+			Description : 기간별 리스트
+		-->
+		SELECT A.SUM_DATE
+			  , SUM(PC_ORD_QTY) AS PC_ORD_QTY
+		 	  , SUM(PC_QTY) AS PC_QTY
+		 	  , SUM(PC_SALE_AMT) AS PC_SALE_AMT
+		 	  , SUM(MO_ORD_QTY) AS MO_ORD_QTY
+		 	  , SUM(MO_QTY) AS MO_QTY
+		 	  , SUM(MO_SALE_AMT) AS MO_SALE_AMT
+		 	  , SUM(SR_ORD_QTY) AS SR_ORD_QTY
+		 	  , SUM(SR_QTY) AS SR_QTY
+		 	  , SUM(SR_SALE_AMT) AS SR_SALE_AMT
+		 	  , SUM(PC_SALE_AMT) + SUM(MO_SALE_AMT) + SUM(SR_SALE_AMT) AS DODOT_AMT
+		 	  , SUM(MK_ORD_QTY) AS MK_ORD_QTY
+		 	  , SUM(MK_QTY) AS MK_QTY
+		 	  , SUM(MK_SALE_AMT) AS MK_SALE_AMT
+		 	  , SUM(PC_SALE_AMT) + SUM(MO_SALE_AMT) + SUM(SR_SALE_AMT) + SUM(MK_SALE_AMT) AS TOT_AMT
+		FROM
+		(
+			  SELECT
+			  	 <if test='dateCheck != null and dateCheck.equals("01")' >
+			     	A.SUM_DAY AS SUM_DATE
+			     </if>
+			     <if test='dateCheck != null and dateCheck.equals("02")' >
+			     	A.SUM_MONTH AS SUM_DATE
+			     </if>
+			     <if test='dateCheck != null and dateCheck.equals("03")' >
+			     	A.SUM_YEAR AS SUM_DATE
+			     </if>
+			     <if test='dateCheck != null and dateCheck.equals("04")' >
+			     	A.SUM_WEEK AS SUM_DATE
+			     </if>
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '01' THEN 1 ELSE 0 END AS PC_ORD_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '01' THEN A.ORD_QTY ELSE 0 END AS PC_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '01' THEN A.SALE_AMT ELSE 0 END AS PC_SALE_AMT
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '02' THEN 1 ELSE 0 END AS MO_ORD_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '02' THEN A.ORD_QTY ELSE 0 END AS MO_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '02' THEN A.SALE_AMT ELSE 0 END AS MO_SALE_AMT
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '03' THEN 1 ELSE 0 END AS SR_ORD_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '03' THEN A.ORD_QTY ELSE 0 END AS SR_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '03' THEN A.SALE_AMT ELSE 0 END AS SR_SALE_AMT
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '04' THEN 1 ELSE 0 END AS MK_ORD_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '04' THEN A.ORD_QTY ELSE 0 END AS MK_QTY
+	 		    , CASE WHEN A.ORD_MDA_CD_DTL1 = '04' THEN A.SALE_AMT ELSE 0 END AS MK_SALE_AMT
+			  FROM SALE_SUM_STATS A
+			  WHERE 1 = 1
+				<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND A.SUM_DAY &gt;= #{startDtm }
+				AND A.SUM_DAY &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					AND A.SUM_MONTH &gt;= #{startDtm }
+					AND A.SUM_MONTH &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					AND A.SUM_YEAR &gt;= #{startDtm }
+					AND A.SUM_YEAR &lt;= #{endDtm }
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("04")' >
+					AND A.SUM_WEEK &gt;= #{startDtm }
+					AND A.SUM_WEEK &lt;= #{endDtm }
+				</if>
+				<if test='pageCheck != null and pageCheck.equals("01")' >
+					AND A.ORD_MDA_CD_DTL1 = '03'
+				</if>
+				<if test='pageCheck != null and !pageCheck.equals("01") and pageGbCd != null and pageGbCd != ""' >
+					AND A.PAGE_GB_CD = #{pageGbCd }
+				</if>
+		) A
+		GROUP BY A.SUM_DATE
+		ORDER BY A.SUM_DATE DESC
+	</select>
+
+	<select id="outerMallSalesListGrid" resultType="biz.app.statistics.model.StatsOuterVO">
+		<!--
+			Query Name : statistics.outerMallSalesListGrid
+			Description : 외부몰(샤방넷) 매출별 리스트
+		-->
+		SELECT C.PAGE_GB_CD
+			  , (SELECT DTL_NM FROM CODE_DETAIL WHERE DTL_CD = C.PAGE_GB_CD) AS PAGE_GB_NM
+			  , ROUND((C.ORD_QTY / C.SUM_ORD_QTY) * 100, 1) AS STATS_RATE
+			  , C.ORD_QTY
+			  , C.ORD_GOODS_QTY
+			  , C.SALE_AMT
+			  , @RNUM := @RNUM + 1 AS STATS_RANK
+		FROM
+		(
+			SELECT A.PAGE_GB_CD
+				  , B.SUM_ORD_QTY
+				  , A.ORD_QTY
+				  , B.ORD_GOODS_QTY
+				  , A.SALE_AMT
+			FROM
+			(
+				SELECT PAGE_GB_CD
+					  , SUM(ORD_QTY) AS ORD_QTY
+					  , SUM(SALE_AMT) AS SALE_AMT
+				FROM SALE_SUM_STATS
+				WHERE 1 = 1
+				<if test="startDtm != null and endDtm != null">
+					AND ORD_CPLT_DTM BETWEEN #{startDtm} AND DATE_ADD(#{endDtm}, INTERVAL 1 DAY)
+				</if>
+				<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+				GROUP BY PAGE_GB_CD
+			) A,
+			(
+				SELECT SUM(ORD_QTY) AS SUM_ORD_QTY
+					  , COUNT(*) AS ORD_GOODS_QTY
+				FROM SALE_SUM_STATS
+				WHERE 1 = 1
+				<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+			) B
+		) C, (SELECT @RNUM := 0) TMP
+		ORDER BY C.PAGE_GB_CD
+	</select>
+
+	<select id="outerMallSalesOptListGrid" resultType="biz.app.statistics.model.StatsOuterVO">
+		<!--
+			Query Name : statistics.outerMallSalesOptListGrid
+			Description : 외부몰(샤방넷) 상품옵션별 리스트
+		-->
+		SELECT C.SUM_DATE
+			  , C.ITEM_NM
+			  , C.ORD_QTY
+			  , ROUND((C.ORD_QTY / C.SUM_ORD_QTY) * 100, 1) AS STATS_RATE
+			  , @RNUM := @RNUM + 1 AS STATS_RANK
+		FROM
+		(
+			SELECT A.SUM_DATE
+				  , A.ITEM_NM
+				  , A.ORD_QTY
+				  , B.SUM_ORD_QTY
+			FROM
+			(
+				SELECT ITEM_NM
+					  , SUM(ORD_QTY) AS ORD_QTY
+					<if test='dateCheck != null and dateCheck.equals("01")' >
+						, SUM_DAY AS SUM_DATE
+					</if>
+					<if test='dateCheck != null and dateCheck.equals("02")' >
+						, SUM_MONTH AS SUM_DATE
+					</if>
+					<if test='dateCheck != null and dateCheck.equals("03")' >
+						, SUM_YEAR AS SUM_DATE
+					</if>
+				FROM SALE_SUM_STATS
+				WHERE 1 = 1
+				<if test='dateCheck != null and dateCheck.equals("01")' >
+					AND SUM_DAY &gt;= #{startDtm}
+					AND SUM_DAY &lt;= #{endDtm}
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					AND SUM_MONTH &gt;= #{startDtm}
+					AND SUM_MONTH &lt;= #{endDtm}
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					AND SUM_YEAR &gt;= #{startDtm}
+					AND SUM_YEAR &lt;= #{endDtm}
+				</if>
+				<if test='searchGoodsValue != null and searchGoodsValue != ""'>
+					<choose>
+						<when test='pageGbCd.equals("type01")'>
+							AND GOODS_BOM_CD LIKE CONCAT('%', #{searchGoodsValue}, '%')
+						</when>
+						<when test='pageGbCd.equals("type02")'>
+							AND GOODS_BOM_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+						</when>
+						<when test='pageGbCd.equals("type03")'>
+							AND GOODS_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+						</when>
+					</choose>
+				</if>
+				<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+				GROUP BY
+				<if test='dateCheck != null and dateCheck.equals("01")' >
+					SUM_DAY
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					SUM_MONTH
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					SUM_YEAR
+				</if>
+				, ITEM_NM
+			) A,
+			(
+				SELECT SUM(ORD_QTY) AS SUM_ORD_QTY
+				FROM SALE_SUM_STATS
+				WHERE 1 = 1
+				<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+			) B
+		) C, (SELECT @RNUM := 0) TMP
+		ORDER BY C.SUM_DATE
+	</select>
+
+	<select id="outerMallSalesRankListGrid" resultType="biz.app.statistics.model.StatsOuterVO">
+		<!--
+			Query Name : statistics.outerMallSalesRankListGrid
+			Description : 외부몰(샤방넷) 판매매출순위 리스트
+		-->
+		SELECT D.GOODS_ID
+			  , D.GOODS_NM
+			  , D.GOODS_BOM_CD
+			  , D.GOODS_BOM_NM
+			  , D.ITEM_NM
+			  , D.ORD_QTY
+			  , D.STATS_RANK
+			  , ROUND((D.ORD_QTY / D.SUM_ORD_QTY) * 100, 1) AS STATS_RATE
+		FROM
+		(
+			SELECT C.GOODS_ID
+				  , C.GOODS_NM
+				  , C.GOODS_BOM_CD
+				  , C.GOODS_BOM_NM
+				  , C.ITEM_NM
+				  , C.ORD_QTY
+				  , C.SUM_ORD_QTY
+				  , @RNUM := @RNUM + 1 AS STATS_RANK
+			FROM
+			(
+				SELECT A.GOODS_ID
+					  , A.GOODS_NM
+					  , A.GOODS_BOM_CD
+					  , A.GOODS_BOM_NM
+					  , A.ITEM_NM
+					  , A.ORD_QTY
+					  , B.SUM_ORD_QTY
+				FROM
+				(
+					SELECT GOODS_ID
+						  , GOODS_NM
+						  , GOODS_BOM_CD
+						  , GOODS_BOM_NM
+						  , ITEM_NM
+						  , SUM(ORD_QTY) AS ORD_QTY
+					FROM SALE_SUM_STATS
+					WHERE 1 = 1
+					<if test="startDtm != null and endDtm != null">
+						AND ORD_CPLT_DTM BETWEEN #{startDtm} AND DATE_ADD(#{endDtm}, INTERVAL 1 DAY)
+					</if>
+					AND COMP_NO = #{compNo}
+					<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+					GROUP BY GOODS_ID, GOODS_NM, GOODS_BOM_CD, GOODS_BOM_NM, ITEM_NM
+				) A,
+				(
+					SELECT SUM(ORD_QTY) AS SUM_ORD_QTY
+					FROM SALE_SUM_STATS
+					WHERE 1 = 1
+					<!-- PAGE_GB_CD_DTL1 NOT IN ('01', '02') --> <!-- A, B 제외 -->
+				) B
+			) C, (SELECT @RNUM := 0) TMP
+			ORDER BY C.GOODS_ID
+		) D
+		WHERE 1 = 1
+		<if test="searchRank != null">
+			AND D.STATS_RANK &lt;= #{searchRank}
+		</if>
+	</select>
+
+	<select id="goodsSalesOptListGrid" resultType="biz.app.statistics.model.StatsGoodsVO">
+		<!--
+			Query Name : statistics.goodsSalesOptListGrid
+			Description : 상품 상품옵션별 리스트
+		-->
+		SELECT A.SUM_DATE
+			  , A.GOODS_BOM_CD
+			  , A.GOODS_BOM_NM
+			  , A.ORD_QTY
+
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+			  , ROUND(A.ORD_QTY / (TO_DAYS(#{endDtm}) - TO_DAYS(#{startDtm})), 2) AS DAY_AVG
+			  , ROUND(A.ORD_QTY / (TO_DAYS(#{endDtm}) - TO_DAYS(#{startDtm})) * 30, 2) AS MONTH_AVG
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("04")' >
+			  , ROUND(A.ORD_QTY / (TO_DAYS(STR_TO_DATE(CONCAT(#{endDtm}, 'SATURDAY'), '%X%V %W')) - TO_DAYS(STR_TO_DATE(CONCAT(#{startDtm}, 'SUNDAY'), '%X%V %W'))), 2) AS DAY_AVG
+			  , ROUND(A.ORD_QTY / (TO_DAYS(STR_TO_DATE(CONCAT(#{endDtm}, 'SATURDAY'), '%X%V %W')) - TO_DAYS(STR_TO_DATE(CONCAT(#{startDtm}, 'SUNDAY'), '%X%V %W'))) * 30, 2) AS MONTH_AVG
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+			  , ROUND(A.ORD_QTY / (TO_DAYS(LAST_DAY(CONCAT(#{endDtm}, '01'))) - TO_DAYS(CONCAT(#{startDtm}, '01'))), 2) AS DAY_AVG
+			  , ROUND(A.ORD_QTY / (TO_DAYS(LAST_DAY(CONCAT(#{endDtm}, '01'))) - TO_DAYS(CONCAT(#{startDtm}, '01'))) * 30, 2) AS MONTH_AVG
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+			  , ROUND(A.ORD_QTY / (TO_DAYS(LAST_DAY(CONCAT(#{endDtm},'12','31'))) - TO_DAYS(CONCAT(#{startDtm},'01','01'))), 2) AS DAY_AVG
+			  , ROUND(A.ORD_QTY / (TO_DAYS(LAST_DAY(CONCAT(#{endDtm},'12','31'))) - TO_DAYS(CONCAT(#{startDtm},'01','01'))) * 30, 2) AS MONTH_AVG
+			</if>
+		FROM
+		(
+			SELECT GOODS_BOM_CD
+			     , GOODS_BOM_NM
+				 , SUM(ORD_QTY) AS ORD_QTY
+				 <if test='dateCheck != null and dateCheck.equals("01")' >
+					, SUM_DAY AS SUM_DATE
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("02")' >
+					, SUM_MONTH AS SUM_DATE
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("03")' >
+					, SUM_YEAR AS SUM_DATE
+				</if>
+				<if test='dateCheck != null and dateCheck.equals("04")' >
+					, SUM_WEEK AS SUM_DATE
+				</if>
+			FROM SALE_SUM_STATS
+			WHERE 1 = 1
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				AND SUM_DAY &gt;= #{startDtm}
+				AND SUM_DAY &lt;= #{endDtm}
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				AND SUM_MONTH &gt;= #{startDtm}
+				AND SUM_MONTH &lt;= #{endDtm}
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				AND SUM_YEAR &gt;= #{startDtm}
+				AND SUM_YEAR &lt;= #{endDtm}
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("04")' >
+				AND SUM_WEEK &gt;= #{startDtm }
+				AND SUM_WEEK &lt;= #{endDtm }
+			</if>
+			<if test='dispLvl != null and dispLvl != "" and !dispLvl.equals("0")'>
+				<choose>
+					<when test='dispLvl.equals("1")'>
+						AND DISP_CLSF_NO_DEPTH1 = #{dispNo}
+					</when>
+					<when test='dispLvl.equals("2")'>
+						AND DISP_CLSF_NO_DEPTH2 = #{dispNo}
+					</when>
+					<when test='dispLvl.equals("3")'>
+						AND DISP_CLSF_NO_DEPTH3 = #{dispNo}
+					</when>
+				</choose>
+			</if>
+			<if test='searchGoodsValue != null and searchGoodsValue != ""'>
+				<choose>
+					<when test='pageGbCd.equals("type01")'>
+						AND GOODS_BOM_CD LIKE CONCAT('%', #{searchGoodsValue}, '%')
+					</when>
+					<when test='pageGbCd.equals("type02")'>
+						AND GOODS_BOM_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+					</when>
+					<when test='pageGbCd.equals("type03")'>
+						AND GOODS_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+					</when>
+				</choose>
+			</if>
+			GROUP BY
+			<if test='dateCheck != null and dateCheck.equals("01")' >
+				SUM_DAY
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("02")' >
+				SUM_MONTH
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("03")' >
+				SUM_YEAR
+			</if>
+			<if test='dateCheck != null and dateCheck.equals("04")' >
+				SUM_WEEK
+			</if>
+			 , GOODS_BOM_CD
+			 , GOODS_BOM_NM
+		) A
+		ORDER BY A.SUM_DATE
+	</select>
+
+	<select id="goodsSalesRankListGrid" resultType="biz.app.statistics.model.StatsGoodsVO">
+		<!--
+			Query Name : statistics.goodsSalesRankListGrid
+			Description : 상품 판매순위 리스트
+		-->
+		SELECT D.GOODS_BOM_CD
+			  , D.GOODS_BOM_NM
+			  , D.ORD_QTY
+			  , D.SUM_ORD_QTY
+			  , D.STATS_RANK
+			  , E.SYS_REG_DTM
+		FROM
+		(
+			SELECT C.GOODS_BOM_CD
+				  , C.GOODS_BOM_NM
+				  , C.ORD_QTY
+				  , SUM_ORD_QTY
+				  , @RNUM := @RNUM + 1 AS STATS_RANK
+			FROM
+			(
+				SELECT A.GOODS_BOM_CD
+					  , A.GOODS_BOM_NM
+					  , A.ORD_QTY
+					  , B.SUM_ORD_QTY
+				FROM
+				(
+					SELECT GOODS_BOM_CD
+						  , GOODS_BOM_NM
+						  , SUM(ORD_QTY) AS ORD_QTY
+					FROM SALE_SUM_STATS
+					WHERE 1 = 1
+					<if test="startDtm != null and endDtm != null">
+						AND ORD_CPLT_DTM BETWEEN #{startDtm} AND DATE_ADD(#{endDtm}, INTERVAL 1 DAY)
+					</if>
+					<if test='dispLvl != null and dispLvl != "" and !dispLvl.equals("0")'>
+						<choose>
+							<when test='dispLvl.equals("1")'>
+								AND DISP_CLSF_NO_DEPTH1 = #{dispNo}
+							</when>
+							<when test='dispLvl.equals("2")'>
+								AND DISP_CLSF_NO_DEPTH2 = #{dispNo}
+							</when>
+							<when test='dispLvl.equals("3")'>
+								AND DISP_CLSF_NO_DEPTH3 = #{dispNo}
+							</when>
+						</choose>
+					</if>
+					<if test='searchGoodsValue != null and searchGoodsValue != ""'>
+						<choose>
+							<when test='pageGbCd.equals("type01")'>
+								AND GOODS_BOM_CD LIKE CONCAT('%', #{searchGoodsValue}, '%')
+							</when>
+							<when test='pageGbCd.equals("type02")'>
+								AND GOODS_BOM_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+							</when>
+							<when test='pageGbCd.equals("type03")'>
+								AND GOODS_NM LIKE CONCAT('%', #{searchGoodsValue}, '%')
+							</when>
+						</choose>
+					</if>
+					GROUP BY GOODS_BOM_CD, GOODS_BOM_NM
+				) A,
+				(
+					SELECT GOODS_BOM_CD
+						 , SUM(ORD_QTY) AS SUM_ORD_QTY
+					FROM SALE_SUM_STATS
+					WHERE 1 = 1
+					<if test='dispLvl != null and dispLvl != "" and !dispLvl.equals("0")'>
+						<choose>
+							<when test='dispLvl.equals("1")'>
+								AND DISP_CLSF_NO_DEPTH1 = #{dispNo}
+							</when>
+							<when test='dispLvl.equals("2")'>
+								AND DISP_CLSF_NO_DEPTH2 = #{dispNo}
+							</when>
+							<when test='dispLvl.equals("3")'>
+								AND DISP_CLSF_NO_DEPTH3 = #{dispNo}
+							</when>
+						</choose>
+					</if>
+					GROUP BY GOODS_BOM_CD
+				) B
+				WHERE A.GOODS_BOM_CD = B.GOODS_BOM_CD
+			) C, (SELECT @RNUM := 0) TMP
+			ORDER BY C.GOODS_BOM_CD
+		) D LEFT OUTER JOIN BOM_BASE E ON (E.BOM_CD = D.GOODS_BOM_CD)
+		WHERE 1 = 1
+		<if test="searchRank != null">
+			AND D.STATS_RANK &lt;= #{searchRank}
+		</if>
+	</select>
+
+	<select id="listWmsCountryGrid" resultType="biz.app.statistics.model.DayWmsStockTotalVO">
+		<!--
+			Query Name : statistics.listWmsCountryGrid
+			Description : WMS원산지별재고통계 리스트
+		-->
+
+		SELECT
+			 (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'BOM_CTR_ORG'	/* BOM원산지 */ AND code_detail.DTL_CD = T1.BOM_CTR_ORG_CD) AS BOM_CTR_ORG_NM
+		  	, T1.STK_AMT
+		  	, ROUND((T1.STK_AMT / T2.TOT_AMT) * 100, 1)AS RATE
+		FROM
+		(
+   			SELECT
+	      		BOM_CTR_ORG_CD
+	      		,SUM(STK_AMT) AS STK_AMT
+		    FROM
+		    	DAY_WMS_STOCK_TOTAL
+		    WHERE
+		    	BASE_DT = replace( #{baseDt}, '-', '' )
+		    GROUP BY BOM_CTR_ORG_CD
+
+	    ) T1, (SELECT SUM(STK_AMT) AS TOT_AMT FROM DAY_WMS_STOCK_TOTAL WHERE BASE_DT = replace( #{baseDt}, '-', '' )) T2
+	</select>
+
+	<select id="listWmsWareHouseGrid" resultType="biz.app.statistics.model.DayWmsStockTotalVO">
+		<!--
+			Query Name : statistics.listWmsWareHouseGrid
+			Description : WMS창고별재고통계 리스트
+		-->
+
+		SELECT
+			 (SELECT WHS_NM FROM WMS_WAREHOUSE WHERE WHS_NO = T1.WHS_NO) AS WHS_NM
+		  	, T1.STK_AMT
+		  	, ROUND((T1.STK_AMT / T2.TOT_AMT) * 100, 1)AS RATE
+		FROM
+		(
+   			SELECT
+	      		WHS_NO
+	      		,SUM(STK_AMT) AS STK_AMT
+		    FROM
+		    	DAY_WMS_STOCK_TOTAL
+		    WHERE
+		    	BASE_DT = replace( #{baseDt}, '-', '' )
+		    GROUP BY WHS_NO
+
+	    ) T1, (SELECT SUM(STK_AMT) AS TOT_AMT FROM DAY_WMS_STOCK_TOTAL WHERE BASE_DT = replace( #{baseDt}, '-', '' )) T2
+	</select>
+
+
+	<select id="listWmsCompanyGrid" resultType="biz.app.statistics.model.DayWmsStockTotalVO">
+		<!--
+			Query Name : statistics.listWmsCompanyGrid
+			Description : WMS업체별재고통계 리스트
+		-->
+		SELECT
+			COMP_NM
+		  	,SUM(AMT)AS STK_AMT
+		  	,SUM(COMRATE) AS RATE
+		FROM(
+		  	SELECT
+			    CASE (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = T1.COMP_NO)
+			   		WHEN (1000000 <![CDATA[<]]> T1.AMT) THEN '기타'
+			    ELSE
+			        (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = T1.COMP_NO)
+			    END AS COMP_NM
+		    	,T1.AMT
+		    	,ROUND((T1.AMT / T2.TOT_AMT) * 100, 1)AS COMRATE
+		  	FROM(
+		    	SELECT
+		      		COMP_NO
+		      		,SUM(STK_AMT) AS AMT
+		    	FROM
+		      		DAY_WMS_STOCK_TOTAL
+		    	WHERE
+		      		BASE_DT = replace( #{baseDt}, '-', '' )
+		    	GROUP BY COMP_NO
+		  	) T1, (SELECT SUM(STK_AMT) AS TOT_AMT FROM day_wms_stock_total WHERE BASE_DT = replace( #{baseDt}, '-', '' )) T2
+		)T3
+		GROUP BY COMP_NM
+		ORDER BY STK_AMT DESC, CASE COMP_NM WHEN (COMP_NM = '기타') THEN 1 ELSE 0 END DESC
+	</select>
+
+	<select id="listWmsPoCompGrid" resultType="biz.app.statistics.model.MonthWmsPoTotalVO">
+		<!--
+			Query Name : statistics.listWmsPoCompGrid
+			Description : WMS 업체별 발주현황 리스트
+		-->
+			SELECT BASE_YM                                                    baseYm,
+			       t2.COMP_NM                                                 sumTgNm,
+			       t1.FIRST_PO_AMT                                            firstPoAmt,
+			       t1.SECOND_PO_AMT                                           secondPoAmt,
+			       t1.THIRD_PO_AMT                                            thirdPoAmt,
+			       t1.ADD_PO_AMT                                              addPoAmt,
+			       (FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT) sumAmt,
+			         round(
+			            (  (FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT)
+			             / totAmt) * 100,
+			            1)
+			          rate,
+			       round(t1.INCREASE_RATIO, 1)                                incRatio
+			FROM month_wms_po_total    t1,
+			     company_base          t2,
+			     (SELECT sum(FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT)
+			                totAmt
+			      FROM month_wms_po_total
+			      WHERE base_ym = replace(#{baseYm}, '-', '') AND sum_gb_cd = '${@framework.common.constants.CommonConstants@SUM_GB_10}') t3
+			WHERE     base_ym = replace(#{baseYm}, '-', '')
+			      AND sum_gb_cd = '${@framework.common.constants.CommonConstants@SUM_GB_10}'
+			      AND t1.sum_tg_id = t2.comp_no
+				<if test='compNo != null and compNo != ""'>
+					AND comp_no = #{compNo}
+				</if>
+	</select>
+
+	<select id="listWmsPoSeriesGrid" resultType="biz.app.statistics.model.MonthWmsPoTotalVO">
+		<!--
+			Query Name : statistics.listWmsPoSeriesGrid
+			Description : WMS 시리즈별 발주현황 리스트
+		-->
+			SELECT BASE_YM                                                    baseYm,
+			       t2.BND_NM_KO                                               sumTgNm,
+			       t1.FIRST_PO_AMT                                            firstPoAmt,
+			       t1.SECOND_PO_AMT                                           secondPoAmt,
+			       t1.THIRD_PO_AMT                                            thirdPoAmt,
+			       t1.ADD_PO_AMT                                              addPoAmt,
+			       (FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT) sumAmt,
+			         round(
+			            (  (FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT)
+			             / totAmt) * 100,
+			            1)
+			          rate,
+			       round(t1.INCREASE_RATIO, 1)                                incRatio
+			FROM month_wms_po_total    t1,
+			     brand_base            t2,
+			     (SELECT sum(FIRST_PO_AMT + SECOND_PO_AMT + THIRD_PO_AMT + ADD_PO_AMT)
+			                totAmt
+			      FROM month_wms_po_total
+			      WHERE base_ym = replace(#{baseYm}, '-', '') AND sum_gb_cd = '${@framework.common.constants.CommonConstants@SUM_GB_20}') t3
+			WHERE     base_ym = replace(#{baseYm}, '-', '')
+			      AND sum_gb_cd = '${@framework.common.constants.CommonConstants@SUM_GB_20}'
+			      AND t1.sum_tg_id = t2.bnd_no
+				<if test='seriesNo != null and seriesNo != ""'>
+					AND bnd_no = #{seriesNo}
+				</if>
+	</select>
+
+
+	<select id="goodsSalesList" resultType="biz.app.statistics.model.OrderBestGoodsReportVO">
+		<!--
+			Query Name : statistics.goodsSalesList
+			Description : 베스트 200 상품매출현황
+		-->
+		SELECT result.*
+		  FROM (
+				SELECT @RN:=@RN+1 AS RANK, TB.*
+				  FROM(
+						SELECT  /* QUERYID(statistics.pageGoodsSales)   */
+								OBGR.GOODS_ID	    /*	상품 아이디	        */
+							,	SUM(OBGR.ORD_QTY)   ORD_QTY	   /*	주문 수량	        */
+							,	SUM(OBGR.ORD_AMT)	ORD_AMT    /*	주문 금액	        */
+							,	SUM(OBGR.CNC_QTY)	CNC_QTY    /*	취소 수량	        */
+							,	SUM(OBGR.CNC_AMT)	CNC_AMT    /*	취소 금액	        */
+							,	SUM(OBGR.RTN_QTY)	RTN_QTY    /*	반품 수량	        */
+							,	SUM(OBGR.RTN_AMT)	RTN_AMT    /*	반품 금액	        */
+							,	SUM(OBGR.TOTAL_SCR) TOTAL_SCR  /*	집계 점수	        */ 
+			      			, 	SUM(OBGR.ORD_AMT) - SUM(OBGR.CNC_AMT) - SUM(OBGR.RTN_AMT) AS TOT_AMT
+							,   GB.GOODS_NM	        /*  상품 명                 */
+							,   GB.COMP_NO	        /*  업체 번호               */
+							,   GB.BND_NO	        /*  브랜드 번호             */
+							,   BB.BND_NM_KO	    /*  브랜드 명 국문          */
+							,   CB.COMP_NM	        /*  업체 명                 */
+							FROM ORDER_BEST_GOODS_REPORT OBGR
+							     INNER JOIN GOODS_BASE GB   ON ( OBGR.GOODS_ID = GB.GOODS_ID )
+							     INNER JOIN BRAND_BASE BB   ON ( GB.BND_NO     = BB.BND_NO   )
+							     INNER JOIN COMPANY_BASE CB ON ( GB.COMP_NO    = CB.COMP_NO  )
+							WHERE 1 = 1
+							 	  AND OBGR.TOTAL_DT BETWEEN  #{totalDtStart}  AND #{totalDtEnd}
+							  <if test='stId != null and stId != ""'>
+								  AND OBGR.ST_ID  = #{stId}
+							  </if>
+							  <if test='ordMdaCd != null and ordMdaCd != ""'>
+								  AND OBGR.ORD_MDA_CD  = #{ordMdaCd}
+							  </if>
+							GROUP BY OBGR.GOODS_ID,GB.GOODS_NM ,GB.COMP_NO, GB.BND_NO,BB.BND_NM_KO ,CB.COMP_NM
+							ORDER BY TOTAL_SCR  DESC 
+				      )AS TB,
+		              (SELECT @RN:=0) AS R
+		        ) result
+		        WHERE result.RANK  <![CDATA[<=]]> 200 
+ 
+	</select>
+    
+	<select id="compBrandSalesListGrid" resultType="biz.app.statistics.model.StatsByCompBrandVO">
+	<!--
+			Query Name : statistics.compBrandSalesListGrid
+			Description : 업체 및 브랜드 매출현황 목록
+		-->
+		SELECT /* QUERYID(statistics.compBrandSalesListGrid) */
+			P.COMP_NO
+			, COMP_NM
+			, P.BND_NO
+			, P.BND_NM_KO AS BND_NM
+			, ORD_QTY
+			, ORD_AMT
+			, CNC_QTY
+			, CNC_AMT
+			, RTN_QTY
+			, RTN_AMT
+			, TOT_AMT
+		FROM
+		 (
+		      SELECT COMP_NO
+			      , OCBR.BND_NO
+			      , BND_NM_KO
+			      , SUM(ORD_QTY) AS ORD_QTY
+			      , SUM(ORD_AMT) AS ORD_AMT
+			      , SUM(CNC_QTY) AS CNC_QTY
+			      , SUM(CNC_AMT) AS CNC_AMT
+			      , SUM(RTN_QTY) AS RTN_QTY
+			      , SUM(RTN_AMT) AS RTN_AMT
+			      , SUM(ORD_AMT) - SUM(CNC_AMT) - SUM(RTN_AMT) AS TOT_AMT
+		        FROM  ORDER_COMP_BND_REPORT OCBR INNER JOIN BRAND_BASE BB ON (OCBR.BND_NO = BB.BND_NO)
+		      WHERE 1=1
+				AND STR_TO_DATE(TOTAL_DT, '%Y%m%d') BETWEEN STR_TO_DATE(#{startDtm}, '%Y%m%d') AND STR_TO_DATE(#{endDtm}, '%Y%m%d')
+				<if test="stId != null  and  ! stId.equals('') ">
+				AND ST_ID = #{stId}
+				</if>
+				<if test="compNo != null  and  ! compNo.equals('') ">
+				AND OCBR.COMP_NO = #{compNo}
+				</if>
+				<if test="bndNo != null  and  ! bndNo.equals('') ">
+				AND OCBR.BND_NO = #{bndNo}
+				</if>
+				<if test="ordMdaCd != null  and  ! ordMdaCd.equals('') ">
+				AND ORD_MDA_CD = #{ordMdaCd}
+				</if>
+			GROUP BY COMP_NO, OCBR.BND_NO, BND_NM_KO
+		) P
+		INNER JOIN COMPANY_BASE CB ON ( P.COMP_NO = CB.COMP_NO  )
+	</select>
+
+	<select id="memberStatsListGrid" resultType="biz.app.statistics.model.MemberFlowReportVO">
+	<!--
+			Query Name : statistics.memberStatsListGrid
+			Description : 회원 현황 목록
+		-->
+		SELECT /* QUERYID(statistics.memberStatsListGrid) */
+			'10' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+		FROM  MEMBER_FLOW_REPORT
+		INNER JOIN (
+			SELECT @MAX_DT := MAX(TOTAL_DT) as max_total_dt FROM MEMBER_FLOW_REPORT,
+						(SELECT @MAX_DT := '') VAR
+		) DT
+		WHERE TOTAL_DT = DT.MAX_TOTAL_DT AND MBR_FLOW_GB_CD= '${@framework.common.constants.CommonConstants@MBR_FLOW_GB_10}'
+		GROUP BY MBR_FLOW_GB_CD
+		UNION ALL
+		SELECT '20' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+			FROM  MEMBER_FLOW_REPORT
+			WHERE STR_TO_DATE(TOTAL_DT,'%Y%m%d') BETWEEN STR_TO_DATE(#{startDtm},'%Y%m%d') and STR_TO_DATE(#{endDtm},'%Y%m%d')
+			AND MBR_FLOW_GB_CD= '${@framework.common.constants.CommonConstants@MBR_FLOW_GB_20}'
+			GROUP BY MBR_FLOW_GB_CD
+		UNION ALL
+		SELECT '30' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+		FROM  MEMBER_FLOW_REPORT
+		INNER JOIN (
+				SELECT @MAX_DT := MAX(TOTAL_DT) as max_total_dt FROM MEMBER_FLOW_REPORT,
+						(SELECT @MAX_DT := '') VAR
+				) DT
+			WHERE TOTAL_DT = DT.MAX_TOTAL_DT AND MBR_FLOW_GB_CD= '${@framework.common.constants.CommonConstants@MBR_FLOW_GB_30}'
+			GROUP BY MBR_FLOW_GB_CD
+		UNION ALL
+		SELECT '40' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+		FROM  MEMBER_FLOW_REPORT
+		INNER JOIN (
+				SELECT @MAX_DT := MAX(TOTAL_DT) as max_total_dt FROM MEMBER_FLOW_REPORT,
+						(SELECT @MAX_DT := '') VAR
+				) DT
+			WHERE TOTAL_DT = DT.MAX_TOTAL_DT AND MBR_FLOW_GB_CD='${@framework.common.constants.CommonConstants@MBR_FLOW_GB_40}'
+			GROUP BY MBR_FLOW_GB_CD
+		UNION ALL
+		SELECT '50' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+		FROM  MEMBER_FLOW_REPORT
+			WHERE STR_TO_DATE(TOTAL_DT,'%Y%m%d') BETWEEN STR_TO_DATE(#{startDtm},'%Y%m%d') and STR_TO_DATE(#{endDtm},'%Y%m%d')
+			AND MBR_FLOW_GB_CD= '${@framework.common.constants.CommonConstants@MBR_FLOW_GB_50}'
+			GROUP BY MBR_FLOW_GB_CD
+		UNION ALL
+		SELECT '60' AS MBR_FLOW_GB_CD, Sum(fm_20) AS FM_20, sum(fm_30) AS FM_30, sum(fm_40) AS FM_40, sum(fm_50) AS FM_50, sum(fm_60) AS FM_60, SUM(FM_20+FM_30+FM_40+FM_50+FM_60) AS FEMALE_SUM,
+			sum(ml_20) AS ML_20, sum(ml_30) AS ML_30, sum(ml_40) AS ML_40, sum(ml_50) AS ML_50 , sum(ml_60) AS ML_60, SUM(ML_20+ML_30+ML_40+ML_50+ML_60) AS MALE_SUM, SUM(TOT_MBR_CNT) AS TOT_MBR_CNT
+		FROM  MEMBER_FLOW_REPORT
+			WHERE STR_TO_DATE(TOTAL_DT,'%Y%m%d') BETWEEN STR_TO_DATE(#{startDtm},'%Y%m%d') and STR_TO_DATE(#{endDtm},'%Y%m%d')
+			AND MBR_FLOW_GB_CD= '${@framework.common.constants.CommonConstants@MBR_FLOW_GB_60}'
+			GROUP BY MBR_FLOW_GB_CD
+	</select>
+</mapper>

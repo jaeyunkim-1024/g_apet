@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	업체 공지
+	작성자  	kwj
+	작성일자  	2020.12.21
+-->
+
+<mapper namespace="series">	
+
+	<select id="pageSeries" parameterType="biz.app.contents.model.SeriesSO" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.pageSeries
+			Description	: 시리즈 목록 조회
+		-->
+		SELECT
+			*
+			, @ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+		FROM(		
+			SELECT  /* QUERYID(series.pageSeries) */ 
+				SRIS_NO				/* 시리즈 번호 */
+				, SRIS_ID				/* 시리즈 아이디 */
+				, DISP_YN				/* 시리즈 전시여부 */
+				, TP_CD					/* 시리즈 타입코드 */
+				, FL_NO					/* 시리즈 파일번호 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필이미지 경로 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_20}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_IMG_PATH	/* 시리즈 이미지 경로 */
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@APET_TP}' AND DTL_CD = T1.TP_CD) AS TP_NM /* 시리즈 타입명 */			
+				, SRIS_NM				/* 시리즈명 */ 
+				, SRIS_DSCRT			/* 시리즈 설명 */
+				, (SELECT COUNT(*) FROM APET_CONTENTS_SEASON WHERE SRIS_NO = T1.SRIS_NO) AS SESN_CNT /* 시즌수 */
+				, CONCAT(DATE_FORMAT(SYS_REG_DTM, '%Y.%m.%d'), '\n', '(', DATE_FORMAT(SYS_UPD_DTM, '%Y.%m.%d'), ')') AS REG_MOD_DTM 
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */	
+				, AD_YN					/* 광고 노출 여부 */		
+				, (SELECT COUNT(*) FROM APET_CONTENTS WHERE SRIS_NO = T1.SRIS_NO) AS VD_CNT	/* 영상건수 */
+				, SRIS_SEQ /* 시리즈 정렬순서 */
+			FROM
+				APET_CONTENTS_SERIES T1	
+				, (SELECT @ROWNUM:=0) TMP			
+			WHERE 1=1
+			<if test="srisNo != null">
+			  AND T1.SRIS_NO = #{srisNo }
+			</if>
+			<if test="sysRegDtmStart != null">
+			  AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+			  AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>		
+			<if test="srisId != null and srisId != ''">
+			  AND UPPER(T1.SRIS_ID) = UPPER(#{srisId })
+			</if>
+			<if test="dispYn != null and dispYn != ''">
+			  AND T1.DISP_YN = #{dispYn }
+			</if>
+			<if test="srisNm != null and srisNm != ''">
+			  AND T1.SRIS_NM LIKE CONCAT('%', #{srisNm }, '%') 
+			</if>
+			<if test="adYn != null and adYn != ''">
+			  AND T1.AD_YN = #{adYn }
+			</if>
+			<if test="tpCd != null and tpCd != ''">
+			  AND T1.TP_CD = #{tpCd }
+			</if>
+			) T1
+		/*ORDER BY T1.SRIS_NO DESC*/
+		ORDER BY T1.SRIS_SEQ DESC
+			 	
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	
+	
+	<select id="pageSeriesCount" parameterType="biz.app.contents.model.SeriesSO" resultType="java.lang.Integer">
+		<!--
+			Query Name	: series.pageSeriesCount
+			Description	: 시리즈 목록 조회 count
+		-->
+		SELECT  
+			COUNT(*)	/* QUERYID(series.pageSeries) */						
+		FROM
+			APET_CONTENTS_SERIES T1				
+		WHERE 1=1
+		<if test="srisNo != null">
+		  AND T1.SRIS_NO = #{srisNo }
+		</if>
+		<if test="sysRegDtmStart != null">
+		  AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+		  AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>		
+		<if test="srisId != null and srisId != ''">
+		  AND UPPER(T1.SRIS_ID) = UPPER(#{srisId })
+		</if>
+		<if test="dispYn != null and dispYn != ''">
+		  AND T1.DISP_YN = #{dispYn }
+		</if>
+		<if test="srisNm != null and srisNm != ''">
+		  AND T1.SRIS_NM LIKE CONCAT('%', #{srisNm }, '%') 
+		</if>
+		<if test="adYn != null and adYn != ''">
+		  AND T1.AD_YN = #{adYn }
+		</if>	
+		<if test="tpCd != null and tpCd != ''">
+		  AND T1.TP_CD = #{tpCd }
+		</if>
+		
+	</select>
+	
+	<update id="updateSeriesStat" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.updateSeriesStat Description : 시리즈 전시상태 수정 -->
+		UPDATE APET_CONTENTS_SERIES SET	
+			   DISP_YN 			= #{dispYn } 		/* 전시상태 */
+			 , SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */  
+		WHERE SRIS_NO = #{srisNo }
+		
+	</update>
+	
+	<update id="updateSeries" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.updateSeries Description : 시리즈 수정 -->
+		UPDATE APET_CONTENTS_SERIES SET
+			   DISP_YN 				= #{dispYn } 			/* 전시상태 */
+			 <if test="tpCd != null">
+			 , TP_CD				= #{tpCd }				/* 타입코드 */
+			 </if>
+			 , FL_NO				= #{flNo }				/* 파일번호 */			 
+			 , SRIS_NM 				= #{srisNm }  			/* 시리즈명 */
+			 , SRIS_DSCRT 			= #{srisDscrt }  		/* 시리즈설명 */
+			 , SYS_UPDR_NO			= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */  
+			 , AD_YN				= #{adYn }				/* 광고 노출 여부 */
+		WHERE SRIS_NO = #{srisNo }
+		
+	</update>
+	
+	<insert id="insertSeries" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeries Description : 시리즈 등록 -->
+		INSERT INTO APET_CONTENTS_SERIES
+		(
+		  SRIS_NO				/* 시리즈번호 */
+		, SRIS_ID				/* 시리즈ID */
+		, DISP_YN 				/* 전시상태 */
+		, TP_CD					/* 타입코드 */
+		, FL_NO					/* 파일번호 */	    
+	    , SRIS_NM 				/* 시리즈명 */
+	    , SRIS_DSCRT 			/* 시리즈설명 */
+	    , SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+	    , SYS_UPDR_NO			/* 시스템 수정자 번호 */
+	    , SYS_UPD_DTM			/* 시스템 수정 일시 */  
+	    , AD_YN					/* 광고 노출 여부 */
+		)
+		VALUES
+		(
+		  #{srisNo }
+		, CONCAT('NL',#{tpCd },LPAD(#{srisNo },4,0))
+		, #{dispYn }
+		, #{tpCd }
+		, #{flNo }
+		, #{srisNm }
+		, #{srisDscrt }
+		, #{sysRegrNo }
+		, NOW()  
+		, #{sysUpdrNo }
+		, NOW()
+		, #{adYn }	
+		)
+		
+	</insert>
+	
+	<select id="pageSeason" parameterType="biz.app.contents.model.SeriesSO" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.pageSeason
+			Description	: 시즌 목록 조회
+		-->		
+		SELECT *
+		FROM (
+			SELECT  /* QUERYID(series.pageSeason) */
+				@ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+				, SESN_NO				/* 시즌 번호 */
+				, SRIS_NO				/* 시리즈 번호 */
+				, SESN_NM				/* 시즌 명 */
+				, FL_NO					/* 시즌 이미지번호 */				
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO ORDER BY SEQ DESC LIMIT 1) AS SESN_IMG_PATH	/* 시즌 이미지 경로 */ 		
+				, SESN_DSCRT			/* 시즌 설명 */
+				, DISP_YN				/* 시즌 전시여부 */			
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, (SELECT COUNT(*) FROM APET_CONTENTS WHERE SRIS_NO = T1.SRIS_NO AND SESN_NO = T1.SESN_NO) AS VD_CNT	/* 영상건수 */
+			FROM 
+				APET_CONTENTS_SEASON T1		 
+				, (SELECT @ROWNUM:=0) TMP	
+			WHERE 1=1
+			<if test="srisNo != null">
+			  AND T1.SRIS_NO = #{srisNo }
+			</if>
+			) T1 				
+		ORDER BY T1.SESN_NO DESC			 	
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageSeasonCount" parameterType="biz.app.contents.model.SeriesSO" resultType="java.lang.Integer">	
+		<!--
+			Query Name	: series.pageSeasonCount
+			Description	: 시즌 목록수 조회
+		-->		
+		SELECT 
+			  COUNT(*)	 /* QUERYID(series.pageSeasonCount) */
+		FROM 
+			APET_CONTENTS_SEASON T1		 	
+		WHERE 1=1
+		<if test="srisNo != null">
+		  AND T1.SRIS_NO = #{srisNo }
+		</if>				
+		
+	</select>
+	
+	<select id="getSeasonDetail" parameterType="biz.app.contents.model.SeriesSO" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.getSeasonDetail
+			Description	: 시즌 상세 조회
+		-->		
+		SELECT  /* QUERYID(series.getSeasonDetail) */
+			  SESN_NO				/* 시즌 번호 */
+			, SRIS_NO				/* 시리즈 번호 */
+			, SESN_NM				/* 시즌 명 */
+			, FL_NO					/* 파일번호 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE T2 WHERE T2.FL_NO = T1.FL_NO ORDER BY SEQ DESC LIMIT 1) AS SESN_IMG_PATH	/* 시즌 이미지 경로 */ 	
+			, SESN_DSCRT			/* 시즌 설명 */
+			, DISP_YN				/* 시즌 전시여부 */			
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, (SELECT COUNT(*) FROM APET_CONTENTS WHERE SRIS_NO = T1.SRIS_NO AND SESN_NO = T1.SESN_NO) AS VD_CNT	/* 영상건수 */ 
+		FROM 
+			APET_CONTENTS_SEASON T1		 	
+		WHERE 
+		  T1.SESN_NO = #{sesnNo }
+		  AND T1.SRIS_NO = #{srisNo }	
+	</select>	
+	
+	<update id="updateSeason" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.updateSeason Description : 시즌 수정 -->
+		UPDATE APET_CONTENTS_SEASON SET
+			   SESN_NM				= #{sesnNm }			/* 시즌명 */
+			 , FL_NO				= #{flNo }				/* 파일번호 */
+			 , SESN_DSCRT			= #{sesnDscrt }			/* 시즌 설명 */
+			 , DISP_YN				= #{dispYn } 			/* 전시상태 */
+			 , SYS_UPDR_NO			= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+		WHERE SRIS_NO = #{srisNo }
+		  AND SESN_NO = #{sesnNo }
+	</update>
+	
+	<select id="getSeasonNo" parameterType="biz.app.contents.model.SeriesSO" resultType="java.lang.Long">
+		<!--
+			Query Name	: series.getSeasonNo
+			Description	: 시즌 번호 채번
+		-->
+		SELECT IFNULL(MAX(SESN_NO), 0)+1			
+		FROM APET_CONTENTS_SEASON
+		WHERE SRIS_NO = #{srisNo }
+	</select>
+	
+	<insert id="insertSeason" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeason Description : 시즌 등록 -->		
+		<selectKey keyProperty="sesnNo" resultType="java.lang.Long" order="BEFORE">			
+			SELECT IFNULL(MAX(SESN_NO), 0)+1 FROM APET_CONTENTS_SEASON WHERE SRIS_NO = #{srisNo }
+		</selectKey>
+		INSERT INTO APET_CONTENTS_SEASON 
+		(
+		  SESN_NO				/* 시즌번호 */
+		, SRIS_NO				/* 시리즈번호 */
+	    , SESN_NM 				/* 시즌명 */
+	    , FL_NO			 	 	/* 파일번호 */
+	    , SESN_DSCRT 			/* 시즌설명 */
+		, DISP_YN 				/* 전시상태 */
+	    , SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+	    , SYS_UPDR_NO			/* 시스템 수정자 번호 */
+	    , SYS_UPD_DTM			/* 시스템 수정 일시 */  
+		)
+		VALUES
+		(
+		  #{sesnNo }
+		, #{srisNo }
+		, #{sesnNm }
+		, #{flNo }
+		, #{sesnDscrt }	
+		, #{dispYn }	
+		, #{sysRegrNo }
+		, NOW()  
+		, #{sysUpdrNo }
+		, NOW()
+		)
+		
+	</insert>
+	
+	<update id="updateSeasonStat" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.updateSeasonStat Description : 시즌 전시상태 일괄수정 -->
+		UPDATE APET_CONTENTS_SEASON SET	
+			   DISP_YN 			= #{dispYn } 		/* 전시상태 */
+			 , SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */  
+		WHERE SRIS_NO = #{srisNo }
+		  AND SESN_NO = #{sesnNo }
+		
+	</update>
+	
+	<insert id="insertApetAttachFile" parameterType="biz.app.contents.model.ApetAttachFilePO">
+		<!-- Query Name : series.insertApetAttachFile Description : 첨부파일등록 -->		
+		<selectKey keyProperty="seq" resultType="java.lang.Long" order="BEFORE">			
+			SELECT IFNULL(MAX(SEQ),0)+1 FROM APET_ATTACH_FILE WHERE FL_NO = #{flNo }
+		</selectKey>
+		INSERT INTO APET_ATTACH_FILE
+		(
+		  FL_NO					/* 파일 번호 */
+		, SEQ					/* 순번 */
+		, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+		, PHY_PATH				/* 물리경로 */
+		, ORG_FL_NM				/* 원 파일 명 */
+		, FL_SZ					/* 파일 크기 */
+		, SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+		)
+		VALUES
+		(
+		  #{flNo }
+		, #{seq }
+		, #{contsTpCd }
+		, #{phyPath }
+		, #{orgFlNm }
+		, #{flSz }  
+		, #{sysRegrNo }
+		, NOW() 
+		)		
+	</insert>
+		
+	<select id="getAttachFiles" parameterType="biz.app.contents.model.SeriesSO" resultType="biz.app.contents.model.ApetAttachFileVO">
+		<!--
+			Query Name	: series.getAttachFiles
+			Description	: 첨부파일목록
+		-->		
+		SELECT 
+			  FL_NO					/* 파일 번호 */
+			, SEQ					/* 순번 */
+			, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+			, PHY_PATH				/* 물리경로 */
+			, ORG_FL_NM				/* 원 파일 명 */
+			, FL_SZ					/* 파일 크기 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+		    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+		FROM
+			(
+			SELECT 
+				  T1.*
+			    , ROW_NUMBER() OVER(PARTITION BY FL_NO, CONTS_TP_CD ORDER BY SEQ DESC) AS RNUM
+			FROM
+				APET_ATTACH_FILE T1
+			WHERE
+			  FL_NO = #{flNo }
+			) T1
+		WHERE T1.RNUM = 1 	    	    
+			    
+	</select>
+	
+	<select id="getSeriesTagMap" parameterType="biz.app.contents.model.SeriesSO" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.getSeriesTagMap
+			Description	: 태그목록
+		-->		
+		SELECT T1.TAG_NO, T2.TAG_NM
+		FROM APET_CONTENTS_SERIES_TAG_MAP T1 JOIN TAG_BASE T2 ON (T1.TAG_NO = T2.TAG_NO)
+		WHERE SRIS_NO = #{srisNo }    	    
+			    
+	</select>
+	
+	<insert id="updateSeriesTagMap" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.updateSeriesTagMap Description : 시리즈 태그맵 등록 -->
+		
+		INSERT INTO APET_CONTENTS_SERIES_TAG_MAP( 
+			  SRIS_NO
+			, TAG_NO
+			, SYS_REG_DTM
+			, SYS_REGR_NO
+		)VALUES ( 
+			  #{srisNo }
+			, #{tagNo }
+			, NOW()
+			, #{sysRegrNo }
+		)		
+	</insert>
+	
+	<delete id="deleteSeriesTagMap">
+		<!-- Query Name : series.deleteSeriesTagMap Description :  시리즈 태그맵 삭제 -->
+		DELETE FROM APET_CONTENTS_SERIES_TAG_MAP
+		WHERE SRIS_NO = #{srisNo }
+	</delete>
+	
+	<select id="foGetSeries" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.foGetSeries
+			Description	: FO시리즈 상세조회
+		-->		
+		SELECT  /* series.foGetSeries */
+			 SRIS.SRIS_NO				/* 시리즈 번호 */
+			, SESN.SESN_NO				/* 시즌 번호 */
+			, SRIS.SRIS_ID				/* 시리즈 아이디 */
+			, SRIS.DISP_YN				/* 시리즈 전시여부 */
+			, SRIS.TP_CD					/* 시리즈 타입코드 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필이미지 경로 */
+            , (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SESN.FL_NO ORDER BY SEQ DESC LIMIT 1) AS SESN_IMG_PATH	/* 시즌 이미지 경로 */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'APET_TP' AND DTL_CD = SRIS.TP_CD) AS TP_NM /* 시리즈 타입명 */			
+			, SRIS.SRIS_NM				/* 시리즈명 */ 
+			, SRIS.SRIS_DSCRT			/* 시리즈 설명 */
+			, SESN.SESN_DSCRT			/* 시즌 설명 */
+			, SRIS.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SRIS.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SRIS.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SRIS.SYS_UPD_DTM			/* 시스템 수정 일시 */				
+		FROM
+			APET_CONTENTS_SERIES SRIS		
+         JOIN APET_CONTENTS_SEASON SESN  ON (SRIS.SRIS_NO = SESN.SRIS_NO)
+		WHERE 1=1
+			AND SRIS.SRIS_NO = #{srisNo}
+			AND SESN.SESN_NO = #{sesnNo}
+			AND SESN.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+	</select>
+	
+	<select id="foGetSeason" resultType="biz.app.contents.model.SeriesVO" >
+		<!--
+			Query Name	: series.foGetSeason
+			Description	: FO시즌 상세조회
+		-->	
+		SELECT  /* QUERYID(series.foGetSeason) */
+			SESN_NO					/* 시즌 번호 */
+			, SRIS_NO				/* 시리즈 번호 */
+			, SESN_NM				/* 시즌 명 */
+			, FL_NO					/* 시즌 이미지번호 */				
+		FROM 
+			APET_CONTENTS_SEASON 	 
+		WHERE 1=1
+			AND SRIS_NO = #{srisNo}
+			AND DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+		ORDER BY SESN_NO ASC
+	</select>
+	
+	<select id="foSeriesList" resultMap="foGetSeriesList">
+		<!--
+			Query Name	: series.foSeriesList
+			Description	: FO시리즈 리스트 
+		-->	
+		SELECT  /* QUERYID(series.foSeriesList) */ 	
+			SRIS_NO				/* 시리즈 번호 */
+			, SRIS_ID				/* 시리즈 아이디 */
+			, DISP_YN				/* 시리즈 전시여부 */
+            , FL_NO
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'APET_TP' AND DTL_CD = SRIS.TP_CD) AS TP_NM /* 시리즈 타입명 */			
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH	/* 시리즈 프로필 */
+			, SRIS_NM				/* 시리즈명 */
+			, SRIS_DSCRT			/* 시리즈 설명 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		  FROM APET_CONTENTS_SERIES SRIS
+		 WHERE DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+		/*ORDER BY SRIS_NM*/
+		ORDER BY SRIS_SEQ
+	</select>
+	
+	<resultMap type="biz.app.contents.model.SeriesVO" id="foGetSeriesList">
+		<collection property="seasonList" column="srisNo=SRIS_NO" javaType="java.util.ArrayList" ofType="biz.app.contents.model.SeriesVO" select="series.foSeasonList" />
+	</resultMap>
+	
+	<select id="foSeasonList" resultType="biz.app.contents.model.SeriesVO">
+		<!--
+			Query Name	: series.foSeasonList
+			Description	: FO시즌 리스트
+		-->	
+		SELECT  /* QUERYID(series.foSeasonList) */
+			SESN_NO 					/* 시즌 번호 */
+			, SRIS_NO					/* 시리즈 번호 */
+			, SESN_NM					/* 시즌 명 */
+			, SESN_DSCRT 				/* 시즌 설명 */
+			,(SELECT COUNT(*) FROM APET_CONTENTS AC WHERE AC.SRIS_NO = #{srisNo} AND AC.SESN_NO = SESN.SESN_NO AND AC.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}' ) AS VD_CNT
+			, FL_NO						/* 시즌 이미지번호 */
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SESN.FL_NO ORDER BY SEQ DESC LIMIT 1) AS SESN_IMG_PATH    /* 시즌 이미지 */        
+			, DISP_YN				/* 시리즈 전시여부 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		  FROM APET_CONTENTS_SEASON SESN
+		 WHERE SESN.SRIS_NO = #{srisNo}
+		   AND SESN.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+		ORDER BY SESN.SESN_NO ASC
+	</select>
+	
+	<insert id="insertSeriesHist" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeriesHist Description : 시리즈 히스토리 등록  -->		
+		
+		INSERT INTO APET_CONTENTS_SERIES_HIST
+		(
+		  HIST_NO				/* 이력번호 */
+		, SRIS_NO				/* 시리즈번호 */
+		, SRIS_ID				/* 시리즈ID */
+		, DISP_YN 				/* 전시상태 */
+		, TP_CD					/* 타입코드 */
+		, FL_NO					/* 파일번호 */	    
+	    , SRIS_NM 				/* 시리즈명 */
+	    , SRIS_DSCRT 			/* 시리즈설명 */
+	    , SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */	     
+	    , AD_YN					/* 광고 노출 여부 */
+		)		
+	    SELECT
+	  		  #{histNo}
+	  		, SRIS_NO				
+			, SRIS_ID				
+			, DISP_YN 				
+			, TP_CD					
+			, FL_NO					
+		    , SRIS_NM 				
+		    , SRIS_DSCRT 			
+		    , #{sysRegrNo }
+			, NOW()  			
+		    , AD_YN					
+	    FROM APET_CONTENTS_SERIES
+	    WHERE SRIS_NO = #{srisNo}  
+	
+		
+	</insert>
+	
+	<insert id="insertSeriesTagHist" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeriesTagHist Description : 시리즈 태그 히스토리 등록 -->		
+		
+		INSERT INTO APET_CONTENTS_SERIES_TAG_MAP_HIST( 
+			  HIST_NO				/* 이력번호 */
+			, SRIS_NO
+			, TAG_NO
+			, SYS_REG_DTM
+			, SYS_REGR_NO
+		)		
+		SELECT
+			  #{histNo}
+			, SRIS_NO
+			, TAG_NO
+			, NOW()
+			, #{sysRegrNo }
+		FROM APET_CONTENTS_SERIES_TAG_MAP
+		WHERE SRIS_NO =  #{srisNo }		
+		
+	</insert>
+	
+	<insert id="insertSeriesFileHist" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeriesFileHist Description : 시리즈 파일 히스토리 등록 -->		
+		
+		INSERT INTO APET_ATTACH_FILE_HIST( 
+			  HIST_NO				/* 이력번호 */
+			, FL_NO					/* 파일 번호 */
+			, SEQ					/* 순번 */
+			, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+			, PHY_PATH				/* 물리경로 */
+			, ORG_FL_NM				/* 원 파일 명 */
+			, FL_SZ					/* 파일 크기 */
+		    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+		) 	
+		SELECT
+			  #{histNo}				/* 이력번호 */
+			, FL_NO					/* 파일 번호 */
+			, SEQ					/* 순번 */
+			, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+			, PHY_PATH				/* 물리경로 */
+			, ORG_FL_NM				/* 원 파일 명 */
+			, FL_SZ					/* 파일 크기 */
+			, NOW()
+			, #{sysRegrNo }
+		FROM APET_ATTACH_FILE
+		WHERE FL_NO =  #{flNo }		
+		  AND SEQ IN (
+		  			  SELECT MAX(SEQ) 
+		  			  FROM APET_ATTACH_FILE 
+		  			  WHERE FL_NO = #{flNo }	
+		  			  GROUP BY CONTS_TP_CD
+		  			  ) 		
+	</insert>
+	
+	<insert id="insertSeasonHist" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.insertSeasonHist Description : 시즌 history 등록 -->		
+		
+		INSERT INTO APET_CONTENTS_SEASON_HIST 
+		(
+		  HIST_NO				/* 이력번호 */
+		, SESN_NO				/* 시즌번호 */
+		, SRIS_NO				/* 시리즈번호 */
+	    , SESN_NM 				/* 시즌명 */
+	    , FL_NO			 	 	/* 파일번호 */
+	    , SESN_DSCRT 			/* 시즌설명 */
+		, DISP_YN 				/* 전시상태 */
+	    , SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */	      
+		)
+		SELECT
+			  #{histNo}	
+			, SESN_NO				
+			, SRIS_NO				
+		    , SESN_NM 				
+		    , FL_NO			 	 	
+		    , SESN_DSCRT 			
+			, DISP_YN 				
+		    , #{sysUpdrNo }
+			, NOW() 
+		FROM APET_CONTENTS_SEASON		
+		WHERE SESN_NO = #{sesnNo}
+		  AND SRIS_NO = #{srisNo}    	
+		
+	</insert>
+	
+	<delete id="deleteSeries" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.deleteSeries Description :  시리즈 삭제 -->
+		DELETE FROM APET_CONTENTS_SERIES
+		WHERE SRIS_NO = #{srisNo }
+	</delete>
+	
+	<delete id="deleteSeason" parameterType="biz.app.contents.model.SeriesPO">
+		<!-- Query Name : series.deleteSeason Description :  시즌 삭제 -->
+		DELETE FROM APET_CONTENTS_SEASON
+		WHERE SRIS_NO = #{srisNo }
+		AND SESN_NO = #{sesnNo}
+	</delete>
+	
+	<update id="updateSeriesSeqSort">
+		<!--
+			Query Name : series.updateSeriesSeqSort
+			Description : 시리즈 정렬순서(가나다 순) 저장
+		-->
+		
+		/* QUERYID(series.updateSeriesSeqSort) */
+		UPDATE APET_CONTENTS_SERIES T1
+			INNER JOIN
+			(
+				SELECT @a:=@a+1 AS ROWNUM, SRIS_NO
+				  FROM APET_CONTENTS_SERIES, (SELECT @a := 0) RN
+				ORDER BY SRIS_NM ASC
+			) T2
+			ON T1.SRIS_NO = T2.SRIS_NO
+		SET T1.SRIS_SEQ = T2.ROWNUM
+	</update>
+	
+</mapper>

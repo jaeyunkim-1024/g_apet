@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="apetContentsConstruct">
+	<insert id="insertApetContentsConstruct" parameterType="biz.app.contents.model.ApetContentsConstructPO">
+		<!--
+			Query Name	: apetContentsConstruct.insertApetContentsConstruct
+			Description	: Apet 컨텐츠 구성 등록
+		-->
+		INSERT INTO APET_CONTENTS_CONSTRUCT (	/* QUERYID(apetContentsConstruct.insertApetContentsConstruct) */
+			VD_ID				/* 영상 ID */
+			, CSTRT_SEQ			/* 구성 순번 */
+			, CSTRT_GB_CD		/* 구성 구분 코드 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{vdId}				
+			, #{cstrtSeq}			/* 구성 순번 */
+			, #{cstrtGbCd}		/* 구성 구분 코드 */
+			, #{ttl}				/* 제목 */
+			, #{content}			/* 내용 */	
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<select id="getApetContentsConstruct" resultType="biz.app.contents.model.ApetContentsConstructVO">
+		<!--
+			Query Name	: apetContentsConstruct.getApetContentsConstruct
+			Description	: Apet 컨텐츠 구성 조회
+		-->
+		SELECT	/* QUERYID(apetContentsConstruct.getApetContentsConstruct) */
+				VD_ID
+				, CSTRT_SEQ
+				, CSTRT_GB_CD
+				, TTL
+				, CONTENT
+				, SYS_REG_DTM		
+				, SYS_REGR_NO		
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+		FROM 	APET_CONTENTS_CONSTRUCT
+		WHERE 	VD_ID = #{vdId}
+	</select>
+	
+	<delete id="deleteApetContentsConstruct" parameterType="biz.app.contents.model.ApetContentsConstructPO">
+		<!--
+			Query Name	: apetContentsConstruct.deleteApetContentsConstruct
+			Description	: Apet 컨텐츠 구성 삭제
+		-->
+		DELETE /* QUERYID(apetContentsConstruct.deleteApetContentsConstruct) */
+		FROM	APET_CONTENTS_CONSTRUCT
+		WHERE 	VD_ID = #{vdId}
+	</delete>
+	
+		<insert id="insertApetContentsConstructHist" parameterType="biz.app.contents.model.ApetContentsConstructVO">
+		<!--
+			Query Name	: apetContentsConstruct.insertApetContentsConstructHist
+			Description	: Apet 컨텐츠 구성 등록
+		-->
+		INSERT INTO APET_CONTENTS_CONSTRUCT_HIST (	/* QUERYID(apetContentsConstruct.insertApetContentsConstructHist) */
+			HIST_NO				/* 이력번호 */
+			, VD_ID				/* 영상 ID */
+			, CSTRT_SEQ			/* 구성 순번 */
+			, CSTRT_GB_CD		/* 구성 구분 코드 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{histNo}
+			, #{vdId}				
+			, #{cstrtSeq}			/* 구성 순번 */
+			, #{cstrtGbCd}		/* 구성 구분 코드 */
+			, #{ttl}				/* 제목 */
+			, #{content}			/* 내용 */	
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

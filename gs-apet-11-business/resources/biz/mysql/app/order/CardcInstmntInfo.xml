@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	카드사 할부 정보
+	일자 : 2021. 04. 07.
+	작성자 : kek01
+-->
+<mapper namespace="cardcInstmntInfo">
+
+	<insert id="mergeCardcInstmntInfo" parameterType="biz.app.order.model.CardcInstmntInfoPO">
+		<!--
+			Query Name : cardcInstmntInfo.mergeCardcInstmntInfo
+			Description : 카드사 할부 정보 저장
+		-->
+		INSERT INTO CARDC_INSTMNT_INFO  /* QUERYID(cardcInstmntInfo.mergeCardcInstmntInfo) */
+		(
+			CARDC_CD					/* 카드사 코드 */
+			, MONTH						/* 개월 */
+			, INSTMNT_TP_CD				/* 할부 유형 코드 */
+			, MIN_AMT					/* 최소 금액 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{cardcCd}					/* 카드사 코드 */
+			, #{month}					/* 개월 */
+			, #{instmntTpCd}			/* 할부 유형 코드 */
+			, #{minAmt} 				/* 최소 금액 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, #{sysRegDtm}			/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, #{sysUpdDtm}			/* 시스템 수정 일시 */
+		) ON DUPLICATE KEY UPDATE
+			INSTMNT_TP_CD = #{instmntTpCd},
+			MIN_AMT       = #{minAmt},
+			SYS_UPDR_NO   = #{sysUpdrNo},
+			SYS_UPD_DTM   = #{sysUpdDtm}
+	</insert>
+
+	<delete id="deleteCardcInstmntInfo" parameterType="biz.app.order.model.CardcInstmntInfoPO">
+		<!--
+			Query Name : cardcInstmntInfo.deleteCardcInstmntInfo
+			Description :  카드사 할부 정보 삭제
+		-->
+		DELETE
+		  FROM	CARDC_INSTMNT_INFO
+		 WHERE	SYS_UPD_DTM <![CDATA[<]]> #{sysUpdDtm}  /*배치수행시 수정일시 보다 작은 데이타는 삭제*/
+	</delete>
+
+</mapper>

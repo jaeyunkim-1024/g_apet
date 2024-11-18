@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans			http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context				http://www.springframework.org/schema/context/spring-context-4.2.xsd
+						http://www.springframework.org/schema/tx					http://www.springframework.org/schema/tx/spring-tx-4.2.xsd 
+						http://www.springframework.org/schema/util 					http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<util:properties id="propertyConfigurer" location="classpath:config/properties/context.properties "/>
+	<context:property-placeholder properties-ref="propertyConfigurer" />
+
+	<!--  ### Main DB ### -->
+	<bean id="dataSourceSpied"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+		<property name="driverClassName" value="${main.jdbc.mysql.driver}"/>
+		<property name="url" value="${main.jdbc.mysql.url}"/>
+		<property name="username" value="${main.jdbc.mysql.user}"/>
+		<property name="password" value="${main.jdbc.mysql.password}"/>
+	</bean>
+
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="front.web.config.log4JdbcCustomFormatter.FrontLog4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>
+	
+ 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+ 		<property name="mapperLocations">
+ 			<list>
+ 				<value>classpath*:biz/mysql/app/**/*.xml</value>
+ 				<value>classpath*:biz/mysql/common/**/*.xml</value>
+ 				<value>classpath*:biz/mysql/interface/**/*.xml</value>
+ 			</list>
+ 		</property>
+ 		<!-- 암복호화를 위한 typeHandler -->
+ 		<property name="typeHandlers">
+			<array>
+				<bean class="biz.common.typehandler.CryptoTypeHandler"/>
+				<bean class="biz.common.typehandler.CryptoTypeHandlerForEzPay"/>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"> 
+		<constructor-arg ref="sqlSessionFactory"/> 
+	</bean>
+	
+	<!--  ### Dormant DB ### -->
+	<bean id="dormantDataSourceSpied"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+		<property name="driverClassName" value="${dormant.jdbc.mysql.driver}"/>
+		<property name="url" value="${dormant.jdbc.mysql.url}"/>
+		<property name="username" value="${dormant.jdbc.mysql.user}"/>
+		<property name="password" value="${dormant.jdbc.mysql.password}"/>
+	</bean>
+
+	<bean id="dormantDataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dormantDataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="front.web.config.log4JdbcCustomFormatter.FrontLog4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>
+	
+ 	<bean id="dormantSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dormantDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+ 		<property name="mapperLocations">
+ 			<list>
+ 				<value>classpath*:biz/mysql/dormant/**/*.xml</value>
+ 				<value>classpath*:biz/mysql/leave/**/*.xml</value>
+ 			</list>
+ 		</property>
+	</bean>
+
+	<bean id="dormantSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"> 
+		<constructor-arg ref="dormantSqlSessionFactory"/> 
+	</bean>
+	
+	<!--  ### TWC DB ### -->
+	<bean id="twcDataSourceSpied"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+		<property name="driverClassName" value="${twc.jdbc.mysql.driver}"/>
+		<property name="url" value="${twc.jdbc.mysql.url}"/>
+		<property name="username" value="${twc.jdbc.mysql.user}"/>
+		<property name="password" value="${twc.jdbc.mysql.password}"/>
+	</bean>
+
+	<bean id="twcDataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="twcDataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="front.web.config.log4JdbcCustomFormatter.FrontLog4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>
+	
+ 	<bean id="twcSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="twcDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+ 		<property name="mapperLocations">
+ 			<list>
+ 				<value>classpath*:biz/mysql/twc/**/*.xml</value>
+ 			</list>
+ 		</property>
+	</bean>
+
+	<bean id="twcSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"> 
+		<constructor-arg ref="twcSqlSessionFactory"/> 
+	</bean>
+	
+	<!--  ### SLAVE DB ### -->
+	<bean id="slaveDataSourceSpied"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+		<property name="driverClassName" value="${slave.jdbc.mysql.driver}"/>
+		<property name="url" value="${slave.jdbc.mysql.url}"/>
+		<property name="username" value="${slave.jdbc.mysql.user}"/>
+		<property name="password" value="${slave.jdbc.mysql.password}"/>
+	</bean>
+
+	<bean id="slaveDataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="slaveDataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="front.web.config.log4JdbcCustomFormatter.FrontLog4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>
+	
+ 	<bean id="slaveSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="slaveDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+ 		<property name="mapperLocations">
+ 			<list>
+ 				<value>classpath*:biz/mysql/app/**/*.xml</value>
+ 				<value>classpath*:biz/mysql/common/**/*.xml</value>
+ 				<value>classpath*:biz/mysql/interface/**/*.xml</value>
+ 			</list>
+ 		</property>
+ 		<!-- 암복호화를 위한 typeHandler -->
+ 		<property name="typeHandlers">
+			<array>
+				<bean class="biz.common.typehandler.CryptoTypeHandler"/>
+				<bean class="biz.common.typehandler.CryptoTypeHandlerForEzPay"/>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="slaveSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"> 
+		<constructor-arg ref="slaveSqlSessionFactory"/> 
+	</bean>
+
+	<!-- ### 고도몰 DB ### -->
+	<bean id="gdmDataSourceSpied" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${gdm.jdbc.mysql.driver}"/>
+		<property name="url" value="${gdm.jdbc.mysql.url}"/>
+		<property name="username" value="${gdm.jdbc.mysql.user}"/>
+		<property name="password" value="${gdm.jdbc.mysql.password}"/>
+	</bean>
+
+	<bean id="gdmDataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="gdmDataSourceSpied"/>
+		<property name="logFormatter">
+			<bean class="front.web.config.log4JdbcCustomFormatter.FrontLog4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gdmSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="gdmDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath*:biz/mysql/godomall/**/*.xml</value>
+				<value>classpath*:biz/mysql/common/**/*.xml</value>
+			</list>
+		</property>
+
+		<!-- 암복호화를 위한 typeHandler -->
+		<property name="typeHandlers">
+			<array>
+				<bean class="biz.common.typehandler.CryptoTypeHandler"/>
+				<bean class="biz.common.typehandler.CryptoTypeHandlerForEzPay"/>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="gdmSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="gdmSqlSessionFactory"/>
+	</bean>
+
+	<!--  ### Teansaction ### -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+				
+	<tx:annotation-driven transaction-manager="dormantTransactionManager"/>
+	<bean id="dormantTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dormantDataSource"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="TwcTransactionManager"/>
+	<bean id="TwcTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="twcDataSource"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="slaveTransactionManager"/>
+	<bean id="slaveTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="slaveDataSource"/>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="gdmTransactionManager"/>
+	<bean id="gdmTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="gdmDataSource"/>
+	</bean>
+
+	<!-- FO 에서 사용 할 bulk형 sqlSessionFactory -->
+	<bean id="sqlSessionFactoryBulk" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:config/mybatis/myBatisConfig.xml" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath*:biz/mysql/app/**/*.xml</value>
+				<value>classpath*:biz/mysql/common/**/*.xml</value>
+				<value>classpath*:biz/mysql/interface/**/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 2. 1에서 생성한 Factory Bean을 사용하는 SqlSessionTemplate Bean을 생성 -->
+	<bean id="bulkSqlSessionTemplate" name="bulkSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactoryBulk" /> <!-- 1에서 생성한 Factory Bean -->
+		<constructor-arg index="1" value="BATCH" /> <!-- 해당 SqlSessionTemplate은 ExecutorType을 Batch로 설정 -->
+	</bean>
+
+</beans>

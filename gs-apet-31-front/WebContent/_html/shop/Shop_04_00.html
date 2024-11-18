@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"장바구니"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page shop od cart" id="container">
+
+			<div class="pageHeadPc">
+				<div class="inr">
+					<div class="hdt">
+						<h3 class="tit">장바구니</h3>
+					</div>
+				</div>
+			</div>
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<section class="nodata">
+						<div class="inr"><!-- @@ 03.10 변경 -->
+							<div class="msg"><b class="t">장바구니</b>에 담긴 상품이 <br> 없습니다.</div>
+							<div class="bts">
+								<a href="../../_html/shop/Shop_01.html" class="btnGoShop">펫샵 쇼핑하러 가기</a>
+							</div>
+						</div>
+					</section>
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+
+		<script>
+			
+		</script>
+
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+
+	</div>
+</body>
+</html>

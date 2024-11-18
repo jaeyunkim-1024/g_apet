@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<comment>admin_web_dev</comment>
+
+	<entry key="project.gb">admin</entry>
+
+	<entry key="site.domain">devbo.aboutpet.co.kr</entry>
+	
+	<entry key="site.fo.domain">dev.aboutpet.co.kr</entry>
+
+</properties>

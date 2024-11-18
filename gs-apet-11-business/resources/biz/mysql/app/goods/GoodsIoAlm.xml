@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 재입고 알림 대상
+	작성자  	valueFactory
+	작성일자  2021.03.24
+-->
+
+<mapper namespace="GoodsIoAlm">
+
+	<insert id="insertIoAlmTgGoods" parameterType="biz.app.goods.model.GoodsIoAlmPO">
+		INSERT INTO IO_ALM_TG_GOODS (
+		    GOODS_ID
+		    , STK_BTCH_DTM
+		    , STK_QTY
+		    , SND_CPLT_YN
+		    , SYS_REGR_NO
+		    , SYS_REG_DTM
+	    ) VALUES(#{goodsId}
+	    	, NOW()
+	    	, #{stkQty}
+	    	, #{sndCpltYn}
+	    	, #{sysRegrNo}
+	    	, #{sysRegDtm}
+	    )
+	</insert>
+
+
+	<insert id="insertDupIoAlmTgGoods" parameterType="biz.app.goods.model.GoodsIoAlmPO">
+		INSERT IGNORE INTO IO_ALM_TG_GOODS (
+			                          GOODS_ID
+		                            , STK_BTCH_DTM
+		                            , STK_QTY
+		                            , SND_CPLT_YN
+		                            , SYS_REGR_NO
+		                            , SYS_REG_DTM
+		) VALUES(#{goodsId}
+		        , NOW()
+		        , #{stkQty}
+		        , #{sndCpltYn}
+		        , #{sysRegrNo}
+		        , #{sysRegDtm}
+		        )
+		ON DUPLICATE KEY UPDATE
+			STK_QTY     = #{stkQty},
+			SND_CPLT_YN = #{sndCpltYn}
+	</insert>
+
+	<update id="updateIoAlmTgGoods" parameterType="biz.app.goods.model.GoodsIoAlmPO">
+		UPDATE IO_ALM_TG_GOODS /* GoodsIoAlm.updateIoAlmTgGoods 재입고 알림 대상 상품 재고 업데이트 */
+		SET STK_QTY = #{stkQty}
+			, STK_BTCH_DTM = #{stkBtchDtm}
+		WHERE GOODS_ID = #{goodsId}
+	</update>
+
+	<update id="updateIoAlmTgGoodsSendComplate" parameterType="biz.app.goods.model.GoodsIoAlmPO">
+		UPDATE IO_ALM_TG_GOODS
+		SET SND_CPLT_YN = #{sndCpltYn}
+		WHERE GOODS_ID = #{goodsId}
+	</update>
+
+	<select id="selectIoAlarmGoodsTargetList" resultType="biz.app.member.model.MemberIoAlarmVO">
+		SELECT *
+		FROM (
+			     SELECT TG.GOODS_ID
+				      , GB.GOODS_NM
+				      , STK_QTY
+				      , FN_GET_GOODS_STOCK(TG.GOODS_ID, NULL) AS WEB_STK_QTY
+				      , IA.GOODS_IO_ALM_NO
+				      , IA.PAK_GOODS_ID
+				      , (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = IA.PAK_GOODS_ID) AS PAK_GOODS_NM
+				      , IA.MBR_NO
+				      , MB.MBR_NM
+				      , IA.ALM_YN
+				      , IA.ALM_SND_DTM
+				      , IA.DEL_YN
+				      , IA.NOTICE_SEND_NO
+				      , IA.SYS_DELR_NO
+			     FROM IO_ALM_TG_GOODS TG
+				          JOIN GOODS_BASE GB
+				               ON TG.GOODS_ID = GB.GOODS_ID
+					               AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					               AND NOW() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+				          JOIN GOODS_IO_ALARM IA
+				               ON TG.GOODS_ID = IA.GOODS_ID
+					               AND IA.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+					               AND IA.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+					               AND IA.ALM_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+					               AND IA.SYS_REG_DTM > DATE_ADD(NOW(), INTERVAL -3 MONTH)
+				          JOIN MEMBER_BASE MB
+				               ON IA.MBR_NO = MB.MBR_NO
+					               AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+		     ) TB WHERE WEB_STK_QTY > 0
+	</select>
+
+
+	<delete id="deleteIoAlarmTargetList">
+		DELETE FROM IO_ALM_TG_GOODS
+		WHERE STK_BTCH_DTM IS NOT NULL
+		AND STK_QTY > 0
+		AND GOODS_ID IN <foreach collection="goodsIds" item="goodsId" separator="," open=" (" close=")">#{goodsId}</foreach>
+	</delete>
+
+	<select id="selectIoAlarmList" parameterType="biz.app.member.model.MemberIoAlarmSO" resultType="biz.app.goods.model.GoodsIoAlmVO">
+		SELECT T.*
+			, GI.IMG_PATH
+		FROM (
+		SELECT GOODS_IO_ALM_NO
+			, IO.MBR_NO
+		    , (select GOODS_NM from GOODS_BASE where GOODS_ID = IO.GOODS_ID) AS PAK_GOODS_NM
+			, IO.PAK_GOODS_ID
+			, IO.GOODS_ID
+			, GB.GOODS_NM
+			, GB.GOODS_STAT_CD
+	     	, GB.GOODS_CSTRT_TP_CD
+			, IO.NOTICE_SEND_NO
+			, IO.ALM_YN
+			, IO.ALM_SND_DTM
+			, IO.SYS_REG_DTM
+		    , WEB_STK_QTY
+			, CASE WHEN PAK_GOODS_ID IS NOT NULL THEN ATTR1_VAL ELSE NULL END ATTR1_VAL
+			, CASE WHEN PAK_GOODS_ID IS NOT NULL THEN ATTR2_VAL ELSE NULL END ATTR2_VAL
+			, CASE WHEN PAK_GOODS_ID IS NOT NULL THEN ATTR3_VAL ELSE NULL END ATTR3_VAL
+			, CASE WHEN PAK_GOODS_ID IS NOT NULL THEN ATTR4_VAL ELSE NULL END ATTR4_VAL
+			, CASE WHEN PAK_GOODS_ID IS NOT NULL THEN ATTR5_VAL ELSE NULL END ATTR5_VAL
+			, CASE WHEN WEB_STK_QTY <![CDATA[<=]]> 0 THEN '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				ELSE '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			END SOLD_OUT_YN
+			, CASE WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'		/* 상품 판매 중지 : 판매중지 */
+				WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+				WHEN GB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+				WHEN GB.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+				WHEN WEB_STK_QTY  <![CDATA[<=]]> 0
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}' 		/* 단품 재고 오류 ; 품절 */
+				ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 			/* 정상 */
+			END AS SALE_PSB_CD	/* 판매가능상태코드 */
+			, AT.ATTR_VAL
+		FROM GOODS_IO_ALARM IO
+		INNER JOIN LATERAL (
+			SELECT GB.GOODS_ID
+				, FN_GET_GOODS_STOCK(IO.GOODS_ID, NULL) AS WEB_STK_QTY
+				, GB.GOODS_NM
+				, GB.GOODS_STAT_CD
+				, GB.GOODS_CSTRT_TP_CD
+			    , GB.SALE_STRT_DTM
+			    , GB.SALE_END_DTM
+			FROM GOODS_BASE GB
+			WHERE GB.GOODS_ID = IF(IO.PAK_GOODS_ID IS NULL, IO.GOODS_ID, IO.PAK_GOODS_ID)
+		) GB ON (TRUE)
+		LEFT OUTER JOIN LATERAL (
+			SELECT ATTR1_VAL , ATTR2_VAL, ATTR3_VAL, ATTR4_VAL, ATTR5_VAL
+			FROM ITEM_ATTR_HIST HIS
+			WHERE ITEM_NO = (SELECT ITEM_NO FROM ITEM WHERE GOODS_ID = IO.GOODS_ID )
+			ORDER BY SYS_REG_DTM DESC
+			LIMIT 1
+		) GCP ON (TRUE)
+		LEFT OUTER JOIN (
+		  SELECT GA.GOODS_ID
+			   , GROUP_CONCAT(CONCAT(A.ATTR_NM , ' : ', AV.ATTR_VAL) SEPARATOR ' / ') AS ATTR_VAL
+			FROM GOODS_ATTRIBUTE GA 
+			JOIN `ATTRIBUTE` A ON A.ATTR_NO = GA.ATTR_NO 
+			JOIN ATTRIBUTE_VALUE AV ON AV.ATTR_NO = A.ATTR_NO
+			JOIN ITEM_ATTRIBUTE_VALUE IAV
+			  ON IAV.ATTR_NO = AV.ATTR_NO 
+			 AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+			JOIN ITEM I
+			  ON I.ITEM_NO = IAV.ITEM_NO
+			 AND I.GOODS_ID = GA.GOODS_ID 
+		   WHERE 1 = 1
+			 AND A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			 AND AV.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		   GROUP BY GA.GOODS_ID
+		   ORDER BY GA.DISP_PRIOR_RANK
+		 ) AT ON AT.GOODS_ID = IO.GOODS_ID
+		WHERE MBR_NO = #{mbrNo}
+		AND DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		AND IO.SYS_REG_DTM > DATE_ADD(NOW(), INTERVAL -3 MONTH)
+		ORDER BY IO.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+		) T LEFT OUTER JOIN GOODS_IMG GI
+		ON T.GOODS_ID = GI.GOODS_ID
+		AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+</mapper>

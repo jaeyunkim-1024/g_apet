@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 옵션 그룹 구성
+	작성자  	valueFactory
+	작성일자  	2020.01.22
+-->
+<mapper namespace="goodsOptGrp">
+
+	<select id="listGoodsOptGrp" resultType="biz.app.goods.model.GoodsOptGrpVO" >
+		<!--
+			Query Name : goodsOptGrp.listGoodsOptGrp
+			Description : 상품 옵션 그룹 구성 리스트
+		-->
+		/* QUERYID(GoodsOptGrp.listGoodsOptGrp) */
+		
+		SELECT
+			T1.GOODS_OPT_GRP_NO
+			, T1.GOODS_ID
+			, T2.GOODS_NM
+			, T1.ATTR_NO
+			, T1.SHOW_NM
+			, T1.DISP_PRIOR_RANK
+			, T1.SYS_REGR_NO
+			, T1.SYS_REG_DTM
+		FROM GOODS_OPT_GRP T1	
+        JOIN GOODS_BASE T2 ON(T2.GOODS_ID = T1.GOODS_ID)
+		WHERE 1 = 1
+		AND T1.GOODS_ID = #{goodsId}
+		ORDER BY T1.DISP_PRIOR_RANK
+	</select>
+	
+	<insert id="insertGoodsOptGrp" parameterType="biz.app.goods.model.GoodsOptGrpPO" >
+		<!--
+			Query Name : goodsOptGrp.insertGoodsOptGrp
+			Description : 상품 옵션 그룹 구성 등록
+		-->
+		<selectKey keyProperty="goodsOptGrpNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_OPT_GRP_SEQ}') FROM DUAL
+		</selectKey>
+		
+		/* QUERYID(GoodsOptGrp.insertGoodsOptGrp) */
+		
+		INSERT INTO GOODS_OPT_GRP (
+			GOODS_OPT_GRP_NO
+			, GOODS_ID
+			, ATTR_NO
+			, SHOW_NM
+			, DISP_PRIOR_RANK
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{goodsOptGrpNo}
+			, #{goodsId}
+			, #{attrNo}
+			, #{showNm}
+			, #{dispPriorRank}
+			, #{sysRegrNo}
+			, now() 
+		)
+	</insert>
+	
+	<delete id="deleteGoodsOptGrp" parameterType="biz.app.goods.model.GoodsOptGrpPO" >
+		<!--
+			Query Name : GoodsOptGrp.deleteGoodsOptGrp
+			Description : 상품 옵션 그룹 삭제
+		-->
+		
+		/* QUERYID(GoodsOptGrp.deleteGoodsOptGrp) */
+		
+		DELETE FROM GOODS_OPT_GRP
+		WHERE 1=1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+	
+</mapper>

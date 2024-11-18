@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="search">
+
+	<select id="listGoods" resultType="biz.app.search.model.ShopDbGoodsVO">
+		
+		<!--
+            Query Name : search.listGoods
+            Description : 검색 상품의 추가적인 정보 확인(수정중)
+        -->
+        SELECT 
+        	CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_AMT	/* 상품원판매가 */
+			, CASE WHEN CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0
+					THEN CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+					ELSE CAST(FN_SPLIT(GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+					END AS FO_SALE_AMT	/* 최종판매가 */
+        	, T1.*
+        FROM
+        (
+	        SELECT /* QUERYID(search.listGoods) */
+	        	GBT.GOODS_ID
+	        	, GBT.GOODS_NM
+	        	, IMG_PATH
+	        	, BND_NM_KO
+	        	, FN_GET_GOODS_ICON(GBT.GOODS_ID, 1, 
+	        		<choose>
+						<when test="deviceGb eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+							'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+						</when>
+						<otherwise>'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+					</choose>
+	        		) AS ICONS
+				, FN_GET_GOODS_PRICE(GBT.GOODS_ID,1, 
+					<choose>
+						<when test="deviceGb eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+							'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+						</when>
+						<otherwise>'${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+					</choose>
+				) AS GOODS_PRICE_INFO
+				<if test='mbrNo != 0'>
+					, IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID = GBT.GOODS_ID AND MBR_NO = #{mbrNo}) > 0, 'Y', 'N') AS INTEREST_YN
+				</if>
+				, CASE WHEN GBT.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'		/* 상품 판매 중지 : 판매중지 */
+					WHEN GBT.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GBT.SALE_END_DTM <![CDATA[<]]> SYSDATE() THEN
+						'${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN GBT.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매종료 */
+					WHEN GBT.STK_MNG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' AND FN_GET_GOODS_STOCK(GBT.GOODS_ID,NULL) = 0 THEN
+						'${@framework.common.constants.CommonConstants@SALE_PSB_30}'	 	/* 품절 */
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 		/* 정상 */
+					END AS SALE_PSB_CD														/* 판매가능상태코드 */
+			FROM GOODS_BASE  GBT 
+			LEFT JOIN  GOODS_IMG GI ON GBT.GOODS_ID =GI.GOODS_ID AND  GI.IMG_TP_CD = '10' AND GI.DLGT_YN = 'Y'
+			LEFT JOIN  BRAND_BASE BB ON GBT.BND_NO = BB.BND_NO
+			WHERE  
+			<foreach collection="goodsIds" item="goodsId" separator="," open="GBT.GOODS_ID IN (" close=")">#{goodsId}</foreach>
+			<foreach collection="goodsIds" item="goodsId" separator="," open="ORDER BY FIELD(GBT.GOODS_ID, " close=")">#{goodsId}</foreach>
+		)T1
+	</select>
+
+</mapper>

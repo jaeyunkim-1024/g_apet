@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	biz Mapper
+	작성자 		snw
+	작성일자  	2015.06.15
+-->
+
+<mapper namespace="bizCommon">
+
+	<sql id="sortSql">
+	<if test="sidx != null and sidx != ''">
+		ORDER BY	${sidx} ${sord}
+	</if>
+	</sql>
+
+	<sql id="pageSql">
+	<if test="limit != null and offset != null">
+		LIMIT		${limit}, ${offset}
+	</if>
+	</sql>
+
+	<resultMap type="biz.app.system.model.CodeGroupVO" id="listCodeAllMap">
+		<id		property="grpCd"			column="GRP_CD"/>			<!-- 그룹 코드 -->
+		<result property="grpNm"			column="GRP_NM"/>			<!-- 그룹 명 -->
+		<result property="usrDfn1Nm"		column="USR_DFN1_NM"/>		<!-- 사용자 정의1 명 -->
+		<result property="usrDfn2Nm"		column="USR_DFN2_NM"/>		<!-- 사용자 정의2 명 -->
+		<result property="usrDfn3Nm"		column="USR_DFN3_NM"/>		<!-- 사용자 정의3 명 -->
+		<result property="usrDfn4Nm"		column="USR_DFN4_NM"/>		<!-- 사용자 정의4 명 -->
+		<result property="usrDfn5Nm"		column="USR_DFN5_NM"/>		<!-- 사용자 정의5 명 -->
+		<collection property="listCodeDetailVO" ofType="biz.app.system.model.CodeDetailVO">
+			<id		property="dtlCd"			column="DTL_CD"/>			<!-- 상세 코드 -->
+			<result property="dtlNm"			column="DTL_NM"/>			<!-- 상세 명 -->
+			<result property="dtlShtNm"			column="DTL_SHT_NM"/>		<!-- 상세 약어 명 -->
+			<result property="sortSeq"			column="SORT_SEQ"/>			<!-- 정렬 순서 -->
+			<result property="useYn"			column="USE_YN"/>			<!-- 사용 여부 -->
+			<result property="usrDfn1Val"		column="USR_DFN1_VAL"/>		<!-- 사용자 정의1 값 -->
+			<result property="usrDfn2Val"		column="USR_DFN2_VAL"/>		<!-- 사용자 정의2 값 -->
+			<result property="usrDfn3Val"		column="USR_DFN3_VAL"/>		<!-- 사용자 정의3 값 -->
+			<result property="usrDfn4Val"		column="USR_DFN4_VAL"/>		<!-- 사용자 정의4 값 -->
+			<result property="usrDfn5Val"		column="USR_DFN5_VAL"/>		<!-- 사용자 정의5 값 -->
+		</collection>
+	</resultMap>
+
+	<select id="listCodeAll" resultMap="listCodeAllMap">
+		SELECT	/* QUERYID(bizCommon.listCodeAll) */
+				A.GRP_CD			/* 그룹 코드 */
+				, A.GRP_NM			/* 그룹 명 */
+				, A.USR_DFN1_NM		/* 사용자 정의1 명 */
+				, A.USR_DFN2_NM		/* 사용자 정의2 명 */
+				, A.USR_DFN3_NM		/* 사용자 정의3 명 */
+				, A.USR_DFN4_NM		/* 사용자 정의4 명 */
+				, A.USR_DFN5_NM		/* 사용자 정의5 명 */
+				, B.DTL_CD			/* 상세 코드 */
+				, B.DTL_NM			/* 상세 명 */
+				, B.DTL_SHT_NM		/* 상세 약어 명 */
+				, B.SORT_SEQ		/* 정렬 순서 */
+				, B.USE_YN			/* 사용 여부 */
+				, B.USR_DFN1_VAL	/* 사용자 정의1 값 */
+				, B.USR_DFN2_VAL	/* 사용자 정의2 값 */
+				, B.USR_DFN3_VAL	/* 사용자 정의3 값 */
+				, B.USR_DFN4_VAL	/* 사용자 정의4 값 */
+				, B.USR_DFN5_VAL	/* 사용자 정의5 값 */
+		FROM	code_group A
+				, code_detail B
+		WHERE	1=1
+		AND		A.GRP_CD = B.GRP_CD
+		AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		AND		B.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		ORDER BY A.GRP_CD, B.SORT_SEQ
+	</select>
+
+	<select id="getSequence" resultType="Long">
+		SELECT FN_GET_SEQ (#{sequence }) FROM DUAL
+	</select>
+
+	<select id="listAttachFile" resultType="biz.common.model.AttachFileVO">
+		<!--
+			Query Name : bizCommon.listAttachFile
+			Description : listAttachFile
+		-->
+		SELECT	/* QUERYID(bizCommon.listAttachFile) */
+				  FL_NO				/* 파일 번호 */
+				, SEQ				/* 순번 */
+				, PHY_PATH			/* 물리 경로 */
+				, ORG_FL_NM			/* 원 파일 명 */
+				, FL_SZ				/* 파일 크기 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_DEL_YN		/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		/* 시스템 삭제 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		FROM	ATTACH_FILE
+		WHERE	FL_NO = #{flNo}
+		AND		SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+
+	<insert id="insertAttachFile" parameterType="biz.common.model.AttachFilePO">
+		<!--
+			Query Name : bizCommon.insertAttachFile
+			Description : insertAttachFile
+		-->
+		<selectKey keyProperty="seq" resultType="java.lang.Long" order="BEFORE">
+			SELECT	IFNULL(MAX(SEQ), 0) +1 AS SEQ
+			FROM	ATTACH_FILE
+			WHERE	FL_NO = #{flNo}
+		</selectKey>
+		INSERT INTO ATTACH_FILE (
+			  FL_NO				/* 파일 번호 */
+			, SEQ				/* 순번 */
+			, PHY_PATH			/* 물리 경로 */
+			, ORG_FL_NM			/* 원 파일 명 */
+			, FL_SZ				/* 파일 크기 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_DEL_YN		/* 시스템 삭제 여부 */
+		) VALUES (
+			  #{flNo}			/* 파일 번호 */
+			, #{seq}			/* 순번 */
+			, #{phyPath}		/* 물리 경로 */
+			, #{orgFlNm}		/* 원 파일 명 */
+			, #{flSz}			/* 파일 크기 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		)
+	</insert>
+
+	<update id="deleteAttachFile" parameterType="biz.common.model.AttachFilePO">
+		UPDATE	ATTACH_FILE SET
+				SYS_DEL_YN		= '${@framework.common.constants.CommonConstants@DEL_YN_Y}'		/* 시스템 삭제 여부 */
+				, SYS_DELR_NO	= #{sysDelrNo}		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM	= NOW()				/* 시스템 삭제 일시 */
+		WHERE	FL_NO			= #{flNo}
+		AND		SEQ				= #{seq}
+	</update>
+
+	<delete id="initInterestTag">
+		DELETE FROM MBR_TAG_MAP WHERE TAG_NO NOT IN (
+		    	SELECT DTL_CD
+		    	FROM CODE_DETAIL
+		      	WHERE GRP_CD = '${@framework.common.constants.CommonConstants@INT_TAG_INFO_CD}'
+				AND USE_YN =  '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+			  	AND SYS_DEL_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		 )
+	</delete>
+</mapper>

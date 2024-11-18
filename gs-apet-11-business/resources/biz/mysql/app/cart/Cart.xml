@@ -1,0 +1,1245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cart">
+
+	<select id="listCart" resultType="biz.app.cart.model.CartVO">
+		<!--
+			Query Name : cart.listCart
+			Description : 장바구니 목록
+		-->
+		SELECT	/* QUERYID(cart.listCart) */
+			  CT.CART_ID				/* 장바구니 아이디 */
+			, CT.ST_ID					/* 사이트 ID */
+			, CT.MBR_NO				/* 회원 번호 */
+			, CT.GOODS_ID				/* 상품 아이디 */
+			, CT.ITEM_NO				/* 단품 번호 */
+			, CT.BUY_QTY				/* 구매 수량 */
+			, CT.NOW_BUY_YN			/* 바로 구매 여부 */
+			, CT.SSN_ID				/* 세션 아이디 */
+			, CT.PAK_GOODS_ID			/* 묶음 상품 번호 */
+			, GB.GOODS_CSTRT_TP_CD  	/* 상품 구성 유형 코드 */  
+			, CT.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, CT.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, CT.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, CT.SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM
+			cart CT
+  INNER JOIN GOODS_BASE GB
+  		  ON GB.GOODS_ID = CT.GOODS_ID
+		WHERE	1=1
+		<if test='stId != null and stId != ""'>
+			AND CT.ST_ID = #{stId}
+		</if>
+		<if test='ssnId != null and ssnId != ""'>
+			AND CT.SSN_ID = #{ssnId}
+		</if>
+		<if test='nowBuyYn != null and nowBuyYn != ""'>
+			AND CT.NOW_BUY_YN = #{nowBuyYn}
+		</if>
+		<if test='cartIds != null'>
+			AND CT.CART_ID IN (
+				<foreach item="cartId" separator="," collection="cartIds" >
+				#{cartId}
+				</foreach>
+			)
+		</if>
+	</select>
+
+
+	<resultMap type="biz.app.cart.model.CartGoodsVO" id="cartGoodsListMap">
+		<id     property="cartId"			column="CART_ID"/>
+		<result property="stId"				column="ST_ID"/>
+		<result property="mbrNo"			column="MBR_NO"/>
+		<result property="goodsId"			column="GOODS_ID"/>
+		<result property="goodsNm"			column="GOODS_NM"/>
+		<result property="optGoodsNm"		column="OPT_GOODS_NM"/>
+		<result property="compGoodsId"		column="COMP_GOODS_ID"/>
+		<result property="itemNo"			column="ITEM_NO"/>
+		<result property="itemNm"			column="ITEM_NM"/>
+		<result property="compItemId"		column="COMP_ITEM_ID"/>
+		<result property="buyQty"			column="BUY_QTY"/>
+		<result property="ssnId"			column="SSN_ID"/>
+		<result property="pakGoodsId"		column="PAK_GOODS_ID"/>
+		<result property="goodsCstrtTpCd"	column="GOODS_CSTRT_TP_CD"/>
+		<result property="goodsPickYn"		column="GOODS_PICK_YN"/>
+		<result property="mkiGoodsOptContent"	column="MKI_GOODS_OPT_CONTENT"/>
+		<result property="mkiGoodsYn"		column="MKI_GOODS_YN"/>
+		<result property="goodsCmsRate"		column="GOODS_CMS_RATE"/>
+		<result property="imgSeq"			column="IMG_SEQ"/>
+		<result property="imgPath"			column="IMG_PATH"/>
+		<result property="dispClsfNo"		column="DISP_CLSF_NO"/>
+		<result property="minOrdQty"		column="MIN_ORD_QTY"/>
+		<result property="maxOrdQty"		column="MAX_ORD_QTY"/>
+		<result property="webStkQty"		column="WEB_STK_QTY"/>
+		<result property="stkMngYn"			column="STK_MNG_YN"/>
+		<result property="itemMngYn"		column="ITEM_MNG_YN"/>
+		<result property="freeDlvrYn"		column="FREE_DLVR_YN"/>
+		<result property="dlvrcPayMtdCd"	column="DLVRC_PAY_MTD_CD"/>
+		<result property="dlvrcStdCd"		column="DLVRC_STD_CD"/>
+		<result property="dlvrcCdtStdCd"	column="DLVRC_CDT_STD_CD"/>
+		<result property="dlvrcDlvrAmt"		column="DLVRC_DLVR_AMT"/>
+		<result property="dlvrcAddDlvrAmt"	column="DLVRC_ADD_DLVR_AMT"/>
+		<result property="dlvrcBuyQty"		column="DLVRC_BUY_QTY"/>
+		<result property="dlvrcBuyPrc"		column="DLVRC_BUY_PRC"/>
+		<result property="dlvrcPlcNo"		column="DLVRC_PLC_NO"/>
+		<result property="dlvrcCdtCd"		column="DLVRC_CDT_CD"/>
+		<result property="bndNo"			column="BND_NO"/>
+		<result property="bndNmKo"			column="BND_NM_KO"/>
+		<result property="taxGbCd"			column="TAX_GB_CD" />
+		<result property="mdUsrNo"			column="MD_USR_NO" />
+		<result property="compNo"			column="COMP_NO"/>
+		<result property="compNm"			column="COMP_NM"/>
+		<result property="compGbCd"			column="COMP_GB_CD"/>
+		<result property="compTpCd"			column="COMP_TP_CD"/>
+		<result property="upCompNo"			column="UP_COMP_NO"/>
+		<result property="salePrc"			column="SALE_PRC"/>
+		<result property="prmtDcPrc"		column="PRMT_DC_PRC"/>
+		<result property="prmtNo"			column="PRMT_NO"/>
+		<result property="prmtCompDvdRate"	column="PRMT_COMP_DVD_RATE"/>
+		<result property="prmtDcAmt"		column="PRMT_DC_AMT"/>
+		<result property="orgSalePrc"		column="ORG_SALE_PRC"/>
+		<result property="goodsAmtTpCd"		column="GOODS_AMT_TP_CD"/>
+		<result property="goodsPrcNo"		column="GOODS_PRC_NO"/>
+		<result property="addSaleAmt"		column="ADD_SALE_AMT"/>
+		<result property="salePsbCd"		column="SALE_PSB_CD"/>
+		<result property="totalSalePsbCd"	column="TOTAL_SALE_PSB_CD"/>
+		<result property="buyAmt"			column="BUY_AMT"/>
+		<result property="ioAlmYn"			column="IO_ALM_YN"/>
+		<result property="stkQty"			column="STK_QTY"/>
+		<collection property="freebieList" column="{goodsId=GOODS_ID}" javaType="java.util.ArrayList" ofType="biz.app.cart.model.CartGoodsVO$Freebie" select="cart.listFreebie"/>
+		<collection property="couponList" column="{goodsId=GOODS_ID, mbrNo=MBR_NO, webMobileGbCd=WEB_MOBILE_GB_CD, salePsbCd=SALE_PSB_CD, sysRegDtm=SYS_REG_DTM, buyAmt=BUY_AMT}" javaType="java.util.ArrayList" ofType="biz.app.cart.model.CartGoodsVO$Coupon" select="cart.listCoupon"/>
+		<collection property="goodsOptList" column="{goodsId=GOODS_ID, pakGoodsId=PAK_GOODS_ID}" javaType="java.util.ArrayList" ofType="biz.app.cart.model.CartGoodsVO$GoodsOpt" select="cart.listGoodsOpt"/>
+		<collection property="totalSalePsbCdList" column="{goodsId=GOODS_ID}" javaType="java.util.ArrayList" ofType="biz.app.cart.model.CartGoodsVO" select="cart.listCartValidGoods"/>
+	</resultMap>
+
+	<select id="listCartGoods" resultMap="cartGoodsListMap">
+		<!--
+			Query Name : cart.listCartGoods
+			Description : 장바구니 목록 (회원 또는 비회원)
+			-->
+		SELECT T4.* /* QUERYID(cart.listCartGoods) */
+		  FROM (
+			SELECT	T3.CART_ID								/* 장바구니 아이디 */
+				, T3.ST_ID									/* 사이트 아이디 */
+				, T3.MBR_NO									/* 회원 번호 */
+				, T3.GOODS_ID								/* 상품 아이디 */
+				, T3.GOODS_NM								/* 상품 명 */
+				, T3.OPT_GOODS_NM							/* 묶음옵션 상품명 */
+				, T3.COMP_GOODS_ID							/* 업체 상품 아이디 */
+				, T3.ITEM_NO								/* 단품 번호 */
+				, T3.ITEM_NM								/* 단품 명 */
+				, T3.COMP_ITEM_ID							/* 업체 단품 아이디 */
+				, T3.BUY_QTY								/* 구매 수량 */
+				, T3.SSN_ID									/* 세션 아이디(비회원) */
+				, T3.PAK_GOODS_ID							/* 묶음 상품 아이디 */
+				, T3.GOODS_CSTRT_TP_CD						/* 구성 상품 유형 코드 */
+				, T3.SYS_REG_DTM
+				, T3.GOODS_PICK_YN							/* 상품 선택 여부 */
+				, T3.MKI_GOODS_OPT_CONTENT					/* 제작 상품 옵션 내용 */	
+				, T3.MKI_GOODS_YN							/* 제작 상품 여부 */
+				, FN_GET_GOODS_CMS_RATE(T3.GOODS_ID, #{stId}) AS GOODS_CMS_RATE		/* 상품 수수료 율 */
+				, (SELECT IMG_SEQ FROM goods_img WHERE GOODS_ID = T3.GOODS_ID AND DLGT_YN = 'Y' LIMIT 1) AS IMG_SEQ		/* 상품 대표이미지 순번 */
+				, (SELECT IMG_PATH FROM goods_img WHERE GOODS_ID = T3.GOODS_ID AND DLGT_YN = 'Y' LIMIT 1) AS IMG_PATH	/* 상품 대표이미지 경로 */
+				, (SELECT DISP_CLSF_NO FROM display_goods WHERE DLGT_DISP_YN ='Y' AND GOODS_ID = T3.GOODS_ID LIMIT 1) AS DISP_CLSF_NO	/* 대표 전시 번호 */
+				, T3.MIN_ORD_QTY							/* 상품 최소 구매 수량 */
+				, T3.MAX_ORD_QTY							/* 상품 최대 구매 수량 */
+				, T3.WEB_STK_QTY							/* 웹 재고 수량 */
+				, T3.STK_MNG_YN								/* 재고 관리 여부 */
+				, T3.ITEM_MNG_YN							/* 단품 관리 여부 */
+				, T3.FREE_DLVR_YN							/* 무료 배송 여부 */
+				, T3.DLVRC_PAY_MTD_CD						/* 배송비 결제 방법 코드 */
+				, T3.DLVRC_STD_CD							/* 배송비 기준 코드 */
+				, T3.DLVRC_CDT_STD_CD						/* 배송비 조건 기준 코드 */
+				, T3.DLVR_AMT AS DLVRC_DLVR_AMT				/* 배송비 금액 */
+				, T3.ADD_DLVR_AMT AS DLVRC_ADD_DLVR_AMT		/* 배송비 추가 금액 */
+				, T3.DLVRC_BUY_QTY							/* 배송비 구매 수량 */
+				, T3.DLVRC_BUY_PRC							/* 배송비 구매 금액 */
+				, T3.DLVRC_PLC_NO							/* 배송비 정책 번호 */
+				, T3.DLVRC_CDT_CD							/* 배송비 조건 코드 */
+				, T3.BND_NO									/* 브랜드 번호 */
+				, T3.TAX_GB_CD								/* 과세 구분 코드 */
+				, T3.MD_USR_NO								/* MD 사용자 번호 */
+				, T3.IO_ALM_YN								/* 재입고 알람 여부 */
+				, FN_GET_BRAND_NAME_KO(T3.BND_NO) AS BND_NM_KO		/* 브랜드 명 (국문) */
+				, T3.COMP_NO								/* 업체 번호 */
+				, T3.COMP_NM								/* 업체 명 */
+				, T3.COMP_GB_CD								/* 업체 구분 코드 */
+		        , T3.COMP_TP_CD								/* 업체 유형 코드 */
+				, T3.UP_COMP_NO								/* 상위 업체 번호 */
+				, T3.SALE_PRC + T3.ADD_SALE_AMT AS SALE_PRC	/* 상품 판매가 */
+				, T3.PRMT_NO								/* 프로모션 번호 */
+				, (SELECT SPL_COMP_DVD_RATE FROM promotion_base WHERE PRMT_NO = T3.PRMT_NO) AS PRMT_COMP_DVD_RATE		/* 프로모션 업체 분담 비율 */
+				, T3.PRMT_DC_AMT							/* 프로모션 할인 금액 : 개별 */
+				, T3.SALE_PRC + T3.ADD_SALE_AMT - T3.PRMT_DC_AMT AS PRMT_DC_PRC
+				, (T3.SALE_PRC + T3.ADD_SALE_AMT - T3.PRMT_DC_AMT) * T3.BUY_QTY AS BUY_AMT		/* 총 구매 금액 */
+				, T3.GOODS_AMT_TP_CD						/* 상품 금액 유형 코드 */
+				, T3.GOODS_PRC_NO							/* 상품 가격 번호 */
+				, T3.ORG_SALE_PRC							/* 원 판매금액 */
+				, T3.ADD_SALE_AMT							/* 단품 추가 금액 */
+				, T3.STK_QTY
+				, CASE
+					WHEN T3.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T3.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T3.SALE_END_DTM <![CDATA[>=]]> SYSDATE() ) 
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_10}'      /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */
+                    WHEN T3.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T3.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T3.SALE_END_DTM <![CDATA[<]]> SYSDATE())
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_20}'      /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */   
+					WHEN T3.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+					WHEN T3.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T3.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN T3.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+					WHEN T3.BND_SHOW_YN is null OR T3.BND_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				        THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'   /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */	
+					WHEN T3.STK_QTY <![CDATA[<=]]> 0 
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+				  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+				, #{webMobileGbCd} AS WEB_MOBILE_GB_CD
+				, (
+					SELECT 
+						REPLACE(FN_GET_DISP_CTG_PATH(S.DISP_CLSF_NO), '>', '/')
+					FROM	DISPLAY_GOODS S
+					INNER 	JOIN DISPLAY_CATEGORY DC ON(DC.DISP_CLSF_NO=S.DISP_CLSF_NO) 
+					WHERE 	S.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					AND   	S.GOODS_ID = T3.GOODS_ID LIMIT 1
+					) AS DISP_CTG_PATH
+			FROM (
+				SELECT
+					  T2.CART_ID
+					, T2.ST_ID
+					, T2.MBR_NO
+					, T2.GOODS_ID
+					, T2.ITEM_NO
+					, T2.BUY_QTY
+					, T2.SSN_ID
+					, T2.PAK_GOODS_ID
+					, T2.GOODS_CSTRT_TP_CD
+					, T2.SYS_REG_DTM
+					, T2.GOODS_PICK_YN
+					, T2.MKI_GOODS_OPT_CONTENT
+					, T2.MKI_GOODS_YN
+					, CASE WHEN T2.PAK_GOODS_ID IS NULL
+						   THEN T2.GOODS_NM
+						   ELSE T2.PAK_GOODS_NM
+					   END AS GOODS_NM
+				    , CASE WHEN T2.GOODS_CSTRT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_PAK}'
+						   THEN T2.GOODS_NM
+						   ELSE NULL
+					   END AS OPT_GOODS_NM
+					, T2.GOODS_STAT_CD
+					, T2.MIN_ORD_QTY
+					, T2.MAX_ORD_QTY
+					, T2.FREE_DLVR_YN
+					, T2.COMP_NO
+					, T2.COMP_GOODS_ID
+					, T2.COMP_NM
+					, T2.COMP_GB_CD
+					, T2.COMP_TP_CD
+					, T2.UP_COMP_NO
+					, T2.BND_NO
+					, T2.BND_SHOW_YN
+					, T2.STK_MNG_YN
+					, T2.ITEM_MNG_YN
+					, T2.SALE_STRT_DTM
+					, T2.SALE_END_DTM
+					, T2.DLVRC_PLC_NO
+					, T2.TAX_GB_CD
+					, T2.MD_USR_NO
+					, T2.IO_ALM_YN
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_PRC
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 2) AS UNSIGNED) AS PRMT_NO
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) AS PRMT_DC_AMT
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 6) AS UNSIGNED) AS GOODS_AMT_TP_CD
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_PRC
+					, CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 9) AS UNSIGNED) AS GOODS_PRC_NO
+					, T2.ADD_SALE_AMT
+					, T2.ITEM_NM
+					, T2.COMP_ITEM_ID
+					, T2.ITEM_STAT_CD
+					, T2.WEB_STK_QTY
+					, T2.DLVRC_PAY_MTD_CD
+					, T2.DLVRC_STD_CD
+					, T2.DLVRC_CDT_STD_CD
+					, IFNULL(T2.DLVR_AMT, 0) AS DLVR_AMT
+					, IFNULL(T2.ADD_DLVR_AMT, 0) AS ADD_DLVR_AMT
+					, IFNULL(T2.DLVRC_BUY_QTY, 0) AS DLVRC_BUY_QTY
+					, IFNULL(T2.DLVRC_BUY_PRC, 0) AS DLVRC_BUY_PRC
+					, T2.DLVRC_CDT_CD
+					, FN_GET_GOODS_STOCK(T2.GOODS_ID, T2.ITEM_NO) AS STK_QTY
+				FROM (
+					SELECT
+						  CT.CART_ID
+						, CT.ST_ID
+						, CT.MBR_NO
+						, CT.GOODS_ID
+						, CT.ITEM_NO
+						, CT.BUY_QTY
+						, CT.SSN_ID
+						, CT.PAK_GOODS_ID
+						, CASE WHEN PAK_GOODS_ID IS NULL
+							   THEN GB.GOODS_CSTRT_TP_CD
+							   ELSE (SELECT GOODS_CSTRT_TP_CD FROM GOODS_BASE WHERE GOODS_ID = CT.PAK_GOODS_ID)
+						   END AS GOODS_CSTRT_TP_CD
+						, CT.GOODS_PICK_YN
+						, CT.MKI_GOODS_OPT_CONTENT
+						, CT.MKI_GOODS_YN
+						, CT.SYS_REG_DTM
+						, GB.GOODS_NM
+						, (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = CT.PAK_GOODS_ID) AS PAK_GOODS_NM
+						, GB.GOODS_STAT_CD
+						, GB.MIN_ORD_QTY
+						, GB.MAX_ORD_QTY
+						, GB.FREE_DLVR_YN
+						, GB.COMP_NO
+						, GB.COMP_GOODS_ID
+						, CB.COMP_NM
+						, CB.COMP_GB_CD
+						, CB.COMP_TP_CD
+						, CB.UP_COMP_NO
+						, GB.BND_NO
+						, GB.STK_MNG_YN
+						, GB.ITEM_MNG_YN
+						, GB.SALE_STRT_DTM
+						, GB.SALE_END_DTM
+						, GB.DLVRC_PLC_NO
+						, GB.TAX_GB_CD
+						, GB.MD_USR_NO
+						, GB.IO_ALM_YN
+						, FN_GET_GOODS_PRICE(CT.GOODS_ID, CT.ST_ID, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+						, IFNULL(IM.ADD_SALE_AMT, 0) AS ADD_SALE_AMT
+						, IM.ITEM_NM
+						, IM.COMP_ITEM_ID
+						, IM.ITEM_STAT_CD
+						, IM.WEB_STK_QTY
+						, DCP.DLVRC_PAY_MTD_CD
+						, DCP.DLVRC_STD_CD
+						, DCP.DLVRC_CDT_STD_CD
+						, DCP.DLVR_AMT
+						, DCP.ADD_DLVR_AMT
+						, DCP.BUY_QTY AS DLVRC_BUY_QTY
+						, DCP.BUY_PRC AS DLVRC_BUY_PRC
+						, DCP.DLVRC_CDT_CD
+						, BB.BND_SHOW_YN
+					FROM
+						 cart CT
+						,goods_base GB
+						,brand_base BB
+						,item IM
+						,company_base CB
+						,delivery_charge_policy DCP
+					WHERE
+						CT.GOODS_ID = GB.GOODS_ID
+						AND GB.DLVRC_PLC_NO = DCP.DLVRC_PLC_NO
+						AND GB.COMP_NO = CB.COMP_NO
+						AND GB.BND_NO = BB.BND_NO
+						AND CT.ITEM_NO = IM.ITEM_NO
+						AND CT.ST_ID = #{stId}
+						<if test='mbrNo != null'>
+						AND CT.MBR_NO = #{mbrNo}
+						</if>
+						<if test='ssnId != null and ssnId != ""'>
+						AND CT.SSN_ID = #{ssnId}
+						</if>
+						<if test='nowBuyYn != null and nowBuyYn != ""'>
+						AND CT.NOW_BUY_YN = #{nowBuyYn}
+						</if>
+						<if test='cartIds != null'>
+						AND CT.CART_ID IN (
+							<foreach item="cartId" separator="," collection="cartIds" >
+							#{cartId}
+							</foreach>
+						)
+						</if>
+						ORDER BY CT.SYS_REG_DTM
+					) T2
+				) T3
+			)T4
+		<choose>
+			<when test='isMiniCart != null and isMiniCart'>
+				<!-- 미니 장바구니는 배송비 계산안함. -->
+				WHERE T4.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_00}'
+				ORDER BY T4.SYS_REG_DTM DESC
+			</when>
+			<otherwise>
+				ORDER BY T4.COMP_NO, T4.DLVRC_PLC_NO, T4.SYS_REG_DTM DESC, T4.GOODS_ID ASC, T4.ITEM_NO ASC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="getCart" resultType="biz.app.cart.model.CartVO">
+		<!--
+			Query Name : cart.getCart
+			Description : 장바구니 단건 조회
+		-->
+		SELECT	/* QUERYID(cart.getCart) */
+			  CT.CART_ID			/* 장바구니 아이디 */
+			, CT.ST_ID				/* 사이트 아이디 */
+			, CT.MBR_NO				/* 회원 번호 */
+			, CT.GOODS_ID			/* 상품 아이디 */
+			, CT.ITEM_NO			/* 단품 번호 */
+			, CT.BUY_QTY			/* 구매 수량 */
+			, CT.NOW_BUY_YN			/* 바로 구매 여부 */
+			, CT.SSN_ID				/* 세션 아이디(비회원) */
+			, GB.STK_MNG_YN			/* 재고 관리 여부 */
+			, GB.MIN_ORD_QTY		/* 상품 최소 구매 수량 */
+			, GB.MAX_ORD_QTY		/* 상품 최대 구매 수량 */
+			, IT.WEB_STK_QTY		/* 웹 재고 수량 */
+			, CT.PAK_GOODS_ID		/* 묶음 상품 번호 */
+			, CT.MKI_GOODS_OPT_CONTENT	/* 제작 상품 옵션 내용 */	
+			, CT.MKI_GOODS_YN		/* 제작 상품 여부 */
+			, CT.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CT.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CT.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CT.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM
+			 cart CT
+			,goods_base GB
+			,item IT
+		WHERE
+			CT.GOODS_ID = GB.GOODS_ID
+			AND CT.ITEM_NO = IT.ITEM_NO
+			<if test='stId != null'>
+			AND CT.ST_ID = #{stId}
+			</if>
+			<if test='cartId != null and cartId != ""'>
+			AND CT.CART_ID = #{cartId}
+			</if>
+			<if test='mbrNo != null'>
+			AND CT.MBR_NO = #{mbrNo}
+			</if>
+			<if test='goodsId != null and goodsId != ""'>
+			AND CT.GOODS_ID = #{goodsId}
+			</if>
+			<if test='itemNo != null'>
+			AND CT.ITEM_NO = #{itemNo}
+			</if>
+			<if test='ssnId != null and ssnId != ""'>
+			AND CT.SSN_ID = #{ssnId}
+			</if>
+			<if test='nowBuyYn != null and nowBuyYn != ""'>
+			AND CT.NOW_BUY_YN = #{nowBuyYn}
+			</if>
+			<choose>
+				<when test='pakGoodsId != null and pakGoodsId != ""'>
+					AND CT.PAK_GOODS_ID = #{pakGoodsId}
+				</when>
+				<otherwise>
+					AND CT.PAK_GOODS_ID IS NULL
+				</otherwise>
+			</choose>
+	</select>
+
+
+	<insert id="insertCart">
+		<!--
+			Query Name : cart.insertCart
+			Description : 장바구니 등록
+		-->
+		INSERT INTO cart (	/* QUERYID(cart.insertCart) */
+			  CART_ID				/* 장바구니 아이디 */
+			, ST_ID					/* 사이트 아이디 */
+			, MBR_NO				/* 회원 번호 */
+			, GOODS_ID				/* 상품 아이디 */
+			, ITEM_NO				/* 단품 번호 */
+			, BUY_QTY				/* 구매 수량 */
+			, NOW_BUY_YN			/* 바로 구매 여부 */
+			<if test='ssnId != null and ssnId != ""'>
+			, SSN_ID				/* 세션 아이디(비회원) */
+			</if>
+			, PAK_GOODS_ID			/* 묶음 상품 번호 */
+			, MKI_GOODS_YN			/* 제작 상품 여부 */
+			, MKI_GOODS_OPT_CONTENT /* 제작 상품 옵션 내용 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{cartId}
+			, #{stId}
+			, IFNULL(#{mbrNo}, 0)
+			, #{goodsId}
+			, #{itemNo}
+			, #{buyQty}
+			, #{nowBuyYn}
+			<if test='ssnId != null and ssnId != ""'>
+			, #{ssnId}
+			</if>
+			, #{pakGoodsId}			/* 묶음 상품 번호 */
+			, IFNULL(#{mkiGoodsYn}, 'N')	/* 제작 상품 여부 */
+			, #{mkiGoodsOptContent} /* 제작 상품 옵션 내용 */
+			, #{sysRegrNo}
+			, SYSDATE()
+			, #{sysUpdrNo}
+			, SYSDATE()
+		)
+	</insert>
+
+
+	<update id="updateCartInfo">
+		<!--
+			Query Name : cart.updateCartInfo
+			Description : 장바구니 정보 수정(비회원 > 회원)
+		-->
+		UPDATE	cart	/* QUERYID(cart.updateCartInfo) */
+		SET
+			  MBR_NO		= #{mbrNo}
+			, SSN_ID 		= null
+			, SYS_UPDR_NO	= #{sysUpdrNo}
+			, SYS_UPD_DTM	= SYSDATE()
+		WHERE	1=1
+			<if test='stId != null and stId != ""'>
+			AND ST_ID = #{stId}
+			</if>
+			<if test='ssnId != null and ssnId != ""'>
+			AND SSN_ID = #{ssnId}
+			</if>
+			<if test='nowBuyYn != null and nowBuyYn != ""'>
+			AND NOW_BUY_YN = #{nowBuyYn}
+			</if>
+			<if test='cartId != null and cartId != ""'>
+			AND CART_ID = #{cartId}
+			</if>
+	</update>
+
+
+	<delete id="deleteCart">
+		<!--
+			Query Name : cart.deleteCart
+			Description : 장바구니 삭제
+		-->
+		DELETE	/* QUERYID(cart.deleteCart) */
+		FROM	cart
+		WHERE	1=1
+			<if test='cartId != null and cartId != ""'>
+			AND CART_ID = #{cartId}
+			</if>
+			<if test='stId != null and stId != ""'>
+			AND ST_ID = #{stId}
+			</if>
+			<if test='ssnId != null and ssnId != ""'>
+			AND SSN_ID = #{ssnId}
+			</if>
+			<if test='nowBuyYn != null and nowBuyYn != ""'>
+			AND NOW_BUY_YN = #{nowBuyYn}
+			</if>
+			<if test='mbrNo != null'>
+			AND MBR_NO = #{mbrNo}
+			</if>
+			<if test='mbrYn != null and mbrYn != ""'>
+				<if test='mbrYn == "Y"'>
+				AND MBR_NO IS NOT NULL
+				AND SSN_ID IS NULL
+				</if>
+				<if test='mbrYn == "N"'>
+				AND MBR_NO IS NULL
+				AND	SSN_ID IS NOT NULL
+				</if>
+			</if>
+			<if test='strgPeriod != null'>
+			AND DATE_ADD(SYS_REG_DTM, INTERVAL #{strgPeriod} DAY) <![CDATA[<]]> NOW()
+			</if>
+	</delete>
+
+	
+	<update id="updateCartBuyQtyAndCheckYn">
+		<!--
+			Query Name : cart.updateCartBuyQtyAndCheckYn
+			Description : 장바구니 수량, 체크 여부 저장
+		-->
+		UPDATE	cart	/* QUERYID(cart.updateCartBuyQtyAndCheckYn) */
+		SET
+			  BUY_QTY		= #{buyQty}
+			, GOODS_PICK_YN = #{goodsPickYn}
+			, SYS_UPDR_NO	= #{sysUpdrNo} 
+			, SYS_UPD_DTM	= SYSDATE()
+		WHERE
+			CART_ID = #{cartId}
+	</update>
+	
+	<update id="updateCartBuyQty">
+		<!--
+			Query Name : cart.updateCartBuyQty
+			Description : 장바구니 수량 변경
+		-->
+		UPDATE	cart	/* QUERYID(cart.updateCartBuyQty) */
+		SET
+			  BUY_QTY		= #{buyQty}
+			, SYS_UPDR_NO	= #{sysUpdrNo}
+			, SYS_UPD_DTM	= SYSDATE()
+		WHERE
+			CART_ID = #{cartId}
+			AND ST_ID = #{stId}
+	</update>
+
+
+	<update id="updateCartOption">
+		<!--
+			Query Name : cart.updateCartOption
+			Description : 장바구니 옵션 변경
+		-->
+		UPDATE 	cart	/* QUERYID(cart.updateCartOption) */
+		SET
+			  ITEM_NO		= #{itemNo}
+			, SYS_UPDR_NO	= #{sysUpdrNo}
+			, SYS_UPD_DTM	= SYSDATE()
+		WHERE
+			CART_ID = #{cartId}
+			AND ST_ID = #{stId}
+	</update>
+
+
+	<select id="getCartCnt" resultType="Integer">
+		<!--
+			Query Name : cart.getCartCnt
+			Description : 장바구니(일반) 상품 수 조회
+		-->
+		SELECT	/* QUERYID(cart.getCartCnt) */
+			COUNT(A1.CART_ID)
+		FROM cart A1
+			 ,goods_base GB
+			 ,item IM
+			 ,company_base CB
+			 ,delivery_charge_policy DCP
+		WHERE
+			A1.GOODS_ID = GB.GOODS_ID
+		AND GB.DLVRC_PLC_NO = DCP.DLVRC_PLC_NO
+		AND GB.COMP_NO = CB.COMP_NO
+		AND A1.ITEM_NO = IM.ITEM_NO
+		AND	A1.ST_ID = #{stId}
+		AND A1.NOW_BUY_YN = 'N'
+		<if test='mbrNo != null and mbrNo != ""'>
+		AND A1.MBR_NO = #{mbrNo}
+		</if>
+		<if test='ssnId != null and ssnId != ""'>
+		AND A1.SSN_ID = #{ssnId}
+		</if>
+	</select>
+
+	<select id="listCartCoupon" resultType="biz.app.cart.model.CartCouponVO">
+		<!--
+			Query Name : cart.listCartCoupon
+			Description : 장바구니에 적용 가능한 장바구니 쿠폰 목록 조회
+		-->
+		SELECT	/* QUERYID(cart.listCartCoupon) */
+			  CBI.CP_NO
+			, CBI.CP_NM
+			, CBI.CP_KIND_CD
+			, CBI.CP_APL_CD
+			, CBI.APL_VAL
+			, CBI.MIN_BUY_AMT
+			, CBI.MAX_DC_AMT
+			, CBI.MBR_CP_NO
+			, IFNULL(RVS_MRG_PMT_YN,'N') AS RVS_MRG_PMT_YN
+			, CBI.DUPLE_USE_YN
+			, CBI.NOTICE
+			, CBI.LEFT_SECONDS
+			, CBI.APL_DC_AMT
+		FROM (
+			SELECT
+				  CB.CP_NO
+				, CB.CP_NM
+				, CB.CP_KIND_CD
+				, CB.CP_APL_CD
+				, CB.APL_VAL
+				, IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+				, CB.MAX_DC_AMT
+				, MC.MBR_CP_NO
+				, CB.RVS_MRG_PMT_YN
+				, CB.DUPLE_USE_YN
+				, CB.NOTICE
+				, TIMESTAMPDIFF(SECOND, NOW(), MC.USE_END_DTM) AS LEFT_SECONDS
+				, CASE WHEN CB.CP_APL_CD = '10' AND CB.MAX_DC_AMT = 0 THEN 
+					CEILING(#{totGoodsAmt} * (CB.APL_VAL/100) / 10) * 10
+				  WHEN CB.CP_APL_CD = '10' AND CB.MAX_DC_AMT > 0 THEN
+				  	IF(CEILING(#{totGoodsAmt} * (CB.APL_VAL/100) / 10 ) * 10 >= CB.MAX_DC_AMT, CB.MAX_DC_AMT, CEILING(#{totGoodsAmt} * (CB.APL_VAL/100) / 10) * 10 )
+				  ELSE 
+					CEILING(CB.APL_VAL / 10 ) * 10
+				END AS APL_DC_AMT
+			FROM
+				coupon_base CB
+				,member_coupon MC
+			WHERE
+				CB.CP_NO = MC.CP_NO
+				AND CB.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}', #{webMobileGbCd})
+				AND CB.CP_KIND_CD = '${@framework.common.constants.CommonConstants@CP_KIND_20}'
+				AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+				AND MC.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				AND MC.MBR_NO = #{mbrNo}
+				AND NOW() BETWEEN MC.USE_STRT_DTM AND MC.USE_END_DTM
+				-- AND NOW() BETWEEN CB.APL_STRT_DTM AND CB.APL_END_DTM
+<if test='cartSelMbrCpNo != null'>
+			AND MC.MBR_CP_NO = #{cartSelMbrCpNo}
+</if>				
+		) CBI
+		WHERE 1=1
+		  AND CBI.MIN_BUY_AMT <![CDATA[<=]]> #{totGoodsAmt}
+		  AND CBI.APL_DC_AMT  <![CDATA[<=]]> #{totGoodsAmt}
+		ORDER BY APL_DC_AMT DESC, CBI.LEFT_SECONDS, CBI.CP_NO
+	</select>
+
+
+	<resultMap type="biz.app.cart.model.CartCouponDlvrcVO" id="cartCouponDlvrcMap">
+		<result property="dlvrcPlcNo"	column="DLVRC_PLC_NO"/>
+		<result property="compNo"		column="COMP_NO"/>
+		<result property="compGbCd"		column="COMP_GB_CD"/>
+		<result property="compNm"		column="COMP_NM"/>
+		<collection property="couponList" ofType="biz.app.cart.model.CartCouponDlvrcVO$Coupon">
+			<id 	property="cpNo"			column="CP_NO"/>
+			<result property="cpNm"			column="CP_NM"/>
+			<result property="cpAplCd"		column="CP_APL_CD"/>
+			<result property="aplVal"		column="APL_VAL"/>
+			<result property="mbrCpNo"		column="MBR_CP_NO"/>
+			<result property="minBuyAmt"	column="MIN_BUY_AMT"/>
+			<result property="aplDcAmt"		column="APL_DC_AMT"/>
+			<result property="leftSeconds"	column="LEFT_SECONDS"/>
+		</collection>
+	</resultMap>
+
+	<select id="getCartCouponDlvrc" resultMap="cartCouponDlvrcMap">
+		<!--
+			Query Name : cart.getCartCouponDlvrc
+			Description : 장바구니에 적용 가능한 배송비 쿠폰 목록 조회
+		-->
+		SELECT	/* QUERYID(cart.listCartCouponDlvrc) */
+			T.DLVRC_PLC_NO
+			, T.COMP_GB_CD
+			, T.COMP_NO
+			, T.COMP_NM
+			, MCP.CP_NO
+			, MCP.CP_NM
+			, MCP.CP_APL_CD
+			, MCP.APL_VAL
+			, MCP.MBR_CP_NO		/* 회원 쿠폰 번호 */
+			, MCP.MAX_DC_AMT
+			, CASE WHEN MCP.CP_APL_CD = '10' AND IFNULL(MCP.MAX_DC_AMT, 0) = 0 THEN 
+				CEILING(#{dlvrAmt} * (MCP.APL_VAL/100) / 10) * 10
+			  WHEN MCP.CP_APL_CD = '10' AND MCP.MAX_DC_AMT > 0 THEN
+			  	IF(CEILING(#{dlvrAmt} * (MCP.APL_VAL/100) / 10 ) * 10 >= MCP.MAX_DC_AMT, MCP.MAX_DC_AMT, CEILING(#{dlvrAmt} * (MCP.APL_VAL/100) / 10) * 10 )
+			  ELSE 
+				MCP.APL_VAL
+			END AS APL_DC_AMT
+			, MCP.MIN_BUY_AMT
+			, MCP.LEFT_SECONDS
+		FROM (
+			SELECT DCP.DLVRC_PLC_NO
+				   , CB.COMP_GB_CD 
+				   , CB.COMP_NO
+				   , CB.COMP_NM
+			  FROM COMPANY_BASE CB
+		INNER JOIN DELIVERY_CHARGE_POLICY DCP ON (CB.COMP_NO = DCP.COMP_NO)
+		     WHERE DCP.DLVRC_PLC_NO = #{dlvrcPlcNo}
+		) T
+		,
+		(
+			SELECT
+				  CB.CP_NO
+				, CB.CP_NM
+				, CB.CP_TG_CD
+				, CB.CP_APL_CD
+				, CB.APL_VAL
+				, CB.MAX_DC_AMT
+				, CPT.APL_SEQ
+				, CPT.GOODS_ID
+				, CPT.DISP_CLSF_NO
+				, CPT.EXHBT_NO
+				, CPT.COMP_NO
+				, CPT.BND_NO
+				, SPM.ST_ID
+				, MC.MBR_CP_NO
+				, TIMESTAMPDIFF(SECOND, NOW(), MC.USE_END_DTM) AS LEFT_SECONDS
+				, CB.NOTICE
+				, IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+			FROM
+				coupon_base CB
+				LEFT OUTER JOIN coupon_target CPT ON CB.CP_NO = CPT.CP_NO
+				,member_coupon MC
+				,st_prmt_map SPM
+			WHERE
+				CB.CP_NO = MC.CP_NO
+				AND CB.CP_NO = SPM.APL_NO
+				AND SPM.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_20}'
+				AND CB.CP_KIND_CD = '${@framework.common.constants.CommonConstants@CP_KIND_30}'
+				AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+				AND MC.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				AND MC.MBR_NO = #{mbrNo}
+				AND CB.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}', #{webMobileGbCd})
+				AND NOW() BETWEEN MC.USE_STRT_DTM AND MC.USE_END_DTM
+				-- AND NOW() BETWEEN CB.APL_STRT_DTM AND CB.APL_END_DTM
+		) MCP
+		WHERE
+			MCP.ST_ID = #{stId}
+			AND (
+				MCP.CP_TG_CD = '${@framework.common.constants.CommonConstants@CP_TG_10}'
+				OR (MCP.CP_TG_CD = '${@framework.common.constants.CommonConstants@CP_TG_50}' AND T.COMP_NO = MCP.COMP_NO)
+			)
+			/* 자사만 배송비 쿠폰 적용 */
+			AND T.COMP_GB_CD = '${@framework.common.constants.CommonConstants@COMP_GB_10}'
+<if test='totGoodsAmt != null'>
+			AND MCP.MIN_BUY_AMT <![CDATA[<=]]> #{totGoodsAmt}
+</if>
+		GROUP BY T.DLVRC_PLC_NO
+				, T.COMP_GB_CD
+				, T.COMP_NO
+				, T.COMP_NM
+				, MCP.CP_NO
+				, MCP.CP_NM
+				, MCP.CP_APL_CD
+				, MCP.APL_VAL
+				, MCP.MBR_CP_NO
+				, MCP.MAX_DC_AMT
+				, MCP.MIN_BUY_AMT
+				, MCP.LEFT_SECONDS
+		ORDER BY MCP.LEFT_SECONDS, MCP.CP_NO
+	</select>
+	
+	<select id="listValidGoodsStock" resultType="biz.app.cart.model.CartGoodsVO">
+		<!--
+			Query Name : cart.listValidGoodsStock
+			Description : 상품 재고 체크
+		-->
+			SELECT
+				CASE
+					WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND SALE_END_DTM <![CDATA[>=]]> SYSDATE() ) 
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_10}'      /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */
+                    WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_20}'      /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */                  
+					WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+					WHEN SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR SALE_END_DTM <![CDATA[<]]> SYSDATE()
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+					WHEN STK_QTY <![CDATA[<=]]> 0 
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+				  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+				  , GOODS_ID
+				  , GOODS_NM
+				  , STK_QTY
+				  , GOODS_CSTRT_TP_CD
+			FROM(
+				SELECT
+					GB.GOODS_ID,
+					GB.GOODS_NM,
+					GB.GOODS_STAT_CD,
+					GB.SALE_STRT_DTM,
+					GB.SALE_END_DTM,
+					FN_GET_GOODS_STOCK(GB.GOODS_ID, IT.ITEM_NO) AS STK_QTY,
+					GOODS_CSTRT_TP_CD
+				FROM GOODS_BASE GB
+				INNER JOIN item IT
+					ON GB.GOODS_ID = IT.GOODS_ID
+				WHERE 1=1 
+<if test='goodsIds != null'>
+				  AND GB.GOODS_ID IN (
+					<foreach item="goodsId" separator="," collection="goodsIds" >
+					#{goodsId}
+					</foreach>
+
+				  )
+</if>
+			) A
+	</select>
+	
+	<select id="listCoupon" parameterType="java.util.Map" resultType="biz.app.cart.model.CartGoodsVO$Coupon">
+			<!--
+				Query Name : cart.listCoupon
+				Description : 쿠폰 조회 (상품)
+			-->
+			SELECT	/* QUERYID(cart.listCoupon) 상품별 적용 쿠폰 조회 */
+				MC.MBR_CP_NO			/* 회원쿠폰번호 */
+				, CB.CP_NO				/* 쿠폰 번호 */
+				, CB.CP_NM				/* 쿠폰명 */
+				, CB.CP_DSCRT			/* 쿠폰 설명 */
+				, CB.CP_KIND_CD			/* 쿠폰 종류 코드 */
+				, CB.CP_STAT_CD			/* 쿠폰 상태 코드 */
+				, CB.CP_PVD_MTH_CD		/* 쿠폰 지급 방식 코드 */
+				, CB.CP_APL_CD  		/* 쿠폰적용코드 */
+				, CB.APL_VAL			/* 적용값 */
+				, CB.WEB_MOBILE_GB_CD 	/* 웹모바일구분코드 */
+				, CB.MIN_BUY_AMT 		/* 최소구매금액 */
+				, CB.MAX_DC_AMT 		/* 최대할인금액 */
+				, CB.MULTI_APL_YN 		/* 복수적용여부 */ 
+				, CB.OUTSIDE_CP_YN		/* 외부쿠폰 여부 */
+				, CB.OUTSIDE_CP_CD		/* 외부쿠폰 코드 */
+				, CB.NOTICE				/* 유의사항 */
+				, TIMESTAMPDIFF(SECOND, NOW(), MC.USE_END_DTM) AS LEFT_SECONDS
+				, #{sysRegDtm} AS SYS_REG_DTM
+			FROM MEMBER_COUPON MC 
+	  INNER JOIN MEMBER_BASE MB ON MC.MBR_NO = MB.MBR_NO
+	  INNER JOIN COUPON_BASE CB ON MC.CP_NO = CB.CP_NO
+ LEFT OUTER JOIN GOODS_BASE GB ON GB.GOODS_ID = #{goodsId}
+ LEFT OUTER JOIN COUPON_TARGET T2 ON MC.CP_NO = T2.CP_NO
+ LEFT OUTER JOIN DISPLAY_CATEGORY T3 ON T2.DISP_CLSF_NO = T3.DISP_CLSF_NO
+       	     AND T3.DISP_CLSF_CD = '10'
+        	 AND T3.DISP_YN = 'Y'
+        	 AND T3.DEL_YN = 'N'
+ LEFT OUTER JOIN DISPLAY_GOODS T4 ON T3.DISP_CLSF_NO = T4.DISP_CLSF_NO AND T4.DLGT_DISP_YN ='Y'
+ LEFT OUTER JOIN EXHIBITION_BASE T6 ON T2.EXHBT_NO = T6.EXHBT_NO
+        	 AND T6.EXHBT_STAT_CD = '20'
+        	 AND NOW() BETWEEN T6.DISP_STRT_DTM AND T6.DISP_END_DTM
+        	 AND T6.DISP_YN = 'Y'
+        	 AND (T6.WEB_MOBILE_GB_CD = '00' OR T6.WEB_MOBILE_GB_CD = #{webMobileGbCd})
+        	 AND T6.DEL_YN = 'N'
+ LEFT OUTER JOIN EXHIBITION_THEME T7 ON T6.EXHBT_NO = T7.EXHBT_NO
+ LEFT OUTER JOIN EXHIBITION_THEME_GOODS T8 ON T7.THM_NO = T8.THM_NO
+		   WHERE 1=1
+			 AND MC.MBR_NO = #{mbrNo}
+			 AND (CB.ISU_TG_CD IN('${@framework.common.constants.CommonConstants@ISU_TG_00}', 
+			 						CASE WHEN MB.MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_10}' THEN '${@framework.common.constants.CommonConstants@ISU_TG_20}' 
+									     WHEN MB.MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_20}' THEN '${@framework.common.constants.CommonConstants@ISU_TG_10}'
+								   		 ELSE NULL 
+							   		 END)
+			 )
+			 AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+			 AND CB.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}', #{webMobileGbCd})
+			 AND MC.USE_YN = 'N'
+			 AND NOW() BETWEEN MC.USE_STRT_DTM AND MC.USE_END_DTM
+			 AND CB.CP_KIND_CD = '${@framework.common.constants.CommonConstants@CP_KIND_10}'	/* 쿠폰종류-상품*/
+			 AND #{salePsbCd} = '${@framework.common.constants.CommonConstants@SALE_PSB_00}'
+			 -- AND NOW() BETWEEN CB.APL_STRT_DTM AND CB.APL_END_DTM
+			 AND (CP_TG_CD = '10'
+		         OR (CP_TG_CD = '20'
+		         AND T2.GOODS_ID = #{goodsId})
+		         OR (CP_TG_CD = '30'
+		         AND T4.GOODS_ID = #{goodsId})
+		         OR (CP_TG_CD = '40'
+		         AND T8.GOODS_ID = #{goodsId})
+		         OR (CP_TG_CD = '50'
+		         AND T2.COMP_NO = GB.COMP_NO)
+		         OR (CP_TG_CD = '60' AND T2.BND_NO = GB.BND_NO)
+	         )
+	         AND NOT EXISTS( 
+         		 	SELECT 1 FROM COUPON_EXCEPT_GOODS CEG
+		         	 WHERE CEG.CP_NO = CB.CP_NO
+		               AND GOODS_ID = #{goodsId}
+		               AND CP_TG_CD IN ('30' , '40', '50', '60')
+		     )
+		     AND IFNULL(CB.MIN_BUY_AMT, 0) <![CDATA[<=]]> #{buyAmt}      
+		     GROUP BY MC.MBR_CP_NO, CB.CP_NO, CB.CP_NM, CB.CP_DSCRT, CB.CP_KIND_CD, CB.CP_STAT_CD, CB.CP_PVD_MTH_CD, CB.CP_APL_CD, CB.APL_VAL, CB.WEB_MOBILE_GB_CD, CB.MIN_BUY_AMT, CB.MAX_DC_AMT, CB.MULTI_APL_YN, CB.OUTSIDE_CP_YN, CB.OUTSIDE_CP_CD, CB.NOTICE, MC.USE_END_DTM
+	</select>
+
+	<select id="listCartCstrtGoodsInfo" resultType="biz.app.cart.model.CartGoodsVO">
+			<!--
+				Query Name : cart.listCartCstrtGoodsInfo
+				Description : 장바구니 연관상품 조회
+			-->
+			SELECT T3.GOODS_ID
+				  , T3.GOODS_NM
+				  , T3.GOODS_CSTRT_TP_CD
+				  , T3.GOODS_STAT_CD
+				  , T3.MIN_ORD_QTY
+				  , T3.MAX_ORD_QTY
+				  , T3.FREE_DLVR_YN
+				  , T3.COMP_NO
+				  , T3.COMP_GOODS_ID
+				  , T3.BND_NO
+				  , T3.STK_MNG_YN
+				  , T3.ITEM_MNG_YN
+				  , T3.SALE_STRT_DTM
+				  , T3.SALE_END_DTM
+				  , T3.DLVRC_PLC_NO
+				  , T3.TAX_GB_CD
+				  , T3.MD_USR_NO
+				  , T3.IO_ALM_YN
+				  , (SELECT IMG_SEQ FROM goods_img WHERE GOODS_ID = T3.GOODS_ID AND DLGT_YN = 'Y' LIMIT 1) AS IMG_SEQ		/* 상품 대표이미지 순번 */
+				  , (SELECT IMG_PATH FROM goods_img WHERE GOODS_ID = T3.GOODS_ID AND DLGT_YN = 'Y' LIMIT 1) AS IMG_PATH	
+				  , T3.SALE_PRC
+				  , T3.PRMT_DC_AMT							/* 프로모션 할인 금액 : 개별 */
+				  , T3.SALE_PRC + T3.ADD_SALE_AMT - T3.PRMT_DC_AMT AS PRMT_DC_PRC
+				  , T3.GOODS_AMT_TP_CD						/* 상품 금액 유형 코드 */
+				  , T3.GOODS_PRC_NO							/* 상품 가격 번호 */
+				  , T3.ADD_SALE_AMT							/* 단품 추가 금액 */
+				  , T3.ITEM_NO
+				  , T3.ITEM_NM
+				  , T3.COMP_ITEM_ID
+				  , T3.ITEM_STAT_CD
+				  , T3.WEB_STK_QTY
+				  , T3.SALE_PSB_CD
+				  , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM MEMBER_INTEREST_GOODS WHERE MBR_NO = #{mbrNo} AND GOODS_ID = T3.GOODS_ID) AS INTEREST_YN
+				  , T3.ORG_SALE_PRC
+			  FROM (
+				SELECT 
+				      T2.GOODS_ID
+					  , T2.GOODS_NM
+					  , T2.GOODS_CSTRT_TP_CD
+					  , T2.GOODS_STAT_CD
+					  , T2.MIN_ORD_QTY
+					  , T2.MAX_ORD_QTY
+					  , T2.FREE_DLVR_YN
+					  , T2.COMP_NO
+					  , T2.COMP_GOODS_ID
+					  , T2.BND_NO
+					  , T2.STK_MNG_YN
+					  , T2.ITEM_MNG_YN
+					  , T2.SALE_STRT_DTM
+					  , T2.SALE_END_DTM
+					  , T2.DLVRC_PLC_NO
+					  , T2.TAX_GB_CD
+					  , T2.MD_USR_NO
+					  , T2.IO_ALM_YN
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_PRC
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 2) AS UNSIGNED) AS PRMT_NO
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) AS PRMT_DC_AMT
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 6) AS UNSIGNED) AS GOODS_AMT_TP_CD
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_PRC	/* 상품원판매가 */
+					  , CAST(FN_SPLIT(T2.GOODS_PRICE_INFO, '|', 9) AS UNSIGNED) AS GOODS_PRC_NO
+					  , T2.ADD_SALE_AMT
+					  , T2.ITEM_NO
+					  , T2.ITEM_NM
+					  , T2.COMP_ITEM_ID
+					  , T2.ITEM_STAT_CD
+					  , T2.WEB_STK_QTY
+					  ,CASE
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T2.SALE_END_DTM <![CDATA[>=]]> SYSDATE() ) 
+                        	THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_10}'      /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */
+                    	WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE())
+                        	THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_20}'      /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */   
+						WHEN T2.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+						WHEN T2.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T2.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+						WHEN T2.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+						WHEN FN_GET_GOODS_STOCK(T2.GOODS_ID, T2.ITEM_NO) <![CDATA[<=]]> 0 
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+						ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+					  END AS SALE_PSB_CD
+				  FROM (
+					SELECT	/* QUERYID(cart.listCartCstrtGoodsInfo) 장바구니 연관상품 조회 */
+						DISTINCT GB.GOODS_ID
+						, GB.GOODS_NM
+						, GB.GOODS_CSTRT_TP_CD
+						, GB.GOODS_STAT_CD
+						, GB.MIN_ORD_QTY
+						, GB.MAX_ORD_QTY
+						, GB.FREE_DLVR_YN
+						, GB.COMP_NO
+						, GB.COMP_GOODS_ID
+						, GB.BND_NO
+						, GB.STK_MNG_YN
+						, GB.ITEM_MNG_YN
+						, GB.SALE_STRT_DTM
+						, GB.SALE_END_DTM
+						, GB.DLVRC_PLC_NO
+						, GB.TAX_GB_CD
+						, GB.MD_USR_NO
+						, GB.IO_ALM_YN
+						, FN_GET_GOODS_PRICE(GB.GOODS_ID, #{stId}, #{webMobileGbCd}) AS GOODS_PRICE_INFO
+						, IFNULL(IM.ADD_SALE_AMT, 0) AS ADD_SALE_AMT
+						, IM.ITEM_NO
+						, IM.ITEM_NM
+						, IM.COMP_ITEM_ID
+						, IM.ITEM_STAT_CD
+						, IM.WEB_STK_QTY
+					FROM CART CT
+			  INNER JOIN GOODS_BASE CT_GB
+			  		  ON CT_GB.GOODS_ID = CT.GOODS_ID
+			  INNER JOIN GOODS_CSTRT_INFO GCI
+			  		  ON GCI.GOODS_ID = CT_GB.GOODS_ID AND USE_YN = 'Y'
+			  INNER JOIN GOODS_BASE GB
+			  		  ON GB.GOODS_ID = GCI.CSTRT_GOODS_ID
+			  		 AND GB.GOODS_ID != CT_GB.GOODS_ID
+			  		 AND GB.COMP_NO = CT_GB.COMP_NO
+			  INNER JOIN ITEM IM
+			  		  ON GB.GOODS_ID = IM.GOODS_ID
+			  		 AND IM.ITEM_STAT_CD = '10'
+			  	   WHERE 1=1
+					<if test='mbrNo != null'>
+					AND CT.MBR_NO = #{mbrNo}
+					</if>
+					<if test='ssnId != null and ssnId != ""'>
+					AND CT.SSN_ID = #{ssnId}
+					</if>
+					<if test='nowBuyYn != null and nowBuyYn != ""'>
+					AND CT.NOW_BUY_YN = #{nowBuyYn}
+					</if>
+					<if test='cartIds != null'>
+					AND CT.CART_ID IN (
+						<foreach item="cartId" separator="," collection="cartIds" >
+						#{cartId}
+						</foreach>
+					)
+					</if>
+					<if test='exGoodsIds != null'>
+					AND GB.GOODS_ID NOT IN (
+						<foreach item="goodsId" separator="," collection="exGoodsIds" >
+						#{goodsId}
+						</foreach>
+					)
+					</if>
+		  		) T2
+	  		) T3
+	  		WHERE SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_00}'
+			ORDER BY PRMT_DC_PRC
+			LIMIT 10
+	</select>
+	
+	<select id="listGoodsOpt" parameterType="java.util.Map" resultType="biz.app.cart.model.CartGoodsVO$GoodsOpt">
+			<!--
+				Query Name : cart.listGoodsOpt
+				Description : 상품 옵션 리스트 조회
+			-->
+	  SELECT
+            A.ATTR_NM AS SHOW_NM
+            , AV.ATTR_VAL
+            , AV.*
+            , IT.ITEM_NO
+            , GA.*
+        FROM GOODS_CSTRT_PAK GCP
+        JOIN ITEM IT ON GCP.SUB_GOODS_ID = IT.GOODS_ID
+        JOIN GOODS_ATTRIBUTE GA ON ( GA.GOODS_ID = GCP.SUB_GOODS_ID )
+        JOIN ATTRIBUTE A ON (A.ATTR_NO = GA.ATTR_NO)
+        JOIN ITEM_ATTRIBUTE_VALUE IAV ON IAV.ITEM_NO = IT.ITEM_NO AND IAV.ATTR_NO = GA.ATTR_NO
+        JOIN ATTRIBUTE_VALUE AV ON ( GA.ATTR_NO = AV.ATTR_NO AND AV.ATTR_VAL_NO = IAV.ATTR_VAL_NO )
+		WHERE 1=1
+		AND GCP.SUB_GOODS_ID = #{goodsId}
+		AND GCP.GOODS_ID = #{pakGoodsId}
+		ORDER BY GA.DISP_PRIOR_RANK
+	</select>
+	
+	<select id="listFreebie" parameterType="java.util.Map" resultType="biz.app.cart.model.CartGoodsVO$Freebie">
+			<!--
+				Query Name : cart.listFreebie
+				Description : 사은품 조회 (상품)
+			-->
+			SELECT PF.GOODS_ID
+				   , GB.GOODS_NM
+				   , PF.QTY
+				   , GI.IMG_SEQ
+				   , GI.IMG_PATH
+				   , GP.ORG_SALE_AMT
+				   , GP.SALE_AMT
+				   , (SELECT SKU_CD FROM ITEM WHERE GOODS_ID = GB.GOODS_ID) AS SKU_CD
+				   , PF.PRMT_NO
+			  FROM (
+			  SELECT PF.GOODS_ID
+			  		 , FN_GET_GOODS_STOCK(PF.GOODS_ID, NULL) AS QTY
+			  		 , PB.PRMT_NO
+				FROM PROMOTION_BASE PB
+				JOIN PROMOTION_TARGET PT	 
+				  ON PB.PRMT_NO = PT.PRMT_NO	 
+				JOIN PROMOTION_FREEBIE PF
+				  ON PT.PRMT_NO = PF.PRMT_NO
+			   WHERE PB.PRMT_KIND_CD = '${@framework.common.constants.CommonConstants@PRMT_KIND_20}'
+				 AND PB.PRMT_STAT_CD = '${@framework.common.constants.CommonConstants@PRMT_STAT_20}'
+				 AND NOW() BETWEEN PB.APL_STRT_DTM AND PB.APL_END_DTM
+			     AND PT.GOODS_ID = #{goodsId}
+			 ) PF
+		INNER JOIN GOODS_BASE GB
+			    ON PF.GOODS_ID = GB.GOODS_ID
+   LEFT OUTER JOIN GOODS_IMG GI
+				ON PF.GOODS_ID = GI.GOODS_ID
+			   AND GI.DLGT_YN = 'Y'
+   LEFT OUTER JOIN GOODS_PRICE GP ON GB.GOODS_ID = GP.GOODS_ID		   
+   			 WHERE 1=1
+   			   AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+			   AND GP.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+			   AND NOW() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+			   AND GB.GOODS_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@GOODS_STAT_50}','${@framework.common.constants.CommonConstants@GOODS_STAT_60}')
+		  ORDER BY PF.GOODS_ID
+	</select>
+	
+	<select id="getValidGoods" resultType="biz.app.cart.model.CartGoodsVO">
+		<!--
+			Query Name : cart.getValidGoods
+			Description : 상품 판매가능상태 체크
+		-->
+			SELECT
+				CASE		
+					WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND SALE_END_DTM <![CDATA[>=]]> SYSDATE() ) 
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_10}'      /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */
+                    WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR SALE_END_DTM <![CDATA[<]]> SYSDATE())
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_20}'      /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */   
+					WHEN GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+					WHEN SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR SALE_END_DTM <![CDATA[<]]> SYSDATE()
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+					WHEN STOCK_QTY <![CDATA[<=]]> 0 
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 : 품절 */
+					WHEN #{buyQty} <![CDATA[>]]> STOCK_QTY
+							THEN '${@framework.common.constants.CommonConstants@SALE_PSB_40}'		/* 단품 재고 오류 : 구매가능 수량 초과 */	
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+				  END AS SALE_PSB_CD						/* 판매가능상태코드 */
+			FROM(
+				SELECT
+					GB.GOODS_NM,
+					GB.GOODS_STAT_CD,
+					GB.SALE_STRT_DTM,
+					GB.SALE_END_DTM,
+					FN_GET_GOODS_STOCK(GB.GOODS_ID, IT.ITEM_NO) AS STOCK_QTY
+				FROM GOODS_BASE GB
+				INNER JOIN item IT
+					ON GB.GOODS_ID = IT.GOODS_ID
+				WHERE GB.GOODS_ID = #{goodsId}
+			) A
+	</select>
+	
+	<select id="listCartValidGoods" resultType="biz.app.cart.model.CartGoodsVO">
+		<!--
+			Query Name : cart.listCartValidGoods
+			Description : 장바구니 목록 세트상품 판매가능상태 체크
+		-->
+		SELECT
+			CASE
+				WHEN T3.TYPE_10 <![CDATA[>]]> 0 THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'
+				WHEN T3.TYPE_20 <![CDATA[>]]> 0 THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'
+				WHEN T3.TYPE_30 <![CDATA[>]]> 0 THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'
+			<if test="buyQty != null and buyQty != ''">
+				WHEN T3.TYPE_40 <![CDATA[>]]> 0 THEN '${@framework.common.constants.CommonConstants@SALE_PSB_40}'
+			</if>
+				ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}'
+			END AS SALE_PSB_CD
+		FROM (
+			SELECT
+				SUM(CASE WHEN T2.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_00}' THEN 1 ELSE 0 END) OVER() TYPE_00 #정상
+				, SUM(CASE WHEN T2.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_10}' THEN 1 ELSE 0 END) OVER() TYPE_10 /*판매중지*/
+				, SUM(CASE WHEN T2.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_20}' THEN 1 ELSE 0 END) OVER() TYPE_20 /*판매종료*/
+				, SUM(CASE WHEN T2.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_30}' THEN 1 ELSE 0 END) OVER() TYPE_30 /*품절*/
+			<if test="buyQty != null and buyQty != ''">
+				, SUM(CASE WHEN T2.SALE_PSB_CD = '${@framework.common.constants.CommonConstants@SALE_PSB_40}' THEN 1 ELSE 0 END) OVER() TYPE_40 /*품절*/
+			</if>
+			FROM (
+				SELECT
+					CASE						
+					WHEN T1.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T1.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND T1.SALE_END_DTM <![CDATA[>=]]> SYSDATE() ) 
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_10}'      /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */
+                    WHEN T1.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( T1.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T1.SALE_END_DTM <![CDATA[<]]> SYSDATE())
+                        THEN  '${@framework.common.constants.CommonConstants@SALE_PSB_20}'      /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */  
+					WHEN T1.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+					WHEN T1.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR T1.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+					WHEN T1.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+					WHEN T1.STOCK_QTY <![CDATA[<=]]> 0 
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 : 품절 */
+				<if test="buyQty != null and buyQty != ''">
+					WHEN #{buyQty} <![CDATA[>]]> STOCK_QTY
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_40}'		/* 단품 재고 오류 : 구매가능 수량 초과 */
+				</if>
+					ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+				  END AS SALE_PSB_CD						/* 판매가능상태코드 */		
+				FROM (
+					SELECT
+						GB.GOODS_NM,
+						GB.GOODS_STAT_CD,
+						GB.SALE_STRT_DTM,
+						GB.SALE_END_DTM,
+						FN_GET_GOODS_STOCK(GB.GOODS_ID, IT.ITEM_NO) AS STOCK_QTY
+					FROM GOODS_BASE GB
+					INNER JOIN item IT
+						ON GB.GOODS_ID = IT.GOODS_ID
+					JOIN GOODS_CSTRT_SET SUB
+						ON GB.GOODS_ID = SUB.SUB_GOODS_ID
+					WHERE SUB.GOODS_ID = #{goodsId}
+				) T1
+			) T2
+		) T3
+	</select>
+	
+</mapper>

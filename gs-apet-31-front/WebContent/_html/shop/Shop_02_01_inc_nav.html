@@ -1,0 +1,24 @@
+
+<script>
+	$(function(){
+		$(".subtopnav .swiper-container").on("touchEndEvent",function(){
+			/* 탭이동 종료 후 이벤트 */
+			var ind = $(this).find(".active").index();
+//			ui.disp.subnav.elSwiper.el.slideTo(ind);
+		})
+	})
+</script>
+<nav class="subtopnav"><!-- ui.disp.subnav.sld.using(); -->
+	<div class="inr">
+		<div class="swiper-container box">
+			<ul class="swiper-wrapper menu">
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_02_01.html">원터대전</a></li>
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_02_02.html">LIVE</a></li>
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_02_03.html">베스트</a></li>
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_02_04.html">신상품</a></li>
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_02_05.html">기획전</a></li>
+				<li class="swiper-slide"><a class="bt" href="../../_html/shop/Shop_01_01.html">이벤트</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	배송 권역
+	일자 : 2021. 04. 20.
+	작성자 : kjh
+-->
+
+<mapper namespace="dlvrAreaInfo">
+	
+	<select id="getDlvrAreaInfo" resultType="biz.app.order.model.OrderDlvrAreaVO">
+		<!--
+			Query Name : dlvrAreaInfo.getDlvrAreaInfo
+			Description : 배송 권역 정보 조회
+		-->
+		SELECT	/* QUERYID(dlvrAreaInfo.getDlvrAreaInfo) */
+				DLVR_AREA_NO
+				, DLVR_PRCS_TP_CD
+				, SLOT_QTY
+				, USE_YN
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		  FROM DLVR_AREA_INFO
+		 WHERE 1=1
+<if test='dlvrPrcsTpCd != null and dlvrPrcsTpCd != ""'>
+ 		   AND DLVR_PRCS_TP_CD = #{dlvrPrcsTpCd}
+</if>
+<if test='dlvrAreaCd != null and dlvrAreaCd != ""'>
+ 		   AND DLVR_AREA_CD = #{dlvrAreaCd}
+</if>
+<if test='dlvrAreaNo != null and dlvrAreaNo != ""'>
+ 		   AND DLVR_AREA_NO = #{dlvrAreaNo}
+</if>
+	LIMIT 1
+	</select>
+	
+	<update id="updateDlvrAreaPostMap">
+		UPDATE DLVR_AREA_POST_MAP
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+<if test="prcsYn != null and prcsYn != ''">
+				, PRCS_YN = #{prcsYn}
+</if>
+	</update>
+	
+	<insert id="insertDlvrAreaInfo">
+		<!--
+			Query Name : dlvrAreaInfo.insertDlvrAreaInfo
+			Description : 배송 권역 정보 등록
+		-->
+		INSERT INTO DLVR_AREA_INFO
+		(
+			DLVR_AREA_NO
+			, DLVR_PRCS_TP_CD
+			, DLVR_AREA_CD
+			, SLOT_QTY
+			, USE_YN
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{dlvrAreaNo}
+			, #{dlvrPrcsTpCd}
+			, #{dlvrAreaCd}
+			, #{slotQty}
+			, #{useYn}
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<insert id="insertDlvrAreaPostMap">
+		<!--
+			Query Name : dlvrAreaInfo.insertDlvrAreaPostMap
+			Description : 배송 권역 우편번호 매핑 등록
+		-->
+		INSERT INTO DLVR_AREA_POST_MAP 
+		(
+			DLVR_AREA_NO
+			, POST_NO
+			, SIDO
+			, GUGUN
+			, DONG
+			, DLVR_AREA_NM
+			, DLVR_CNTR_CD
+			, DLVR_CNTR_NM
+			, PRCS_YN
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{dlvrAreaNo}
+			, #{postNo}
+			, #{sido}
+			, #{gugun}
+			, #{dong}
+			, #{dlvrAreaNm}
+			, #{dlvrCntrCd}
+			, #{dlvrCntrNm}
+			, 'N'
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+		ON DUPLICATE KEY 
+		UPDATE  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				, SIDO = #{sido}
+			    , GUGUN = #{gugun}
+			    , DONG = #{dong}
+			    , PRCS_YN = 'N'
+			    , DLVR_AREA_NM = #{dlvrAreaNm}
+			    , DLVR_CNTR_CD = #{dlvrCntrCd}
+			    , DLVR_CNTR_NM = #{dlvrCntrNm}
+	</insert>
+	
+	<delete id="deleteDlvrAreaPostMapForBatch">
+		<!--
+			Query Name : dlvrAreaInfo.deleteDlvrAreaPostMapForBatch
+			Description : 배송 권역 우편번호 매핑 삭제 - 배치용
+		-->
+		DELETE FROM DLVR_AREA_POST_MAP
+		 WHERE PRCS_YN = 'Y'
+	</delete>
+</mapper>

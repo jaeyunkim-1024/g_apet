@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<article class="comm popLayer a popSample1" id="popSample1">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<button class="mo-header-backNtn">뒤로</button>
+						<h1 class="tit left">관심 태그 변경</h1>
+						<!-- <button type="button" class="btnPopTxt right c_b">저장</button> -->
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						<div class="tag-choise mt20">
+							<h2>
+								관심있는 태그를<br><span>최소 1개 이상</span> 선택해주세요.
+							</h2>
+							<p class="tag-txt mt60"></p>
+							<div class="filter-area t2">
+								<div class="filter-item">
+									<div class="tag">
+										<button>자체제작</button>
+										<button class="active">위탁배송</button>
+										<button>1+1</button>
+										<button>사은품증정</button>
+										<button>추가증정</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="pull">
+							<div class="bts">
+								<a href="javascript:;" class="btn lg a">저장</a>
+							</div>
+						</div>
+					</main>
+				</div>
+			</div>
+		</article>
+		<script>
+			ui.popLayer.open("popSample1");
+		</script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set22","tit":"고객문의","class":"noneAc"}'></include><!-- 2021.03.15 : noneAc 클래스 추가 -->
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>고객 문의</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<script>
+						var tabName = ['1:1 문의', '상품 Q&A'];	//tab 이름
+					</script>
+					<div class="swiper-container tabSwiper custmHelp" data-el="1">	<!-- APET-1263 - 활성화 할 탭 인덱스.0부터시작 -->
+						<!-- Add Pagination -->
+						<div class="swiper-pagination">
+						</div>
+						<div class="swiper-wrapper">
+							<!-- 탭컨텐츠1 -->
+							<div class="swiper-slide">
+								<!-- 게시글 갯수 -->
+								<div class="infoBox flex">
+									<span class="listCount">총 <strong class="b">56건</strong></span>
+									<button type="button" class="btn b mlA btn_inquiry">문의하기</button>
+								</div>
+								<!-- //게시글 갯수 -->
+								
+								<!-- 데이타없음 -->
+								<div class="no_data i1" style="">
+									<div class="inr">
+										<div class="msg">등록된 문의글이 없습니다.</div>
+									</div>
+								</div>
+								<!-- //데이타없음 -->
+								
+								<!-- 아코디언 -->
+								<div class="my-accd s0420"  style="display:block;">	<!-- 보여야 하는 객체에 display:block; 지정해 주세요. -->
+									<div class="uiqnalist">
+										<ul class="uiAccd qalist" data-accd="accd">
+											<li>
+												<div class="hBox">
+													<div class="tit">11질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep   com">답변대기</em>
+														</div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<li><button type="button" class="bt">수정</button></li>
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div>
+												</div>
+											</li>
+											
+											<!--  case1-1 : 답변대기, 첨부 이미지 없을 때 -->
+											<li class="">
+												<div class="hBox">
+													<div class="tit">case1-1 : 답변대기, 첨부 이미지 없을 때</div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em>
+														</div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<li><button type="button" class="bt">수정</button></li>
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+												<!-- 
+													<div class="addpic">
+														<ul class="pics">
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+														</ul>
+													</div>
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div> -->
+												</div>
+											</li>
+											<!--  //case1-1 -->
+											
+											<!--  case1-2 : 답변대기, 첨부 이미지 있을 때 -->
+											<li class="">
+												<div class="hBox">
+													<div class="tit">case1-2 : 답변대기, 첨부 이미지 있을 때</div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em>
+														</div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<li><button type="button" class="bt">수정</button></li>
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+												
+													<div class="addpic">
+														<ul class="pics">
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+														</ul>
+													</div>
+												<!-- 
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div> -->
+												</div>
+											</li>
+											<!--  //case1-2 -->
+											
+											
+											<!--  case2-1 : 답변 완료, 첨부 이미지 없을 때 -->
+											<li class="">
+												<div class="hBox">
+													<div class="tit">case2-1 : 답변 완료, 첨부 이미지 없을 때</div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em>
+														</div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<!-- <li><button type="button" class="bt">수정</button></li> -->	<!-- 답변 완료후엔 수정 비 노출 -->	<!-- 운영계 테스트 해보니 답변 대기중에도 수정 버튼이 안나오는걸 확인 했습니다. 개발 작업 하시면서 확인 부탁드려요. -->
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+													<!-- 이미지 파일 없을때 addpic 전체 안그려주기 -->
+													<!-- <div class="addpic">
+														<ul class="pics">
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+														</ul>
+													</div> -->
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div>
+												</div>
+											</li>
+											<!--  //case2-1 -->
+											
+											<!--  case2-2 : 답변완료, 첨부 이미지 있을 때 -->
+											<li class="">
+												<div class="hBox">
+													<div class="tit">case2-2 : 답변완료, 첨부 이미지 있을 때</div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em>
+														</div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<!-- <li><button type="button" class="bt">수정</button></li> -->	<!-- 답변 완료후엔 수정 비 노출 -->
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+													<div class="addpic">
+														<ul class="pics">
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+														</ul>
+													</div>
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div>
+												</div>
+											</li>
+											<!--  //case2-2 -->
+											
+											<!-- loop -->
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li class=""><div class="hBox"><div class="tit">질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 100자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변완료</em></div><div class="stat"> <nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<!-- //loop -->
+										</ul>
+									
+									</div>
+									
+								</div>
+								<!-- // 아코디언 -->
+							</div>
+							<!-- //탭컨텐츠1 -->
+							
+							<!-- 탭컨텐츠2 -->
+							<div class="swiper-slide">
+								<!-- 게시글 갯수 -->
+								<div class="infoBox flex">
+									<span class="listCount">총 <strong class="b">613건</strong></span>
+								</div>
+								<!-- //게시글 갯수 -->
+								
+								<!-- 데이타없음 -->
+								<div class="no_data i1" style="">
+									<div class="inr">
+										<div class="msg">등록된 문의글이 없습니다.</div>
+									</div>
+								</div>
+								<!-- //데이타없음 -->
+								
+								<!-- 아코디언 -->
+								<div class="my-accd s0420"  style="display:block;">
+									<div class="uiqnalist">
+										<ul class="uiAccd qalist" data-accd="accd">
+											<li>
+												<div class="hBox">
+													<div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div>
+													<div class="info">
+														<div class="dds">
+															<em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em>
+														</div>
+														<div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div>
+														<div class="stat">
+															<nav class="uidropmu dmenu">
+																<button type="button" class="bt st gb">메뉴열기</button>
+																<div class="list">
+																	<ul class="menu">
+																		<li><button type="button" class="bt">수정</button></li>
+																		<li><button type="button" class="bt">삭제</button></li>
+																	</ul>
+																</div>
+															</nav>
+														</div>
+													</div>
+													<button type="button" class="btnTog">버튼</button>
+												</div>
+												<div class="cBox" style="display: none;">
+													<div class="addpic">
+														<ul class="pics">
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+															<li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li>
+														</ul>
+													</div>
+													<div class="reply">
+														<div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div>
+														<div class="info">
+															<div class="dds">
+																<em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em> 
+															</div>
+														</div>
+													</div>
+												</div>
+											</li>
+											
+											
+											<!-- loop -->
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<li><div class="hBox"><div class="tit">상품 Q&A 질문이 노출되는 영역입니다. 제목과 내용 없습니다. 입력한 질문내용만 노출됩니다. 글자제한수는 1000자 이내로 하겠습니다. </div><div class="info"><div class="dds"><em class="dd date">2020.01.01</em> <em class="dd rep com">답변대기</em></div><div class="go_prdt"><a href="../../_html/shop/Shop_03_01.html">상품바로가기</a></div><div class="stat"><nav class="uidropmu dmenu"><button type="button" class="bt st gb">메뉴열기</button><div class="list"><ul class="menu"><li><button type="button" class="bt">수정</button></li><li><button type="button" class="bt">삭제</button></li></ul></div></nav></div></div><button type="button" class="btnTog">버튼</button></div><div class="cBox" style="display: none;"><div class="addpic"><ul class="pics"><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li><li><a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="첨부이미지"></a></li></ul></div><div class="reply"><div class="msg">안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다. 감사합니다. 안녕하세요. 관리자가 답변한 내용이 전체 노출되는 영역입니다.감사합니다.</div><div class="info"><div class="dds"><em class="dd ids">판매자</em> / <em class="dd date">2020.01.01</em></div></div></div></div></li>
+											<!-- //loop -->
+										</ul>
+									
+									</div>
+									
+								</div>
+								<!-- // 아코디언 -->
+							</div>
+							<!-- //탭컨텐츠2 -->
+						</div>
+					</div>
+						
+					
+					<!-- <include class="uibanners" data-include-html="../inc/banner.html"></include> -->
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</html>

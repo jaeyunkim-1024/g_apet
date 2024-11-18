@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 기본
+	작성자  		snw
+	작성일자  	2017.01.31
+-->
+
+<mapper namespace="goodsBase">
+
+	<sql id="GoodsBaseColumns">
+		GB.GOODS_ID			/* 상품 아이디 */
+		, GB.GOODS_NM			/* 상품 명 */
+		, GB.GOODS_STAT_CD		/* 상품 상태 코드 */
+		, GB.GOODS_TP_CD		/* 상품 유형 코드 */
+		, GB.COMP_NO			/* 업체 번호 */
+		, GB.MDL_NM			/* 모델 명 */
+		, GB.KWD				/* 키워드 */
+		, GB.PR_WDS			/* 홍보 문구 */
+		, GB.PR_WDS_SHOW_YN	/* 홍보 문구 노출 여부 */
+		, GB.BND_NO			/* 브랜드 번호 */
+		, GB.CTR_ORG			/* 원산지 */
+		, GB.MMFT				/* 제조사 */
+		, GB.IMPORTER			/* 수입사 */
+		, GB.STK_MNG_YN		/* 재고 관리 여부 */
+		, GB.TAX_GB_CD			/* 과세 구분 코드 */
+		, GB.MIN_ORD_QTY		/* 최소 주문 수량 */
+		, GB.MAX_ORD_QTY		/* 최대 주문 수량 */
+		, GB.DLVR_MTD_CD		/* 배송 방법 코드 */
+		, GB.FREE_DLVR_YN		/* 무료 배송 여부 */
+		, GB.DLVRC_PLC_NO		/* 배송비 정책 번호 */
+		, GB.COMP_PLC_NO		/* 업체 정책 번호 */
+		, GB.PPLRT_RANK		/* 인기 순위 */
+		, GB.PPLRT_SET_CD		/* 인기 설정 코드 */
+		, GB.SALE_STRT_DTM		/* 판매 시작 일시 */
+		, GB.SALE_END_DTM		/* 판매 종료 일시 */
+		, GB.NTF_ID			/* 고시 아이디 */
+		, GB.MD_USR_NO			/* MD 사용자 번 */
+		, GB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+		, GB.SYS_REG_DTM		/* 시스템 등록 일시 */
+		, GB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		, GB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		, GB.SHOW_YN			/* 노출여부 */
+		, GB.COMP_GOODS_ID   /* 업체 상품 아이디 */
+		, GB.WEB_MOBILE_GB_CD  /* 웹모바일 구분 코드 */
+		, GB.VD_LINK_URL  /* 상품 대표 동영상 링크 URL */
+		, GB.ITEM_MNG_YN /* 단품 관리여부 */
+		, GB.GOODS_CSTRT_TP_CD /* 상품 구성 유형 코드 */
+		, IFNULL(GB.IO_ALM_YN, 'N') AS IO_ALM_YN /* 재입고 여부 */
+	</sql>
+
+	<sql id="StStdInfoColumns">
+		ST_ID				/* 사이트 아이디 */
+		, ST_NM				/* 사이트 명 */
+	</sql>
+
+	<resultMap id="GoodsBaseMap" type="biz.app.goods.model.GoodsBaseVO">
+		<id column="GOODS_ID"					property="goodsId"/>
+		<result column="ITEM_NO"				property="itemNo"/>
+		<result column="GOODS_NM"				property="goodsNm"/>
+		<result column="GOODS_STAT_CD"			property="goodsStatCd"/>
+		<result column="GOODS_TP_CD"			property="goodsTpCd"/>
+		<result column="COMP_NO"				property="compNo"/>
+		<result column="COMP_GB_CD"				property="compGbCd"/>
+		<result column="MDL_NM"					property="mdlNm"/>
+		<result column="KWD"					property="kwd"/>
+		<result column="PR_WDS"					property="prWds"/>
+		<result column="PR_WDS_SHOW_YN"			property="prWdsShowYn"/>
+		<result column="BND_NO"					property="bndNo"/>
+		<result column="CTR_ORG"				property="ctrOrg"/>
+		<result column="MMFT"					property="mmft"/>
+		<result column="IMPORTER"				property="importer"/>
+		<result column="STK_MNG_YN"				property="stkMngYn"/>
+		<result column="TAX_GB_CD"				property="taxGbCd"/>
+		<result column="MIN_ORD_QTY"			property="minOrdQty"/>
+		<result column="MAX_ORD_QTY"			property="maxOrdQty"/>
+		<result column="DLVR_MTD_CD"			property="dlvrMtdCd"/>
+		<result column="FREE_DLVR_YN"			property="freeDlvrYn"/>
+		<result column="DLVRC_PLC_NO"			property="dlvrcPlcNo"/>
+		<result column="DLVRC_MTD_CD"			property="dlvrcMtdCd"/>
+		<result column="COMP_PLC_NO"			property="compPlcNo"/>
+		<result column="PPLRT_RANK"				property="pplrtRank"/>
+		<result column="PPLRT_SET_CD"			property="pplrtSetCd"/>
+		<result column="SALE_STRT_DTM"			property="saleStrtDtm"/>
+		<result column="SALE_END_DTM"			property="saleEndDtm"/>
+		<result column="NTF_ID"					property="ntfId"/>
+		<result column="MD_USR_NO"				property="mdUsrNo"/>
+		<result column="SHOW_YN"				property="showYn"/>
+		<result column="COMP_GOODS_ID" 		property="compGoodsId"/>
+		<result column="WEB_MOBILE_GB_CD"		property="webMobileGbCd"/>
+		<result column="BND_NM_KO"				property="bndNmKo"/>
+		<result column="COMP_NM"				property="compNm"/>
+		<result column="IMG_SEQ"				property="imgSeq"/>
+		<result column="IMG_PATH"				property="imgPath"/>
+		<result column="SYS_REGR_NO"			property="sysRegrNo"/>
+		<result column="SYS_REG_DTM"			property="sysRegDtm"/>
+		<result column="SYS_UPDR_NO"			property="sysUpdrNo"/>
+		<result column="SYS_UPD_DTM"			property="sysUpdDtm"/>
+		<result column="VD_LINK_URL"			property="vdLinkUrl"/>
+		<result column="ITEM_MNG_YN"		    property="itemMngYn"/>
+		<result column="GOODS_CSTRT_TP_CD"		property="goodsCstrtTpCd"/>
+		<result column="IO_ALM_YN"		        property="ioAlmYn"/>
+
+		<collection property="stStdList"	ofType="biz.app.st.model.StStdInfoVO">
+			<id column="ST_ID"					property="stId"/>
+			<result column="ST_NM"				property="stNm"/>
+		</collection>
+	</resultMap>
+
+	<select id="getGoodsBase"	resultMap="GoodsBaseMap">
+		<!--
+			Query Name : goodsBase.getGoodsBase
+			Description : 상품정보 조회
+		-->
+		SELECT /* goodsBase.getGoodsBase */
+			<include refid="GoodsBaseColumns"/>
+			, (SELECT BND_NM_KO FROM BRAND_BASE BB WHERE BB.BND_NO = GB.BND_NO) AS BND_NM_KO	/* 브랜드 명 국문 */
+			, B.COMP_NM  /* 업체 명 국문 */
+			, B.COMP_GB_CD
+			, B.COMP_NO
+			, (SELECT ITEM_NO FROM ITEM WHERE GOODS_ID = #{goodsId} LIMIT 1) AS ITEM_NO
+			, (SELECT IMG_SEQ FROM GOODS_IMG WHERE GOODS_ID = GB.GOODS_ID AND DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') AS IMG_SEQ /* 상품 대표이미지 순번 */
+			, (SELECT IMG_PATH FROM GOODS_IMG WHERE GOODS_ID = GB.GOODS_ID AND DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') AS IMG_PATH /* 상품 대표이미지 경로 */
+			, <include refid="StStdInfoColumns"/>
+		FROM
+			GOODS_BASE GB
+			LEFT OUTER JOIN (SELECT ST.ST_ID, ST.ST_NM, SGM.GOODS_ID FROM ST_STD_INFO ST JOIN ST_GOODS_MAP SGM ON (ST.ST_ID = SGM.ST_ID)) SGM ON (GB.GOODS_ID = SGM.GOODS_ID)
+			LEFT OUTER JOIN COMPANY_BASE B ON (GB.COMP_NO = B.COMP_NO)
+			LEFT OUTER JOIN BRAND_BASE C ON (GB.BND_NO = C.BND_NO)
+		WHERE
+			GB.GOODS_ID = #{goodsId}
+	</select>
+
+	<select id="getGoodsTotalCount"	resultType="biz.app.goods.model.GoodsTotalCountVO">
+		<!--
+			Query Name : goodsBase.getGoodsTotalCount
+			Description : 상품정보 총개수 조회(관련영상, 후기, Q&A)
+		-->
+		SELECT
+			(SELECT count(*) FROM apet_contents_goods_map ACGM
+			INNER JOIN GOODS_BASE GB ON ACGM.GOODS_ID = GB.GOODS_ID
+			LEFT JOIN APET_CONTENTS AC ON ACGM.VD_ID = AC.VD_ID
+			LEFT JOIN APET_ATTACH_FILE AAF ON AC.FL_NO = AAF.FL_NO
+			WHERE GB.GOODS_ID = #{goodsId}
+			AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'	/* 판매중(승인) */
+			AND AC.VD_GB_CD 	 = '${@framework.common.constants.CommonConstants@VD_GB_20}'		/* 영상구분코드(10=교육, 20=기타) */
+			AND AAF.CONTS_TP_CD  = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'		/* 컨텐츠 유형 코드 */
+			AND AC.DISP_YN		 = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'		/* 영상 전시 여부 */	
+		) AS GOODS_CONTENTS_TOTAL
+		FROM DUAL
+	</select>
+
+
+	<insert id="insertGoodsBase" parameterType="biz.app.goods.model.GoodsBasePO" >
+		<!--
+			Query Name : goodsBase.insertGoodsBase
+			Description : 상품 등록
+		-->
+		<selectKey keyProperty="goodsId" resultType="java.lang.String" order="BEFORE">
+			SELECT 
+				CONCAT(
+					<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+						'GI'
+					</if>
+					<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ATTR)">
+						'GO'
+					</if>
+					<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_SET)">
+						'GS'
+					</if>
+					<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_PAK)">
+						'GP'
+					</if>
+				, LPAD(FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_BASE_SEQ}'), 9, '0')) 
+				FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_BASE (
+			  GOODS_NM				/* 상품 명 */
+			, GOODS_STAT_CD			/* 상품 상태 코드 */
+			, NTF_ID				/* 고시 아이디 */
+			, MDL_NM				/* 모델 명 */
+			, COMP_NO				/* 업체 번호 */
+			, CTR_ORG				/* 원산지 */
+			, MIN_ORD_QTY			/* 최소 주문 수량 */
+			, MAX_ORD_QTY			/* 최대 주문 수량 */
+			, BND_NO				/* 브랜드 번호 */
+			, DLVR_MTD_CD			/* 배송 방법 코드 */
+			, DLVRC_PLC_NO			/* 배송 정책 번호 */
+			, COMP_PLC_NO			/* 업체 정책 번호 */
+			, FREE_DLVR_YN			/* 무료 배송 여부 */
+			, IMPORTER				/* 수입사 */
+			, MMFT					/* 제조사 */
+			, TAX_GB_CD				/* 과세 구분 코드 */
+			, STK_MNG_YN			/* 재고 관리 여부 */
+			, MD_USR_NO				/* MD 사용자 번호 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, GOODS_ID				/* 상품 아이디 */
+			, SALE_STRT_DTM			/* 판매 시작 일시 */
+			, SALE_END_DTM			/* 판매 종료 일시 */
+			, SHOW_YN				/* 노출 여부 */
+			, COMP_GOODS_ID			/* 업체 상품 아이디 */
+			, WEB_MOBILE_GB_CD		/* 웹 모바일 구분 코드 */
+			, RTN_PSB_YN			/* 반품 가능 여부 */
+			, RTN_MSG				/* 반품 메세지 */
+			, ITEM_MNG_YN			/* 단품 관리 여부 */
+			, GOODS_TP_CD			/* 상품 유형 코드 */
+			, HITS                  /* 히트수 */
+			, BIGO					/* 비고 */
+			, VD_LINK_URL 			/* 동영상 LINK URL */
+			, ORDMKI_YN				/* 주문제작여부 */
+			, SEO_INFO_NO			/* SEO 정보 번호 */
+			, ATTR_SHOW_TP_CD		/* 속성 노출 유형 - 00일반 10:콤보박스 20:컴포넌트 */
+			, GOODS_CSTRT_TP_CD		/* 상품 구성 유형 - ITEM:단품 ATTR:옵션 SET:세트 PAK:묶음*/
+			, GOODS_ESTM_DISP_CLSF_NO			/* 상품평 전시 분류 번호 */
+			, OSTK_GOODS_SHOW_YN	/* 재고 수량 노출 여부 */
+			, STK_QTY_SHOW_YN		/* 품절 상품 노출 여부 */
+			, NAVER_AFFI_GOODS_YN	/* 네이버 제휴 상품 여부 */
+			, FST_GOODS_ID			/* 최초 상품 아이디 */
+			, IGDT_INFO_LNK_YN		/* 성분 정보 연동 여부 */
+			, TWC_SND_YN		    /* TWC 전송 여부 */
+			, EXP_MNG_YN			/* 유통기한 관리 여부 */
+			, EXP_MONTH				/* 유통기한_월 */
+			, MD_RCOM_WDS			/* MD 추천 문구 */
+			, MD_RCOM_YN			/* MD 추천 여부 */
+			, PET_GB_CD				/* 펫 구분 코드 */
+			, IO_ALM_YN				/* 재입고 여부 */
+			, SHOPLINKER_SND_YN		/* 샵 링커 전송 여부 */
+			, COMP_GOODS_NM			/* 업체 상품명 */
+			, CHECK_POINT			/* 체크포인트 */
+			, PRD_STD_CD			/* 표준 코드 */
+		) VALUES (
+			  #{goodsNm }			/* 상품 명 */
+			, #{goodsStatCd }		/* 상품 상태 코드 */
+			, #{ntfId }				/* 고시 아이디 */
+			, #{mdlNm }				/* 모델 명 */
+			, #{compNo }			/* 업체 번호 */
+			, #{ctrOrg }			/* 원산지 */
+			, #{minOrdQty }			/* 최소 주문 수량 */
+			, #{maxOrdQty }			/* 최대 주문 수량 */
+			, #{bndNo }				/* 브랜드 번호 */
+			, #{dlvrMtdCd }			/* 배송 방법 코드 */
+			, #{dlvrcPlcNo }		/* 배송 정책 번호 */
+			, #{compPlcNo }			/* 업체 정책 번호 */
+			, COALESCE(#{freeDlvrYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')				/* 무료 배송 여부 */
+			, #{importer }			/* 수입사 */
+			, #{mmft }				/* 제조사 */
+			, #{taxGbCd }			/* 과세 구분 코드 */
+			, #{stkMngYn }			/* 재고 관리 여부 */
+			, #{mdUsrNo }			/* MD 사용자 번호 */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{goodsId }			/* 상품 아이디 */
+			, #{saleStrtDtm }		/* 판매 시작 일시 */
+			, #{saleEndDtm }		/* 판매 종료 일시 */
+			, #{showYn }			/* 노출 여부 */
+			, #{compGoodsId }		/* 업체 상품 아이디 */
+			, #{webMobileGbCd }		/* 웹 모바일 구분 코드 */
+			, #{rtnPsbYn }			/* 반품 가능 여부 */
+			, #{rtnMsg }			/* 반품 메세지 */
+			, #{itemMngYn }			/* 단품 관리 여부 */
+			, #{goodsTpCd }			/* 상품 유형 코드 */
+			, 0                     /* 상품 조회수 */ 
+			, #{bigo }				/* 비고 */
+			, #{vdLinkUrl}  		/* 동영상 링크 url */
+			, COALESCE(#{ordmkiYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')				/* 주문제작여부 */
+			, #{seoInfoNo}			/* SEO 정보 번호 */
+			, #{attrShowTpCd}		/* 속성 노출 유형 - 00:일반 10:콤보박스 20:컴포넌트 */
+			, #{goodsCstrtTpCd}		/* 상품 구성 유형 - ITEM:단품 ATTR:옵션 SET:세트 PAK:묶음 */
+			, #{goodsEstmDispClsfNo}			/* 상품평 전시 분류 번호 */
+			, COALESCE(#{ostkGoodsShowYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')		/* 재고 수량 노출 여부 */
+			, COALESCE(#{stkQtyShowYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')			/* 품절 상품 노출 여부 */
+			, COALESCE(#{naverAffiGoodsYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')		/* 네이버 제휴 상품 여부 */
+			, #{fstGoodsId}			/* 최초 상품 아이디 */
+			, COALESCE(#{igdtInfoLnkYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')		/* 성분 정보 연동 여부 */
+			, COALESCE(#{twcSndYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')		        /* TWC 전송 여부  */
+			, COALESCE(#{expMngYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')				/* 유통기한 관리 여부 */
+			, #{expMonth}			/* 유통기한_월 */
+			, #{mdRcomWds}			/* MD 추천 문구 */
+			, COALESCE(#{mdRcomYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')				/* MD 추천 여부 */
+			, #{petGbCd}			/* 펫 구분 코드 */
+			, #{ioAlmYn}			/* 재입고 여부 */
+			, COALESCE(#{shoplinkerSndYn}, '${@framework.common.constants.CommonConstants@COMM_YN_N}')		/* 샵 링커 전송 여부 */
+			, #{compGoodsNm}																				/* 업체상품명 */
+			, #{checkPoint}																					/* 체크포인트 */
+			, #{prdStdCd}																					/* 체크포인트 */
+		)
+	</insert>
+	
+	<update id="updateGoodsBase" parameterType="biz.app.goods.model.GoodsBasePO">
+		<!-- Query Name : goods.updateGoodsBase Description : 상품 수정 -->
+		UPDATE GOODS_BASE SET
+		SYS_UPDR_NO = #{sysUpdrNo } /* 시스템 수정자 번호 */
+		, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		, GOODS_NM = #{goodsNm } /* 상품 명 */
+		<if test="goodsStatCd != null and goodsStatCd != ''">
+		, GOODS_STAT_CD = #{goodsStatCd } /* 상품 상태 코드 */
+		</if>
+		, COMP_NO = #{compNo } /* 업체 번호 */
+		, STK_MNG_YN = #{stkMngYn } /* 재고 관리 여부 */
+		, SALE_STRT_DTM = #{saleStrtDtm } /* 판매 시작 일시 */
+		, SALE_END_DTM = #{saleEndDtm } /* 판매 종료 일시 */
+		, SHOW_YN = #{showYn } /* 노출 여부 */
+		, ITEM_MNG_YN = #{itemMngYn } /* 단품 관리 여부 */
+		, GOODS_TP_CD = #{goodsTpCd } /* 상품 유형 코드 */
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId }
+	</update>
+	
+	<insert id="insertGoodsBaseHist" parameterType="biz.app.goods.model.GoodsBaseHistPO">
+		<!-- Query Name : goods.insertGoodsBaseHist Description : 상품 이력 등록 -->
+		<selectKey keyProperty="histNo" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_BASE_HIST_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_BASE_HIST (
+		HIST_NO /* 상품 기본 이력 번호 */
+		, BIGO /* 비고 */
+		, BND_NO /* 브랜드 번호 */
+		, COMP_GOODS_ID /* 업체 상품 아이디 */
+		, COMP_NO /* 업체 번호 */
+		, COMP_PLC_NO /* 업체 정책 번호 */
+		, CTR_ORG /* 원산지 */
+		, DLVR_MTD_CD /* 배송 방법 코드 */
+		, DLVRC_PLC_NO /* 배송 정책 번호 */
+		, FREE_DLVR_YN /* 무료 배송 여부 */
+		, GOODS_ID /* 상품 아이디 */
+		, GOODS_NM /* 상품 명 */
+		, GOODS_STAT_CD /* 상품 상태 코드 */
+		, GOODS_TP_CD /* 상품 유형 코드 */
+		, HITS /* 히트수 */
+		, IMPORTER /* 수입사 */
+		, ITEM_MNG_YN /* 단품 관리 여부 */
+		, KWD /* 키워드1 */
+		, MAX_ORD_QTY /* 최대 주문 수량 */
+		, MD_USR_NO /* MD 사용자 번호 */
+		, MDL_NM /* 모델 명 */
+		, MIN_ORD_QTY /* 최소 주문 수량 */
+		, MMFT /* 제조사 */
+		, NTF_ID /* 고시 아이디 */
+		, PPLRT_RANK /* 인기 순위 */
+		, PPLRT_SET_CD /* 인기 설정 코드 */
+		, PR_WDS /* 홍보 문구 */
+		, PR_WDS_SHOW_YN /* 홍보 문구 노출 여부 */
+		, RTN_MSG /* 반품 메세지 */
+		, RTN_PSB_YN /* 반품 가능 여부 */
+		, SALE_END_DTM /* 판매 종료 일시 */
+		, SALE_STRT_DTM /* 판매 시작 일시 */
+		, SHOW_YN /* 노출 여부 */
+		, STK_MNG_YN /* 재고 관리 여부 */
+		, SYS_REGR_NO /* 시스템 등록자 번호 */
+		, SYS_REG_DTM /* 시스템 등록 일시 */
+		, SYS_UPDR_NO /* 시스템 수정자 번호 */
+		, SYS_UPD_DTM /* 시스템 수정 일시 */
+		, TAX_GB_CD /* 과세 구분 코드 */
+		, VD_LINK_URL /* 동영상 링크 URL */
+		, WEB_MOBILE_GB_CD /* 웹 모바일 구분 코드 */
+		) VALUES (
+		#{histNo} /* 상품 기본 이력 번호 */
+		, #{bigo} /* 비고 */
+		, #{bndNo} /* 브랜드 번호 */
+		, #{compGoodsId} /* 업체 상품 아이디 */
+		, #{compNo} /* 업체 번호 */
+		, #{compPlcNo} /* 업체 정책 번호 */
+		, #{ctrOrg} /* 원산지 */
+		, #{dlvrMtdCd} /* 배송 방법 코드 */
+		, #{dlvrcPlcNo} /* 배송 정책 번호 */
+		, #{freeDlvrYn} /* 무료 배송 여부 */
+		, #{goodsId} /* 상품 아이디 */
+		, #{goodsNm} /* 상품 명 */
+		, #{goodsStatCd} /* 상품 상태 코드 */
+		, #{goodsTpCd} /* 상품 유형 코드 */
+		<choose>
+		<when test="hits == null or hits == ''">
+		,0
+		</when>
+		<otherwise>
+		, #{hits} /* 히트수 */
+		</otherwise>
+		</choose>
+		, #{importer} /* 수입사 */
+		, #{itemMngYn} /* 단품 관리 여부 */
+		, #{kwd} /* 키워드 */
+		, #{maxOrdQty} /* 최대 주문 수량 */
+		, #{mdUsrNo} /* MD 사용자 번호 */
+		, #{mdlNm} /* 모델 명 */
+		, #{minOrdQty} /* 최소 주문 수량 */
+		, #{mmft} /* 제조사 */
+		, #{ntfId} /* 고시 아이디 */
+		, #{pplrtRank} /* 인기 순위 */
+		, #{pplrtSetCd} /* 인기 설정 코드 */
+		, #{prWds} /* 홍보 문구 */
+		, #{prWdsShowYn} /* 홍보 문구 노출 여부 */
+		, #{rtnMsg} /* 반품 메세지 */
+		, #{rtnPsbYn} /* 반품 가능 여부 */
+		, #{saleEndDtm} /* 판매 종료 일시 */
+		, #{saleStrtDtm} /* 판매 시작 일시 */
+		, #{showYn} /* 노출 여부 */
+		, #{stkMngYn} /* 재고 관리 여부 */
+		, #{sysRegrNo} /* 시스템 등록자 번호 */
+		, NOW() /* 시스템 등록 일시 */
+		, #{sysUpdrNo} /* 시스템 수정자 번호 */
+		, NOW() /* 시스템 수정 일시 */
+		, #{taxGbCd} /* 과세 구분 코드 */
+		, #{vdLinkUrl} /* 동영상 링크 url */
+		, #{webMobileGbCd} /* 웹 모바일 구분 코드 */
+		)
+	</insert>
+	
+	<delete id="deleteStGoodsMap" parameterType="biz.app.goods.model.StGoodsMapSO">
+		DELETE /* QUERYID: GOODS.deleteStGoodsMap */
+		FROM ST_GOODS_MAP
+		WHERE 1=1
+		AND GOODS_ID= #{goodsId}
+		<if test="stId != null and stId != ''">
+			AND ST_ID = #{stId }
+		</if>
+	</delete>
+	
+	<insert id="insertStGoodsMap" parameterType="biz.app.goods.model.StGoodsMapPO">
+		INSERT /* QUERYID: GOODS.insertStGoodsMap */
+		INTO ST_GOODS_MAP (
+			ST_ID
+			,GOODS_ID
+			,SVMN_RATE /*적립금율 */
+			,USE_PSB_SVMN_RATE /*사용가능 적립금율 */
+			,GOODS_STYLE_CD /* 상품 스타일 코드 */
+			,CMS_RATE /* 수수료 율 */
+			,SPL_AMT /*공급 금액*/
+			,SYS_REGR_NO
+			,SYS_REG_DTM
+			,SYS_UPDR_NO
+			,SYS_UPD_DTM
+		) VALUES (
+			#{stId}
+			,#{goodsId}
+			,#{svmnRate}
+			,#{usePsbSvmnRate}
+			,#{goodsStyleCd}
+			,#{cmsRate } /* 수수료 율 */
+            ,#{splAmt } /* 공급가 */
+			,#{sysRegrNo}
+			,NOW()
+			,#{sysUpdrNo}
+			,NOW()
+		)
+	</insert>
+
+	<update id="updateStGoodsMap" parameterType="biz.app.goods.model.StGoodsMapPO">
+		<!-- Query Name : goods.updateStGoodsMap Description : StGoodsMap 수정 -->
+		UPDATE ST_GOODS_MAP
+			SET SYS_UPDR_NO = #{sysUpdrNo } /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+	        <if test="goodsStyleCd != null and goodsStyleCd != ''">
+	        ,GOODS_STYLE_CD = #{goodsStyleCd}
+	        </if>
+		WHERE
+		    GOODS_ID = #{goodsId}
+		    AND ST_ID = #{stId}
+	</update>
+	
+	<update id="updateGoodsCisNo" parameterType="biz.app.goods.model.GoodsBasePO">
+		<!--
+			Query Name : goods.updateGoodsCisNo
+			Description : CIS 번호 수정
+		-->
+		/* QUERYID(goods.updateGoodsCisNo) */
+		UPDATE GOODS_BASE
+		SET CIS_NO = #{cisNo}
+		WHERE GOODS_ID = #{goodsId}
+	</update>
+</mapper>

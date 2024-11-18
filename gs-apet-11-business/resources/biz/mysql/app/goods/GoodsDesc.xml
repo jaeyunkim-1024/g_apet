@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsDesc">
+
+	<!-- 상품 설명 상세 조회 -->
+	<select id="getGoodsDesc" resultType="biz.app.goods.model.GoodsDescVO">
+		SELECT /* QUERYID(GoodsDesc.getGoodsDesc) */
+			GOODS_ID
+				,SVC_GB_CD
+				,CONTENT
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+		FROM	GOODS_DESC
+		WHERE	GOODS_ID = #{goodsId}
+		AND		SVC_GB_CD = #{svcGbCd}
+	</select>
+
+
+	<insert id="insertGoodsDesc" parameterType="biz.app.goods.model.GoodsDescPO" >
+		<!--
+			Query Name : goodsDesc.insertGoodsDesc
+			Description : 상품 상세 설명 등록
+		-->
+		INSERT INTO GOODS_DESC (
+			  CONTENT			/* 내용 */
+			, SVC_GB_CD			/* 서비스 구분 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+		) VALUES (
+			  #{content }		/* 내용 */
+			, #{svcGbCd }		/* 서비스 구분 코드 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{goodsId}		/* 상품 아이디 */
+		)
+	</insert>
+
+
+	<update id="updateGoodsDesc" parameterType="biz.app.goods.model.GoodsDescPO" >
+		<!--
+			Query Name : goodsDesc.updateGoodsDesc
+			Description : 상품 상세 설명 수정
+		-->
+		UPDATE	GOODS_DESC SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()		/* 시스템 수정 일시 */
+				, CONTENT			= #{content }		/* 내용 */
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+		AND		SVC_GB_CD		= #{svcGbCd }
+	</update>
+
+
+	<insert id="insertGoodsDescHist" parameterType="biz.app.goods.model.GoodsDescHistPO" >
+		<!--
+			Query Name : goodsDesc.insertGoodsDescHist
+			Description : 상품 상세 설명 이력 등록
+		-->
+		<selectKey keyProperty="goodsDescHistSeq" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_DESC_HIST_SEQ }') FROM DUAL
+		</selectKey>
+			INSERT INTO GOODS_DESC_HIST (
+				  GOODS_DESC_HIST_SEQ		/* 상품 설명 이력 순 */
+				, GOODS_ID					/* 상품 아이디 */
+				, SVC_GB_CD					/* 서비스 구분 코드 */
+				, CONTENT					/* 내용 */
+				, SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, SYS_REG_DTM				/* 시스템 등록 일시 */
+				, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				/* 시스템 수정 일시 */
+			) VALUES (
+				  #{goodsDescHistSeq }		/* 상품 설명 이력 순 */
+				, #{goodsId }				/* 상품 아이디 */
+				, #{svcGbCd }				/* 서비스 구분 코드 */
+				, #{content }				/* 내용 */
+				, #{sysRegrNo }				/* 시스템 등록자 번호 */
+				, NOW()						/* 시스템 등록 일시 */
+				, #{sysUpdrNo }				/* 시스템 수정자 번호 */
+				, NOW()						/* 시스템 수정 일시 */
+			)
+	</insert>
+
+
+	<select id="getGoodsDescAll" resultType="biz.app.goods.model.GoodsDescVO" >
+		<!--
+			Query Name : goodsDesc.getGoodsDescAll
+			Description : 상품 상세 설명 조회
+		-->
+		SELECT	/* QUERYID(goodsDesc.getGoodsDescAll ) */
+				MAX(CASE WHEN SVC_GB_CD = '${@framework.common.constants.CommonConstants@SVC_GB_10 }' THEN CONTENT ELSE '' END) AS CONTENT_PC,
+				MAX(CASE WHEN SVC_GB_CD = '${@framework.common.constants.CommonConstants@SVC_GB_20 }' THEN CONTENT ELSE '' END) AS CONTENT_MOBILE
+				, GOODS_ID			/* 상품 아이디 */
+		FROM	GOODS_DESC
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+		GROUP BY GOODS_ID
+	</select>
+
+
+	<select id="listGoodsDesc" resultType="biz.app.goods.model.GoodsDescVO" >
+		<!--
+			Query Name : goodsDesc.listGoodsDesc
+			Description : 상품 상세 설명 조회
+		-->
+		SELECT	/* QUERYID(goodsDesc.listGoodsDesc ) */
+				  CONTENT			/* 내용 */
+				, SVC_GB_CD			/* 서비스 구분 코드 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, GOODS_ID			/* 상품 아이디 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_DESC
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+	</select>
+
+
+
+
+
+</mapper>

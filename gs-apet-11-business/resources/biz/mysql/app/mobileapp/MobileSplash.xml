@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mobileapp">
+
+	<select id="pageMobileSplash" resultType="biz.app.mobileapp.model.MobileSplashVO">
+		<!--
+			Query Name : mobileapp.pageMobileSplash
+			Description : Splash 페이지 목록
+		-->
+		SELECT	/* QUERYID(mobileapp.pageMobileSplash) */
+			 SPLASH_NO				/* 스플래시 번호 */
+			,APP_ID					/* 앱 ID */
+			,MOBILE_OS				/* 모바일 OS */
+			,TITLE					/* 등록명 */
+			,LINK_TYPE				/* 링크형식 */
+			,LINK					/* 웹페이지 또는 이미지 URL */
+			,STATUS					/* 등록상태 */
+			,SYS_REGR_NO			/* 시스템 등록자 번호 */
+			,SYS_REG_DTM			/* 시스템 등록 일시 */
+			,SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM			/* 시스템 수정 일시 */
+			,FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			,FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			MOBILE_SPLASH
+		WHERE 1 = 1
+		    <if test="mobileOs != null and mobileOs != ''">
+			AND MOBILE_OS = #{mobileOs}
+			</if>
+			<if test="status != null and status != ''">
+			AND STATUS = #{status}
+			</if>
+        <include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageMobileSplashCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : mobileapp.pageMobileSplashCount
+			Description : Splash 페이지 목록 카운트
+		-->
+		SELECT	/* QUERYID(mobileapp.pageMobileSplashCount) */
+			COUNT(*)
+		FROM
+			MOBILE_SPLASH
+		WHERE 1 = 1
+			<if test="mobileOs != null and mobileOs != ''">
+			AND MOBILE_OS = #{mobileOs}
+			</if>
+			<if test="status != null and status != ''">
+			AND STATUS = #{status}
+			</if>
+	</select>
+
+	<select id="getMobileSplash" resultType="biz.app.mobileapp.model.MobileSplashVO">
+		<!--
+			Query Name : mobileapp.getMobileSplash
+			Description : Splash 정보 조회
+		-->
+		SELECT	/* QUERYID(mobileapp.getMobileSplash) */
+			 SPLASH_NO				/* 스플래시 번호 */
+			,APP_ID					/* 앱 ID */
+			,MOBILE_OS				/* 모바일 OS */
+			,TITLE					/* 등록명 */
+			,LINK_TYPE				/* 링크형식 */
+			,LINK					/* 웹페이지 또는 이미지 URL */
+			,STATUS					/* 등록상태 */
+			,SYS_REGR_NO			/* 시스템 등록자 번호 */
+			,SYS_REG_DTM			/* 시스템 등록 일시 */
+			,SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM			/* 시스템 수정 일시 */
+			,FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			,FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			MOBILE_SPLASH
+		WHERE 
+			SPLASH_NO = #{splashNo}
+	</select>
+	
+	<insert id="insertMobileSplash" parameterType="biz.app.mobileapp.model.MobileSplashPO" useGeneratedKeys="true" keyProperty="splashNo">
+		<!--
+			Query Name : mobileapp.insertMobileSplash
+			Description : Splash 등록
+		-->
+		INSERT INTO MOBILE_SPLASH (	/* QUERYID(mobileapp.insertMobileSplash) */
+			 APP_ID					/* 앱 ID */
+			,MOBILE_OS				/* 모바일 OS */
+			,TITLE					/* 등록명 */
+			,LINK_TYPE				/* 링크형식 */
+			,LINK					/* 웹페이지 또는 이미지 URL */
+			,STATUS					/* 등록상태 */
+			,SYS_REGR_NO			/* 시스템 등록자 번호 */
+			,SYS_REG_DTM			/* 시스템 등록 일시 */
+			,SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			 #{appId} 
+			,#{mobileOs} 
+			,#{title} 
+			,#{linkType} 
+			,#{link} 
+			,#{status} 
+			,#{sysRegrNo}
+			,NOW()	
+			,#{sysUpdrNo}
+			,NOW()
+		)
+	</insert>
+
+	<update id="updatePrevSplash" parameterType="biz.app.mobileapp.model.MobileSplashPO">
+		<!--
+			Query Name : mobileapp.updatePrevSplash
+			Description : Splash 수정
+		-->
+		UPDATE MOBILE_SPLASH	/* QUERYID(mobileapp.updatePrevSplash) */
+		SET
+			 STATUS = ${@framework.common.constants.CommonConstants@APP_SPLASH_STATUS_2}				/* 등록상태 - 중지 */
+			,SYS_UPDR_NO = #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+		WHERE
+			mobile_os = #{mobileOs}
+			AND status = ${@framework.common.constants.CommonConstants@APP_SPLASH_STATUS_1}
+	</update>
+	
+	<update id="updateMobileSplash" parameterType="biz.app.mobileapp.model.MobileSplashPO">
+		<!--
+			Query Name : mobileapp.updateMobileSplash
+			Description : Splash 수정
+		-->
+		UPDATE MOBILE_SPLASH	/* QUERYID(mobileapp.updateMobileSplash) */
+		SET
+			 APP_ID = #{appId}				/* 앱 ID */
+			,MOBILE_OS = #{mobileOs}		/* 모바일 OS */
+			,TITLE = #{title}				/* 등록명 */
+			,LINK_TYPE = #{linkType}		/* 링크형식 */
+			,LINK = #{link}					/* 웹페이지 또는 이미지 URL */
+			,STATUS = #{status}				/* 등록상태 */
+			,SYS_UPDR_NO = #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+		WHERE
+			SPLASH_NO = #{splashNo}
+	</update>
+
+	<delete id="deleteMobileSplash" parameterType="biz.app.mobileapp.model.MobileSplashPO">
+		<!--
+			Query Name : mobileapp.deleteMobileSplash
+			Description : Splash 삭제
+		-->
+		DELETE FROM MOBILE_SPLASH	/* QUERYID(mobileapp.deleteMobileSplash) */
+		WHERE SPLASH_NO in (${splashNos})
+	</delete>
+	
+</mapper>

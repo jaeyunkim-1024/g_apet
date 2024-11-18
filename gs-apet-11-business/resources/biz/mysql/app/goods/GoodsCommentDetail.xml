@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 평가
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsCommentDetail">
+	<update id="updateGoodsCommentDetail" parameterType="biz.app.goods.model.GoodsCommentDetailPO" >
+		<!--
+			Query Name : goodsComment.updateGoodsCommentDetail
+			Description : 상품 상세 수정 [PO]
+		-->
+		UPDATE	goods_comment SET
+			sys_updr_no = #{sysUpdrNo} , sys_upd_dtm = #{sysUpdDtm}
+		<if test="dispYn != null">
+			, disp_yn = #{dispYn}
+		</if>
+
+		<if test="bestYn != null">
+			, best_yn = #{bestYn}
+		</if>
+
+		<if test="snctYn != null">
+			, snct_yn = #{snctYn}
+		</if>
+		<if test="snctRsn != null">
+			, SNCT_RSN = #{snctRsn}
+		</if>
+
+		WHERE goods_estm_no = #{goodsEstmNo}
+	</update>
+	
+	<update id="updateGoodsCommentLinkDetail" parameterType="biz.app.goods.model.GoodsCommentDetailPO" >
+		<!--
+			Query Name : goodsComment.updateGoodsCommentLinkDetail
+			Description : 상품 상세 LINK 수정 [PO]
+		-->
+		UPDATE	goods_comment_link 
+		SET sys_regr_no = #{sysUpdrNo} 
+			, sys_reg_dtm = #{sysUpdDtm}
+		<if test="bestYn != null">
+			, best_yn = #{bestYn}
+		</if>
+		WHERE goods_estm_no = #{goodsEstmNo}
+	</update>
+
+	<update id="updateGoodsCommentBestDetail" parameterType="biz.app.goods.model.GoodsCommentDetailPO" >
+		<!--
+			Query Name : goodsComment.updateGoodsCommentDetail
+			Description : 상품 상세 수정 [PO]
+		-->
+		UPDATE	goods_comment SET
+		sys_updr_no = #{sysUpdrNo} , sys_upd_dtm = #{sysUpdDtm}
+		, best_yn = #{bestYn}
+		WHERE
+		<if test="goodsEstmNos != null" >
+			<foreach collection="goodsEstmNos" item="item" separator="," open="goods_estm_no IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+	</update>
+	
+	<update id="updateGoodsCommentLinkBestDetail" parameterType="biz.app.goods.model.GoodsCommentDetailPO" >
+		<!--
+			Query Name : goodsComment.updateGoodsCommentLinkBestDetail
+			Description : 상품 상세 LINK 수정 [PO]
+		--> 
+		UPDATE	goods_comment_link 
+		SET sys_regr_no = #{sysUpdrNo} 
+			, sys_reg_dtm = #{sysUpdDtm}
+			, best_yn = #{bestYn}
+		WHERE 
+		<if test="goodsEstmNos != null" >
+			<foreach collection="goodsEstmNos" item="item" separator="," open="goods_estm_no IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+	</update>
+
+	<select id="getGoodsCommentEstmScoreList" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : GoodsCommentDetail.getGoodsCommentEstmScoreList
+			Description : 상품 후기 평점 정보
+			usrDfn1Val
+		-->
+		SELECT	DTL_CD
+		,DTL_NM
+		, USR_DFN1_VAL
+		FROM 	code_detail
+		WHERE	GRP_CD = '${@framework.common.constants.CommonConstants@GOODS_ESTM_SCR_TP}'
+		ORDER BY LENGTH(DTL_CD)
+	</select>
+
+	<select id="getGoodsCommentEstmReplyList" resultType="biz.app.goods.model.GoodsCommentDetailReplyVO">
+		<!--
+			Query Name : GoodsCommentDetail.getGoodsCommentEstmScoreList
+			Description : 상품 후기 평점 정보
+			usrDfn1Val
+		-->
+		SELECT
+			@ROWNUM := @ROWNUM + 1 ROWNUM
+			, GEQ.QST_CONTENT        /* 평가 문항 내용 */
+			, GEQ.QST_CLSF        /* 평가 문항 분류 */
+			, GEQ.USE_YN         /* 평가 문항 내용 사용 여부 */
+			, GEQ.RPL_TP_CD     /* 평가 답변 유형 코드 */
+			, GEI.ITEM_CONTENT     /* 평가 답변 내용 */
+			, GEI.DISP_SEQ         /* 평가 전시 순서 */
+			, ESTM_RPL_NO        /* 상품 답변 번호 */
+			, GER.GOODS_ESTM_NO    /* 상품평 번호 */
+			, GER.ESTM_QST_NO    /* 평가 질의 번호(FK) */
+			, GER.ESTM_ITEM_NO    /* 평가 항목 번호(FK) */
+			, GER.ESTM_SCORE    /* 평가 점수 */
+		FROM (SELECT @ROWNUM := 0 ) VAR, goods_estm_qst_ctg_map geqcm
+		INNER JOIN goods_base gb
+		ON GB.GOODS_ESTM_DISP_CLSF_NO = GEQCM.DISP_CLSF_NO
+		INNER JOIN goods_estm_qst geq
+		ON GEQCM.ESTM_QST_NO = GEQ.ESTM_QST_NO
+		LEFT JOIN goods_estm_rpl ger
+		ON GEQ.ESTM_QST_NO = GER.ESTM_QST_NO 
+		LEFT JOIN goods_estm_item gei
+		ON ger.ESTM_QST_NO = gei.ESTM_QST_NO
+		AND ger.ESTM_ITEM_NO = gei.ESTM_ITEM_NO
+		LEFT JOIN goods_comment gc
+		ON ger.GOODS_ESTM_NO = gc.GOODS_ESTM_NO
+		WHERE 1=1
+		AND gb.GOODS_ID = gc.GOODS_ID
+		AND ger.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+	<select id="getGoodsCommentRptpRsnInfoList" resultType="biz.app.goods.model.GoodsCommentDetailReplyVO">
+		<!--
+			Query Name : GoodsCommentDetail.getGoodsCommentRptpRsnInfoList
+			Description : 상품평 신고 목록 조회
+			usrDfn1Val
+		-->
+		SELECT 	GEA.GOODS_ESTM_NO
+				, GEA.MBR_NO
+				, GEA.GOODS_ESTM_ACTN_CD
+				, GEA.RPTP_RSN_CD
+				, (SELECT DTL_NM FROM CODE_DETAIL CD WHERE CD.GRP_CD = 'RPTP_RSN' AND CD.DTL_CD = GEA.RPTP_RSN_CD) AS RPTP_RSN_NM
+				, GEA.RPTP_RSN_CONTENT
+				, GEA.SYS_REGR_NO
+				, GEA.SYS_REG_DTM 
+		FROM GOODS_ESTM_ACTN GEA 
+		WHERE 1 = 1
+		AND GEA.GOODS_ESTM_ACTN_CD = 'RPT'
+		AND GEA.GOODS_ESTM_NO = #{goodsEstmNo}  
+	
+	</select>
+	
+	<select id="getPetLogGoodsCommentRptpRsnInfoList" resultType="biz.app.goods.model.GoodsCommentDetailReplyVO">
+		<!--
+			Query Name : GoodsCommentDetail.getGoodsCommentRptpRsnInfoList
+			Description : 상품평 신고 목록 조회
+			usrDfn1Val
+		-->
+		SELECT GC.GOODS_ESTM_NO
+				, PLR.MBR_NO
+				, MB.LOGIN_ID 
+				, PLR.RPTP_RSN_CD
+				, (SELECT DTL_NM FROM CODE_DETAIL CD WHERE CD.GRP_CD = 'RPTP_RSN' AND CD.DTL_CD = PLR.RPTP_RSN_CD) AS RPTP_RSN_NM
+				, PLR.RPTP_CONTENT
+				, PLR.SYS_REGR_NO
+				, PLR.SYS_REG_DTM 
+		FROM PET_LOG_RPTP PLR 
+		JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM 
+		ON PLGRM.PET_LOG_NO = PLR.PET_LOG_NO 
+		JOIN GOODS_COMMENT GC 
+		ON GC.GOODS_ESTM_NO = PLGRM.GOODS_ESTM_NO 
+		JOIN MEMBER_BASE MB 
+		ON MB.MBR_NO = PLR.MBR_NO 
+		WHERE GC.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+
+	<select id="getGoodsCommentPetlogInfo" resultType="biz.app.goods.model.GoodsCommentDetailPetlogVO">
+		<!--
+			Query Name : GoodsCommentDetail.getGoodsCommentPetlogInfo
+			Description : 상품 펫로그 조회
+			usrDfn1Val
+		-->
+		SELECT
+			PB.PET_NO			/* 펫 번호 */
+			,PB.MBR_NO 			/* 회원 번호 */
+			, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = PB.MBR_NO) ESTM_ID	/* 회원 아이디 */
+			, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = PL.MBR_NO) PETLOG_ESTM_ID /* 펫로그 회원 아이디 */
+			,PB.IMG_PATH 		/* 이미지 경로 */
+			,PB.PET_GB_CD 		/* 펫 구분 코드 */
+			,PB.PET_KIND_NM 	/* 종류 코드 */
+			,PB.PET_NM 			/* 펫 이름 */
+			,PB.PET_GD_GB_CD 	/* 펫 성별 구분 코드 */
+			,PB.AGE 			/* 펫 나이 */
+			,PB.`MONTH` 		/* 개월 */
+			,PB.BIRTH 			/* 펫 출생일 */
+			,PB.WEIGHT 			/* WEIGHT(소형,중형,대형)*/
+			,PB.NAVER_PET_KEY 	/* 네이버 펫 KEY */
+			,PB.ALLERGY_YN		/* 알러지 여부 */
+			,PB.FIXING_YN 		/* 중성화 여부 */
+			,PB.WRY_DA_YN 		/* 염려 질환 여부 */
+			,PB.SYS_REGR_NO 	/* 등록자 번호 */
+			,PB.SYS_REG_DTM 	/* 등록일*/
+			,plgrm.GOODS_ESTM_NO/* 상품 번호 */
+			,PL.IMG_PATH1		/* 펫로그 이미지1 */
+			,PL.IMG_PATH2		/* 펫로그 이미지2 */
+			,PL.IMG_PATH3		/* 펫로그 이미지3 */
+			,PL.IMG_PATH4		/* 펫로그 이미지4 */
+			,PL.IMG_PATH5		/* 펫로그 이미지5 */
+			,PL.VD_PATH			/* 펫로그 영상 */
+		FROM pet_base pb
+		LEFT JOIN pet_log_goods_review_map plgrm
+		ON PB.PET_NO = PLGRM.PET_LOG_NO
+		LEFT JOIN pet_log_base pl
+		ON PB.PET_NO = PL.PET_LOG_NO
+		LEFT JOIN member_base mb
+		ON pb.MBR_NO = mb.MBR_NO
+		WHERE PB.PET_NO = ${petLogNo}
+	</select>
+</mapper>

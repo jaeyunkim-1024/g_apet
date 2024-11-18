@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"에러페이지"}'></include>
+
+		
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login srch agree" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents error-wrap-area" id="contents">
+					
+					<!-- 404 에러 -->
+					<div class="error-area">
+						<div class="error">
+							<p class="txt">서비스에 접속할 수 없습니다.</p>
+							<p class="txt-s">
+								잠시 문제가 생겨 페이지를 표시하지 못했습니다. <br>
+								잠시 후 다시 접속해주세요.
+							</p>
+							<div class="btnSet">
+								<a href="javascript:;" class="btn c">이전 페이지</a>
+								<a href="javascript:;" class="btn b">홈 바로가기</a>
+							</div>
+						</div>
+					</div>
+					<!-- // 404 에러  -->
+					
+				</div>
+			</div>
+		</main>
+
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+		<script>
+			
+		
+		</script>
+	</div>
+</body>
+</html>

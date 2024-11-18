@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	견적서
+	일자 : 2017. 02. 22.
+	작성자 : snw
+-->
+
+<mapper namespace="estimate">
+
+	<select id="pageEstimate" resultType="biz.app.estimate.model.EstimateVO">
+		<!--
+			Query Name : estimate.pageEstimate
+			Description : 견적서 목록 페이징 조회
+		-->
+		SELECT	/* estimate.pageEstimate */
+					ESTM_NO
+					,TG_NM
+					,DLVR_REQ_DT
+					,ESTM_DT
+					,TEL
+					,EMAIL
+					,SYS_REGR_NO
+					,SYS_REG_DTM
+					,MBR_NO
+					,FN_GET_MEMBER_NAME(MBR_NO) AS MBR_NM
+		FRO		ESTIMATE
+		WHERE 	1=1
+		<include refid="estimate.pageEstimateCondition" />
+		ORDER BY SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageEstimateCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : estimate.pageEstimateCount
+			Description : 견적서 목록 페이징 데이터수 조회
+		-->
+		SELECT	COUNT(*)
+		FROM		ESTIMATE
+		WHERE 	1=1
+		<include refid="estimate.pageEstimateCondition" />
+	</select>
+	
+	<sql id="pageEstimateCondition">
+		<if test="strtDtm != null and endDtm != null">
+		AND		ESTM_DT BETWEEN replace( #{strtDtm}, '-', '' ) AND replace( #{endDtm}, '-', '' )
+
+		</if>
+		<if test='tgNm != null and tgNm != ""'>
+		AND		TG_NM = #{tgNm}
+		</if>	
+	</sql>
+	
+</mapper>

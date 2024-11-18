@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	일자 : 2021. 03. 15.
+	작성자 : kjhvf01
+-->
+
+<mapper namespace="ordSavePnt">
+
+
+	<insert id="insertGsPntHist" parameterType="biz.app.order.model.OrdSavePntPO">
+		<!--
+			Query Name : ordSavePnt.insertGsPntHist
+			Description : 적립 포인트 이력
+		-->
+		<selectKey keyProperty="gsPntHistNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GS_PNT_HIST_SEQ}') FROM DUAL
+		</selectKey>
+		
+		INSERT INTO GS_PNT_HIST 
+		(
+			GS_PNT_HIST_NO			
+			, SAVE_USE_GB_CD			
+			, ORG_GS_PNT_HIST_NO
+			, DEAL_GB_CD
+			, MBR_NO
+			, GSPNT_NO
+			, PAY_AMT
+			, PNT
+			, DEAL_DTM
+			, DEAL_NO
+			, ORD_NO
+			, ORD_DTL_SEQ
+			, CLM_NO
+			, CLM_DTL_SEQ		
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) 
+		SELECT
+			#{gsPntHistNo}
+			, #{saveUseGbCd}
+			, #{orgGsPntHistNo}
+			, #{dealGbCd}
+			, #{mbrNo}
+			, #{gspntNo}
+			, #{payAmt}
+			, #{pnt}
+			, #{dealDtm}
+			, #{dealNo}
+			, #{ordNo}
+			, #{ordDtlSeq}
+			, #{clmNo}
+			, #{clmDtlSeq}		
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+	</insert>
+	
+	<insert id="insertOrdSavePntInfo" parameterType="biz.app.order.model.OrdSavePntPO">
+		<!--
+			Query Name : ordSavePnt.insertOrdSavePntInfo
+			Description : 주문 적립 포인트 정보 등록
+		-->
+		
+		INSERT INTO ORD_SAVE_PNT_INFO 
+		(
+			ORD_NO			
+			, ORD_DTL_SEQ			
+			, ORD_SAVE_PNT
+			, GS_PNT_HIST_NO
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) 
+		SELECT
+			#{ordNo}			
+			, #{ordDtlSeq}			
+			, #{ordSavePnt}
+			, #{gsPntHistNo}
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+	</insert>
+	
+	<select id="getOrdSavePntInfo" resultType="biz.app.order.model.OrdSavePntVO" >
+		<!--
+			Query Name : ordSavePnt.insertOrdSavePntInfo
+			Description : 주문 적립 포인트 단건 조회
+		-->
+		SELECT	/* QUERYID(ordSavePnt.getOrdSavePntInfo) */
+				PI.ORD_NO
+				, PI.ORD_DTL_SEQ
+				, PI.ORD_SAVE_PNT
+				, PI.GS_PNT_HIST_NO
+				, PH.SAVE_USE_GB_CD
+				, PH.DEAL_GB_CD
+				, PH.PNT
+				, PH.DEAL_DTM
+				, PH.DEAL_NO
+				, PH.CLM_NO
+				, PH.CLM_DTL_SEQ
+		  FROM ORD_SAVE_PNT_INFO PI
+	INNER JOIN GS_PNT_HIST PH
+			ON (PH.GS_PNT_HIST_NO = PI.GS_PNT_HIST_NO)
+		 WHERE PI.ORD_NO = #{ordNo}
+		   AND PI.ORD_DTL_SEQ = #{ordDtlSeq}
+	</select>
+	
+	<select id="getSavePntHist" resultType="biz.app.order.model.GsPntHistVO" >
+		<!--
+			Query Name : ordSavePnt.getSavePntHist
+			Description : 적립 포인트 이력 단건 조회
+		-->
+		SELECT	/* QUERYID(ordSavePnt.getSavePntHist) */
+				GS_PNT_HIST_NO
+				, GSPNT_NO
+				, ORD_NO
+				, PAY_AMT
+		FROM	GS_PNT_HIST
+		WHERE 1=1
+			<if test="ordNo != null and ordNo != ''">
+				AND	ORD_NO =  #{ordNo} 
+			</if>
+			<if test="saveUseGbCd != null and saveUseGbCd != ''">
+				AND SAVE_USE_GB_CD = #{saveUseGbCd}
+			</if>
+			<if test="dealGbCd != null and dealGbCd != ''">
+				and  DEAL_GB_CD = #{dealGbCd}
+			</if>
+			<if test="orgGsPntHistNoIsNull != null and orgGsPntHistNoIsNull == true">
+				and  ORG_GS_PNT_HIST_NO IS NULL
+			</if>
+		ORDER BY GS_PNT_HIST_NO DESC
+		LIMIT 1
+	</select>
+	
+	<update id="updateOrdSavePntInfo">
+		<!--
+			Query Name : ordSavePnt.updateOrdSavePntInfo
+			Description : 주문 적립 포인트 수정
+		-->
+		UPDATE /* QUERYID(ordSavePnt.updateOrdSavePntInfo) */
+			ORD_SAVE_PNT_INFO
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+					, ORD_SAVE_PNT = #{ordSavePnt}
+					, GS_PNT_HIST_NO = #{gsPntHistNo}
+		WHERE	ORD_NO = #{ordNo}
+		  AND   ORD_DTL_SEQ = #{ordDtlSeq}
+	</update>
+	
+</mapper>

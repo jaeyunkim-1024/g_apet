@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 관심상품
+	작성자  	snw
+	작성일자  	2016.02.16
+-->
+
+<mapper namespace="memberInterestGoods">
+
+	<select id="getMemberInterestGoods" resultType="biz.app.member.model.MemberInterestGoodsVO">
+		<!--
+			Query Name : memberInterestGoods.getMemberInterestGoods
+			Description : 회원 관심상품 상세조회
+		-->
+		SELECT	MBR_NO
+				,GOODS_ID
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+		FROM	MEMBER_INTEREST_GOODS
+		WHERE	MBR_NO = #{mbrNo}
+		AND		GOODS_ID = #{goodsId}
+	</select>
+
+	<insert id="insertMemberInterestGoods">
+		<!--
+			Query Name : memberInterestGoods.insertMemberInterestGoods
+			Description : 회원 관심상품 등록
+		-->
+		INSERT INTO	MEMBER_INTEREST_GOODS
+			(
+				MBR_NO
+				,GOODS_ID
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+			)
+			VALUES
+			(
+				#{mbrNo}
+				,#{goodsId}
+				,#{sysRegrNo}
+				,SYSDATE()
+			)
+	</insert>
+
+	<!-- 회원 관심 상품 목록 : 조건절 -->
+	<sql id="pageMemberInterestGoodsCondition">
+		<if test='mbrNo != null'>
+		AND MIG.MBR_NO = ${mbrNo}
+		</if>
+	</sql>
+
+	<delete id="deleteMemberInterestGoods">
+		<!--
+			Query Name : memberInterestGoods.deleteMemberInterestGoods
+			Description : 회원 관심 상품 삭제
+		-->
+
+		DELETE /* QUERYID(memberInterestGoods.deleteMemberInterestGoods) */
+		FROM	MEMBER_INTEREST_GOODS
+		WHERE	1=1
+		<if test='goodsId != null and goodsId != ""'>
+		AND		GOODS_ID = #{goodsId}
+		</if>
+		<if test='mbrNo != null'>
+		AND		MBR_NO = #{mbrNo}
+		</if>
+		<if test='strgPeriod != null'>
+		AND		DATE_ADD(SYS_REG_DTM, INTERVAL #{strgPeriod} DAY) <![CDATA[<]]> NOW()
+		</if>
+	</delete>
+
+	<select id="listRelatedGoods" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : MemberInterestgoods.listRelatedGoods
+			Description : 상품에 관련된 연관상품 목록 2개(마이페이지: 찜상품에서 사용함)
+		-->
+		SELECT /* QUERYID(MemberInterestgoods.listRelatedGoods) */
+			A.GOODS_ID AS GOODS_ID
+			,GOODS_NM
+			,IMG_SEQ
+			,IMG_PATH
+		FROM GOODS_BASE A
+		INNER JOIN GOODS_CSTRT_INFO C ON C.CSTRT_GOODS_ID = A.GOODS_ID AND C.GOODS_ID = #{GOODS_ID}
+		INNER JOIN GOODS_IMG GI
+			ON A.GOODS_ID = GI.GOODS_ID AND DLGT_YN= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		WHERE
+			1=1
+		ORDER BY A.SYS_REG_DTM DESC
+		LIMIT 0,2
+	</select>
+
+	<select id="listMemberInterestGoodsCount" resultType="java.lang.Integer">
+	
+		<!-- Query Name : MemberInterestgoods.listRelatedGoodsCount
+			Description : 마이페이지 > 찜상품 개수 -->
+		SELECT 
+			COUNT(*)
+		FROM
+		 	MEMBER_INTEREST_GOODS MIG
+		 	INNER JOIN GOODS_PRICE_INFO_TOTAL GPIT ON GPIT.GOODS_ID =  MIG.GOODS_ID
+		 	INNER JOIN GOODS_BASE GB ON (MIG.GOODS_ID = GB.GOODS_ID)
+			INNER JOIN GOODS_IMG GI ON (MIG.GOODS_ID = GI.GOODS_ID AND DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+		WHERE 1 = 1
+			AND GPIT.TOTAL_DAY = (SELECT MAX(TOTAL_DAY) FROM GOODS_PRICE_INFO_TOTAL) 
+			AND GPIT.ST_ID = #{stId}
+			<include refid="pageMemberInterestGoodsCondition" />
+	</select>
+	
+	
+	<select id="checkMemberInterestGoods" resultType="biz.app.member.model.MemberInterestGoodsVO">
+		<!--
+			Query Name : MemberInterestgoods.checkMemberInterestGoods
+			Description : 회원 찜 상품 여부
+		-->
+		SELECT /* QUERYID(memberInterestGoods.checkMemberInterestGoods) */
+			GB.GOODS_ID,
+			IF((SELECT COUNT(*) AS CNT FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID=GB.GOODS_ID AND MBR_NO=#{mbrNo}) > 0, 'Y', 'N') AS INTEREST_YN
+		FROM
+			GOODS_BASE GB
+		WHERE
+			<foreach collection="goodsIds" item="item" separator="," open="GB.GOODS_ID IN (" close=")">
+				#{item }
+			</foreach>
+		<foreach collection="goodsIds" item="item" separator="," open="ORDER BY FIELD(GOODS_ID, " close=")">
+			#{item }
+		</foreach>
+	</select>
+	
+	<select id="pageMemberInterestGoods" resultType="biz.app.member.model.MemberInterestGoodsVO">
+		<!--
+			Query Name : MemberInterestgoods.pageMemberInterestGoods
+			Description : 관심상품 페이지 리스트
+		-->
+		<include refid="listMemberInterestGoodsSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<sql id="listMemberInterestGoodsSql">
+		SELECT
+			GBT.GOODS_ID
+			, GBT.GOODS_NM
+			, WEB_STK_QTY
+			, GBT.OSTK_GOODS_SHOW_YN	/* 품절 상품 노출 여부 */
+			, GBT.SYS_REG_DTM	/* 찜 등록일 */
+			, GBT.IMG_PATH
+			, CASE WHEN FN_GET_GOODS_STOCK(GBT.GOODS_ID,NULL) <![CDATA[<=]]> 0 THEN '${@framework.common.constants.CommonConstants@DEL_YN_Y}'
+			ELSE '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			END SOLD_OUT_YN	/* 품절 여부 */
+			, CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT		/* 상품판매가 */
+			, CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) AS ORG_SALE_AMT	/* 상품원판매가 */
+			, CASE WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0
+			THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			END AS DC_AMT
+			, CASE WHEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0
+			THEN CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			ELSE CAST(FN_SPLIT(GBT.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED)
+			END AS FO_SALE_AMT	/* 최종판매가 */
+			<if test='mbrNo != null'>
+				,IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID = GBT.GOODS_ID AND MBR_NO = #{mbrNo}) > 0, 'Y', 'N') AS INTEREST_YN
+			</if>
+		from (
+			<include refid="defaultMemberInterestGoods" />
+		) GBT
+		WHERE 1 = 1
+		<include refid="bizCommon.sortSql" />
+	</sql>
+	
+	<sql id="defaultMemberInterestGoods">
+		SELECT 
+			FN_GET_GOODS_PRICE(G.GOODS_ID, #{stId}, WEB_MOBILE_GB_CD) AS GOODS_PRICE_INFO	/* 가격 정보 */
+			, FN_GET_BRAND_NAME(G.BND_NO) AS BND_NM 	/* 노출 브랜드명 */
+			, GI.IMG_PATH	 /* 상품 이미지 경로 */
+			, FN_GET_GOODS_STOCK(G.GOODS_ID,NULL) AS WEB_STK_QTY /* 재고 */
+			, MIG.SYS_REG_DTM
+			, G.GOODS_ID
+			, G.GOODS_NM
+			, G.OSTK_GOODS_SHOW_YN	/* 품절 상품 노출 여부 */
+		FROM GOODS_BASE G
+		JOIN MEMBER_INTEREST_GOODS MIG ON MIG.GOODS_ID = G.GOODS_ID
+		JOIN GOODS_IMG GI ON G.GOODS_ID = GI.GOODS_ID AND GI.IMG_TP_CD = '${@framework.common.constants.CommonConstants@IMG_TP_10}' AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		WHERE 1 = 1
+		AND MIG.MBR_NO = #{mbrNo}
+		AND G.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND G.GOODS_STAT_CD IN (
+					    	'${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					   		, '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+					    )
+		AND G.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}'
+		<choose>
+			<when test="deviceGb eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+				, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+			</when>
+			<otherwise>, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+		</choose>
+		)
+	</sql>
+	
+	<select id="pageMemberInterestGoodsCount" resultType="Integer">
+		SELECT COUNT(GBT.GOODS_ID)
+		FROM (
+			<include refid="defaultMemberInterestGoods" /> 
+		) GBT
+	</select>
+	
+	
+	<select id="listMemberInterestGoods" resultType="biz.app.member.model.MemberInterestGoodsVO">
+	<!--
+		Query Name : MemberInterestgoods.listRelatedGoods
+		Description : 마이페이지 > 찜 > 상품 전체목록
+	-->
+		<include refid="listMemberInterestGoodsSql" />
+	</select>
+	
+</mapper>

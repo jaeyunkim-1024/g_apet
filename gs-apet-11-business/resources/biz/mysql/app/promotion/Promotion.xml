@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="promotion">
+
+	<resultMap type="biz.app.promotion.model.PromotionBaseVO" id="PromotionBaseMap">
+		<result property="prmtNo"					column="PRMT_NO"/>
+		<result property="prmtKindCd"				column="PRMT_KIND_CD"/>
+		<result property="prmtStatCd"				column="PRMT_STAT_CD"/>
+		<result property="prmtNm"					column="PRMT_NM"/>
+		<result property="prmtAplCd"				column="PRMT_APL_CD"/>
+		<result property="aplVal"					column="APL_VAL"/>
+		<result property="prmtTgCd"					column="PRMT_TG_CD"/>
+		<result property="rvsMrgPmtYn"				column="RVS_MRG_PMT_YN"/>
+		<result property="aplStrtDtm"				column="APL_STRT_DTM"/>
+		<result property="aplEndDtm"				column="APL_END_DTM"/>
+		<result property="splCompDvdRate"			column="SPL_COMP_DVD_RATE"/>		
+		<result property="sysRegrNo"				column="SYS_REGR_NO"/>
+		<result property="sysRegDtm"				column="SYS_REG_DTM"/>
+		<result property="sysUpdrNo"				column="SYS_UPDR_NO"/>
+		<result property="sysUpdDtm"				column="SYS_UPD_DTM"/>
+		<result property="sysRegrNm"				column="SYS_REGR_NM"/>
+		<result property="sysUpdrNm"				column="SYS_UPDR_NM"/>
+		<result property="prmtAplGbCd"				column="PRMT_APL_GB_CD"/>
+		
+		<collection property="stStdList" column="{aplNo=PRMT_NO, prmtAplGbCd=PRMT_APL_GB_CD, stUseYn=ST_USE_YN}" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="inline.getStStdInfoPrmtById"/> 
+	</resultMap>
+
+	<select id="pagePromotion" resultMap="PromotionBaseMap">
+		<!--
+			Query Name : promotion.pagePromotion
+			Description : 프로모션 페이지 리스트
+		-->
+		SELECT	/* QUERYID(promotion.pagePromotion) */
+				  P.PRMT_NO			/* 프로모션 번호 */
+				, PRMT_KIND_CD		/* 프로모션 종류 코드 */
+				, PRMT_STAT_CD		/* 프로모션 상태 코드 */
+				, PRMT_NM			/* 프로모션 명 */
+				, PRMT_APL_CD		/* 프로모션 적용 코드 */
+				, APL_VAL			/* 적용 값 */
+				, PRMT_TG_CD		/* 프로모션대상코드 */
+				, RVS_MRG_PMT_YN	/* 역 마진 허용 여부 */
+				, APL_STRT_DTM		/* 적용 시작 일시 */
+				, APL_END_DTM		/* 적용 종료 일시 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, SPL_COMP_DVD_RATE /* 공급업체 분담율 */
+				, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' AS PRMT_APL_GB_CD
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM	PROMOTION_BASE P
+		WHERE	1 = 1
+		<if test="prmtNo != null">
+		AND		PRMT_NO = #{prmtNo}
+		</if>
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM 
+							(SELECT M.APL_NO AS PRMT_NO 
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID 
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}') SM 
+						WHERE P.PRMT_NO = SM.PRMT_NO)
+		</if>
+		<if test="prmtKindCd != null and prmtKindCd != ''">
+		AND		PRMT_KIND_CD = #{prmtKindCd}
+		</if>
+		<if test="prmtStatCd != null and prmtStatCd != ''">
+		AND		PRMT_STAT_CD = #{prmtStatCd}
+		</if>
+        <if test="prmtTgCd != null and prmtTgCd != ''">
+        AND     PRMT_TG_CD = #{prmtTgCd}
+        </if>
+		<if test="prmtNm != null and prmtNm != ''">
+		AND		PRMT_NM LIKE CONCAT('%', #{prmtNm}, '%')
+		</if>
+		<!-- if test="aplStrtDtm != null and aplEndDtm != ''"-->
+		<if test="aplStrtDtm != null and aplEndDtm != null">
+		AND		(APL_STRT_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm} OR APL_END_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm})
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	
+	<select id="pagePromotionCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pagePromotionCount
+			Description : test
+		-->
+		SELECT	/* QUERYID(promotion.pagePromotionCount) */
+				COUNT(*)
+		FROM	PROMOTION_BASE P
+		WHERE	1 = 1
+		<if test="prmtNo != null">
+		AND		PRMT_NO = #{prmtNo}
+		</if>
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM 
+							(SELECT M.APL_NO AS PRMT_NO 
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID 
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}') SM 
+						WHERE P.PRMT_NO = SM.PRMT_NO)
+		</if>		
+		<if test="prmtKindCd != null and prmtKindCd != ''">
+		AND		PRMT_KIND_CD = #{prmtKindCd}
+		</if>
+		<if test="prmtStatCd != null and prmtStatCd != ''">
+		AND		PRMT_STAT_CD = #{prmtStatCd}
+		</if>
+        <if test="prmtTgCd != null and prmtTgCd != ''">
+        AND     PRMT_TG_CD = #{prmtTgCd}
+        </if>   		
+		<if test="prmtNm != null and prmtNm != ''">
+		AND		PRMT_NM LIKE CONCAT('%', #{prmtNm}, '%')
+		</if>
+		<!--  if test="aplStrtDtm != null and aplEndDtm != ''" -->
+		<if test="aplStrtDtm != null and aplEndDtm != null">
+		AND		(APL_STRT_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm} OR APL_END_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm})
+		</if>
+	</select>
+	
+	<select id="getPromotion" resultMap="PromotionBaseMap">
+		<!--
+			Query Name : promotion.getPromotion
+			Description : 프로모션 정보 조회
+		-->
+		SELECT	/* QUERYID(promotion.getPromotion) */
+				  P.PRMT_NO			/* 프로모션 번호 */
+				, PRMT_KIND_CD		/* 프로모션 종류 코드 */
+				, PRMT_STAT_CD		/* 프로모션 상태 코드 */
+				, PRMT_NM			/* 프로모션 명 */
+				, PRMT_APL_CD		/* 프로모션 적용 코드 */
+				, APL_VAL			/* 적용 값 */
+				, PRMT_TG_CD		/* 프로모션대상코드 */
+				, RVS_MRG_PMT_YN	/* 역 마진 허용 여부 */
+				, APL_STRT_DTM		/* 적용 시작 일시 */
+				, APL_END_DTM		/* 적용 종료 일시 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, SPL_COMP_DVD_RATE	/* 공급업체 분담율 */
+				, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' AS PRMT_APL_GB_CD
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM	PROMOTION_BASE P
+		WHERE	P.PRMT_NO = #{prmtNo}
+		<if test="prmtKindCd != null and prmtKindCd != ''">
+			AND		PRMT_KIND_CD = #{prmtKindCd}
+		</if>
+	</select>
+
+	<insert id="insertPromotionBase" parameterType="biz.app.promotion.model.PromotionBasePO">
+		<!--
+			Query Name : promotion.insertPromotionBase
+			Description : insertPromotionBase
+		-->
+		<selectKey keyProperty="prmtNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PROMOTION_BASE_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO PROMOTION_BASE (
+			  PRMT_NO			/* 프로모션 번호 */
+			, PRMT_KIND_CD		/* 프로모션 종류 코드 */
+			, PRMT_STAT_CD		/* 프로모션 상태 코드 */
+			, PRMT_NM			/* 프로모션 명 */
+			, PRMT_APL_CD		/* 프로모션 적용 코드 */
+			, APL_VAL			/* 적용 값 */
+			, PRMT_TG_CD        /* 프로모션대상코드 */
+			, RVS_MRG_PMT_YN	/* 역 마진 허용 여부 */
+			, APL_STRT_DTM		/* 적용 시작 일시 */
+			, APL_END_DTM		/* 적용 종료 일시 */
+			, SPL_COMP_DVD_RATE /* 공급업체 분담율 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{prmtNo}			/* 프로모션 번호 */
+			, #{prmtKindCd}		/* 프로모션 종류 코드 */
+			, #{prmtStatCd}		/* 프로모션 상태 코드 */
+			, #{prmtNm}			/* 프로모션 명 */
+			, #{prmtAplCd}		/* 프로모션 적용 코드 */
+			, #{aplVal}			/* 적용 값 */
+			, #{prmtTgCd}		/* 프로모션대상코드 */
+			, #{rvsMrgPmtYn}    /* 역 마진 허용 여부 */
+			, #{aplStrtDtm}		/* 적용 시작 일시 */
+			, STR_TO_DATE( DATE_ADD(#{aplEndDtm}, INTERVAL 1 DAY) - INTERVAL 1 SECOND, '%Y-%m-%d %H:%i:%s')  /* 적용 종료 일시 */
+			, #{splCompDvdRate}	/* 공급업체 분담율 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updatePromotionBase" parameterType="biz.app.promotion.model.PromotionBasePO">
+		<!--
+			Query Name : promotion.updatePromotionBase
+			Description : updatePromotionBase
+		-->
+		UPDATE	PROMOTION_BASE SET
+				  PRMT_KIND_CD		= #{prmtKindCd}		/* 프로모션 종류 코드 */
+				, PRMT_STAT_CD		= #{prmtStatCd}		/* 프로모션 상태 코드 */
+				, PRMT_NM			= #{prmtNm}			/* 프로모션 명 */
+				, PRMT_APL_CD		= #{prmtAplCd}		/* 프로모션 적용 코드 */
+				, APL_VAL			= #{aplVal}			/* 적용 값 */
+				, PRMT_TG_CD        = #{prmtTgCd}		/* 프로모션대상코드 */    
+				, RVS_MRG_PMT_YN    = #{rvsMrgPmtYn}	/* 역 마진 허용 여부 */
+				, SPL_COMP_DVD_RATE = #{splCompDvdRate} /* 공급업체 분담율 */
+				, APL_STRT_DTM		= #{aplStrtDtm}		/* 적용 시작 일시 */
+				, APL_END_DTM		=  STR_TO_DATE( DATE_ADD(#{aplEndDtm}, INTERVAL 1 DAY) - INTERVAL 1 SECOND, '%Y-%m-%d %H:%i:%s')	/* 적용 종료 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	
+			1 = 1
+			AND	PRMT_NO	= #{prmtNo}
+	</update>
+	
+	<insert id="insertStStdGiftMap" parameterType="biz.app.st.model.StStdInfoPO">
+		<!--
+			Query Name : company.insertStStdEventMap
+			Description : 사이트와 프로모션(사은품) 매핑 등록
+		-->
+		INSERT INTO ST_PRMT_MAP (
+			  ST_ID				/* 사이트 아이디 */
+			, APL_NO			/* 이벤트 번호 */
+			, PRMT_APL_GB_CD	/* 프로모션/쿠폰/이벤트 구본 코드 */ 
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{prmtNo}			/* 이벤트 번호 */
+			, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' /* 프로모션/쿠폰/이벤트 구본 코드 */			
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<delete id="deleteStStdGiftMap" parameterType="biz.app.promotion.model.PromotionBasePO">
+		<!--
+			Query Name : delete.deleteStStdEventMap
+			Description : 프로모션(사은품)에 매핑된 사이트 정보를 모두 삭제
+		-->
+		DELETE FROM ST_PRMT_MAP
+		<choose>
+			<when test="prmtNo != null and prmtNo != ''">
+				WHERE APL_NO = #{prmtNo} 
+					AND PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' 
+			</when>
+			<otherwise>
+				WHERE 1 = 2
+			</otherwise>
+		</choose>
+	</delete>	
+
+	<resultMap type="biz.app.promotion.model.PromotionTargetVO" id="PromotionTargetMap">
+		<id property="goodsId"					column="GOODS_ID"/>
+		<result property="compGoodsId"          column="COMP_GOODS_ID"/>
+		<result property="goodsNm"				column="GOODS_NM"/>
+		<result property="goodsStatCd"			column="GOODS_STAT_CD"/>
+		<result property="mdlNm"				column="MDL_NM"/>
+		<result property="compNo"				column="COMP_NO"/>
+		<result property="compNm"				column="COMP_NM"/>
+		<result property="mmft"					column="MMFT"/>
+		<result property="saleStrtDtm"			column="SALE_STRT_DTM"/>
+		<result property="saleEndDtm"			column="SALE_END_DTM"/>
+		<result property="showYn"				column="SHOW_YN"/>
+		<result property="goodsTpCd"			column="GOODS_TP_CD"/>
+		<result property="bigo"					column="BIGO"/>
+		<result property="bndNo"				column="BND_NO"/>
+		<result property="bndNmKo"				column="BND_NM_KO"/>
+		<result property="saleAmt"				column="SALE_AMT"/>
+		<result property="aplSeq"				column="APL_SEQ"/>
+		<result property="splCompDvdRate"		column="SPL_COMP_DVD_RATE"/>
+		
+		<collection property="stStdList" column="{goodsId=GOODS_ID, stUseYn=ST_USE_YN}" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="inline.getStStdInfoGoodsById"/>
+	</resultMap>
+
+	<select id="listPromotionTarget" resultMap="PromotionTargetMap">
+		<!--
+			Query Name : promotion.listPromotionTarget
+			Description : 프로모션 대상상품 리스트
+		-->
+		SELECT	/* QUERYID(promotion.listPromotionTarget) */ A.GOODS_ID
+		        , A.COMP_GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, F.APL_SEQ
+				, PB.SPL_COMP_DVD_RATE
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM	
+			GOODS_BASE A LEFT 
+				JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+				LEFT JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+				JOIN GOODS_PRICE D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+				JOIN PROMOTION_TARGET F ON A.GOODS_ID = F.GOODS_ID
+				JOIN PROMOTION_BASE PB ON PB.PRMT_NO = F.PRMT_NO
+		WHERE 
+			F.PRMT_NO = #{prmtNo}
+		    <if test="stStdList != null and stStdList.size() != 0">
+		    AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = A.GOODS_ID
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    )
+		    AND EXISTS (SELECT 1 FROM ST_PRMT_MAP SP WHERE SP.APL_NO = F.PRMT_NO
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SP.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    	AND SP.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}')	
+		    </if>
+		    AND D.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		ORDER BY A.GOODS_ID DESC
+	</select>
+
+	<resultMap type="biz.app.promotion.model.PromotionFreebieVO" id="PromotionFreebieMap">
+		<id property="goodsId"					column="GOODS_ID"/>
+		<result property="goodsNm"				column="GOODS_NM"/>
+		<result property="goodsStatCd"			column="GOODS_STAT_CD"/>
+		<result property="mdlNm"				column="MDL_NM"/>
+		<result property="compNo"				column="COMP_NO"/>
+		<result property="compNm"				column="COMP_NM"/>
+		<result property="mmft"					column="MMFT"/>
+		<result property="saleStrtDtm"			column="SALE_STRT_DTM"/>
+		<result property="saleEndDtm"			column="SALE_END_DTM"/>
+		<result property="showYn"				column="SHOW_YN"/>
+		<result property="goodsTpCd"			column="GOODS_TP_CD"/>
+		<result property="bigo"					column="BIGO"/>
+		<result property="bndNo"				column="BND_NO"/>
+		<result property="bndNmKo"				column="BND_NM_KO"/>
+		<result property="saleAmt"				column="SALE_AMT"/>
+		<result property="splCompDvdRate"		column="SPL_COMP_DVD_RATE"/>
+		<result property="frbQty"				column="FRB_QTY"/>
+		
+		<collection property="stStdList" column="{goodsId=GOODS_ID, stUseYn=ST_USE_YN}" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="inline.getStStdInfoGoodsById"/>
+	</resultMap>
+	
+	<select id="listPromotionFreebie" resultMap="PromotionFreebieMap">
+		<!--
+			Query Name : promotion.listPromotionFreebie
+			Description : 프로모션 사은품 리스트
+		-->
+		SELECT	/* QUERYID(promotion.listPromotionFreebie) */ A.GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, PB.SPL_COMP_DVD_RATE
+				, F.FRB_QTY
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM 
+			GOODS_BASE A 
+				JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+				LEFT OUTER JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+				JOIN GOODS_PRICE D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM AND D.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}')
+				JOIN PROMOTION_FREEBIE F ON A.GOODS_ID = F.GOODS_ID
+				JOIN PROMOTION_BASE PB ON PB.PRMT_NO = F.PRMT_NO
+		WHERE	
+			F.PRMT_NO = #{prmtNo}
+		    <if test="stStdList != null and stStdList.size() != 0">
+		    AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = A.GOODS_ID
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    )
+		    AND EXISTS (SELECT 1 FROM ST_PRMT_MAP SP WHERE SP.APL_NO = F.PRMT_NO
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SP.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    	AND SP.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}')	
+		    </if>
+		ORDER BY A.GOODS_ID DESC
+	</select>
+
+	<insert id="insertPromotionTarget" parameterType="biz.app.promotion.model.PromotionTargetPO" >
+		<!--
+			Query Name : promotion.insertPromotionTarget
+			Description : 프로모션 타겟
+		-->
+		<selectKey keyProperty="aplSeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PROMOTION_TARGET_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO PROMOTION_TARGET (
+			  PRMT_NO			/* 프로모션 번호 */
+			, APL_SEQ			/* 적용 순번 */
+			, DISP_CLSF_NO		/* 전시 분류 번 */
+			, EXHBT_NO			/* 기획전 번호 */
+			, GOODS_ID			/* 상품 아이디 */
+			, COMP_NO           /* 업체번호 */
+			, BND_NO            /* 브랜드번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{prmtNo}			/* 프로모션 번호 */
+			, #{aplSeq}			/* 적용 순번 */
+			, #{dispClsfNo}		/* 전시 분류 번 */
+			, #{exhbtNo}		/* 기획전 번호 */
+			, #{goodsId}		/* 상품 아이디 */
+			, #{compNo}         /* 업체번호 */
+			, #{bndNo}          /* 브랜드번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deletePromotionTarget" parameterType="biz.app.promotion.model.PromotionTargetPO" >
+		DELETE
+		FROM	PROMOTION_TARGET
+		WHERE	PRMT_NO = #{prmtNo}
+		<if test="aplSeq != null and aplSeq != ''">
+		AND		APL_SEQ = #{aplSeq}
+		</if>
+	</delete>
+
+	<select id="selectPromotionTargetCheck" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM	PROMOTION_TARGET
+		WHERE	PRMT_NO		= #{prmtNo}
+		AND		GOODS_ID	= #{goodsId}
+	</select>
+
+	<insert id="insertPromotionFreebie" parameterType="biz.app.promotion.model.PromotionFreebiePO" >
+		<!--
+			Query Name : promotion.insertPromotionTarget
+			Description : 프로모션 사은품 등록한다
+		-->
+		INSERT INTO PROMOTION_FREEBIE (
+			PRMT_NO			/* 프로모션 번호 */
+			, GOODS_ID			/* 상품 아이디 */
+			, FRB_QTY			/* 사은품 수량 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			#{prmtNo}			/* 프로모션 번호 */
+			, #{goodsId}		/* 상품 아이디 */
+			, #{frbQty}		    /* 사은품 수량 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		) ON DUPLICATE KEY UPDATE SYS_UPDR_NO = #{sysUpdrNo}, SYS_UPD_DTM = NOW() 
+	</insert>
+
+	<delete id="deletePromotionFreebie" parameterType="biz.app.promotion.model.PromotionFreebiePO" >
+		<!--
+			Query Name : promotion.deletePromotionFreebie
+			Description : 프로모션 사은품을 삭제한다
+		-->
+		DELETE FROM PROMOTION_FREEBIE
+		<choose>
+			<when test="prmtNo != null and prmtNo != ''  ">
+			WHERE 
+				PRMT_NO = #{prmtNo}
+			</when>
+			<otherwise>
+			WHERE 
+				1 = 2
+			</otherwise>
+		</choose>
+	</delete>
+
+	<select id="selectPromotionFreebieCheck" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM	PROMOTION_FREEBIE
+		WHERE	PRMT_NO		= #{prmtNo}
+		AND		GOODS_ID	= #{goodsId}
+	</select>
+
+	<select id="listGoodsPromotionFreebie" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : promotion.listGoodsPromotionFreebie
+			Description : 사은품 리스트 조회
+		-->
+		SELECT goods.GOODS_ID, goods.GOODS_NM, goods.GOODS_STAT_CD, goods.SALE_STRT_DTM, goods.SALE_END_DTM, img.IMG_SEQ,img.IMG_PATH
+		FROM  promotion_base base
+		INNER JOIN promotion_freebie freebie
+		ON    base.PRMT_NO = freebie.PRMT_NO
+		INNER JOIN promotion_target target
+		ON    base.PRMT_NO = target.PRMT_NO
+		INNER JOIN goods_base goods
+		ON    freebie.GOODS_ID = goods.GOODS_ID
+		LEFT  JOIN goods_img img
+		ON    goods.GOODS_ID = img.GOODS_ID
+		AND   img.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		WHERE 1 = 1
+		AND   base.PRMT_KIND_CD = '${@framework.common.constants.CommonConstants@PRMT_KIND_20}'
+		AND   base.PRMT_STAT_CD = '${@framework.common.constants.CommonConstants@PRMT_STAT_20}'
+		AND   now() between base.APL_STRT_DTM AND base.APL_END_DTM
+		AND   goods.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+		AND   now() between goods.SALE_STRT_DTM AND goods.SALE_END_DTM
+		AND   target.GOODS_ID = #{goodsId}
+		ORDER BY target.GOODS_ID DESC
+	</select>
+
+	<select id="pagePromotionBase" resultMap="PromotionBaseMap">
+		<!--
+			Query Name : promotion.pagePromotionBase
+			Description : 프로모션 페이지 리스트
+		-->
+		SELECT	/* QUERYID(promotion.pagePromotion) */
+				  P.PRMT_NO			/* 프로모션 번호 */
+				, PRMT_KIND_CD		/* 프로모션 종류 코드 */
+				, PRMT_STAT_CD		/* 프로모션 상태 코드 */
+				, PRMT_NM			/* 프로모션 명 */
+				 
+				, PRMT_APL_CD		/* 프로모션 적용 코드 */
+				, APL_VAL			/* 적용 값 */
+				, PRMT_TG_CD		/* 프로모션대상코드 */
+				, RVS_MRG_PMT_YN	/* 역 마진 허용 여부 */
+				, APL_STRT_DTM		/* 적용 시작 일시 */
+				, APL_END_DTM		/* 적용 종료 일시 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, SPL_COMP_DVD_RATE /* 공급업체 분담율 */
+				, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' AS PRMT_APL_GB_CD
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM	PROMOTION_BASE P
+		WHERE	P.PRMT_KIND_CD  = '${@framework.common.constants.CommonConstants@PRMT_KIND_10}'
+		<if test="prmtNo != null">
+		AND		PRMT_NO = #{prmtNo}
+		</if>
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM 
+							(SELECT M.APL_NO AS PRMT_NO 
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID 
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}') SM 
+						WHERE P.PRMT_NO = SM.PRMT_NO)
+		</if>
+		<if test="prmtKindCd != null and prmtKindCd != ''">
+		AND		PRMT_KIND_CD = #{prmtKindCd}
+		</if>
+		<if test="prmtStatCd != null and prmtStatCd != ''">
+		AND		PRMT_STAT_CD = #{prmtStatCd}
+		</if>
+        <if test="prmtTgCd != null and prmtTgCd != ''">
+        AND     PRMT_TG_CD = #{prmtTgCd}
+        </if>   		
+		<if test="prmtNm != null and prmtNm != ''">
+		AND		PRMT_NM LIKE CONCAT('%', #{prmtNm}, '%')
+		</if>
+		<if test="prmtAplCd != null and prmtAplCd != ''">
+		AND		PRMT_APL_CD = #{prmtAplCd}
+		</if>
+		<!-- if test="aplStrtDtm != null and aplEndDtm != ''"-->
+		<if test="aplStrtDtm != null and aplEndDtm != null">
+		AND		(APL_STRT_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm} OR APL_END_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm})
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pagePromotionBaseCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pagePromotionCount
+			Description : test
+		-->
+		SELECT	/* QUERYID(promotion.pagePromotionCount) */
+				COUNT(*)
+		FROM	PROMOTION_BASE P
+		WHERE	P.PRMT_KIND_CD  = '${@framework.common.constants.CommonConstants@PRMT_KIND_10}'
+		<if test="prmtNo != null">
+		AND		PRMT_NO = #{prmtNo}
+		</if>
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM 
+							(SELECT M.APL_NO AS PRMT_NO 
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID 
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}') SM 
+						WHERE P.PRMT_NO = SM.PRMT_NO)
+		</if>		
+		<if test="prmtKindCd != null and prmtKindCd != ''">
+		AND		PRMT_KIND_CD = #{prmtKindCd}
+		</if>
+		<if test="prmtStatCd != null and prmtStatCd != ''">
+		AND		PRMT_STAT_CD = #{prmtStatCd}
+		</if>
+        <if test="prmtTgCd != null and prmtTgCd != ''">
+        AND     PRMT_TG_CD = #{prmtTgCd}
+        </if>		
+		<if test="prmtNm != null and prmtNm != ''">
+		AND		PRMT_NM LIKE CONCAT('%', #{prmtNm}, '%')
+		</if>
+		<!-- if test="aplStrtDtm != null and aplEndDtm != ''" -->
+		<if test="aplStrtDtm != null and aplEndDtm != null">
+		AND		(APL_STRT_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm} OR APL_END_DTM BETWEEN #{aplStrtDtm} AND #{aplEndDtm})
+		</if>
+	</select>
+	 
+	 
+	
+	<select id="listPromotionExTarget" resultMap="PromotionTargetMap">
+		<!--
+			Query Name : promotion.listPromotionExTarget
+			Description : 프로모션 제외대상상품 리스트
+		-->
+		SELECT	/* QUERYID(promotion.listPromotionExTarget) */ A.GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, 0 AS APL_SEQ
+				, PB.SPL_COMP_DVD_RATE
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+		FROM	
+			GOODS_BASE A LEFT 
+				JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+				LEFT JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+				JOIN GOODS_PRICE D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+				JOIN PROMOTION_EXCEPT_GOODS F ON A.GOODS_ID = F.GOODS_ID
+				JOIN PROMOTION_BASE PB ON PB.PRMT_NO = F.PRMT_NO
+		WHERE 
+			F.PRMT_NO = #{prmtNo}
+		    <if test="stStdList != null and stStdList.size() != 0">
+		    AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = A.GOODS_ID
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    )
+		    AND EXISTS (SELECT 1 FROM ST_PRMT_MAP SP WHERE SP.APL_NO = F.PRMT_NO
+		    	<foreach collection="stStdList" item="st" separator="," open="AND SP.ST_ID IN (" close=")">
+		    	#{st.stId}
+		    	</foreach>
+		    	AND SP.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}')	
+		    </if>
+		    AND D.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+	</select>
+	
+	<resultMap type="biz.app.promotion.model.DisplayPromotionTreeVO" id="resultDisplayTree">
+		<id     property="id"			column="ID"/>
+		<result property="text"			column="TEXT"/>
+		<result property="parent"		column="PARENT"/>
+		<result property="leaf"		column="LEAF"/>
+		<collection property="state" ofType="biz.app.promotion.model.DisplayPromotionTreeStateVO">
+			<result property="selected"	column="SELECTED"/>
+		</collection>
+	</resultMap>
+
+	<select id="listPromotionDisplayTree" resultMap="resultDisplayTree">
+		<!--
+			Query Name : promotion.listPromotionDisplayTree
+			Description : test
+		-->
+        SELECT  /* QUERYID(coupon.listCouponDisplayTree) */
+                A.DISP_CLSF_NO      AS ID       /* 전시 분류 번호 */
+                , A.DISP_CLSF_NM        AS TEXT     /* 전시 분류 명 */
+                , A.UP_DISP_CLSF_NO AS PARENT   /* 상위 전시 분류 번호 */
+                , IF(B.PRMT_NO IS NOT NULL, 'true', 'false') AS SELECTED
+        FROM    DISPLAY_CATEGORY A
+        LEFT OUTER JOIN PROMOTION_TARGET B ON A.DISP_CLSF_NO = B.DISP_CLSF_NO AND B.PRMT_NO = ${prmtNo}
+        WHERE   A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+            AND A.ST_ID = #{stId}  
+        <choose>
+            <when test="dispClsfCd != null and dispClsfCd != ''">
+            AND     A.DISP_CLSF_CD = #{dispClsfCd}
+            </when>
+            <otherwise>
+            AND     A.DISP_CLSF_CD = '${@framework.common.constants.CommonConstants@DISP_CLSF_10}'
+            </otherwise>
+        </choose>
+        ORDER BY DISP_LVL, DISP_PRIOR_RANK
+	</select>
+	
+	<select id="listPromotionShowDispClsf" resultType="biz.app.promotion.model.DisplayPromotionTreeVO" >
+	<!--
+		Query Name : promotion.listPromotionShowDispClsf
+		Description : 프로모션 전시분류 리스트
+	-->
+	SELECT	/* QUERYID(promotion.listPromotionShowDispClsf ) */
+			  B.DISP_CLSF_NO			/* 전시 분류 번호 */
+			, FN_GET_DISP_CTG_PATH(B.DISP_CLSF_NO ) DISP_CTG_PATH
+			, B.PRMT_NO				/* 프로모션 번호 */
+		    
+			, B.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, B.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, D.ST_ID						/* 사이트 ID */
+			, D.ST_NM					/* 사이트 명 */
+	FROM	PROMOTION_TARGET B  
+	INNER JOIN DISPLAY_CATEGORY     C ON (C.DISP_CLSF_NO = B.DISP_CLSF_NO)
+	INNER JOIN ST_STD_INFO D ON (D.ST_ID = C.ST_ID)
+	WHERE	1 = 1
+	AND		B.PRMT_NO		= #{prmtNo}
+	ORDER BY   B.DISP_CLSF_NO
+</select>
+	
+ 
+	
+	<insert id="insertStStdPromotionMap" parameterType="biz.app.st.model.StStdInfoPO">
+		<!--
+			Query Name : promotion.insertStStdPromotionMap
+			Description : 사이트와 쿠폰 매핑 등록
+		-->
+		INSERT INTO ST_PRMT_MAP (
+			  ST_ID				/* 사이트 아이디 */
+			, APL_NO			/* 쿠폰 번호 */
+			, PRMT_APL_GB_CD	/* 프로모션/쿠폰/이벤트 구본 코드 */ 
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{prmtNo}			/* 쿠폰 번호 */
+			, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_10}' /* 프로모션/쿠폰/이벤트 구본 코드 */			
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>	
+	
+	<insert id="insertPromotionExTarget" parameterType="biz.app.promotion.model.PromotionTargetPO">
+		<!--
+			Query Name : promotion.insertPromotionExTarget
+			Description : 프로모션 적용 제외 상품 등록
+		-->
+		INSERT INTO PROMOTION_EXCEPT_GOODS (
+			  PRMT_NO			/* 프로모션 번호 */
+			, GOODS_ID			/* 상품 아이디 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{prmtNo}			/* 프로모션 번호 */
+			, #{goodsId}		/* 상품 아이디 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	 
+	<delete id="deletePromotionExTarget" parameterType="biz.app.promotion.model.PromotionBasePO">
+		<!--
+			Query Name : promotion.deletePromotionExTarget
+			Description : 프로모션 적용 제외 상품 삭제
+		-->
+		DELETE
+		FROM	PROMOTION_EXCEPT_GOODS
+		WHERE	PRMT_NO = #{prmtNo}
+	</delete>	
+	<delete id="deletePromotionBase" parameterType="biz.app.promotion.model.PromotionBasePO">
+		<!--
+			Query Name : promotion.deletePromotionBase
+			Description : 프로모션 베이스 삭제
+		-->
+		DELETE
+		FROM	PROMOTION_BASE
+		WHERE	PRMT_NO = #{prmtNo}
+	</delete>
+	
+	
+	
+<select id="listPromotionTargetCompNo" resultType="biz.app.company.model.CompanyBaseVO"> 
+	SELECT  /* QUERYID(promotion.listPromotionTargetCompNo) */
+				  CT.PRMT_NO
+                , CB.COMP_NO            /* 업체 번호 */
+                , CB.COMP_NM            /* 업체 명 */
+                , CB.UP_COMP_NO     /* 상위 업체 번호 */
+                , (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = NULL ) AS UP_COMP_NM     /* 상위 업체명 */
+                , CB.BIZ_NO         /* 사업자 번호 */
+                , CB.COMP_STAT_CD       /* 업체 상태 코드 */
+                , CB.CEO_NM         /* 대표자 명 */
+                , CB.BIZ_CDTS           /* 업태 */
+                , CB.BIZ_TP         /* 종목 */
+                , CB.COMP_GB_CD     /* 업체 구분 코드 */
+                , CB.COMP_TP_CD     /* 업체 유형 코드 */
+                , CB.FAX                /* 팩스 */
+                , CB.TEL                /* 전화 */
+                , CB.POST_NO_OLD        /* 우편 번호 구 */
+                , CB.POST_NO_NEW        /* 우편 번호 신 */
+                , CB.ROAD_ADDR          /* 도로 주소 */
+                , CB.ROAD_DTL_ADDR      /* 도로 상세 주소 */
+                , CB.PRCL_ADDR          /* 지번 주소 */
+                , CB.PRCL_DTL_ADDR      /* 지번 상세 주소 */
+                , CB.BANK_CD            /* 은행 코드 */
+                , CB.ACCT_NO            /* 계좌 번호 */
+                , CB.OOA_NM         /* 예금주 명 */
+                , CB.BIGO               /* 비고 */
+				, CB.SYS_REGR_NO        /* 시스템 등록자 번호 */
+                , CB.SYS_REG_DTM        /* 시스템 등록 일시 */
+                , CB.SYS_UPDR_NO        /* 시스템 수정자 번호 */
+                , CB.SYS_UPD_DTM        /* 시스템 수정 일시 */
+                , FN_GET_USER_NAME(CB.SYS_REGR_NO) AS SYS_REGR_NM   /* 시스템 등록자 */
+                , FN_GET_USER_NAME(CB.SYS_UPDR_NO) AS SYS_UPDR_NM   /* 시스템 수정자 */
+                , CASE WHEN UP_COMP_NO = 0 THEN 0 ELSE 1 END AS CP_LEVEL /* 레벨 */
+		FROM    COMPANY_BASE CB 
+		        INNER JOIN PROMOTION_TARGET CT ON CT.COMP_NO = CB.COMP_NO
+        WHERE   1 = 1
+          AND CT.PRMT_NO = #{prmtNo}
+    	<include refid="bizCommon.sortSql" />
+</select>
+
+<select id="listPromotionTargetBndNo" resultType="biz.app.brand.model.BrandBaseVO"> 
+	SELECT    /* QUERYID(promotion.listPromotionTargetBndNo) */ 
+	          CT.PRMT_NO
+             , A.BND_NO
+			 , A.BND_NM_KO
+			 , A.BND_NM_EN
+			 , A.USE_YN
+			 , A.SORT_SEQ
+			 , A.KO_INIT_CHAR_CD
+			 , A.EN_INIT_CHAR_CD
+			 , A.BND_ITRDC
+			 , A.BND_ITRDC_IMG_PATH
+			 , A.BND_SHOW_YN			 
+			 , A.SYS_REGR_NO
+			 , FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			 , A.SYS_REG_DTM
+		  FROM BRAND_BASE A
+		       INNER JOIN PROMOTION_TARGET CT ON CT.BND_NO = A.BND_NO
+		 WHERE 1 = 1
+          AND CT.PRMT_NO = #{prmtNo}
+    	<include refid="bizCommon.sortSql" />
+</select>
+  
+<select id="listPromotionTargetExhbtNo" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : promotion.listPromotionTargetExhbtNo
+			Description : 기획전 페이지 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.listPromotionTargetExhbtNo) */
+				  DISTINCT EXB.EXHBT_NO		/* 기획전 번호 */
+				, EXB.EXHBT_NM				/* 기획전 명 */
+				, EXB.EXHBT_GB_CD			/* 기획전 구분 코드 */
+				, EXB.EXHBT_STAT_CD			/* 기획전 승인 상태 코드 */
+				, EXB.DISP_YN		/* 전시 여부 */
+				, EXB.DISP_STRT_DTM			/* 전시 시작 일시 */
+				, EXB.DISP_END_DTM			/* 전시 종료 일시 */
+				, STEXM.ST_ID
+				, SI.ST_NM
+				, EXB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, EXB.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, EXB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, EXB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(EXB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(EXB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, EXB.BNR_IMG_PATH     /* 배너 이미지 경로 */
+		     	, EXB.BNR_MO_IMG_PATH  /* 배너 모바일 이미지 경로 */
+		FROM	EXHIBITION_BASE EXB
+		INNER JOIN PROMOTION_TARGET CT  ON (CT.EXHBT_NO = EXB.EXHBT_NO ) 
+		INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME EXT ON EXT.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME_GOODS EXTG ON EXTG.THM_NO = EXT.THM_NO
+		JOIN ST_STD_INFO SI ON SI.ST_ID = STEXM.ST_ID
+		WHERE	1 = 1
+		  AND CT.PRMT_NO =  #{prmtNo}
+		ORDER BY	EXB.EXHBT_NO  DESC
+ 
+	</select>
+	
+</mapper>

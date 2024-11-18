@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명	상품 필터 속성
+	작성자  		yjs01
+	작성일자  	2020.12.07
+-->
+
+<mapper namespace="goodsFiltAttr">
+
+	<!-- 상품 그룹 조회 -->
+	<select id="getFiltAttrList" resultType="biz.app.goods.model.GoodsFiltAttrVO">
+		/* QUERYID(goodsFiltAttr.getFiltAttrList) */
+		SELECT * FROM
+		(
+			<include refid="goodsFiltAttr.getFiltAttr" />
+			<if test='filtAttrSeq != null'>
+				AND		FILT_ATTR_SEQ = #{filtAttrSeq}
+			</if>
+		) ATTR
+		WHERE 1=1
+
+		<include refid="bizCommon.sortSql" />
+
+	</select>
+	<select id="getFiltAttrInfo" resultType="biz.app.goods.model.GoodsFiltAttrVO">
+		/* QUERYID(goodsFiltAttr.getFiltAttrInfo) */
+		SELECT * FROM
+		(
+			<include refid="goodsFiltAttr.getFiltAttr" />
+			AND		FILT_ATTR_SEQ = #{filtAttrSeq}
+		) GRP
+		WHERE 1=1
+
+	</select>
+
+	<sql id="getFiltAttr">
+		SELECT	/* QUERYID(GoodsFiltAttr.getFiltAttr) */
+			FILT_GRP_NO
+			, FILT_ATTR_SEQ
+			, FILT_ATTR_NM
+			, USE_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_FILT_ATTR ATTR
+		WHERE	FILT_GRP_NO	 = #{filtGrpNo}
+	</sql>
+
+	<insert id="filtAttrInsert" parameterType="biz.app.goods.model.GoodsFiltAttrPO" >
+		<!--
+			Query Name : GoodsFiltAttr.filtAttrInsert
+			Description : 상품 필터 그룹 등록
+		-->
+		<selectKey keyProperty="filtAttrSeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_FILT_ATTR_NO}') FROM DUAL
+		</selectKey>
+
+		INSERT INTO GOODS_FILT_ATTR(FILT_GRP_NO, FILT_ATTR_SEQ, FILT_ATTR_NM, USE_YN, SYS_REGR_NO, SYS_REG_DTM)
+		VALUES(#{filtGrpNo}, #{filtAttrSeq}, #{filtAttrNm}, #{useYn}, #{sysRegrNo}, #{sysRegDtm})
+	</insert>
+
+	<update id="filtAttrUpdate" parameterType="biz.app.goods.model.GoodsFiltAttrPO" >
+		<!--
+			Query Name : GoodsFiltAttr.filtAttrUpdate
+			Description : 상품 필터 그룹 수정
+		-->
+		UPDATE	GOODS_FILT_ATTR SET
+		<if test='filtAttrNm != null'>
+			FILT_ATTR_NM  	= #{filtAttrNm},
+		</if>
+		<if test='useYn != null'>
+			USE_YN 			= #{useYn},
+		</if>
+		SYS_UPDR_NO 	= #{sysUpdrNo},
+		SYS_UPD_DTM 	= #{sysUpdDtm}
+		WHERE	FILT_ATTR_SEQ = #{filtAttrSeq}
+		AND 	FILT_GRP_NO	 = #{filtGrpNo}
+
+	</update>
+
+	<delete id="filtAttrDelete" parameterType="biz.app.goods.model.GoodsFiltAttrPO" >
+		<!--
+			Query Name : GoodsFiltAttr.filtAttrDelete
+			Description : 상품 필터 그룹 삭제
+		-->
+		DELETE FROM GOODS_FILT_ATTR
+		WHERE	FILT_ATTR_SEQ = #{filtAttrSeq}
+		AND 	FILT_GRP_NO	 = #{filtGrpNo}
+	</delete>
+
+</mapper>

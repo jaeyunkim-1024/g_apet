@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 버튼 클릭 시  */
+			$(".btn").click(function(){
+				ui.commentBox.open('.pop1');
+			});
+		});
+	</script>
+</head>
+<body style="background:rgba(0,0,0,0.5)">
+	<div class="btnSet">
+		<a href="javascript:;" class="btn lg a">팝업 OPEN</a>
+	</div>
+	<!-- 댓글 -->
+	<div class="commentBoxAp logcommentBox pop1">
+		<div class="head t2">
+			<div class="con">
+				<div class="tit">
+					댓글 <span class="price-box">4</span><!-- 2021.02.02 : span태그 추가 -->
+				</div>
+				<a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+			</div>
+		</div>
+		<div class="con t2">
+			<div class="box inf">
+				<div class="commendListBox">
+					<ul>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<!-- <div class="tit">hhlee04<span class="nameCardAp">작성자</span></div>  -->
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">수정</b></a></li>
+											<li><a class="bt" href="javascript:;"><b class="t">삭제</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">뽕실뽕실한 우리집 강아지</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+						<li>
+							<div class="pic"></div>
+							<div class="con">
+								<div class="tit">hhlee04</div>
+								<div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+								<div class="date">2020.10.22</div>
+							</div>
+							<!-- select box -->
+							<div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+								<div class="popSelect">
+									<input type="text" class="popSelInput">
+									<div class="popSelInnerWrap">
+										<ul>
+											<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- // select box -->
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="input">
+				<span></span>
+				<textarea type="text" maxlength="50" placeholder="댓글을 입력해주세요."></textarea>
+				<button onClick="ui.popSel.open(this)">등록</button>
+			</div>
+			<!-- 2021.02.08 : 위치 수정 -->
+			<div class="fixed_box" style="display:none;">
+				<!-- // tag -->
+				<div class="tagList"><!-- 높이만큼 top속성 -주시면 됩니다 -->
+					<ul>
+						<li>#산책</li>
+						<li>#산책중</li>
+						<li>#산책하는날</li>
+						<li>#산과바다</li>
+						<li>#산에가는날</li>
+					</ul>
+				</div>
+				<!-- // tag -->
+				<!-- user -->
+				<div class="userList" style="display:none;">
+					<ul>
+						<li><div class="pic"><img src="../../_images/_temp/temp_logDogImg02.png" alt="img"></div>hihiore</li>
+						<li><div class="pic"><img src="../../_images/_temp/temp_logDogImg02.png" alt="img"></div>hihioreart01</li>
+						<li><div class="pic"><img src="../../_images/_temp/temp_logDogImg02.png" alt="img"></div>hihiore00</li>
+						<li><div class="pic"><img src="../../_images/_temp/temp_logDogImg02.png" alt="img"></div>hihioreraeo45</li>
+						<li><div class="pic"><img src="../../_images/_temp/temp_logDogImg02.png" alt="img"></div>hihiorerefodjofd7</li>
+					</ul>
+				</div>
+				<!-- // user -->
+				<!-- 댓글 수정 중 알림 -->
+				<div class="alert-commentBox" style="display:none;">
+					<p><span class="icon-speechBubble"></span>댓글을 수정 중입니다.</p>
+					<button class="close" onClick="$(this).parent().hide();"></button>
+				</div>
+				<!-- // 댓글 수정 중 알림 -->
+			</div>
+			<!-- // 2021.02.08 : 위치 수정 -->
+		</div>
+	</div>
+	<!-- //댓글 -->
+</body>
+</html>

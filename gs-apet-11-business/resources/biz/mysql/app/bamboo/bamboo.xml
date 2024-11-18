@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bamboo">
+
+
+<select id="bamboo"  resultType="string">
+	<!--
+		Query Name	: bamboo
+		Description	: 뱀푸테스트
+	-->
+	select '뱀부테스트 버튼' AS test from dual
+</select>
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	이메일 전송 이력 Map
+	작성자  	snw 
+	작성일자  	2016.04.22 
+-->
+
+<mapper namespace="emailSendHistoryMap">
+
+	<select id="listEmailSendHistoryMap" resultType="biz.app.email.model.EmailSendHistoryMapVO">
+		<!--
+			Query Name : emailSendHistoryMap.listEmailSendHistoryMap
+			Description :  이메일 전송 이력 MAP 목록 조회
+		-->
+		SELECT	HIST_NO
+					,HIST_SEQ
+					,MAP01
+					,MAP02
+					,MAP03
+					,MAP04
+					,MAP05
+					,MAP06
+					,MAP07
+					,MAP08
+					,MAP09
+					,MAP10
+					,SYS_REGR_NO
+					,SYS_REG_DTM
+					,SYS_UPDR_NO
+					,SYS_UPD_DTM
+		FROM		EMAIL_SEND_HISTORY_MAP
+		WHERE	HIST_NO = #{histNo}
+		ORDER BY HIST_SEQ
+	</select>
+	
+	<insert id="insertEmailSendHistoryMap">
+		<!--
+			Query Name : emailSendHistoryMap.insertEmailSendHistoryMap
+			Description : 이메일 전송 이력 MAP 등록
+		-->
+	    <selectKey resultType="Long" keyProperty="histSeq" order="BEFORE">
+	       SELECT IFNULL(MAX(HIST_SEQ), 0) + 1 FROM EMAIL_SEND_HISTORY_MAP WHERE HIST_NO =  #{histNo}
+	    </selectKey> 		
+		INSERT INTO EMAIL_SEND_HISTORY_MAP
+			(
+				HIST_NO
+				,HIST_SEQ
+				,MAP01
+				,MAP02
+				,MAP03
+				,MAP04
+				,MAP05
+				,MAP06
+				,MAP07
+				,MAP08
+				,MAP09
+				,MAP10
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+			)
+			VALUES
+			(
+				#{histNo}
+				,#{histSeq}
+				,#{map01}
+				,#{map02}
+				,#{map03}
+				,#{map04}
+				,#{map05}
+				,#{map06}
+				,#{map07}
+				,#{map08}
+				,#{map09}
+				,#{map10}
+				,#{sysRegrNo}
+				,SYSDATE()
+				,#{sysUpdrNo}
+				,SYSDATE()
+			)	
+	</insert>
+	
+</mapper>

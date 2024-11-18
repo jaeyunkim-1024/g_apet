@@ -1,0 +1,2624 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	주문
+	2021.06.25
+	고도몰 주문 xml
+-->
+<mapper namespace="order">
+    <select id="listOrderCdCountList" resultType="biz.app.order.model.OrderStatusVO">
+        <!--
+            Query Name : order.listOrderCdCountList
+            Description : Front 마이페이지 나의 최근 주문현황
+        -->
+        SELECT /* 펫츠비 주문 이력 QUERYID(order.listOrderCdCountList) */
+        COUNT(1),
+        IFNULL(SUM(ORD_ACPT), 0) AS ORD_ACPT, IFNULL(SUM(ORD_CMPLT), 0) AS ORD_CMPLT, IFNULL(SUM(ORD_SHP_RDY), 0) AS ORD_SHP_RDY,
+        IFNULL(SUM(ORD_SHP_ING), 0) AS ORD_SHP_ING, IFNULL(SUM(ORD_SHP_CMPLT), 0) AS ORD_SHP_CMPLT, IFNULL(SUM(PUR_CNFM), 0) AS PCHSE_CNFM, IFNULL(SUM(ORD_CNCL), 0) AS ORD_CNCL
+        FROM (
+        SELECT
+
+        IF(OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS ORD_ACPT,
+
+
+        IF(OD.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}') AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS ORD_CMPLT,
+
+
+        IF(OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}' AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS ORD_SHP_RDY,
+
+
+        IF(OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}' AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS ORD_SHP_ING,
+
+
+        IF(OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}' AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS ORD_SHP_CMPLT,
+
+
+        IF(OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}' AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) > 0, 1, 0) AS PUR_CNFM,
+
+        CASE WHEN (OD.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}')) AND OD.CNC_QTY > 0 THEN 1 ELSE 0 END AS ORD_CNCL
+        FROM
+        ORDER_BASE OB
+        JOIN ORDER_DETAIL OD ON (OB.ORD_NO = OD.ORD_NO)
+        JOIN GOODS_IMG GI ON (OD.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+        WHERE OB.DATA_STAT_CD IS NOT NULL
+        AND OB.ORDR_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+        AND OB.ORD_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_STAT_10}', '${@framework.common.constants.CommonConstants@ORD_STAT_20}')
+        AND OB.MBR_NO = #{migMemno}  /* 회원번호 */
+        AND OB.ORDR_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+        AND OB.ORD_ACPT_DTM BETWEEN #{ordAcptDtmStart} AND #{ordAcptDtmEnd}
+        ) ORD
+    </select>
+
+
+    <resultMap id="resultMapForClaim" type="biz.app.claim.model.ClaimDetailVO" autoMapping="true">
+        <result property="clmNo"				column="CD_CLM_NO"              />
+        <result property="clmDtlSeq"			column="CD_CLM_DTL_SEQ"         />
+        <result property="clmDtlTpCd"			column="CD_CLM_DTL_TP_CD"       />
+        <result property="clmDtlStatCd"			column="CD_CLM_DTL_STAT_CD"     />
+        <result property="clmRsnCd"				column="CD_CLM_RSN_CD"          />
+        <result property="clmRsnContent"		column="CD_CLM_RSN_CONTENT"     />
+        <result property="clmDenyRsnContent"	column="CD_CLM_DENY_RSN_CONTENT"/>
+        <result property="mbrNo"				column="CD_MBR_NO"              />
+        <result property="ordNo"				column="CD_ORD_NO"              />
+        <result property="ordDtlSeq"			column="CD_ORD_DTL_SEQ"         />
+        <result property="orgClmNo"				column="CD_ORG_CLM_NO"          />
+        <result property="orgClmDtlSeq"			column="CD_ORG_CLM_DTL_SEQ"     />
+        <result property="goodsId"				column="CD_GOODS_ID"            />
+        <result property="goodsNm"				column="CD_GOODS_NM"            />
+        <result property="dealGoodsId"			column="CD_DEAL_GOODS_ID"       />
+        <result property="pakGoodsId"			column="CD_PAK_GOODS_ID"        />
+        <result property="dispClsfNo"			column="CD_DISP_CLSF_NO"        />
+        <result property="compGoodsId"			column="CD_COMP_GOODS_ID"       />
+        <result property="compItemId"			column="CD_COMP_ITEM_ID"        />
+        <result property="goodsPrcNo"			column="CD_GOODS_PRC_NO"        />
+        <result property="saleAmt"				column="CD_SALE_AMT"            />
+        <result property="payAmt"				column="CD_PAY_AMT"             />
+        <result property="rmnPayAmt"			column="CD_RMN_PAY_AMT"         />
+        <result property="clmQty"				column="CD_CLM_QTY"             />
+        <result property="cms"					column="CD_CMS"                 />
+        <result property="goodsCmsnRt"			column="CD_GOODS_CMSN_RT"       />
+        <result property="taxGbCd"				column="CD_TAX_GB_CD"           />
+        <result property="dlvrcNo"				column="CD_DLVRC_NO"            />
+        <result property="rtnDlvrcNo"			column="CD_RTN_DLVRC_NO"        />
+        <result property="dlvraNo"				column="CD_DLVRA_NO"            />
+        <result property="rtrnaNo"				column="CD_RTRNA_NO"            />
+        <result property="dlvrNo"				column="CD_DLVR_NO"             />
+        <result property="compNo"				column="CD_COMP_NO"             />
+        <result property="upCompNo"				column="CD_UP_COMP_NO"          />
+        <result property="clmCpltDtm"			column="CD_CLM_CPLT_DTM"        />
+        <result property="rtnMtdCd"				column="CD_RTN_MTD_CD"          />
+        <result property="outsideClmDtlNo"		column="CD_OUTSIDE_CLM_DTL_NO"  />
+        <result property="stlNo"				column="CD_STL_NO"              />
+        <result property="dlvrCpltPicUrl"		column="CD_DLVR_CPLT_PIC_URL"   />
+        <result property="dlvrSms"				column="CD_DLVR_SMS"            />
+        <result property="twcTckt"				column="CD_TWC_TCKT"            />
+        <result property="dlvrCpltYn"			column="CD_DLVR_CPLT_YN"        />
+        <result property="itemNm"				column="CD_ITEM_NM"				/>
+        <result property="itemNo"				column="CD_ITEM_NO"				/>
+        <result property="dispClsfNm"			column="CD_DISP_CLSF_NM"		/>
+        <result property="cpDcAmt"				column="CD_CP_DC_AMT"			/>
+        <result property="cartCpDcAmt"			column="CD_CART_CP_DC_AMT"		/>
+        <result property="bndNmKo"				column="CD_BND_NM_KO"			/>
+        <result property="subGoodsNm"			column="CD_SUB_GOODS_NM"		/>
+        <result property="dlvrPrcsTpCd"			column="CD_DLVR_PRCS_TP_CD"		/>
+        <association property="claimBaseVO" javaType="biz.app.claim.model.ClaimBaseVO" autoMapping="true">
+        </association>
+    </resultMap>
+
+    <resultMap id="orderListMap2ndE" type="biz.app.order.model.OrderBaseVO" autoMapping="true">
+        <id property="ordNo" column="ord_no" /> <!-- 주문번호별 -->
+        <collection property="orderCompanyListVO" ofType="biz.app.order.model.OrderCompanyVO" autoMapping="true">
+            <id property="compNo" column="comp_no" /> <!-- 회사번호별 -->
+            <collection property="orderInvoiceListVO" ofType="biz.app.order.model.OrderInvoiceVO" autoMapping="true">
+                <id property="dlvrInvNo" column="DLVR_INV_NO" /> <!-- 송장번호별 -->
+                <id property="cdClmNo" column="CD_CLM_NO" />
+                <collection property="orderDlvrStatListVO" ofType="biz.app.order.model.OrderDlvrStatVO" autoMapping="true">
+                    <id property="forceDtlStat" column="FORCE_DTL_STAT" /> <!-- 프로세스단계(odrdtlstat, clmtpcd) -->
+                    <result property="ordDtlStatCd" column="ORD_DTL_STAT_CD" />
+                    <result property="clmTpCd" column="CB_CLM_TP_CD" />
+                    <result property="clmStatCd" column="CB_CLM_STAT_CD" /> <!-- 2021.05.28, ssmvf01, 클레임 상태 추가 -->
+                    <result property="dlvrPrcsTpCd" column="DLVR_PRCS_TP_CD" />
+                    <result property="clmDtlStatCd" column="CD_CLM_DTL_STAT_CD" />
+                    <result property="compGbCd" column="COMP_GB_CD"/>
+                    <result property="dlvrInvNo" column="DLVR_INV_NO" />
+                    <result property="viewClmDtlStatCd" 	column="VIEW_CD_CLM_DTL_STAT_CD" />
+                    <result property="dlvrCpltDtm"			column="DLVR_CPLT_DTM"/>				<!-- 배송완료일자-->
+                    <result property="dlvrCpltDtmWeek"		column="DLVR_CPLT_DTM_WEEK"/>			<!-- 배송완료일자 요일-->
+                    <result property="ordBankInfo"			column="ORD_BANK_INFO"/>				<!-- 입금대기 은행정보-->
+                    <result property="ordDt"				column="ORD_DT"/>						<!-- 배송 예정 일자-->
+                    <result property="ordDtWeek"			column="ORD_DT_WEEK"/>					<!-- 배송 예정 일자 요일-->
+                    <discriminator column="LIST_DELIMITER" javaType="String"> <!-- 쿼리로 LIST_DELIMITER 컬럼을 두어 리스트를 나눠담는다 -->
+                        <case value="DELIVERY">
+                            <collection property="orderDetailListVO" ofType="biz.app.order.model.OrderDetailVO" javaType="list" autoMapping="true">
+                            </collection>
+                        </case>
+                        <case value="CLAIM">
+                            <collection property="claimDetailListVO" ofType="biz.app.order.model.OrderDetailVO" autoMapping="true">
+                                <association property="claimDetailVO" resultMap="resultMapForClaim" autoMapping="true">
+                                </association>
+                            </collection>
+                        </case>
+                    </discriminator>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="pageOrderDeliveryList2ndE" resultMap="orderListMap2ndE">
+        SELECT /* 펫츠비 주문 이력 QUERYID(order.listOrderDetail2ndE) */
+        LIST.*
+        , (SELECT PAY_MEANS_CD FROM PAY_BASE WHERE ORD_CLM_GB_CD ='10' AND CNC_YN ='N'  AND ORD_NO = LIST.ORD_NO ORDER BY PAY_MEANS_CD LIMIT 1) AS PAY_MEANS_CD
+        , (SELECT PAY_STAT_CD FROM PAY_BASE WHERE ORD_CLM_GB_CD ='10' AND CNC_YN ='N'  AND ORD_NO = LIST.ORD_NO ORDER BY PAY_MEANS_CD LIMIT 1) AS PAY_STAT_CD
+        , (SELECT CASE WHEN SUM(IF(FN_GET_ORDER_CLAIM_ING_YN(ORD_NO, ORD_DTL_SEQ)='Y', 1, 0)) = 0
+        AND SUM(IF(RMN_ORD_QTY - RTN_QTY - CLM_EXC_CPLT_QTY > 0, 1, 0)) = SUM(IF(RMN_ORD_QTY - RTN_QTY - CLM_EXC_CPLT_QTY > 0 AND ORD_DTL_STAT_CD = '170', 1, 0)) THEN 'Y'
+        ELSE 'N'
+        END
+        FROM ORDER_DETAIL
+        WHERE ORD_NO = LIST.ORD_NO
+        ) AS ORD_DELETE_FLG
+        FROM (
+        SELECT
+        OBB.*
+        , (SELECT IFNULL(SUM(CLM_QTY), 0) AS CLM_EXC_QTY FROM CLAIM_BASE CB ,CLAIM_DETAIL CD
+        WHERE CB.CLM_NO = CD.CLM_NO AND CB.CLM_TP_CD = '30' AND CB.CLM_STAT_CD IN ('30') AND CD.CLM_DTL_TP_CD = '40' AND CB.ORD_NO = OBB.ORD_NO AND CD.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+        ) AS CLM_EXC_CPLT_QTY
+        FROM (
+        SELECT
+        ORD_NO,
+        ST_ID,
+        ORD_STAT_CD,
+        ORD_MDA_CD,
+        MBR_NO,
+        MBR_GRD_CD,
+        ORD_NM,
+        ORDR_ID,
+        ORDR_EMAIL,
+        ORDR_TEL,
+        ORDR_MOBILE,
+        ORDR_IP,
+        ORD_ACPT_DTM,
+        ORD_CPLT_DTM,
+        OUTSIDE_ORD_NO,
+        CHNL_ID,
+        ORD_DTL_CNT,
+        ORD_PRCS_RST_CD,
+        ORD_PRCS_RST_MSG,
+        DATA_STAT_CD,
+        DLVR_PRCS_TP_CD, /* 일반택배일 경우 강제로 코드를 10으로 바꿔줌 */
+        ORDR_SHOW_YN,
+        PAY_AMT_TOTAL,		/* 결제 금액 */
+        CNC_PSB_YN,			/* 취소 가능 여부 */
+        ORD_DTL_SEQ,
+        ORD_DTL_STAT_CD,
+        GOODS_ID,
+        ITEM_NO,
+        ITEM_NM,
+        DEAL_GOODS_ID,
+        PAK_GOODS_ID,
+        COMP_GOODS_ID,
+        COMP_ITEM_ID,
+        ORD_QTY,
+        CNC_QTY,
+        RTN_QTY,
+        RMN_ORD_QTY,
+        GOODS_PRC_NO,
+        SALE_AMT,
+        PAY_AMT,
+        RMN_PAY_AMT,
+        CMS,
+        GOODS_CMSN_RT,
+        TAX_GB_CD,
+        ORD_SVMN,
+        SVMN_VLD_PRD_CD,
+        SVMN_VLD_PRD,
+        FREE_DLVR_YN,
+        HOT_DEAL_YN,
+        DLVRC_NO,
+        ORD_DLVRA_NO,
+        COMP_NO,
+        UP_COMP_NO,
+        MD_USR_NO,
+        GOODS_ESTM_NO,
+        GOODS_ESTM_REG_YN,
+        OUTSIDE_ORD_DTL_NO,
+        STL_NO,
+        DISP_CLSF_NO,
+        DLVR_CPLT_PIC_URL,
+        DLVR_SMS,
+        DLVR_CPLT_YN,
+        MKI_GOODS_YN,
+        MKI_GOODS_OPT_CONTENT,
+        RSV_GOODS_YN,
+        ISU_SCHD_PNT,
+        RTN_PSB_YN,				/* 반품 가능 여부 */
+        RTN_ING_YN,				/* 반품 진행 여무 */
+        RTN_CPLT_QTY,			/* 반품 완료 수량 */
+        CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+        CLM_ING_YN,				/* 클레임 진행 여부 */
+        PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+        CP_DC_AMT,				/* 쿠폰 할인 금액 */
+        DLVR_NO,				/* 배송 번호 */
+        STK_QTY,
+        VLD_ORD_QTY,
+        IMG_SEQ,
+        IMG_PATH,
+        RVS_IMG_PATH,
+        COMP_NM,
+        COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+        ITEM_MNG_YN,
+        BND_NM, 			/* 노출 브랜드명 */
+        BND_NM_KO,		/* 브랜드명 국문 */
+        GOODS_CSTRT_TP_CD,
+        PAK_ITEM_NM,
+        CASE WHEN DLVR_NO &lt; 0 AND ADDDATE((SELECT DLVR_CPLT_DTM FROM DELIVERY WHERE DLVR_NO = OBB.DLVR_NO),7) &lt; SYSDATE() THEN 'N' ELSE 'Y' END AS COMPARE_DTM_YN,
+        (
+        SELECT
+        GROUP_CONCAT( GB.GOODS_NM )
+        FROM GOODS_BASE GB
+        WHERE GB.GOODS_ID IN (
+        SELECT ODC.CSTRT_GOODS_ID
+        FROM ORD_DTL_CSTRT ODC
+        INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OBB.ORD_NO AND ODC.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+        WHERE ODC.ORD_NO  = OBB.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+        ORDER BY OBB.ORD_DTL_SEQ ASC
+        )
+        )AS SUB_GOODS_NM,		/*사은품명*/
+        ( SELECT ODAM.ORD_DT FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT,
+        ( SELECT WEEKDAY(DATE_FORMAT(ODAM.ORD_DT, '%Y%m%d')) FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT_WEEK,
+        ( SELECT DLVR_CPLT_DTM FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM,		/*배송 완료 일시*/
+        ( SELECT WEEKDAY(DATE_FORMAT(DLVR_CPLT_DTM, '%Y%m%d')) FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM_WEEK,	/*배송 완료 일시 요일*/
+        IFNULL((SELECT INV_NO FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO), '') AS DLVR_INV_NO,
+        (
+        SELECT CONCAT_WS('|', if(BANK_CD='', null, BANK_CD) , if(ACCT_NO='', null, ACCT_NO), if(DPST_SCHD_DT='', null, DPST_SCHD_DT))
+        FROM PAY_BASE PB
+        WHERE PB.ORD_CLM_GB_CD ='10' AND PB.PAY_MEANS_CD IN('fc','pc'
+        , 'eb','fb','pb'
+        , 'eb','fv','pv'
+        ) AND CNC_YN ='N'  AND PB.ORD_NO = OBB.ORD_NO
+        ) AS ORD_BANK_INFO,
+        (CASE WHEN PAK_GOODS_ID IS null THEN GOODS_NM ELSE PAK_GOODS_NM END) AS GOODS_NM,     /* 상품 명 */
+        (CASE WHEN GOODS_CSTRT_TP_CD = 'PAK' THEN GOODS_NM ELSE NULL END) AS OPT_GOODS_NM,
+        CD_CLM_NO,
+        CD_CLM_DTL_SEQ,
+        CD_CLM_DTL_TP_CD,
+        CD_CLM_DTL_STAT_CD,
+        CD_CLM_RSN_CD,
+        CD_CLM_RSN_CONTENT,
+        CD_CLM_DENY_RSN_CONTENT,
+        CD_MBR_NO,
+        CD_ORD_NO,
+        CD_ORD_DTL_SEQ,
+        CD_ORG_CLM_NO,
+        CD_ORG_CLM_DTL_SEQ,
+        CD_GOODS_ID,
+        CD_GOODS_NM,
+        CD_DEAL_GOODS_ID,
+        CD_PAK_GOODS_ID,
+        CD_DISP_CLSF_NO,
+        CD_COMP_GOODS_ID,
+        CD_COMP_ITEM_ID,
+        CD_GOODS_PRC_NO,
+        CD_SALE_AMT,
+        CD_PAY_AMT,
+        CD_RMN_PAY_AMT,
+        CD_CLM_QTY,
+        CD_CMS,
+        CD_GOODS_CMSN_RT,
+        CD_TAX_GB_CD,
+        CD_DLVRC_NO,
+        CD_RTN_DLVRC_NO,
+        CD_DLVRA_NO,
+        CD_RTRNA_NO,
+        CD_DLVR_NO,
+        CD_COMP_NO,
+        CD_UP_COMP_NO,
+        CD_CLM_CPLT_DTM,
+        CD_RTN_MTD_CD,
+        CD_OUTSIDE_CLM_DTL_NO,
+        CD_STL_NO,
+        CD_DLVR_CPLT_PIC_URL,
+        CD_DLVR_SMS,
+        CD_TWC_TCKT,
+        CD_DLVR_CPLT_YN,
+        CD_STK_QTY,
+        CD_RFD_PAY_TOT_AMT,
+        CB_ST_ID,
+        CB_CLM_TP_CD,
+        CB_CLM_STAT_CD,
+        CB_ORD_MDA_CD,
+        CB_CHNL_ID,
+        CB_SWAP_YN,
+        CB_ACPT_DTM,
+        CB_CNC_DTM,
+        CB_CPLT_DTM,
+        CB_ACPTR_NO,
+        CB_CNCR_NO,
+        CB_CPLTR_NO,
+        CB_OUTSIDE_CLM_NO,
+        CB_ORDR_SHOW_YN,
+        CD_ITEM_NM,
+        CD_ITEM_NO,
+        CD_DISP_CLSF_NM,
+        CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+        CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+        CD_BND_NM_KO,		/* 브랜드명 국문 */
+        CD_SUB_GOODS_NM,	/*사은품명*/
+        CD_DLVR_PRCS_TP_CD,
+        CASE WHEN CLM_DTL_STAT_ASC IS NULL OR ((ORD_QTY - CNC_QTY - RTN_QTY) > 0) THEN CONCAT('1ORD', ORD_DTL_STAT_CD)
+        WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN CONCAT('2CLM', CLM_DTL_STAT_ASC)
+        ELSE CONCAT('2CLM', CLM_DTL_STAT_ASC)
+        END AS FORCE_DTL_STAT, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+        CASE WHEN CLM_DTL_STAT_ASC IS NULL OR ((ORD_QTY - CNC_QTY - RTN_QTY) > 0) THEN 'DELIVERY'
+        WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN 'CLAIM'
+        ELSE 'CLAIM'
+        END AS LIST_DELIMITER, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+        CLM_DTL_SEQ_ORDER,
+        CASE WHEN CB_CLM_TP_CD != '30'
+        THEN CD_CLM_DTL_STAT_CD
+        WHEN CLM_DTL_STAT_ASC = '31'
+        THEN '410'
+        WHEN CLM_DTL_STAT_ASC = '32'
+        THEN '330'
+        <!-- 교환 거부 순서 변경 -->
+        WHEN CLM_DTL_STAT_ASC = '50'
+        THEN '350'
+        WHEN CLM_DTL_STAT_ASC = '45'
+        THEN '450'
+        ELSE CD_CLM_DTL_STAT_CD
+        END AS VIEW_CD_CLM_DTL_STAT_CD
+        FROM (
+        SELECT
+        OB.ORD_NO,
+        OB.ST_ID,
+        OB.ORD_STAT_CD,
+        OB.ORD_MDA_CD,
+        OB.MBR_NO,
+        OB.MBR_GRD_CD,
+        OB.ORD_NM,
+        OB.ORDR_ID,
+        OB.ORDR_EMAIL,
+        OB.ORDR_TEL,
+        OB.ORDR_MOBILE,
+        OB.ORDR_IP,
+        OB.ORD_ACPT_DTM,
+        OB.ORD_CPLT_DTM,
+        OB.OUTSIDE_ORD_NO,
+        OB.CHNL_ID,
+        OB.ORD_DTL_CNT,
+        OB.ORD_PRCS_RST_CD,
+        OB.ORD_PRCS_RST_MSG,
+        OB.DATA_STAT_CD,
+        (
+        CASE WHEN COMP_GB_CD='10' THEN OB.DLVR_PRCS_TP_CD
+        ELSE '10' END
+        ) AS DLVR_PRCS_TP_CD,
+        OB.ORDR_SHOW_YN,
+        FN_GET_ORDER_PAY_AMT(OB.ORD_NO) AS PAY_AMT_TOTAL,		/* 결제 금액 */
+        FN_GET_ORDER_CANCEL_PSB_YN(OB.ORD_NO) AS CNC_PSB_YN,	/* 취소 가능 여부 */
+        OD.ORD_DTL_SEQ,
+        OD.ORD_DTL_STAT_CD,
+        OD.GOODS_ID,
+        OD.ITEM_NO,
+        OD.ITEM_NM,
+        OD.DEAL_GOODS_ID,
+        OD.PAK_GOODS_ID,
+        OD.COMP_GOODS_ID,
+        OD.COMP_ITEM_ID,
+        OD.ORD_QTY,
+        OD.CNC_QTY,
+        OD.RTN_QTY,
+        OD.RMN_ORD_QTY,
+        OD.GOODS_PRC_NO,
+        OD.SALE_AMT,
+        OD.PAY_AMT,
+        OD.RMN_PAY_AMT,
+        OD.CMS,
+        OD.GOODS_CMSN_RT,
+        OD.TAX_GB_CD,
+        OD.ORD_SVMN,
+        OD.SVMN_VLD_PRD_CD,
+        OD.SVMN_VLD_PRD,
+        OD.FREE_DLVR_YN,
+        OD.HOT_DEAL_YN,
+        OD.DLVRC_NO,
+        OD.ORD_DLVRA_NO,
+        OD.COMP_NO,
+        OD.UP_COMP_NO,
+        OD.MD_USR_NO,
+        OD.GOODS_ESTM_NO,
+        OD.GOODS_ESTM_REG_YN,
+        OD.OUTSIDE_ORD_DTL_NO,
+        OD.STL_NO,
+        OD.DISP_CLSF_NO,
+        OD.DLVR_CPLT_PIC_URL,
+        OD.DLVR_SMS,
+        OD.DLVR_CPLT_YN,
+        OD.MKI_GOODS_YN,
+        OD.MKI_GOODS_OPT_CONTENT,
+        OD.RSV_GOODS_YN,
+        OD.ISU_SCHD_PNT,
+        (SELECT RTN_PSB_YN FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID) AS RTN_PSB_YN,	/* 반품 가능 여부 */
+        FN_GET_ORDER_CLAIM_ING_RTN_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_ING_YN,			/* 반품 진행 여무 */
+        FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS RTN_CPLT_QTY,		/* 반품 완료 수량 */
+        FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+        FN_GET_ORDER_CLAIM_ING_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS CLM_ING_YN,				/* 클레임 진행 여부 */
+        FN_GET_ORDER_DTL_PRMT_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+        FN_GET_ORDER_DTL_CP_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS CP_DC_AMT,				/* 쿠폰 할인 금액 */
+        FN_GET_ORDER_DLVR_NO(OD.ORD_NO, OD.ORD_DTL_SEQ, 'Y') AS DLVR_NO,				/* 배송 번호 */
+        FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS STK_QTY,
+        OD.RMN_ORD_QTY -  FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS VLD_ORD_QTY, /* 유효 주문 수량 */
+        GI.IMG_SEQ,
+        GI.IMG_PATH,
+        GI.RVS_IMG_PATH,
+        CP.COMP_NM,
+        CP.COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+        GB.ITEM_MNG_YN,
+        GB.GOODS_NM,
+        FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM, 			/* 노출 브랜드명 */
+        FN_GET_BRAND_NAME_KO(GB.BND_NO) AS BND_NM_KO,		/* 브랜드명 국문 */
+        (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID) AS PAK_GOODS_NM,
+        CASE WHEN OD.PAK_GOODS_ID IS NULL THEN GB.GOODS_CSTRT_TP_CD
+        ELSE (SELECT GOODS_CSTRT_TP_CD FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID)
+        END AS GOODS_CSTRT_TP_CD,
+        CASE WHEN OD.PAK_GOODS_ID IS NOT NULL THEN
+        (
+        SELECT GROUP_CONCAT(CONCAT_WS(' : ', GOG.SHOW_NM , AV.ATTR_VAL) ORDER BY GOG.DISP_PRIOR_RANK SEPARATOR '|')
+        FROM GOODS_BASE GB,ITEM IT, GOODS_OPT_GRP GOG, GOODS_ATTRIBUTE GA, ITEM_ATTRIBUTE_VALUE IAV, ATTRIBUTE_VALUE AV
+        WHERE GB.GOODS_ID = IT.GOODS_ID AND GA.GOODS_ID = GB.GOODS_ID
+        AND GA.ATTR_NO = AV.ATTR_NO AND GOG.ATTR_NO = GA.ATTR_NO
+        AND GOG.ATTR_NO = AV.ATTR_NO AND IAV.ITEM_NO = IT.ITEM_NO
+        AND IAV.ATTR_NO = AV.ATTR_NO AND AV.ATTR_VAL_NO = IAV.ATTR_VAL_NO
+        AND GB.GOODS_ID = OD.GOODS_ID AND GOG.GOODS_ID = OD.PAK_GOODS_ID
+        )
+        END AS PAK_ITEM_NM,
+        CD.ORD_NO					AS	CD_CLM_NO,
+        CD.CLM_DTL_SEQ				AS	CD_CLM_DTL_SEQ,
+        CD.CLM_DTL_TP_CD			AS	CD_CLM_DTL_TP_CD,
+        CD.CLM_DTL_STAT_CD			AS	CD_CLM_DTL_STAT_CD,
+        (SELECT USR_DFN3_VAL FROM CODE_DETAIL WHERE GRP_CD = 'CLM_DTL_STAT' AND DTL_CD = CD.CLM_DTL_STAT_CD) AS CLM_DTL_STAT_ASC,
+        CD.CLM_RSN_CD				AS	CD_CLM_RSN_CD,
+        CD.CLM_RSN_CONTENT			AS	CD_CLM_RSN_CONTENT,
+        CD.CLM_DENY_RSN_CONTENT		AS	CD_CLM_DENY_RSN_CONTENT,
+        CD.MBR_NO					AS	CD_MBR_NO,
+        CD.ORD_NO					AS	CD_ORD_NO,
+        CD.ORD_DTL_SEQ				AS	CD_ORD_DTL_SEQ,
+        CD.ORG_CLM_NO				AS	CD_ORG_CLM_NO,
+        CD.ORG_CLM_DTL_SEQ			AS	CD_ORG_CLM_DTL_SEQ,
+        CD.GOODS_ID					AS	CD_GOODS_ID,
+        CD.GOODS_NM					AS	CD_GOODS_NM,
+        CD.DEAL_GOODS_ID			AS	CD_DEAL_GOODS_ID,
+        CD.PAK_GOODS_ID				AS	CD_PAK_GOODS_ID,
+        CD.DISP_CLSF_NO				AS	CD_DISP_CLSF_NO,
+        CD.COMP_GOODS_ID			AS	CD_COMP_GOODS_ID,
+        CD.COMP_ITEM_ID				AS	CD_COMP_ITEM_ID,
+        CD.GOODS_PRC_NO				AS	CD_GOODS_PRC_NO,
+        CD.SALE_AMT					AS	CD_SALE_AMT,
+        CD.PAY_AMT					AS	CD_PAY_AMT,
+        CD.RMN_PAY_AMT				AS	CD_RMN_PAY_AMT,
+        CD.CLM_QTY					AS	CD_CLM_QTY,
+        CD.CMS						AS	CD_CMS,
+        CD.GOODS_CMSN_RT			AS	CD_GOODS_CMSN_RT,
+        CD.TAX_GB_CD				AS	CD_TAX_GB_CD,
+        CD.DLVRC_NO					AS	CD_DLVRC_NO,
+        CD.RTN_DLVRC_NO				AS	CD_RTN_DLVRC_NO,
+        CD.DLVRA_NO					AS	CD_DLVRA_NO,
+        CD.RTRNA_NO					AS	CD_RTRNA_NO,
+        CD.DLVR_NO						CD_DLVR_NO,
+        CD.COMP_NO					AS	CD_COMP_NO,
+        CD.UP_COMP_NO				AS	CD_UP_COMP_NO,
+        CD.CLM_CPLT_DTM				AS	CD_CLM_CPLT_DTM,
+        CD.RTN_MTD_CD				AS	CD_RTN_MTD_CD,
+        CD.OUTSIDE_CLM_DTL_NO		AS	CD_OUTSIDE_CLM_DTL_NO,
+        CD.STL_NO					AS	CD_STL_NO,
+        CD.DLVR_CPLT_PIC_URL		AS	CD_DLVR_CPLT_PIC_URL,
+        CD.DLVR_SMS					AS	CD_DLVR_SMS,
+        CD.TWC_TCKT					AS	CD_TWC_TCKT,
+        CD.DLVR_CPLT_YN				AS	CD_DLVR_CPLT_YN,
+        FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS CD_STK_QTY,
+        (CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT AS CD_RFD_PAY_TOT_AMT,
+        CB.ST_ID					AS	CB_ST_ID,
+        CB.CLM_TP_CD				AS	CB_CLM_TP_CD,
+        CB.CLM_STAT_CD				AS	CB_CLM_STAT_CD,
+        CB.ORD_MDA_CD				AS	CB_ORD_MDA_CD,
+        CB.CHNL_ID					AS	CB_CHNL_ID,
+        CB.SWAP_YN					AS	CB_SWAP_YN,
+        CB.ACPT_DTM					AS	CB_ACPT_DTM,
+        CB.CNC_DTM					AS	CB_CNC_DTM,
+        CB.CPLT_DTM					AS	CB_CPLT_DTM,
+        CB.ACPTR_NO					AS	CB_ACPTR_NO,
+        CB.CNCR_NO					AS	CB_CNCR_NO,
+        CB.CPLTR_NO					AS	CB_CPLTR_NO,
+        CB.OUTSIDE_CLM_NO			AS	CB_OUTSIDE_CLM_NO,
+        CB.ORDR_SHOW_YN				AS	CB_ORDR_SHOW_YN,
+        CASE
+        WHEN CB.CLM_TP_CD = '30'
+        THEN ( SELECT CDT.ITEM_NM FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+        ELSE CD.ITEM_NM
+        END AS CD_ITEM_NM,
+        CASE
+        WHEN CB.CLM_TP_CD = '30'
+        THEN ( SELECT CDT.ITEM_NO FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+        ELSE CD.ITEM_NO
+        END AS CD_ITEM_NO,
+        (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = CD.DISP_CLSF_NO) AS CD_DISP_CLSF_NM,
+        (
+        SELECT IFNULL(SUM(APL_AMT), 0)
+        FROM APL_BNFT AB
+        WHERE AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '210'
+        ) AS CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+        (
+        SELECT	IFNULL(SUM(APL_AMT), 0)
+        FROM APL_BNFT AB
+        WHERE	AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '220'
+        ) AS CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+        (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = CD.GOODS_ID)) AS CD_BND_NM_KO,	/* 브랜드명 국문 */
+        (
+        SELECT GROUP_CONCAT( GB.GOODS_NM, ',')
+        FROM GOODS_BASE GB
+        WHERE GB.GOODS_ID IN (
+        SELECT ODC.CSTRT_GOODS_ID
+        FROM ORD_DTL_CSTRT ODC
+        INNER JOIN ORDER_DETAIL ODD ON ODC.ORD_NO = ODD.ORD_NO AND ODC.ORD_DTL_SEQ = ODD.ORD_DTL_SEQ
+        WHERE ODC.ORD_NO  = OD.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+        ORDER BY ODD.ORD_DTL_SEQ ASC
+        )
+        ) AS CD_SUB_GOODS_NM, /*사은품명*/
+        CASE WHEN (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = CD.COMP_NO) = '20' THEN '10'
+        ELSE (SELECT DLVR_PRCS_TP_CD FROM ORDER_BASE X1 WHERE X1.ORD_NO = CD.ORD_NO)
+        END CD_DLVR_PRCS_TP_CD,
+        ROW_NUMBER() OVER(PARTITION BY OD.ORD_NO, OD.ORD_DTL_SEQ ORDER BY OD.ORD_DTL_SEQ DESC) AS CLM_DTL_SEQ_ORDER
+        FROM (
+        SELECT
+        ORD_NO,
+        ST_ID,
+        ORD_STAT_CD,
+        ORD_MDA_CD,
+        MBR_NO,
+        MBR_GRD_CD,
+        ORD_NM,
+        ORDR_ID,
+        ORDR_EMAIL,
+        ORDR_TEL,
+        ORDR_MOBILE,
+        ORDR_IP,
+        ORD_ACPT_DTM,
+        ORD_CPLT_DTM,
+        OUTSIDE_ORD_NO,
+        CHNL_ID,
+        ORD_DTL_CNT,
+        ORD_PRCS_RST_CD,
+        ORD_PRCS_RST_MSG,
+        DATA_STAT_CD,
+        DLVR_PRCS_TP_CD,
+        ORDR_SHOW_YN
+        FROM
+        ORDER_BASE OB
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <include refid="order.pageOrderDeliveryListCondition" />
+        </trim>
+        ORDER BY ORD_ACPT_DTM DESC
+        <include refid="bizCommon.pageSql" />
+        ) OB
+        INNER JOIN ORDER_DETAIL OD ON (OB.ORD_NO = OD.ORD_NO)
+        INNER JOIN GOODS_BASE GB ON (OD.GOODS_ID = GB.GOODS_ID)
+        INNER JOIN GOODS_IMG GI ON (OD.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = 'Y')
+        INNER JOIN COMPANY_BASE CP ON (OD.COMP_NO = CP.COMP_NO )
+        LEFT JOIN CLAIM_DETAIL CD ON (OD.ORD_NO = CD.ORD_NO AND OD.ORD_DTL_SEQ = CD.ORD_DTL_SEQ)
+        LEFT JOIN CLAIM_BASE CB ON CB.CLM_NO = CD.CLM_NO AND CB.CLM_STAT_CD &lt;> '40'
+        ) OBB
+        )OBB
+        WHERE
+        OBB.LIST_DELIMITER = 'DELIVERY'
+        AND CLM_DTL_SEQ_ORDER = 1
+        UNION ALL
+        SELECT
+        OBB.*
+        , (SELECT IFNULL(SUM(CLM_QTY), 0) AS CLM_EXC_QTY FROM CLAIM_BASE CB ,CLAIM_DETAIL CD
+        WHERE CB.CLM_NO = CD.CLM_NO AND CB.CLM_TP_CD = '30' AND CB.CLM_STAT_CD IN ('30') AND CD.CLM_DTL_TP_CD = '40' AND CB.ORD_NO = OBB.ORD_NO AND CD.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+        ) AS CLM_EXC_CPLT_QTY
+        FROM (
+        SELECT
+        ORD_NO,
+        ST_ID,
+        ORD_STAT_CD,
+        ORD_MDA_CD,
+        MBR_NO,
+        MBR_GRD_CD,
+        ORD_NM,
+        ORDR_ID,
+        ORDR_EMAIL,
+        ORDR_TEL,
+        ORDR_MOBILE,
+        ORDR_IP,
+        ORD_ACPT_DTM,
+        ORD_CPLT_DTM,
+        OUTSIDE_ORD_NO,
+        CHNL_ID,
+        ORD_DTL_CNT,
+        ORD_PRCS_RST_CD,
+        ORD_PRCS_RST_MSG,
+        DATA_STAT_CD,
+        DLVR_PRCS_TP_CD, /* 일반택배일 경우 강제로 코드를 10으로 바꿔줌 */
+        ORDR_SHOW_YN,
+        PAY_AMT_TOTAL,		/* 결제 금액 */
+        CNC_PSB_YN,			/* 취소 가능 여부 */
+        ORD_DTL_SEQ,
+        ORD_DTL_STAT_CD,
+        GOODS_ID,
+        ITEM_NO,
+        ITEM_NM,
+        DEAL_GOODS_ID,
+        PAK_GOODS_ID,
+        COMP_GOODS_ID,
+        COMP_ITEM_ID,
+        ORD_QTY,
+        CNC_QTY,
+        RTN_QTY,
+        RMN_ORD_QTY,
+        GOODS_PRC_NO,
+        SALE_AMT,
+        PAY_AMT,
+        RMN_PAY_AMT,
+        CMS,
+        GOODS_CMSN_RT,
+        TAX_GB_CD,
+        ORD_SVMN,
+        SVMN_VLD_PRD_CD,
+        SVMN_VLD_PRD,
+        FREE_DLVR_YN,
+        HOT_DEAL_YN,
+        DLVRC_NO,
+        ORD_DLVRA_NO,
+        COMP_NO,
+        UP_COMP_NO,
+        MD_USR_NO,
+        GOODS_ESTM_NO,
+        GOODS_ESTM_REG_YN,
+        OUTSIDE_ORD_DTL_NO,
+        STL_NO,
+        DISP_CLSF_NO,
+        DLVR_CPLT_PIC_URL,
+        DLVR_SMS,
+        DLVR_CPLT_YN,
+        MKI_GOODS_YN,
+        MKI_GOODS_OPT_CONTENT,
+        RSV_GOODS_YN,
+        ISU_SCHD_PNT,
+        RTN_PSB_YN,				/* 반품 가능 여부 */
+        RTN_ING_YN,				/* 반품 진행 여무 */
+        RTN_CPLT_QTY,			/* 반품 완료 수량 */
+        CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+        CLM_ING_YN,				/* 클레임 진행 여부 */
+        PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+        CP_DC_AMT,				/* 쿠폰 할인 금액 */
+        DLVR_NO,				/* 배송 번호 */
+        STK_QTY,
+        VLD_ORD_QTY,
+        IMG_SEQ,
+        IMG_PATH,
+        RVS_IMG_PATH,
+        COMP_NM,
+        COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+        ITEM_MNG_YN,
+        BND_NM, 			/* 노출 브랜드명 */
+        BND_NM_KO,		/* 브랜드명 국문 */
+        GOODS_CSTRT_TP_CD,
+        PAK_ITEM_NM,
+        CASE WHEN DLVR_NO &lt; 0 AND ADDDATE((SELECT DLVR_CPLT_DTM FROM DELIVERY WHERE DLVR_NO = OBB.DLVR_NO),7) &lt; SYSDATE() THEN 'N' ELSE 'Y' END AS COMPARE_DTM_YN,
+        (
+        SELECT
+        GROUP_CONCAT( GB.GOODS_NM )
+        FROM GOODS_BASE GB
+        WHERE GB.GOODS_ID IN (
+        SELECT ODC.CSTRT_GOODS_ID
+        FROM ORD_DTL_CSTRT ODC
+        INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OBB.ORD_NO AND ODC.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+        WHERE ODC.ORD_NO  = OBB.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+        ORDER BY OBB.ORD_DTL_SEQ ASC
+        )
+        )AS SUB_GOODS_NM,		/*사은품명*/
+        ( SELECT ODAM.ORD_DT FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT,
+        ( SELECT WEEKDAY(DATE_FORMAT(ODAM.ORD_DT, '%Y%m%d')) FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT_WEEK,
+        ( SELECT DLVR_CPLT_DTM FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM,		/*배송 완료 일시*/
+        ( SELECT WEEKDAY(DATE_FORMAT(DLVR_CPLT_DTM, '%Y%m%d')) FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM_WEEK,	/*배송 완료 일시 요일*/
+        IFNULL((SELECT INV_NO FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO), '') AS DLVR_INV_NO,
+        (
+        SELECT CONCAT_WS('|', if(BANK_CD='', null, BANK_CD) , if(ACCT_NO='', null, ACCT_NO), if(DPST_SCHD_DT='', null, DPST_SCHD_DT))
+        FROM PAY_BASE PB
+        WHERE PB.ORD_CLM_GB_CD ='10' AND PB.PAY_MEANS_CD IN('fc','pc'
+        , 'eb','fb','pb'
+        , 'eb','fv','pv'
+        ) AND CNC_YN ='N'  AND PB.ORD_NO = OBB.ORD_NO
+        ) AS ORD_BANK_INFO,
+        (CASE WHEN PAK_GOODS_ID IS null THEN GOODS_NM ELSE PAK_GOODS_NM END) AS GOODS_NM,     /* 상품 명 */
+        (CASE WHEN GOODS_CSTRT_TP_CD = 'PAK' THEN GOODS_NM ELSE NULL END) AS OPT_GOODS_NM,
+        CD_CLM_NO,
+        CD_CLM_DTL_SEQ,
+        CD_CLM_DTL_TP_CD,
+        CD_CLM_DTL_STAT_CD,
+        CD_CLM_RSN_CD,
+        CD_CLM_RSN_CONTENT,
+        CD_CLM_DENY_RSN_CONTENT,
+        CD_MBR_NO,
+        CD_ORD_NO,
+        CD_ORD_DTL_SEQ,
+        CD_ORG_CLM_NO,
+        CD_ORG_CLM_DTL_SEQ,
+        CD_GOODS_ID,
+        CD_GOODS_NM,
+        CD_DEAL_GOODS_ID,
+        CD_PAK_GOODS_ID,
+        CD_DISP_CLSF_NO,
+        CD_COMP_GOODS_ID,
+        CD_COMP_ITEM_ID,
+        CD_GOODS_PRC_NO,
+        CD_SALE_AMT,
+        CD_PAY_AMT,
+        CD_RMN_PAY_AMT,
+        CD_CLM_QTY,
+        CD_CMS,
+        CD_GOODS_CMSN_RT,
+        CD_TAX_GB_CD,
+        CD_DLVRC_NO,
+        CD_RTN_DLVRC_NO,
+        CD_DLVRA_NO,
+        CD_RTRNA_NO,
+        CD_DLVR_NO,
+        CD_COMP_NO,
+        CD_UP_COMP_NO,
+        CD_CLM_CPLT_DTM,
+        CD_RTN_MTD_CD,
+        CD_OUTSIDE_CLM_DTL_NO,
+        CD_STL_NO,
+        CD_DLVR_CPLT_PIC_URL,
+        CD_DLVR_SMS,
+        CD_TWC_TCKT,
+        CD_DLVR_CPLT_YN,
+        CD_STK_QTY,
+        CD_RFD_PAY_TOT_AMT,
+        CB_ST_ID,
+        CB_CLM_TP_CD,
+        CB_CLM_STAT_CD,
+        CB_ORD_MDA_CD,
+        CB_CHNL_ID,
+        CB_SWAP_YN,
+        CB_ACPT_DTM,
+        CB_CNC_DTM,
+        CB_CPLT_DTM,
+        CB_ACPTR_NO,
+        CB_CNCR_NO,
+        CB_CPLTR_NO,
+        CB_OUTSIDE_CLM_NO,
+        CB_ORDR_SHOW_YN,
+        CD_ITEM_NM,
+        CD_ITEM_NO,
+        CD_DISP_CLSF_NM,
+        CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+        CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+        CD_BND_NM_KO,		/* 브랜드명 국문 */
+        CD_SUB_GOODS_NM,	/*사은품명*/
+        CD_DLVR_PRCS_TP_CD,
+        CASE WHEN CLM_DTL_STAT_ASC IS NULL THEN CONCAT('1ORD', ORD_DTL_STAT_CD)
+        WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN CONCAT('2CLM', CLM_DTL_STAT_ASC)
+        ELSE CONCAT('2CLM', CLM_DTL_STAT_ASC)
+        END AS FORCE_DTL_STAT, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+        CASE WHEN CLM_DTL_STAT_ASC IS NULL THEN 'DELIVERY'
+        WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN 'CLAIM'
+        ELSE 'CLAIM'
+        END AS LIST_DELIMITER, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+        CLM_DTL_SEQ_ORDER,
+        CASE WHEN CB_CLM_TP_CD != '30'
+        THEN CD_CLM_DTL_STAT_CD
+        WHEN CLM_DTL_STAT_ASC = '31'
+        THEN '410'
+        WHEN CLM_DTL_STAT_ASC = '32'
+        THEN '330'
+        <!-- 교환 거부 순서 변경 -->
+        WHEN CLM_DTL_STAT_ASC = '50'
+        THEN '350'
+        WHEN CLM_DTL_STAT_ASC = '45'
+        THEN '450'
+        ELSE CD_CLM_DTL_STAT_CD
+        END AS VIEW_CD_CLM_DTL_STAT_CD
+        FROM (
+        SELECT
+        OB.ORD_NO,
+        OB.ST_ID,
+        OB.ORD_STAT_CD,
+        OB.ORD_MDA_CD,
+        OB.MBR_NO,
+        OB.MBR_GRD_CD,
+        OB.ORD_NM,
+        OB.ORDR_ID,
+        OB.ORDR_EMAIL,
+        OB.ORDR_TEL,
+        OB.ORDR_MOBILE,
+        OB.ORDR_IP,
+        OB.ORD_ACPT_DTM,
+        OB.ORD_CPLT_DTM,
+        OB.OUTSIDE_ORD_NO,
+        OB.CHNL_ID,
+        OB.ORD_DTL_CNT,
+        OB.ORD_PRCS_RST_CD,
+        OB.ORD_PRCS_RST_MSG,
+        OB.DATA_STAT_CD,
+        (
+        CASE WHEN COMP_GB_CD='10' THEN OB.DLVR_PRCS_TP_CD
+        ELSE '10' END
+        ) AS DLVR_PRCS_TP_CD,
+        OB.ORDR_SHOW_YN,
+        FN_GET_ORDER_PAY_AMT(OB.ORD_NO) AS PAY_AMT_TOTAL,		/* 결제 금액 */
+        FN_GET_ORDER_CANCEL_PSB_YN(OB.ORD_NO) AS CNC_PSB_YN,	/* 취소 가능 여부 */
+        OD.ORD_DTL_SEQ,
+        OD.ORD_DTL_STAT_CD,
+        OD.GOODS_ID,
+        OD.ITEM_NO,
+        OD.ITEM_NM,
+        OD.DEAL_GOODS_ID,
+        OD.PAK_GOODS_ID,
+        OD.COMP_GOODS_ID,
+        OD.COMP_ITEM_ID,
+        OD.ORD_QTY,
+        OD.CNC_QTY,
+        OD.RTN_QTY,
+        OD.RMN_ORD_QTY,
+        OD.GOODS_PRC_NO,
+        OD.SALE_AMT,
+        OD.PAY_AMT,
+        OD.RMN_PAY_AMT,
+        OD.CMS,
+        OD.GOODS_CMSN_RT,
+        OD.TAX_GB_CD,
+        OD.ORD_SVMN,
+        OD.SVMN_VLD_PRD_CD,
+        OD.SVMN_VLD_PRD,
+        OD.FREE_DLVR_YN,
+        OD.HOT_DEAL_YN,
+        OD.DLVRC_NO,
+        OD.ORD_DLVRA_NO,
+        OD.COMP_NO,
+        OD.UP_COMP_NO,
+        OD.MD_USR_NO,
+        OD.GOODS_ESTM_NO,
+        OD.GOODS_ESTM_REG_YN,
+        OD.OUTSIDE_ORD_DTL_NO,
+        OD.STL_NO,
+        OD.DISP_CLSF_NO,
+        OD.DLVR_CPLT_PIC_URL,
+        OD.DLVR_SMS,
+        OD.DLVR_CPLT_YN,
+        OD.MKI_GOODS_YN,
+        OD.MKI_GOODS_OPT_CONTENT,
+        OD.RSV_GOODS_YN,
+        OD.ISU_SCHD_PNT,
+        (SELECT RTN_PSB_YN FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID) AS RTN_PSB_YN,	/* 반품 가능 여부 */
+        FN_GET_ORDER_CLAIM_ING_RTN_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_ING_YN,			/* 반품 진행 여무 */
+        FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS RTN_CPLT_QTY,		/* 반품 완료 수량 */
+        FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+        FN_GET_ORDER_CLAIM_ING_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS CLM_ING_YN,				/* 클레임 진행 여부 */
+        FN_GET_ORDER_DTL_PRMT_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+        FN_GET_ORDER_DTL_CP_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS CP_DC_AMT,				/* 쿠폰 할인 금액 */
+        <!-- FN_GET_ORDER_DLVR_NO(OD.ORD_NO, OD.ORD_DTL_SEQ, 'Y') AS DLVR_NO,				/* 배송 번호 */ -->
+        FN_GET_CLM_DLVR_NO(CD.CLM_NO, MAX(CD.CLM_DTL_SEQ) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ), 'Y') AS DLVR_NO,	/*배송번호 - 교환배송쪽 배송번호를 가져오도록 수정 - 2021.05.17 by kek01*/
+        FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS STK_QTY,
+        OD.RMN_ORD_QTY -  FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS VLD_ORD_QTY, /* 유효 주문 수량 */
+        GI.IMG_SEQ,
+        GI.IMG_PATH,
+        GI.RVS_IMG_PATH,
+        CP.COMP_NM,
+        CP.COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+        GB.ITEM_MNG_YN,
+        GB.GOODS_NM,
+        FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM, 			/* 노출 브랜드명 */
+        FN_GET_BRAND_NAME_KO(GB.BND_NO) AS BND_NM_KO,		/* 브랜드명 국문 */
+        (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID) AS PAK_GOODS_NM,
+        CASE WHEN OD.PAK_GOODS_ID IS NULL THEN GB.GOODS_CSTRT_TP_CD
+        ELSE (SELECT GOODS_CSTRT_TP_CD FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID)
+        END AS GOODS_CSTRT_TP_CD,
+        CASE WHEN OD.PAK_GOODS_ID IS NOT NULL THEN
+        (
+        SELECT GROUP_CONCAT(CONCAT_WS(' : ', GOG.SHOW_NM , AV.ATTR_VAL) ORDER BY GOG.DISP_PRIOR_RANK SEPARATOR '|')
+        FROM GOODS_BASE GB,ITEM IT, GOODS_OPT_GRP GOG, GOODS_ATTRIBUTE GA, ITEM_ATTRIBUTE_VALUE IAV, ATTRIBUTE_VALUE AV
+        WHERE GB.GOODS_ID = IT.GOODS_ID AND GA.GOODS_ID = GB.GOODS_ID
+        AND GA.ATTR_NO = AV.ATTR_NO AND GOG.ATTR_NO = GA.ATTR_NO
+        AND GOG.ATTR_NO = AV.ATTR_NO AND IAV.ITEM_NO = IT.ITEM_NO
+        AND IAV.ATTR_NO = AV.ATTR_NO AND AV.ATTR_VAL_NO = IAV.ATTR_VAL_NO
+        AND GB.GOODS_ID = OD.GOODS_ID AND GOG.GOODS_ID = OD.PAK_GOODS_ID
+        )
+        END AS PAK_ITEM_NM,
+        CD.CLM_NO					AS	CD_CLM_NO,
+        <!-- CD.CLM_DTL_SEQ				AS	CD_CLM_DTL_SEQ, -->
+        <!-- CD.CLM_DTL_STAT_CD			AS	CD_CLM_DTL_STAT_CD, -->
+        <!-- CD.CLM_QTY					AS	CD_CLM_QTY, -->
+        CD.CLM_DTL_SEQ				AS	ORG_CD_CLM_DTL_SEQ,
+        MIN(CD.CLM_DTL_SEQ) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD) AS	CD_CLM_DTL_SEQ,
+        MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD) AS	CD_CLM_DTL_STAT_CD,
+        <!-- 2021-06-09 교환일 경우 배송쪽 남은수량 합 -->
+        CASE
+            WHEN CB.CLM_TP_CD = '30'
+            THEN (
+                SELECT SUM(RMN_CLM_QTY)
+                FROM CLAIM_DETAIL
+                WHERE CLM_NO = CD.CLM_NO AND ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = CD.ORD_DTL_SEQ AND CLM_DTL_TP_CD = '40'
+            )
+            ELSE SUM(CD.RMN_CLM_QTY) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD )
+        END AS CD_CLM_QTY,
+        CD.CLM_DTL_TP_CD			AS	CD_CLM_DTL_TP_CD,
+        (SELECT USR_DFN3_VAL FROM CODE_DETAIL WHERE GRP_CD = 'CLM_DTL_STAT' AND DTL_CD = CD.CLM_DTL_STAT_CD) AS CLM_DTL_STAT_ASC,
+        CD.CLM_RSN_CD				AS	CD_CLM_RSN_CD,
+        CD.CLM_RSN_CONTENT			AS	CD_CLM_RSN_CONTENT,
+        CD.CLM_DENY_RSN_CONTENT		AS	CD_CLM_DENY_RSN_CONTENT,
+        CD.MBR_NO					AS	CD_MBR_NO,
+        CD.ORD_NO					AS	CD_ORD_NO,
+        CD.ORD_DTL_SEQ				AS	CD_ORD_DTL_SEQ,
+        CD.ORG_CLM_NO				AS	CD_ORG_CLM_NO,
+        CD.ORG_CLM_DTL_SEQ			AS	CD_ORG_CLM_DTL_SEQ,
+        CD.GOODS_ID					AS	CD_GOODS_ID,
+        CD.GOODS_NM					AS	CD_GOODS_NM,
+        CD.DEAL_GOODS_ID			AS	CD_DEAL_GOODS_ID,
+        CD.PAK_GOODS_ID				AS	CD_PAK_GOODS_ID,
+        CD.DISP_CLSF_NO				AS	CD_DISP_CLSF_NO,
+        CD.COMP_GOODS_ID			AS	CD_COMP_GOODS_ID,
+        CD.COMP_ITEM_ID				AS	CD_COMP_ITEM_ID,
+        CD.GOODS_PRC_NO				AS	CD_GOODS_PRC_NO,
+        CD.SALE_AMT					AS	CD_SALE_AMT,
+        CD.PAY_AMT					AS	CD_PAY_AMT,
+        CD.RMN_PAY_AMT				AS	CD_RMN_PAY_AMT,
+        CD.CMS						AS	CD_CMS,
+        CD.GOODS_CMSN_RT			AS	CD_GOODS_CMSN_RT,
+        CD.TAX_GB_CD				AS	CD_TAX_GB_CD,
+        CD.DLVRC_NO					AS	CD_DLVRC_NO,
+        CD.RTN_DLVRC_NO				AS	CD_RTN_DLVRC_NO,
+        CD.DLVRA_NO					AS	CD_DLVRA_NO,
+        CD.RTRNA_NO					AS	CD_RTRNA_NO,
+        CD.DLVR_NO						CD_DLVR_NO,
+        CD.COMP_NO					AS	CD_COMP_NO,
+        CD.UP_COMP_NO				AS	CD_UP_COMP_NO,
+        CD.CLM_CPLT_DTM				AS	CD_CLM_CPLT_DTM,
+        CD.RTN_MTD_CD				AS	CD_RTN_MTD_CD,
+        CD.OUTSIDE_CLM_DTL_NO		AS	CD_OUTSIDE_CLM_DTL_NO,
+        CD.STL_NO					AS	CD_STL_NO,
+        CD.DLVR_CPLT_PIC_URL		AS	CD_DLVR_CPLT_PIC_URL,
+        CD.DLVR_SMS					AS	CD_DLVR_SMS,
+        CD.TWC_TCKT					AS	CD_TWC_TCKT,
+        CD.DLVR_CPLT_YN				AS	CD_DLVR_CPLT_YN,
+        FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS CD_STK_QTY,
+        (CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT AS CD_RFD_PAY_TOT_AMT,
+        CB.ST_ID					AS	CB_ST_ID,
+        CB.CLM_TP_CD				AS	CB_CLM_TP_CD,
+        CB.CLM_STAT_CD				AS	CB_CLM_STAT_CD,
+        CB.ORD_MDA_CD				AS	CB_ORD_MDA_CD,
+        CB.CHNL_ID					AS	CB_CHNL_ID,
+        CB.SWAP_YN					AS	CB_SWAP_YN,
+        CB.ACPT_DTM					AS	CB_ACPT_DTM,
+        CB.CNC_DTM					AS	CB_CNC_DTM,
+        CB.CPLT_DTM					AS	CB_CPLT_DTM,
+        CB.ACPTR_NO					AS	CB_ACPTR_NO,
+        CB.CNCR_NO					AS	CB_CNCR_NO,
+        CB.CPLTR_NO					AS	CB_CPLTR_NO,
+        CB.OUTSIDE_CLM_NO			AS	CB_OUTSIDE_CLM_NO,
+        CB.ORDR_SHOW_YN				AS	CB_ORDR_SHOW_YN,
+        CASE
+        WHEN CB.CLM_TP_CD = '30'
+        THEN ( SELECT CDT.ITEM_NM FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+        ELSE CD.ITEM_NM
+        END AS CD_ITEM_NM,
+        CASE
+        WHEN CB.CLM_TP_CD = '30'
+        THEN ( SELECT CDT.ITEM_NO FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+        ELSE CD.ITEM_NO
+        END AS CD_ITEM_NO,
+        (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = CD.DISP_CLSF_NO) AS CD_DISP_CLSF_NM,
+        (
+        SELECT IFNULL(SUM(APL_AMT), 0)
+        FROM APL_BNFT AB
+        WHERE AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '210'
+        ) AS CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+        (
+        SELECT	IFNULL(SUM(APL_AMT), 0)
+        FROM APL_BNFT AB
+        WHERE	AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '220'
+        ) AS CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+        (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = CD.GOODS_ID)) AS CD_BND_NM_KO,	/* 브랜드명 국문 */
+        (
+        SELECT GROUP_CONCAT( GB.GOODS_NM, ',')
+        FROM GOODS_BASE GB
+        WHERE GB.GOODS_ID IN (
+        SELECT ODC.CSTRT_GOODS_ID
+        FROM ORD_DTL_CSTRT ODC
+        INNER JOIN ORDER_DETAIL ODD ON ODC.ORD_NO = ODD.ORD_NO AND ODC.ORD_DTL_SEQ = ODD.ORD_DTL_SEQ
+        WHERE ODC.ORD_NO  = OD.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+        ORDER BY ODD.ORD_DTL_SEQ ASC
+        )
+        ) AS CD_SUB_GOODS_NM, /*사은품명*/
+        CASE WHEN (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = CD.COMP_NO) = '20' THEN '10'
+        ELSE (SELECT DLVR_PRCS_TP_CD FROM ORDER_BASE X1 WHERE X1.ORD_NO = CD.ORD_NO)
+        END CD_DLVR_PRCS_TP_CD,
+        ROW_NUMBER() OVER(PARTITION BY OD.ORD_NO, OD.ORD_DTL_SEQ, CD.CLM_NO ORDER BY CD.CLM_DTL_SEQ DESC) AS CLM_DTL_SEQ_ORDER,
+        CASE WHEN CD.CLM_DTL_TP_CD IN ('10', '20') THEN 'Y'
+        WHEN CD.CLM_DTL_TP_CD = '30'
+        THEN CASE WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '310'
+        THEN CASE WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410
+        THEN 'N'
+        ELSE 'Y'
+        END
+        WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '360'
+        THEN CASE WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410
+        THEN 'Y'
+        ELSE 'N'
+        END
+        WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '350'
+        THEN 'Y'
+        ELSE 'Y'
+        END
+        WHEN CD.CLM_DTL_TP_CD = '40'
+        THEN CASE WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '310'
+        THEN CASE WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410
+        THEN 'Y'
+        ELSE 'N'
+        END
+        WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '360'
+        THEN CASE WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410
+        THEN 'N'
+        ELSE 'Y'
+        END
+        WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '350'
+        THEN 'N'
+        ELSE 'N'
+        END
+        ELSE 'N'
+        END AS VIEW_CLM_YN
+        FROM (
+        SELECT
+        ORD_NO,
+        ST_ID,
+        ORD_STAT_CD,
+        ORD_MDA_CD,
+        MBR_NO,
+        MBR_GRD_CD,
+        ORD_NM,
+        ORDR_ID,
+        ORDR_EMAIL,
+        ORDR_TEL,
+        ORDR_MOBILE,
+        ORDR_IP,
+        ORD_ACPT_DTM,
+        ORD_CPLT_DTM,
+        OUTSIDE_ORD_NO,
+        CHNL_ID,
+        ORD_DTL_CNT,
+        ORD_PRCS_RST_CD,
+        ORD_PRCS_RST_MSG,
+        DATA_STAT_CD,
+        DLVR_PRCS_TP_CD,
+        ORDR_SHOW_YN
+        FROM
+        ORDER_BASE OB
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <include refid="order.pageOrderDeliveryListCondition" />
+        </trim>
+        ORDER BY ORD_ACPT_DTM DESC
+        <include refid="bizCommon.pageSql" />
+        ) OB
+        INNER JOIN ORDER_DETAIL OD ON (OB.ORD_NO = OD.ORD_NO)
+        INNER JOIN GOODS_BASE GB ON (OD.GOODS_ID = GB.GOODS_ID)
+        INNER JOIN GOODS_IMG GI ON (OD.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = 'Y')
+        INNER JOIN COMPANY_BASE CP ON (OD.COMP_NO = CP.COMP_NO )
+        INNER JOIN CLAIM_DETAIL CD ON (OD.ORD_NO = CD.ORD_NO AND OD.ORD_DTL_SEQ = CD.ORD_DTL_SEQ)
+        LEFT JOIN CLAIM_BASE CB ON CB.CLM_NO = CD.CLM_NO AND CB.CLM_STAT_CD &lt;> '40'
+        ) OBB
+        WHERE OBB.VIEW_CLM_YN = 'Y'
+        AND OBB.CD_CLM_QTY <![CDATA[>]]> 0
+        AND OBB.ORG_CD_CLM_DTL_SEQ = CD_CLM_DTL_SEQ
+        )OBB
+        WHERE
+        LIST_DELIMITER = 'CLAIM'
+        ) LIST
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="arrOrdDtlStatCd != null and arrOrdDtlStatCd.length > 0">
+                AND ORD_DTL_STAT_CD IN (
+                <foreach collection="arrOrdDtlStatCd" item="ordDtlStatCd" separator="," >
+                    #{ordDtlStatCd}
+                </foreach>
+                )    /* 주문상태코드 */
+            </if>
+        </trim>
+        ORDER BY ORD_ACPT_DTM DESC, COMP_GB_CD, COMP_NO, IF(CD_CLM_NO = ORD_NO, 'Z00000000000000000', CD_CLM_NO) DESC, FORCE_DTL_STAT,  ORD_DTL_SEQ
+    </select>
+
+    <select id="pageOrderDeliveryList2ndECount" resultType="java.lang.Integer">
+        SELECT  /* 펫츠비 주문 이력 QUERYID(order.pageOrderDeliveryListCount) */
+        COUNT(*)
+        FROM		ORDER_BASE OB
+        WHERE 1=1
+        <include refid="order.pageOrderDeliveryListCondition" />
+    </select>
+
+    <sql id="pageOrderDeliveryListCondition">
+        <!--
+            Query Name : order.pageOrderDeliveryListCondition
+            Description : Front 마이페이지 주문/배송조회 리스트 조건절
+        -->
+        AND 	DATA_STAT_CD IS NOT NULL
+        AND 	ORD_NO IN (
+            SELECT ORD_NO FROM ORDER_DETAIL OD
+            WHERE 1=1
+            <if test="arrOrdDtlStatCd != null and arrOrdDtlStatCd.length > 0">
+                AND OD.RMN_ORD_QTY - OD.RTN_QTY - FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) &gt; 0
+            </if>
+            AND OD.ORD_NO = OB.ORD_NO
+        )
+        <if test="ordrShowYn != null and ordrShowYn != ''">
+            AND ORDR_SHOW_YN = #{ordrShowYn}    /* 회원번호 */
+        </if>
+        <if test="ordAcptDtmStart != null">
+            AND 	ORD_ACPT_DTM <![CDATA[>=]]> #{ordAcptDtmStart}
+        </if>
+        <if test="ordAcptDtmEnd != null">
+            AND 	ORD_ACPT_DTM <![CDATA[<=]]> #{ordAcptDtmEnd}
+        </if>
+        <if test="migMemno != null and migMemno != 0L">
+            AND MBR_NO = #{migMemno}    /* 회원번호 */
+        </if>
+        <if test="ordNo != null and ordNo != ''">
+            AND ORD_NO = #{ordNo}    /* 주문번호 */
+        </if>
+        <if test="arrOrdDtlStatCd != null and arrOrdDtlStatCd.length > 0">
+            AND ORD_NO IN (
+            SELECT ORD_NO FROM ORDER_DETAIL
+            WHERE ORD_DTL_STAT_CD IN(
+            <foreach collection="arrOrdDtlStatCd" item="ordDtlStatCd" separator="," >
+                #{ordDtlStatCd}
+            </foreach>
+            )
+            )    /* 주문상태코드 */
+        </if>
+    </sql>
+
+    <resultMap id="orderDetailMap2ndE" type="biz.app.order.model.OrderBaseVO" autoMapping="true">
+        <id property="ordNo" column="ord_no" /> <!-- 주문번호별 -->
+        <collection property="orderCompanyListVO" ofType="biz.app.order.model.OrderCompanyVO" autoMapping="true">
+            <id property="compNo" column="comp_no" /> <!-- 회사번호별 -->
+            <collection property="orderInvoiceListVO" ofType="biz.app.order.model.OrderInvoiceVO" autoMapping="true">
+                <id property="dlvrInvNo" column="DLVR_INV_NO" /> <!-- 송장번호별 -->
+                <id property="cdClmNo" column="CD_CLM_NO" />
+                <collection property="orderDlvrStatListVO" ofType="biz.app.order.model.OrderDlvrStatVO" autoMapping="true">
+                    <id property="forceDtlStat" column="FORCE_DTL_STAT" /> <!-- 프로세스단계(odrdtlstat, clmtpcd) -->
+                    <result property="ordDtlStatCd" column="ORD_DTL_STAT_CD" />
+                    <result property="clmTpCd" column="CB_CLM_TP_CD" />
+                    <result property="clmStatCd" column="CB_CLM_STAT_CD" /> <!-- 2021.05.28, ssmvf01, 클레임 상태 추가 -->
+                    <result property="dlvrPrcsTpCd" column="DLVR_PRCS_TP_CD" />
+                    <result property="clmDtlStatCd" column="CD_CLM_DTL_STAT_CD" />
+                    <result property="compGbCd" column="COMP_GB_CD"/>
+                    <result property="dlvrInvNo" column="DLVR_INV_NO" />
+                    <result property="viewClmDtlStatCd" column="VIEW_CD_CLM_DTL_STAT_CD" />
+                    <discriminator column="LIST_DELIMITER" javaType="String"> <!-- 쿼리로 LIST_DELIMITER 컬럼을 두어 리스트를 나눠담는다 -->
+                        <case value="DELIVERY">
+                            <collection property="orderDetailListVO" ofType="biz.app.order.model.OrderDetailVO" javaType="list" autoMapping="true">
+                            </collection>
+                        </case>
+                        <case value="CLAIM">
+                            <collection property="claimDetailListVO" ofType="biz.app.order.model.OrderDetailVO" autoMapping="true">
+                                <association property="claimDetailVO" resultMap="resultMapForClaim" autoMapping="true">
+                                </association>
+                            </collection>
+                        </case>
+                    </discriminator>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="listOrderDetail2ndE" parameterType= "biz.app.order.model.OrderDetailSO" resultMap="orderDetailMap2ndE" >
+        SELECT /* 펫츠비 주문 이력 QUERYID(orderDetail.listOrderDetail2ndE) */
+                LIST.*
+            ,   (SELECT PAY_MEANS_CD FROM PAY_BASE WHERE ORD_CLM_GB_CD ='10' AND CNC_YN ='N'  AND ORD_NO = LIST.ORD_NO ORDER BY PAY_MEANS_CD LIMIT 1) AS PAY_MEANS_CD
+            ,   (SELECT PAY_STAT_CD FROM PAY_BASE WHERE ORD_CLM_GB_CD ='10' AND CNC_YN ='N'  AND ORD_NO = LIST.ORD_NO ORDER BY PAY_MEANS_CD LIMIT 1) AS PAY_STAT_CD
+            ,   (
+                    SELECT
+                        CASE
+                                WHEN SUM(IF(FN_GET_ORDER_CLAIM_ING_YN(ORD_NO, ORD_DTL_SEQ)='Y', 1, 0)) = 0
+                                    AND SUM(IF(RMN_ORD_QTY - RTN_QTY - CLM_EXC_CPLT_QTY > 0, 1, 0)) = SUM(IF(RMN_ORD_QTY - RTN_QTY - CLM_EXC_CPLT_QTY > 0
+                                    AND ORD_DTL_STAT_CD = '170', 1, 0))
+                                THEN 'Y'
+                            ELSE 'N'
+                        END
+                    FROM ORDER_DETAIL
+                    WHERE ORD_NO = LIST.ORD_NO
+                ) AS ORD_DELETE_FLG
+        FROM (
+                SELECT      OBB.*
+                        ,   (
+                                SELECT IFNULL(SUM(CLM_QTY), 0) AS CLM_EXC_QTY
+                                FROM CLAIM_BASE CB ,CLAIM_DETAIL CD
+                                WHERE CB.CLM_NO = CD.CLM_NO
+                                        AND CB.CLM_TP_CD = '30'
+                                        AND CB.CLM_STAT_CD IN ('30')
+                                        AND CD.CLM_DTL_TP_CD = '40'
+                                        AND CB.ORD_NO = OBB.ORD_NO
+                                        AND CD.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+                            ) AS CLM_EXC_CPLT_QTY
+                FROM (
+                        SELECT
+                            ORD_NO,
+                            ST_ID,
+                            ORD_STAT_CD,
+                            ORD_MDA_CD,
+                            MBR_NO,
+                            MBR_GRD_CD,
+                            ORD_NM,
+                            ORDR_ID,
+                            ORDR_EMAIL,
+                            ORDR_TEL,
+                            ORDR_MOBILE,
+                            ORDR_IP,
+                            ORD_ACPT_DTM,
+                            ORD_CPLT_DTM,
+                            OUTSIDE_ORD_NO,
+                            CHNL_ID,
+                            ORD_DTL_CNT,
+                            ORD_PRCS_RST_CD,
+                            ORD_PRCS_RST_MSG,
+                            DATA_STAT_CD,
+                            DLVR_PRCS_TP_CD, /* 일반택배일 경우 강제로 코드를 10으로 바꿔줌 */
+                            ORDR_SHOW_YN,
+                            PAY_AMT_TOTAL,		/* 결제 금액 */
+                            CNC_PSB_YN,			/* 취소 가능 여부 */
+                            ORD_DTL_SEQ,
+                            ORD_DTL_STAT_CD,
+                            GOODS_ID,
+                            ITEM_NO,
+                            ITEM_NM,
+                            DEAL_GOODS_ID,
+                            PAK_GOODS_ID,
+                            COMP_GOODS_ID,
+                            COMP_ITEM_ID,
+                            ORD_QTY,
+                            CNC_QTY,
+                            RTN_QTY,
+                            RMN_ORD_QTY,
+                            GOODS_PRC_NO,
+                            SALE_AMT,
+                            PAY_AMT,
+                            RMN_PAY_AMT,
+                            CMS,
+                            GOODS_CMSN_RT,
+                            TAX_GB_CD,
+                            ORD_SVMN,
+                            SVMN_VLD_PRD_CD,
+                            SVMN_VLD_PRD,
+                            FREE_DLVR_YN,
+                            HOT_DEAL_YN,
+                            DLVRC_NO,
+                            ORD_DLVRA_NO,
+                            COMP_NO,
+                            UP_COMP_NO,
+                            MD_USR_NO,
+                            GOODS_ESTM_NO,
+                            GOODS_ESTM_REG_YN,
+                            OUTSIDE_ORD_DTL_NO,
+                            STL_NO,
+                            DISP_CLSF_NO,
+                            DLVR_CPLT_PIC_URL,
+                            DLVR_SMS,
+                            DLVR_CPLT_YN,
+                            MKI_GOODS_YN,
+                            MKI_GOODS_OPT_CONTENT,
+                            RSV_GOODS_YN,
+                            ISU_SCHD_PNT,
+                            RTN_PSB_YN,				/* 반품 가능 여부 */
+                            RTN_ING_YN,				/* 반품 진행 여무 */
+                            RTN_CPLT_QTY,			/* 반품 완료 수량 */
+                            CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+                            CLM_ING_YN,				/* 클레임 진행 여부 */
+                            PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+                            CP_DC_AMT,				/* 쿠폰 할인 금액 */
+                            DLVR_NO,				/* 배송 번호 */
+                            STK_QTY,
+                            VLD_ORD_QTY,
+                            IMG_SEQ,
+                            IMG_PATH,
+                            RVS_IMG_PATH,
+                            COMP_NM,
+                            COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+                            ITEM_MNG_YN,
+                            BND_NM, 			/* 노출 브랜드명 */
+                            BND_NM_KO,		/* 브랜드명 국문 */
+                            GOODS_CSTRT_TP_CD,
+                            PAK_ITEM_NM,
+                            CASE
+                                WHEN DLVR_NO &lt; 0 AND ADDDATE((SELECT DLVR_CPLT_DTM FROM DELIVERY WHERE DLVR_NO = OBB.DLVR_NO),7) &lt; SYSDATE() THEN 'N'
+                                ELSE 'Y'
+                            END AS COMPARE_DTM_YN,
+                            (
+                                SELECT
+                                GROUP_CONCAT( GB.GOODS_NM )
+                                FROM GOODS_BASE GB
+                                WHERE GB.GOODS_ID IN (
+                                SELECT ODC.CSTRT_GOODS_ID
+                                FROM ORD_DTL_CSTRT ODC
+                                INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OBB.ORD_NO AND ODC.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+                                WHERE ODC.ORD_NO  = OBB.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+                                ORDER BY OBB.ORD_DTL_SEQ ASC
+                                )
+                            )AS SUB_GOODS_NM,		/*사은품명*/
+                            ( SELECT ODAM.ORD_DT FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT,
+                            ( SELECT WEEKDAY(DATE_FORMAT(ODAM.ORD_DT, '%Y%m%d')) FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT_WEEK,
+                            ( SELECT DLVR_CPLT_DTM FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM,		/*배송 완료 일시*/
+                            (
+                                SELECT WEEKDAY(DATE_FORMAT(DLVR_CPLT_DTM, '%Y%m%d'))
+                                FROM DELIVERY DV
+                                WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM_WEEK,	/*배송 완료 일시 요일*/
+                            IFNULL((SELECT INV_NO FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO), '') AS DLVR_INV_NO,
+                            (
+                                SELECT CONCAT_WS('|', if(BANK_CD='', null, BANK_CD) , if(ACCT_NO='', null, ACCT_NO), if(DPST_SCHD_DT='', null, DPST_SCHD_DT))
+                                FROM PAY_BASE PB
+                                WHERE PB.ORD_CLM_GB_CD ='10'
+                                AND PB.PAY_MEANS_CD IN('fc','pc'
+                                    , 'eb','fb','pb'
+                                    , 'eb','fv','pv'
+                                ) AND CNC_YN ='N'  AND PB.ORD_NO = OBB.ORD_NO
+                            ) AS ORD_BANK_INFO,
+                        (CASE WHEN PAK_GOODS_ID IS null THEN GOODS_NM ELSE PAK_GOODS_NM END) AS GOODS_NM,     /* 상품 명 */
+                        (CASE WHEN GOODS_CSTRT_TP_CD = 'PAK' THEN GOODS_NM ELSE NULL END) AS OPT_GOODS_NM,
+                        CD_CLM_NO,
+                        CD_CLM_DTL_SEQ,
+                        CD_CLM_DTL_TP_CD,
+                        CD_CLM_DTL_STAT_CD,
+                        CD_CLM_RSN_CD,
+                        CD_CLM_RSN_CONTENT,
+                        CD_CLM_DENY_RSN_CONTENT,
+                        CD_MBR_NO,
+                        CD_ORD_NO,
+                        CD_ORD_DTL_SEQ,
+                        CD_ORG_CLM_NO,
+                        CD_ORG_CLM_DTL_SEQ,
+                        CD_GOODS_ID,
+                        CD_GOODS_NM,
+                        CD_DEAL_GOODS_ID,
+                        CD_PAK_GOODS_ID,
+                        CD_DISP_CLSF_NO,
+                        CD_COMP_GOODS_ID,
+                        CD_COMP_ITEM_ID,
+                        CD_GOODS_PRC_NO,
+                        CD_SALE_AMT,
+                        CD_PAY_AMT,
+                        CD_RMN_PAY_AMT,
+                        CD_CLM_QTY,
+                        CD_CMS,
+                        CD_GOODS_CMSN_RT,
+                        CD_TAX_GB_CD,
+                        CD_DLVRC_NO,
+                        CD_RTN_DLVRC_NO,
+                        CD_DLVRA_NO,
+                        CD_RTRNA_NO,
+                        CD_DLVR_NO,
+                        CD_COMP_NO,
+                        CD_UP_COMP_NO,
+                        CD_CLM_CPLT_DTM,
+                        CD_RTN_MTD_CD,
+                        CD_OUTSIDE_CLM_DTL_NO,
+                        CD_STL_NO,
+                        CD_DLVR_CPLT_PIC_URL,
+                        CD_DLVR_SMS,
+                        CD_TWC_TCKT,
+                        CD_DLVR_CPLT_YN,
+                        CD_STK_QTY,
+                        CD_RFD_PAY_TOT_AMT,
+                        CB_ST_ID,
+                        CB_CLM_TP_CD,
+                        CB_CLM_STAT_CD,
+                        CB_ORD_MDA_CD,
+                        CB_CHNL_ID,
+                        CB_SWAP_YN,
+                        CB_ACPT_DTM,
+                        CB_CNC_DTM,
+                        CB_CPLT_DTM,
+                        CB_ACPTR_NO,
+                        CB_CNCR_NO,
+                        CB_CPLTR_NO,
+                        CB_OUTSIDE_CLM_NO,
+                        CB_ORDR_SHOW_YN,
+                        CD_ITEM_NM,
+                        CD_ITEM_NO,
+                        CD_DISP_CLSF_NM,
+                        CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+                        CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+                        CD_BND_NM_KO,		/* 브랜드명 국문 */
+                        CD_SUB_GOODS_NM,	/*사은품명*/
+                        CD_DLVR_PRCS_TP_CD,
+
+                        CASE
+                            WHEN CLM_DTL_STAT_ASC IS NULL OR ((ORD_QTY - CNC_QTY - RTN_QTY) > 0) THEN CONCAT('1ORD', ORD_DTL_STAT_CD)
+                            WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN CONCAT('2CLM', CLM_DTL_STAT_ASC)
+                            ELSE CONCAT('2CLM', CLM_DTL_STAT_ASC)
+                        END AS FORCE_DTL_STAT, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+
+                        CASE
+                            WHEN CLM_DTL_STAT_ASC IS NULL OR ((ORD_QTY - CNC_QTY - RTN_QTY) > 0) THEN 'DELIVERY'
+                            WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN 'CLAIM'
+                            ELSE 'CLAIM'
+                        END AS LIST_DELIMITER, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+
+                        CLM_DTL_SEQ_ORDER,
+
+                        CASE
+                            WHEN CB_CLM_TP_CD != '30' THEN CD_CLM_DTL_STAT_CD
+                            WHEN CLM_DTL_STAT_ASC = '31' THEN '410'
+                            WHEN CLM_DTL_STAT_ASC = '32' THEN '330'
+                            <!-- 교환 거부 순서 변경 -->
+                            WHEN CLM_DTL_STAT_ASC = '50' THEN '350'
+                            WHEN CLM_DTL_STAT_ASC = '45' THEN '450'
+                            ELSE CD_CLM_DTL_STAT_CD
+                        END AS VIEW_CD_CLM_DTL_STAT_CD
+                FROM (
+                        SELECT
+                            OB.ORD_NO,
+                            OB.ST_ID,
+                            OB.ORD_STAT_CD,
+                            OB.ORD_MDA_CD,
+                            OB.MBR_NO,
+                            OB.MBR_GRD_CD,
+                            OB.ORD_NM,
+                            OB.ORDR_ID,
+                            OB.ORDR_EMAIL,
+                            OB.ORDR_TEL,
+                            OB.ORDR_MOBILE,
+                            OB.ORDR_IP,
+                            OB.ORD_ACPT_DTM,
+                            OB.ORD_CPLT_DTM,
+                            OB.OUTSIDE_ORD_NO,
+                            OB.CHNL_ID,
+                            OB.ORD_DTL_CNT,
+                            OB.ORD_PRCS_RST_CD,
+                            OB.ORD_PRCS_RST_MSG,
+                            OB.DATA_STAT_CD,
+
+                            (
+                                CASE
+                                    WHEN COMP_GB_CD='10' THEN OB.DLVR_PRCS_TP_CD
+                                    ELSE '10'
+                                END
+                            ) AS DLVR_PRCS_TP_CD,
+
+                            OB.ORDR_SHOW_YN,
+                            FN_GET_ORDER_PAY_AMT(OB.ORD_NO) AS PAY_AMT_TOTAL,		/* 결제 금액 */
+                            FN_GET_ORDER_CANCEL_PSB_YN(OB.ORD_NO) AS CNC_PSB_YN,	/* 취소 가능 여부 */
+                            OD.ORD_DTL_SEQ,
+                            OD.ORD_DTL_STAT_CD,
+                            OD.GOODS_ID,
+                            OD.ITEM_NO,
+                            OD.ITEM_NM,
+                            OD.DEAL_GOODS_ID,
+                            OD.PAK_GOODS_ID,
+                            OD.COMP_GOODS_ID,
+                            OD.COMP_ITEM_ID,
+                            OD.ORD_QTY,
+                            OD.CNC_QTY,
+                            OD.RTN_QTY,
+                            OD.RMN_ORD_QTY,
+                            OD.GOODS_PRC_NO,
+                            OD.SALE_AMT,
+                            OD.PAY_AMT,
+                            OD.RMN_PAY_AMT,
+                            OD.CMS,
+                            OD.GOODS_CMSN_RT,
+                            OD.TAX_GB_CD,
+                            OD.ORD_SVMN,
+                            OD.SVMN_VLD_PRD_CD,
+                            OD.SVMN_VLD_PRD,
+                            OD.FREE_DLVR_YN,
+                            OD.HOT_DEAL_YN,
+                            OD.DLVRC_NO,
+                            OD.ORD_DLVRA_NO,
+                            OD.COMP_NO,
+                            OD.UP_COMP_NO,
+                            OD.MD_USR_NO,
+                            OD.GOODS_ESTM_NO,
+                            OD.GOODS_ESTM_REG_YN,
+                            OD.OUTSIDE_ORD_DTL_NO,
+                            OD.STL_NO,
+                            OD.DISP_CLSF_NO,
+                            OD.DLVR_CPLT_PIC_URL,
+                            OD.DLVR_SMS,
+                            OD.DLVR_CPLT_YN,
+                            OD.MKI_GOODS_YN,
+                            OD.MKI_GOODS_OPT_CONTENT,
+                            OD.RSV_GOODS_YN,
+                            OD.ISU_SCHD_PNT,
+                            (SELECT RTN_PSB_YN FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID) AS RTN_PSB_YN,	/* 반품 가능 여부 */
+                            FN_GET_ORDER_CLAIM_ING_RTN_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_ING_YN,			/* 반품 진행 여무 */
+                            FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS RTN_CPLT_QTY,		/* 반품 완료 수량 */
+                            FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+                            FN_GET_ORDER_CLAIM_ING_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS CLM_ING_YN,				/* 클레임 진행 여부 */
+                            FN_GET_ORDER_DTL_PRMT_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+                            FN_GET_ORDER_DTL_CP_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS CP_DC_AMT,				/* 쿠폰 할인 금액 */
+                            FN_GET_ORDER_DLVR_NO(OD.ORD_NO, OD.ORD_DTL_SEQ, 'Y') AS DLVR_NO,				/* 배송 번호 */
+                            FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS STK_QTY,
+                            OD.RMN_ORD_QTY -  FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS VLD_ORD_QTY, /* 유효 주문 수량 */
+                            GI.IMG_SEQ,
+                            GI.IMG_PATH,
+                            GI.RVS_IMG_PATH,
+                            CP.COMP_NM,
+                            CP.COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+                            GB.ITEM_MNG_YN,
+                            GB.GOODS_NM,
+                            FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM, 			/* 노출 브랜드명 */
+                            FN_GET_BRAND_NAME_KO(GB.BND_NO) AS BND_NM_KO,		/* 브랜드명 국문 */
+                            (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID) AS PAK_GOODS_NM,
+                            CASE WHEN OD.PAK_GOODS_ID IS NULL THEN GB.GOODS_CSTRT_TP_CD
+                            ELSE (SELECT GOODS_CSTRT_TP_CD FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID)
+                            END AS GOODS_CSTRT_TP_CD,
+                            CASE WHEN OD.PAK_GOODS_ID IS NOT NULL THEN
+                            (
+                            SELECT GROUP_CONCAT(CONCAT_WS(' : ', GOG.SHOW_NM , AV.ATTR_VAL) ORDER BY GOG.DISP_PRIOR_RANK SEPARATOR '|')
+                            FROM GOODS_BASE GB,ITEM IT, GOODS_OPT_GRP GOG, GOODS_ATTRIBUTE GA, ITEM_ATTRIBUTE_VALUE IAV, ATTRIBUTE_VALUE AV
+                            WHERE GB.GOODS_ID = IT.GOODS_ID AND GA.GOODS_ID = GB.GOODS_ID
+                            AND GA.ATTR_NO = AV.ATTR_NO AND GOG.ATTR_NO = GA.ATTR_NO
+                            AND GOG.ATTR_NO = AV.ATTR_NO AND IAV.ITEM_NO = IT.ITEM_NO
+                            AND IAV.ATTR_NO = AV.ATTR_NO AND AV.ATTR_VAL_NO = IAV.ATTR_VAL_NO
+                            AND GB.GOODS_ID = OD.GOODS_ID AND GOG.GOODS_ID = OD.PAK_GOODS_ID
+                            )
+                            END AS PAK_ITEM_NM,
+                            CD.ORD_NO					AS	CD_CLM_NO,
+                            CD.CLM_DTL_SEQ				AS	CD_CLM_DTL_SEQ,
+                            CD.CLM_DTL_TP_CD			AS	CD_CLM_DTL_TP_CD,
+                            CD.CLM_DTL_STAT_CD			AS	CD_CLM_DTL_STAT_CD,
+                            (SELECT USR_DFN3_VAL FROM CODE_DETAIL WHERE GRP_CD = 'CLM_DTL_STAT' AND DTL_CD = CD.CLM_DTL_STAT_CD) AS CLM_DTL_STAT_ASC,
+                            CD.CLM_RSN_CD				AS	CD_CLM_RSN_CD,
+                            CD.CLM_RSN_CONTENT			AS	CD_CLM_RSN_CONTENT,
+                            CD.CLM_DENY_RSN_CONTENT		AS	CD_CLM_DENY_RSN_CONTENT,
+                            CD.MBR_NO					AS	CD_MBR_NO,
+                            CD.ORD_NO					AS	CD_ORD_NO,
+                            CD.ORD_DTL_SEQ				AS	CD_ORD_DTL_SEQ,
+                            CD.ORG_CLM_NO				AS	CD_ORG_CLM_NO,
+                            CD.ORG_CLM_DTL_SEQ			AS	CD_ORG_CLM_DTL_SEQ,
+                            CD.GOODS_ID					AS	CD_GOODS_ID,
+                            CD.GOODS_NM					AS	CD_GOODS_NM,
+                            CD.DEAL_GOODS_ID			AS	CD_DEAL_GOODS_ID,
+                            CD.PAK_GOODS_ID				AS	CD_PAK_GOODS_ID,
+                            CD.DISP_CLSF_NO				AS	CD_DISP_CLSF_NO,
+                            CD.COMP_GOODS_ID			AS	CD_COMP_GOODS_ID,
+                            CD.COMP_ITEM_ID				AS	CD_COMP_ITEM_ID,
+                            CD.GOODS_PRC_NO				AS	CD_GOODS_PRC_NO,
+                            CD.SALE_AMT					AS	CD_SALE_AMT,
+                            CD.PAY_AMT					AS	CD_PAY_AMT,
+                            CD.RMN_PAY_AMT				AS	CD_RMN_PAY_AMT,
+                            CD.CLM_QTY					AS	CD_CLM_QTY,
+                            CD.CMS						AS	CD_CMS,
+                            CD.GOODS_CMSN_RT			AS	CD_GOODS_CMSN_RT,
+                            CD.TAX_GB_CD				AS	CD_TAX_GB_CD,
+                            CD.DLVRC_NO					AS	CD_DLVRC_NO,
+                            CD.RTN_DLVRC_NO				AS	CD_RTN_DLVRC_NO,
+                            CD.DLVRA_NO					AS	CD_DLVRA_NO,
+                            CD.RTRNA_NO					AS	CD_RTRNA_NO,
+                            CD.DLVR_NO						CD_DLVR_NO,
+                            CD.COMP_NO					AS	CD_COMP_NO,
+                            CD.UP_COMP_NO				AS	CD_UP_COMP_NO,
+                            CD.CLM_CPLT_DTM				AS	CD_CLM_CPLT_DTM,
+                            CD.RTN_MTD_CD				AS	CD_RTN_MTD_CD,
+                            CD.OUTSIDE_CLM_DTL_NO		AS	CD_OUTSIDE_CLM_DTL_NO,
+                            CD.STL_NO					AS	CD_STL_NO,
+                            CD.DLVR_CPLT_PIC_URL		AS	CD_DLVR_CPLT_PIC_URL,
+                            CD.DLVR_SMS					AS	CD_DLVR_SMS,
+                            CD.TWC_TCKT					AS	CD_TWC_TCKT,
+                            CD.DLVR_CPLT_YN				AS	CD_DLVR_CPLT_YN,
+                            FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS CD_STK_QTY,
+                            (CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT AS CD_RFD_PAY_TOT_AMT,
+                            CB.ST_ID					AS	CB_ST_ID,
+                            CB.CLM_TP_CD				AS	CB_CLM_TP_CD,
+                            CB.CLM_STAT_CD				AS	CB_CLM_STAT_CD,
+                            CB.ORD_MDA_CD				AS	CB_ORD_MDA_CD,
+                            CB.CHNL_ID					AS	CB_CHNL_ID,
+                            CB.SWAP_YN					AS	CB_SWAP_YN,
+                            CB.ACPT_DTM					AS	CB_ACPT_DTM,
+                            CB.CNC_DTM					AS	CB_CNC_DTM,
+                            CB.CPLT_DTM					AS	CB_CPLT_DTM,
+                            CB.ACPTR_NO					AS	CB_ACPTR_NO,
+                            CB.CNCR_NO					AS	CB_CNCR_NO,
+                            CB.CPLTR_NO					AS	CB_CPLTR_NO,
+                            CB.OUTSIDE_CLM_NO			AS	CB_OUTSIDE_CLM_NO,
+                            CB.ORDR_SHOW_YN				AS	CB_ORDR_SHOW_YN,
+                            CASE
+                            WHEN CB.CLM_TP_CD = '30'
+                            THEN ( SELECT CDT.ITEM_NM FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+                            ELSE CD.ITEM_NM
+                            END AS CD_ITEM_NM,
+                            CASE
+                            WHEN CB.CLM_TP_CD = '30'
+                            THEN ( SELECT CDT.ITEM_NO FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+                            ELSE CD.ITEM_NO
+                            END AS CD_ITEM_NO,
+                            (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = CD.DISP_CLSF_NO) AS CD_DISP_CLSF_NM,
+                            (
+                            SELECT IFNULL(SUM(APL_AMT), 0)
+                            FROM APL_BNFT AB
+                            WHERE AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '210'
+                            ) AS CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+                            (
+                            SELECT	IFNULL(SUM(APL_AMT), 0)
+                            FROM APL_BNFT AB
+                            WHERE	AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '220'
+                            ) AS CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+                            (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = CD.GOODS_ID)) AS CD_BND_NM_KO,	/* 브랜드명 국문 */
+                            (
+                            SELECT GROUP_CONCAT( GB.GOODS_NM, ',')
+                            FROM GOODS_BASE GB
+                            WHERE GB.GOODS_ID IN (
+                            SELECT ODC.CSTRT_GOODS_ID
+                            FROM ORD_DTL_CSTRT ODC
+                            INNER JOIN ORDER_DETAIL ODD ON ODC.ORD_NO = ODD.ORD_NO AND ODC.ORD_DTL_SEQ = ODD.ORD_DTL_SEQ
+                            WHERE ODC.ORD_NO  = OD.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+                            ORDER BY ODD.ORD_DTL_SEQ ASC
+                            )
+                            ) AS CD_SUB_GOODS_NM, /*사은품명*/
+                            CASE WHEN (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = CD.COMP_NO) = '20' THEN '10'
+                            ELSE (SELECT DLVR_PRCS_TP_CD FROM ORDER_BASE X1 WHERE X1.ORD_NO = CD.ORD_NO)
+                            END CD_DLVR_PRCS_TP_CD,
+                            ROW_NUMBER() OVER(PARTITION BY OD.ORD_NO, OD.ORD_DTL_SEQ ORDER BY OD.ORD_DTL_SEQ DESC) AS CLM_DTL_SEQ_ORDER
+                            FROM (
+                                SELECT
+                                        ORD_NO,
+                                        ST_ID,
+                                        ORD_STAT_CD,
+                                        ORD_MDA_CD,
+                                        MBR_NO,
+                                        MBR_GRD_CD,
+                                        ORD_NM,
+                                        ORDR_ID,
+                                        ORDR_EMAIL,
+                                        ORDR_TEL,
+                                        ORDR_MOBILE,
+                                        ORDR_IP,
+                                        ORD_ACPT_DTM,
+                                        ORD_CPLT_DTM,
+                                        OUTSIDE_ORD_NO,
+                                        CHNL_ID,
+                                        ORD_DTL_CNT,
+                                        ORD_PRCS_RST_CD,
+                                        ORD_PRCS_RST_MSG,
+                                        DATA_STAT_CD,
+                                        DLVR_PRCS_TP_CD,
+                                        ORDR_SHOW_YN
+                                FROM ORDER_BASE OB
+                                WHERE ORD_NO = #{ordNo}
+                            ) OB
+                            INNER JOIN ORDER_DETAIL OD ON (OB.ORD_NO = OD.ORD_NO)
+                            INNER JOIN GOODS_BASE GB ON (OD.GOODS_ID = GB.GOODS_ID)
+                            INNER JOIN GOODS_IMG GI ON (OD.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = 'Y')
+                            INNER JOIN COMPANY_BASE CP ON (OD.COMP_NO = CP.COMP_NO )
+                            LEFT JOIN CLAIM_DETAIL CD ON (OD.ORD_NO = CD.ORD_NO AND OD.ORD_DTL_SEQ = CD.ORD_DTL_SEQ)
+                            LEFT JOIN CLAIM_BASE CB ON CB.CLM_NO = CD.CLM_NO AND CB.CLM_STAT_CD &lt;> '40'
+                        ) OBB
+                )OBB
+        WHERE   OBB.LIST_DELIMITER = 'DELIVERY'
+                AND CLM_DTL_SEQ_ORDER = 1
+
+        UNION ALL
+
+            SELECT
+                OBB.*
+                , (
+                    SELECT IFNULL(SUM(CLM_QTY), 0) AS CLM_EXC_QTY
+                    FROM CLAIM_BASE CB ,CLAIM_DETAIL CD
+                    WHERE CB.CLM_NO = CD.CLM_NO
+                        AND CB.CLM_TP_CD = '30'
+                        AND CB.CLM_STAT_CD IN ('30')
+                        AND CD.CLM_DTL_TP_CD = '40'
+                        AND CB.ORD_NO = OBB.ORD_NO
+                        AND CD.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+                ) AS CLM_EXC_CPLT_QTY
+            FROM (
+                    SELECT
+                        ORD_NO,
+                        ST_ID,
+                        ORD_STAT_CD,
+                        ORD_MDA_CD,
+                        MBR_NO,
+                        MBR_GRD_CD,
+                        ORD_NM,
+                        ORDR_ID,
+                        ORDR_EMAIL,
+                        ORDR_TEL,
+                        ORDR_MOBILE,
+                        ORDR_IP,
+                        ORD_ACPT_DTM,
+                        ORD_CPLT_DTM,
+                        OUTSIDE_ORD_NO,
+                        CHNL_ID,
+                        ORD_DTL_CNT,
+                        ORD_PRCS_RST_CD,
+                        ORD_PRCS_RST_MSG,
+                        DATA_STAT_CD,
+                        DLVR_PRCS_TP_CD, /* 일반택배일 경우 강제로 코드를 10으로 바꿔줌 */
+                        ORDR_SHOW_YN,
+                        PAY_AMT_TOTAL,		/* 결제 금액 */
+                        CNC_PSB_YN,			/* 취소 가능 여부 */
+                        ORD_DTL_SEQ,
+                        ORD_DTL_STAT_CD,
+                        GOODS_ID,
+                        ITEM_NO,
+                        ITEM_NM,
+                        DEAL_GOODS_ID,
+                        PAK_GOODS_ID,
+                        COMP_GOODS_ID,
+                        COMP_ITEM_ID,
+                        ORD_QTY,
+                        CNC_QTY,
+                        RTN_QTY,
+                        RMN_ORD_QTY,
+                        GOODS_PRC_NO,
+                        SALE_AMT,
+                        PAY_AMT,
+                        RMN_PAY_AMT,
+                        CMS,
+                        GOODS_CMSN_RT,
+                        TAX_GB_CD,
+                        ORD_SVMN,
+                        SVMN_VLD_PRD_CD,
+                        SVMN_VLD_PRD,
+                        FREE_DLVR_YN,
+                        HOT_DEAL_YN,
+                        DLVRC_NO,
+                        ORD_DLVRA_NO,
+                        COMP_NO,
+                        UP_COMP_NO,
+                        MD_USR_NO,
+                        GOODS_ESTM_NO,
+                        GOODS_ESTM_REG_YN,
+                        OUTSIDE_ORD_DTL_NO,
+                        STL_NO,
+                        DISP_CLSF_NO,
+                        DLVR_CPLT_PIC_URL,
+                        DLVR_SMS,
+                        DLVR_CPLT_YN,
+                        MKI_GOODS_YN,
+                        MKI_GOODS_OPT_CONTENT,
+                        RSV_GOODS_YN,
+                        ISU_SCHD_PNT,
+                        RTN_PSB_YN,				/* 반품 가능 여부 */
+                        RTN_ING_YN,				/* 반품 진행 여무 */
+                        RTN_CPLT_QTY,			/* 반품 완료 수량 */
+                        CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+                        CLM_ING_YN,				/* 클레임 진행 여부 */
+                        PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+                        CP_DC_AMT,				/* 쿠폰 할인 금액 */
+                        DLVR_NO,				/* 배송 번호 */
+                        STK_QTY,
+                        VLD_ORD_QTY,
+                        IMG_SEQ,
+                        IMG_PATH,
+                        RVS_IMG_PATH,
+                        COMP_NM,
+                        COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+                        ITEM_MNG_YN,
+                        BND_NM, 			/* 노출 브랜드명 */
+                        BND_NM_KO,		/* 브랜드명 국문 */
+                        GOODS_CSTRT_TP_CD,
+                        PAK_ITEM_NM,
+                        CASE WHEN DLVR_NO &lt; 0 AND ADDDATE((SELECT DLVR_CPLT_DTM FROM DELIVERY WHERE DLVR_NO = OBB.DLVR_NO),7) &lt; SYSDATE() THEN 'N' ELSE 'Y' END AS COMPARE_DTM_YN,
+
+                        (
+                            SELECT GROUP_CONCAT( GB.GOODS_NM )
+                            FROM GOODS_BASE GB
+                            WHERE GB.GOODS_ID IN (
+                                SELECT ODC.CSTRT_GOODS_ID
+                                FROM ORD_DTL_CSTRT ODC
+                                INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OBB.ORD_NO AND ODC.ORD_DTL_SEQ = OBB.ORD_DTL_SEQ
+                                WHERE ODC.ORD_NO  = OBB.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+                                ORDER BY OBB.ORD_DTL_SEQ ASC
+                            )
+                        )AS SUB_GOODS_NM,		/*사은품명*/
+
+                        ( SELECT ODAM.ORD_DT FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT,
+                        ( SELECT WEEKDAY(DATE_FORMAT(ODAM.ORD_DT, '%Y%m%d')) FROM ORD_DLVR_AREA_MAP ODAM WHERE ODAM.ORD_NO = OBB.ORD_NO AND ODAM.DEL_YN ='N') AS ORD_DT_WEEK,
+                        ( SELECT DLVR_CPLT_DTM FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM,		/*배송 완료 일시*/
+                        ( SELECT WEEKDAY(DATE_FORMAT(DLVR_CPLT_DTM, '%Y%m%d')) FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO AND DV.ORD_CLM_GB_CD ='10') as DLVR_CPLT_DTM_WEEK,	/*배송 완료 일시 요일*/
+
+                        IFNULL((SELECT INV_NO FROM DELIVERY DV WHERE DV.DLVR_NO = OBB.DLVR_NO), '') AS DLVR_INV_NO,
+
+                        (
+                            SELECT CONCAT_WS('|', if(BANK_CD='', null, BANK_CD) , if(ACCT_NO='', null, ACCT_NO), if(DPST_SCHD_DT='', null, DPST_SCHD_DT))
+                            FROM PAY_BASE PB
+                            WHERE PB.ORD_CLM_GB_CD ='10'
+                            AND PB.PAY_MEANS_CD IN('fc','pc'
+                                , 'eb','fb','pb'
+                                , 'eb','fv','pv'
+                            ) AND CNC_YN ='N'  AND PB.ORD_NO = OBB.ORD_NO
+                        ) AS ORD_BANK_INFO,
+
+                        (CASE WHEN PAK_GOODS_ID IS null THEN GOODS_NM ELSE PAK_GOODS_NM END) AS GOODS_NM,     /* 상품 명 */
+                        (CASE WHEN GOODS_CSTRT_TP_CD = 'PAK' THEN GOODS_NM ELSE NULL END) AS OPT_GOODS_NM,
+
+                        CD_CLM_NO,
+                        CD_CLM_DTL_SEQ,
+                        CD_CLM_DTL_TP_CD,
+                        CD_CLM_DTL_STAT_CD,
+                        CD_CLM_RSN_CD,
+                        CD_CLM_RSN_CONTENT,
+                        CD_CLM_DENY_RSN_CONTENT,
+                        CD_MBR_NO,
+                        CD_ORD_NO,
+                        CD_ORD_DTL_SEQ,
+                        CD_ORG_CLM_NO,
+                        CD_ORG_CLM_DTL_SEQ,
+                        CD_GOODS_ID,
+                        CD_GOODS_NM,
+                        CD_DEAL_GOODS_ID,
+                        CD_PAK_GOODS_ID,
+                        CD_DISP_CLSF_NO,
+                        CD_COMP_GOODS_ID,
+                        CD_COMP_ITEM_ID,
+                        CD_GOODS_PRC_NO,
+                        CD_SALE_AMT,
+                        CD_PAY_AMT,
+                        CD_RMN_PAY_AMT,
+                        CD_CLM_QTY,
+                        CD_CMS,
+                        CD_GOODS_CMSN_RT,
+                        CD_TAX_GB_CD,
+                        CD_DLVRC_NO,
+                        CD_RTN_DLVRC_NO,
+                        CD_DLVRA_NO,
+                        CD_RTRNA_NO,
+                        CD_DLVR_NO,
+                        CD_COMP_NO,
+                        CD_UP_COMP_NO,
+                        CD_CLM_CPLT_DTM,
+                        CD_RTN_MTD_CD,
+                        CD_OUTSIDE_CLM_DTL_NO,
+                        CD_STL_NO,
+                        CD_DLVR_CPLT_PIC_URL,
+                        CD_DLVR_SMS,
+                        CD_TWC_TCKT,
+                        CD_DLVR_CPLT_YN,
+                        CD_STK_QTY,
+                        CD_RFD_PAY_TOT_AMT,
+                        CB_ST_ID,
+                        CB_CLM_TP_CD,
+                        CB_CLM_STAT_CD,
+                        CB_ORD_MDA_CD,
+                        CB_CHNL_ID,
+                        CB_SWAP_YN,
+                        CB_ACPT_DTM,
+                        CB_CNC_DTM,
+                        CB_CPLT_DTM,
+                        CB_ACPTR_NO,
+                        CB_CNCR_NO,
+                        CB_CPLTR_NO,
+                        CB_OUTSIDE_CLM_NO,
+                        CB_ORDR_SHOW_YN,
+                        CD_ITEM_NM,
+                        CD_ITEM_NO,
+                        CD_DISP_CLSF_NM,
+                        CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+                        CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+                        CD_BND_NM_KO,		/* 브랜드명 국문 */
+                        CD_SUB_GOODS_NM,	/*사은품명*/
+                        CD_DLVR_PRCS_TP_CD,
+
+                        CASE
+                            WHEN CLM_DTL_STAT_ASC IS NULL THEN CONCAT('1ORD', ORD_DTL_STAT_CD)
+                            WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN CONCAT('2CLM', CLM_DTL_STAT_ASC)
+                            ELSE CONCAT('2CLM', CLM_DTL_STAT_ASC)
+                        END AS FORCE_DTL_STAT, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+
+                        CASE
+                            WHEN CLM_DTL_STAT_ASC IS NULL THEN 'DELIVERY'
+                            WHEN (CLM_DTL_STAT_ASC IS NOT NULL AND ((ORD_QTY - CNC_QTY - RTN_QTY) > 0)) THEN 'CLAIM'
+                            ELSE 'CLAIM'
+                        END AS LIST_DELIMITER, /* 주문과 클레임을 구분하여 리스트에 담기위한 구분자 */
+
+                        CLM_DTL_SEQ_ORDER,
+                        CASE
+                            WHEN CB_CLM_TP_CD != '30' THEN CD_CLM_DTL_STAT_CD
+                            WHEN CLM_DTL_STAT_ASC = '31' THEN '410'
+                            WHEN CLM_DTL_STAT_ASC = '32' THEN '330'
+                            <!-- 교환 거부 순서 변경 -->
+                            WHEN CLM_DTL_STAT_ASC = '50' THEN '350'
+                            WHEN CLM_DTL_STAT_ASC = '45' THEN '450'
+                            ELSE CD_CLM_DTL_STAT_CD
+                        END AS VIEW_CD_CLM_DTL_STAT_CD
+                    FROM (
+                        SELECT
+                            OB.ORD_NO,
+                            OB.ST_ID,
+                            OB.ORD_STAT_CD,
+                            OB.ORD_MDA_CD,
+                            OB.MBR_NO,
+                            OB.MBR_GRD_CD,
+                            OB.ORD_NM,
+                            OB.ORDR_ID,
+                            OB.ORDR_EMAIL,
+                            OB.ORDR_TEL,
+                            OB.ORDR_MOBILE,
+                            OB.ORDR_IP,
+                            OB.ORD_ACPT_DTM,
+                            OB.ORD_CPLT_DTM,
+                            OB.OUTSIDE_ORD_NO,
+                            OB.CHNL_ID,
+                            OB.ORD_DTL_CNT,
+                            OB.ORD_PRCS_RST_CD,
+                            OB.ORD_PRCS_RST_MSG,
+                            OB.DATA_STAT_CD,
+                            (
+                            CASE WHEN COMP_GB_CD='10' THEN OB.DLVR_PRCS_TP_CD
+                            ELSE '10' END
+                            ) AS DLVR_PRCS_TP_CD,
+                            OB.ORDR_SHOW_YN,
+                            FN_GET_ORDER_PAY_AMT(OB.ORD_NO) AS PAY_AMT_TOTAL,		/* 결제 금액 */
+                            FN_GET_ORDER_CANCEL_PSB_YN(OB.ORD_NO) AS CNC_PSB_YN,	/* 취소 가능 여부 */
+                            OD.ORD_DTL_SEQ,
+                            OD.ORD_DTL_STAT_CD,
+                            OD.GOODS_ID,
+                            OD.ITEM_NO,
+                            OD.ITEM_NM,
+                            OD.DEAL_GOODS_ID,
+                            OD.PAK_GOODS_ID,
+                            OD.COMP_GOODS_ID,
+                            OD.COMP_ITEM_ID,
+                            OD.ORD_QTY,
+                            OD.CNC_QTY,
+                            OD.RTN_QTY,
+                            OD.RMN_ORD_QTY,
+                            OD.GOODS_PRC_NO,
+                            OD.SALE_AMT,
+                            OD.PAY_AMT,
+                            OD.RMN_PAY_AMT,
+                            OD.CMS,
+                            OD.GOODS_CMSN_RT,
+                            OD.TAX_GB_CD,
+                            OD.ORD_SVMN,
+                            OD.SVMN_VLD_PRD_CD,
+                            OD.SVMN_VLD_PRD,
+                            OD.FREE_DLVR_YN,
+                            OD.HOT_DEAL_YN,
+                            OD.DLVRC_NO,
+                            OD.ORD_DLVRA_NO,
+                            OD.COMP_NO,
+                            OD.UP_COMP_NO,
+                            OD.MD_USR_NO,
+                            OD.GOODS_ESTM_NO,
+                            OD.GOODS_ESTM_REG_YN,
+                            OD.OUTSIDE_ORD_DTL_NO,
+                            OD.STL_NO,
+                            OD.DISP_CLSF_NO,
+                            OD.DLVR_CPLT_PIC_URL,
+                            OD.DLVR_SMS,
+                            OD.DLVR_CPLT_YN,
+                            OD.MKI_GOODS_YN,
+                            OD.MKI_GOODS_OPT_CONTENT,
+                            OD.RSV_GOODS_YN,
+                            OD.ISU_SCHD_PNT,
+                            (SELECT RTN_PSB_YN FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID) AS RTN_PSB_YN,	/* 반품 가능 여부 */
+                            FN_GET_ORDER_CLAIM_ING_RTN_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_ING_YN,			/* 반품 진행 여무 */
+                            FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS RTN_CPLT_QTY,		/* 반품 완료 수량 */
+                            FN_GET_ORDER_CLAIM_EXC_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ)  AS CLM_EXC_ING_QTY,		/* 교환 진행 수량 */
+                            FN_GET_ORDER_CLAIM_ING_YN(OD.ORD_NO, OD.ORD_DTL_SEQ) AS CLM_ING_YN,				/* 클레임 진행 여부 */
+                            FN_GET_ORDER_DTL_PRMT_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS PRMT_DC_AMT,			/* 프로모션 할인 금액 */
+                            FN_GET_ORDER_DTL_CP_DC_AMT(OB.ORD_NO, OD.ORD_DTL_SEQ) AS CP_DC_AMT,				/* 쿠폰 할인 금액 */
+                            <!-- FN_GET_ORDER_DLVR_NO(OD.ORD_NO, OD.ORD_DTL_SEQ, 'Y') AS DLVR_NO,				/* 배송 번호 */ -->
+                            FN_GET_CLM_DLVR_NO(CD.CLM_NO, MAX(CD.CLM_DTL_SEQ) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ), 'Y') AS DLVR_NO,	/*배송번호 - 교환배송쪽 배송번호를 가져오도록 수정 - 2021.05.17 by kek01*/
+                            FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS STK_QTY,
+                            OD.RMN_ORD_QTY -  FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS VLD_ORD_QTY, /* 유효 주문 수량 */
+                            GI.IMG_SEQ,
+                            GI.IMG_PATH,
+                            GI.RVS_IMG_PATH,
+                            CP.COMP_NM,
+                            CP.COMP_GB_CD, /* 업체 구분 코드 10:자사 */
+                            GB.ITEM_MNG_YN,
+                            GB.GOODS_NM,
+                            FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM, 			/* 노출 브랜드명 */
+                            FN_GET_BRAND_NAME_KO(GB.BND_NO) AS BND_NM_KO,		/* 브랜드명 국문 */
+                            ( SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = OD.PAK_GOODS_ID ) AS PAK_GOODS_NM,
+
+                            CASE
+                                WHEN OD.PAK_GOODS_ID IS NULL THEN GB.GOODS_CSTRT_TP_CD
+                                ELSE (
+                                        SELECT GOODS_CSTRT_TP_CD
+                                        FROM GOODS_BASE
+                                        WHERE GOODS_ID = OD.PAK_GOODS_ID
+                                )
+                            END AS GOODS_CSTRT_TP_CD,
+
+                            CASE
+                                WHEN OD.PAK_GOODS_ID IS NOT NULL THEN
+                                                                (
+                                                                    SELECT GROUP_CONCAT(CONCAT_WS(' : ', GOG.SHOW_NM , AV.ATTR_VAL) ORDER BY GOG.DISP_PRIOR_RANK SEPARATOR '|')
+                                                                    FROM GOODS_BASE GB,ITEM IT, GOODS_OPT_GRP GOG, GOODS_ATTRIBUTE GA, ITEM_ATTRIBUTE_VALUE IAV, ATTRIBUTE_VALUE AV
+                                                                    WHERE GB.GOODS_ID = IT.GOODS_ID
+                                                                        AND GA.GOODS_ID = GB.GOODS_ID
+                                                                        AND GA.ATTR_NO = AV.ATTR_NO AND GOG.ATTR_NO = GA.ATTR_NO
+                                                                        AND GOG.ATTR_NO = AV.ATTR_NO AND IAV.ITEM_NO = IT.ITEM_NO
+                                                                        AND IAV.ATTR_NO = AV.ATTR_NO AND AV.ATTR_VAL_NO = IAV.ATTR_VAL_NO
+                                                                        AND GB.GOODS_ID = OD.GOODS_ID AND GOG.GOODS_ID = OD.PAK_GOODS_ID
+                                                                )
+                                END AS PAK_ITEM_NM,
+
+                            CD.CLM_NO					AS	CD_CLM_NO,
+                            <!-- CD.CLM_DTL_SEQ				AS	CD_CLM_DTL_SEQ, -->
+                            <!-- CD.CLM_DTL_STAT_CD			AS	CD_CLM_DTL_STAT_CD, -->
+                            <!-- CD.CLM_QTY					AS	CD_CLM_QTY, -->
+                            CD.CLM_DTL_SEQ				AS	ORG_CD_CLM_DTL_SEQ,
+                            MIN(CD.CLM_DTL_SEQ) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD) AS	CD_CLM_DTL_SEQ,
+                            MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD) AS	CD_CLM_DTL_STAT_CD,
+
+                            <!-- 2021-06-09 교환일 경우 배송쪽 남은수량 합 -->
+                            CASE
+                                WHEN CB.CLM_TP_CD = '30' THEN (
+                                                                SELECT SUM(RMN_CLM_QTY)
+                                                                FROM CLAIM_DETAIL
+                                                                WHERE CLM_NO = CD.CLM_NO
+                                                                    AND ORD_NO = OD.ORD_NO
+                                                                    AND ORD_DTL_SEQ = CD.ORD_DTL_SEQ
+                                                                    AND CLM_DTL_TP_CD = '40')
+                                ELSE SUM(CD.RMN_CLM_QTY) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD )
+                            END AS CD_CLM_QTY,
+
+                            CD.CLM_DTL_TP_CD			AS	CD_CLM_DTL_TP_CD,
+
+                            (
+                                SELECT USR_DFN3_VAL
+                                FROM CODE_DETAIL
+                                WHERE GRP_CD = 'CLM_DTL_STAT'
+                                AND DTL_CD = CD.CLM_DTL_STAT_CD
+                            ) AS CLM_DTL_STAT_ASC,
+
+                            CD.CLM_RSN_CD				AS	CD_CLM_RSN_CD,
+                            CD.CLM_RSN_CONTENT			AS	CD_CLM_RSN_CONTENT,
+                            CD.CLM_DENY_RSN_CONTENT		AS	CD_CLM_DENY_RSN_CONTENT,
+                            CD.MBR_NO					AS	CD_MBR_NO,
+                            CD.ORD_NO					AS	CD_ORD_NO,
+                            CD.ORD_DTL_SEQ				AS	CD_ORD_DTL_SEQ,
+                            CD.ORG_CLM_NO				AS	CD_ORG_CLM_NO,
+                            CD.ORG_CLM_DTL_SEQ			AS	CD_ORG_CLM_DTL_SEQ,
+                            CD.GOODS_ID					AS	CD_GOODS_ID,
+                            CD.GOODS_NM					AS	CD_GOODS_NM,
+                            CD.DEAL_GOODS_ID			AS	CD_DEAL_GOODS_ID,
+                            CD.PAK_GOODS_ID				AS	CD_PAK_GOODS_ID,
+                            CD.DISP_CLSF_NO				AS	CD_DISP_CLSF_NO,
+                            CD.COMP_GOODS_ID			AS	CD_COMP_GOODS_ID,
+                            CD.COMP_ITEM_ID				AS	CD_COMP_ITEM_ID,
+                            CD.GOODS_PRC_NO				AS	CD_GOODS_PRC_NO,
+                            CD.SALE_AMT					AS	CD_SALE_AMT,
+                            CD.PAY_AMT					AS	CD_PAY_AMT,
+                            CD.RMN_PAY_AMT				AS	CD_RMN_PAY_AMT,
+                            CD.CMS						AS	CD_CMS,
+                            CD.GOODS_CMSN_RT			AS	CD_GOODS_CMSN_RT,
+                            CD.TAX_GB_CD				AS	CD_TAX_GB_CD,
+                            CD.DLVRC_NO					AS	CD_DLVRC_NO,
+                            CD.RTN_DLVRC_NO				AS	CD_RTN_DLVRC_NO,
+                            CD.DLVRA_NO					AS	CD_DLVRA_NO,
+                            CD.RTRNA_NO					AS	CD_RTRNA_NO,
+                            CD.DLVR_NO						CD_DLVR_NO,
+                            CD.COMP_NO					AS	CD_COMP_NO,
+                            CD.UP_COMP_NO				AS	CD_UP_COMP_NO,
+                            CD.CLM_CPLT_DTM				AS	CD_CLM_CPLT_DTM,
+                            CD.RTN_MTD_CD				AS	CD_RTN_MTD_CD,
+                            CD.OUTSIDE_CLM_DTL_NO		AS	CD_OUTSIDE_CLM_DTL_NO,
+                            CD.STL_NO					AS	CD_STL_NO,
+                            CD.DLVR_CPLT_PIC_URL		AS	CD_DLVR_CPLT_PIC_URL,
+                            CD.DLVR_SMS					AS	CD_DLVR_SMS,
+                            CD.TWC_TCKT					AS	CD_TWC_TCKT,
+                            CD.DLVR_CPLT_YN				AS	CD_DLVR_CPLT_YN,
+                            FN_GET_GOODS_STOCK(OD.GOODS_ID, OD.ITEM_NO) AS CD_STK_QTY,
+                            (CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT AS CD_RFD_PAY_TOT_AMT,
+                            CB.ST_ID					AS	CB_ST_ID,
+                            CB.CLM_TP_CD				AS	CB_CLM_TP_CD,
+                            CB.CLM_STAT_CD				AS	CB_CLM_STAT_CD,
+                            CB.ORD_MDA_CD				AS	CB_ORD_MDA_CD,
+                            CB.CHNL_ID					AS	CB_CHNL_ID,
+                            CB.SWAP_YN					AS	CB_SWAP_YN,
+                            CB.ACPT_DTM					AS	CB_ACPT_DTM,
+                            CB.CNC_DTM					AS	CB_CNC_DTM,
+                            CB.CPLT_DTM					AS	CB_CPLT_DTM,
+                            CB.ACPTR_NO					AS	CB_ACPTR_NO,
+                            CB.CNCR_NO					AS	CB_CNCR_NO,
+                            CB.CPLTR_NO					AS	CB_CPLTR_NO,
+                            CB.OUTSIDE_CLM_NO			AS	CB_OUTSIDE_CLM_NO,
+                            CB.ORDR_SHOW_YN				AS	CB_ORDR_SHOW_YN,
+
+                            CASE
+                                WHEN CB.CLM_TP_CD = '30' THEN ( SELECT CDT.ITEM_NM FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+                                ELSE CD.ITEM_NM
+                            END AS CD_ITEM_NM,
+
+                            CASE
+                                WHEN CB.CLM_TP_CD = '30' THEN ( SELECT CDT.ITEM_NO FROM CLAIM_DETAIL CDT WHERE CDT.CLM_NO = CD.CLM_NO ORDER BY CDT.CLM_DTL_SEQ DESC LIMIT 1)
+                                ELSE CD.ITEM_NO
+                            END AS CD_ITEM_NO,
+
+                            (SELECT DISP_CLSF_NM FROM DISPLAY_CATEGORY WHERE DISP_CLSF_NO = CD.DISP_CLSF_NO) AS CD_DISP_CLSF_NM,
+
+                            (
+                                SELECT IFNULL(SUM(APL_AMT), 0)
+                                FROM APL_BNFT AB
+                                WHERE AB.ORD_NO = OD.ORD_NO AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ AND AB.APL_BNFT_GB_CD = '20' AND AB.APL_BNFT_TP_CD  = '210'
+                            ) AS CD_CP_DC_AMT,		/* 상품 쿠폰 할인 금액 */
+
+                            (
+                                SELECT	IFNULL(SUM(APL_AMT), 0)
+                                FROM APL_BNFT AB
+                                WHERE	AB.ORD_NO = OD.ORD_NO
+                                    AND AB.ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+                                    AND AB.APL_BNFT_GB_CD = '20'
+                                    AND AB.APL_BNFT_TP_CD  = '220'
+                            ) AS CD_CART_CP_DC_AMT,	/** 장바구니 쿠폰 할인 금액 */
+
+                            (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = CD.GOODS_ID)) AS CD_BND_NM_KO,	/* 브랜드명 국문 */
+
+                            (
+                                SELECT GROUP_CONCAT( GB.GOODS_NM, ',')
+                                FROM GOODS_BASE GB
+                                WHERE GB.GOODS_ID IN (
+                                    SELECT ODC.CSTRT_GOODS_ID
+                                    FROM ORD_DTL_CSTRT ODC
+                                    INNER JOIN ORDER_DETAIL ODD ON ODC.ORD_NO = ODD.ORD_NO AND ODC.ORD_DTL_SEQ = ODD.ORD_DTL_SEQ
+                                    WHERE ODC.ORD_NO  = OD.ORD_NO AND ODC.CSTRT_GOODS_GB_CD = '30'
+                                    ORDER BY ODD.ORD_DTL_SEQ ASC
+                                )
+                            ) AS CD_SUB_GOODS_NM, /*사은품명*/
+
+                            CASE
+                                WHEN (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = CD.COMP_NO) = '20' THEN '10'
+                                ELSE (SELECT DLVR_PRCS_TP_CD FROM ORDER_BASE X1 WHERE X1.ORD_NO = CD.ORD_NO)
+                            END CD_DLVR_PRCS_TP_CD,
+
+                            ROW_NUMBER() OVER(PARTITION BY OD.ORD_NO, OD.ORD_DTL_SEQ, CD.CLM_NO ORDER BY CD.CLM_DTL_SEQ DESC) AS CLM_DTL_SEQ_ORDER,
+
+                            CASE
+                                    WHEN CD.CLM_DTL_TP_CD IN ('10', '20') THEN 'Y'
+
+                                    WHEN CD.CLM_DTL_TP_CD = '30' THEN
+                                        CASE
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '310' THEN
+                                                    CASE
+                                                        WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410 THEN 'N'
+                                                        ELSE 'Y'
+                                                    END
+
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '360' THEN
+                                                    CASE
+                                                        WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410 THEN 'Y'
+                                                        ELSE 'N'
+                                                    END
+
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '350' THEN 'Y'
+                                            ELSE 'Y'
+                                        END
+
+                                    WHEN CD.CLM_DTL_TP_CD = '40' THEN
+                                        CASE
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '310' THEN
+                                                CASE
+                                                    WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410 THEN 'Y'
+                                                    ELSE 'N'
+                                                END
+
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '360' THEN
+                                                CASE
+                                                    WHEN MAX(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = 410 THEN 'N'
+                                                    ELSE 'Y'
+                                                END
+
+                                            WHEN MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ) = '350' THEN 'N'
+
+                                            ELSE 'N'
+                                        END
+
+                                    ELSE 'N'
+                            END AS VIEW_CLM_YN
+                        FROM (
+                            SELECT
+                                ORD_NO,
+                                ST_ID,
+                                ORD_STAT_CD,
+                                ORD_MDA_CD,
+                                MBR_NO,
+                                MBR_GRD_CD,
+                                ORD_NM,
+                                ORDR_ID,
+                                ORDR_EMAIL,
+                                ORDR_TEL,
+                                ORDR_MOBILE,
+                                ORDR_IP,
+                                ORD_ACPT_DTM,
+                                ORD_CPLT_DTM,
+                                OUTSIDE_ORD_NO,
+                                CHNL_ID,
+                                ORD_DTL_CNT,
+                                ORD_PRCS_RST_CD,
+                                ORD_PRCS_RST_MSG,
+                                DATA_STAT_CD,
+                                DLVR_PRCS_TP_CD,
+                                ORDR_SHOW_YN
+                                FROM ORDER_BASE OB
+                                WHERE ORD_NO = #{ordNo}
+                        ) OB
+                        INNER JOIN ORDER_DETAIL OD ON (OB.ORD_NO = OD.ORD_NO)
+                        INNER JOIN GOODS_BASE GB ON (OD.GOODS_ID = GB.GOODS_ID)
+                        INNER JOIN GOODS_IMG GI ON (OD.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = 'Y')
+                        INNER JOIN COMPANY_BASE CP ON (OD.COMP_NO = CP.COMP_NO )
+                        INNER JOIN CLAIM_DETAIL CD ON (OD.ORD_NO = CD.ORD_NO AND OD.ORD_DTL_SEQ = CD.ORD_DTL_SEQ)
+                        LEFT JOIN CLAIM_BASE CB ON CB.CLM_NO = CD.CLM_NO AND CB.CLM_STAT_CD &lt;> '40'
+                    ) OBB
+                    WHERE OBB.VIEW_CLM_YN = 'Y'
+                    AND OBB.CD_CLM_QTY <![CDATA[>]]> 0
+                    AND OBB.ORG_CD_CLM_DTL_SEQ = CD_CLM_DTL_SEQ
+            )OBB
+            WHERE LIST_DELIMITER = 'CLAIM'
+        ) LIST
+    ORDER BY ORD_ACPT_DTM DESC, COMP_GB_CD, COMP_NO, IF(CD_CLM_NO = ORD_NO, 'Z00000000000000000', CD_CLM_NO) DESC, FORCE_DTL_STAT, ORD_DTL_SEQ
+    </select>
+
+    <select id="getOrderDlvra" resultType="biz.app.order.model.OrderDlvraVO">
+        <!--
+            Query Name : orderDlvra..getOrderDlvra
+            Description : 주문 배송지 단건 조회
+        -->
+        SELECT	/* 펫츠비 주문 이력 QUERYID(orderDlvra.getOrderDlvra) */
+        OD.ORD_DLVRA_NO
+        , OD.ADRS_NM
+        , OD.GB_NM
+        , OD.TEL
+        , OD.MOBILE
+        , OD.POST_NO_OLD
+        , OD.PRCL_ADDR
+        , OD.PRCL_DTL_ADDR
+        , OD.POST_NO_NEW
+        , OD.ROAD_ADDR
+        , OD.ROAD_DTL_ADDR
+        , OD.DLVR_MEMO
+        , OD.GOODS_RCV_PST_CD		/* 상품 수령 위치 코드 */
+        , OD.GOODS_RCV_PST_ETC		/* 상품 수령 위치 기타 */
+        /*, OD.DLVR_DEMAND_YN		 배송 요청사항 여부 */
+        , OD.PBL_GATE_ENT_MTD_CD	/* 공동 현관 출입 방법 코드 */
+        , OD.PBL_GATE_PSWD			/* 공동 현관 비밀번호 */
+        , OD.DLVR_DEMAND			/* 배송 요청사항 */
+        ,case GOODS_RCV_PST_CD
+        when '10' then		/*문앞*/
+        (
+        case OD.PBL_GATE_ENT_MTD_CD when '10' then 'Y'
+        when '30' then 'Y'
+        else'N'
+        end
+        )
+        when '20' then
+        (
+        case OD.PBL_GATE_ENT_MTD_CD when '20' then 'Y'
+        when '30' then 'Y'
+        else'N'
+        end
+        )
+        when '30' then 'Y'
+        when '40' then
+        (
+        case IFNULL(OD.GOODS_RCV_PST_ETC, '') when '' then 'N'
+        else 'Y'
+        end
+        )
+        else
+        'N'
+        end as DLVR_DEMAND_YN
+        , OD.SYS_REGR_NO
+        , OD.SYS_REG_DTM
+        , OD.SYS_UPDR_NO
+        , OD.SYS_UPD_DTM
+        , OD.GB_NM
+        , DAI.DLVR_AREA_CD
+        <!-- , DAI.DLVR_AREA_NM  //2021.04.12 by kek01 주석처리 -->
+        , DAPM.DLVR_AREA_NM
+        , DAI.DLVR_CNTR_CD
+        , DAI.DLVR_CNTR_NM
+        , DAI.DLVR_PRCS_TP_CD
+        , DAPM.SIDO
+        , DAPM.GUGUN
+        , DAPM.DONG
+        , ORD.DLVR_CPLT_PIC_URL
+        , ORD.DLVR_SMS
+        , ORD.DLVR_CPLT_YN
+        FROM
+        ORDER_DLVRA OD
+        LEFT OUTER JOIN ORD_DLVR_AREA_MAP ODAM
+        ON OD.ORD_NO = ODAM.ORD_NO
+        AND ODAM.DEL_YN = 'N'
+        LEFT OUTER JOIN DLVR_AREA_INFO DAI
+        ON DAI.DLVR_AREA_NO = ODAM.DLVR_AREA_NO
+        LEFT OUTER JOIN DLVR_AREA_POST_MAP DAPM
+        ON DAPM.DLVR_AREA_NO = DAI.DLVR_AREA_NO
+        AND DAPM.POST_NO = OD.POST_NO_NEW
+        LEFT OUTER JOIN ORDER_DETAIL ORD
+        ON ORD.ORD_NO = OD.ORD_NO
+        AND ORD.ORD_DTL_SEQ = (SELECT ORD_DTL_SEQ FROM ORDER_DETAIL WHERE ORD_NO = OD.ORD_NO ORDER BY ORD_DTL_SEQ LIMIT 1)
+        WHERE	1 = 1
+        <if test="ordDlvraNo != null and ordDlvraNo != ''">
+            AND		OD.ORD_DLVRA_NO = #{ordDlvraNo}
+        </if>
+        <if test="ordNo != null and ordNo != ''">
+            AND    OD.ORD_DLVRA_NO  IN (SELECT ORD_DLVRA_NO FROM ORDER_DETAIL WHERE ORD_NO = #{ordNo})
+        </if>
+    </select>
+
+    <select id="getOrderPayInfo" resultType="biz.app.order.model.OrderPayVO">
+        <!--
+        Query Name : order.getOrderPayInfo
+        Description : 주문 결제 총괄 정보 조회
+    -->
+        SELECT  	/* order.getOrderPayInfo */
+            ORD_GOODS.ORD_NO
+            ,ORD_GOODS.GOODS_TOTAL_AMT AS GOODS_AMT
+            ,ORD_GOODS.CP_DC_TOTAL_AMT AS CP_DC_AMT
+            ,ORD_GOODS.ORD_SVMN_TOTAL_AMT AS ORD_SVMN
+            ,PAY_SVMN.PAY_AMT AS SVMN_AMT
+            ,CLM_SVMN.PAY_AMT AS CLM_SVMN_AMT
+            ,FN_GET_ORDER_PAY_AMT(#{ordNo}) AS PAY_AMT
+            ,DLVR.REAL_DLVR_AMT AS DLVR_AMT
+            ,PAY_INFO.PAY_MEANS_CD
+            ,PAY_INFO.PAY_STAT_CD
+            ,PAY_INFO.PAY_CPLT_DTM
+            ,PAY_INFO.CFM_NO
+            ,PAY_INFO.CFM_DTM
+            ,PAY_INFO.CARDC_CD
+            ,PAY_INFO.CARD_NO
+            ,PAY_INFO.BANK_CD
+            ,PAY_INFO.ACCT_NO
+            ,PAY_INFO.OOA_NM
+            ,PAY_INFO.DPSTR_NM
+            ,PAY_INFO.DPST_SCHD_DT
+            , PAY_INFO.INSTMNT_INFO
+            , PAY_INFO.FINTR_YN
+            , PAY_INFO.DEAL_NO			<!-- 추가  -->
+            ,CLMPAY.CLM_GOODS_AMT		<!-- 추가  -->
+            ,CLMPAY.CLM_ORG_DLVRC_AMT	<!-- 추가  -->
+            ,CLMPAY.CLM_CP_DC_AMT		<!-- 추가  -->
+            ,CLMPAY.CLM_NEW_RTN_ORG_DLVRC_AMT	<!-- 추가  -->
+            ,CLMPAY.CLM_DLVRC_AMT	<!-- 추가  -->
+            ,CLMPAY.CLM_PAY_AMT	<!-- 추가  -->
+            ,ORDPAYAMT.ORD_PAY_AMT	<!-- 추가  -->
+            ,DLVR_ORG.ORG_DLVR_AMT <!-- 추가  -->
+            ,ORD_GOODS.ORG_GOODS_TOTAL_AMT AS ORG_GOODS_AMT	<!-- 추가  -->
+            ,ORD_GOODS.ORG_CP_DC_TOTAL_AMT AS ORG_CP_DC_AMT	<!-- 추가  -->
+            FROM    (
+            SELECT  	OD2.ORD_NO
+            ,SUM((OD2.SALE_AMT * OD2.VLD_QTY)) AS GOODS_TOTAL_AMT
+            ,SUM((OD2.CP_DC_AMT * OD2.VLD_QTY)+ (OD2.RMN_PAY_AMT * -1)) AS CP_DC_TOTAL_AMT
+            ,SUM(OD2.ISU_SCHD_PNT) AS ORD_SVMN_TOTAL_AMT
+            ,SUM((OD2.SALE_AMT * OD2.ORD_QTY)) AS ORG_GOODS_TOTAL_AMT	<!-- 추가  -->
+            ,SUM((OD2.CP_DC_AMT * OD2.ORD_QTY)+ (OD2.RMN_PAY_AMT * -1)) AS ORG_CP_DC_TOTAL_AMT	<!-- 추가  -->
+        FROM    (
+            SELECT	ROD.ORD_NO
+                    ,ROD.VLD_QTY
+                    ,ROD.SALE_AMT
+                    ,ROD.CP_DC_AMT
+                    ,ROD.PAY_AMT
+                    ,ROD.ORD_SVMN
+                    ,ROD.RMN_PAY_AMT
+                    ,ROD.ISU_SCHD_PNT
+                    ,ROD.ORD_QTY	<!-- 추가  -->
+                    FROM		(
+                                    SELECT  	OD.ORD_NO
+                                            , RMN_ORD_QTY - FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS VLD_QTY
+                                            , OD.SALE_AMT - FN_GET_ORDER_DTL_PRMT_DC_AMT(OD.ORD_NO, OD.ORD_DTL_SEQ) AS SALE_AMT
+                                            , FN_GET_ORDER_DTL_CP_DC_AMT(OD.ORD_NO, OD.ORD_DTL_SEQ) AS CP_DC_AMT
+                                            , OD.PAY_AMT
+                                            , OD.ORD_SVMN
+                                            , OD.RMN_PAY_AMT
+                                            , OD.ISU_SCHD_PNT
+                                            , OD.ORD_QTY	<!-- 추가  -->
+                                FROM    	ORDER_DETAIL OD
+                                WHERE   	OD.ORD_NO = #{ordNo}
+                    ) ROD
+            <!--  WHERE	ROD.VLD_QTY > 0  -->
+            ) OD2
+            GROUP BY OD2.ORD_NO
+        ) ORD_GOODS
+        LEFT OUTER JOIN (
+                SELECT  ORD_NO
+                        , PAY_MEANS_CD
+                        , PAY_STAT_CD
+                        , PAY_CPLT_DTM
+                        , CFM_NO
+                        , CFM_DTM
+                        , CARDC_CD
+                        , CARD_NO
+                        , BANK_CD
+                        , ACCT_NO
+                        , OOA_NM
+                        , DPSTR_NM
+                        , DPST_SCHD_DT
+                        , INSTMNT_INFO
+                        , FINTR_YN
+                        , DEAL_NO
+                FROM    PAY_BASE
+                WHERE   ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+                AND     PAY_MEANS_CD NOT IN ('fp','naverCHG','naverpoint','gd','gm')
+                AND     ORD_NO  = #{ordNo}
+        ) PAY_INFO ON PAY_INFO.ORD_NO = ORD_GOODS.ORD_NO
+        ,
+        (
+            SELECT  IFNULL(SUM(IF(PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}', PAY_AMT, PAY_AMT * -1)),0) AS PAY_AMT
+            FROM    PAY_BASE
+            WHERE   ORD_NO = #{ordNo}
+            AND     CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+            AND     PAY_MEANS_CD IN ('fp','naverCHG','naverpoint','gd','gm')
+            AND     (ORD_CLM_GB_CD = '10' OR (ORD_CLM_GB_CD = '20' AND CLM_NO IN (SELECT CLM_NO FROM CLAIM_BASE WHERE CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}')))
+        ) PAY_SVMN
+        ,
+        (
+        SELECT  IFNULL(SUM(IF(PAY_GB_CD = '10', PAY_AMT, PAY_AMT * -1)),0) AS PAY_AMT
+        FROM    PAY_BASE
+        WHERE   ORD_NO = #{ordNo}
+        AND     CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+        AND     PAY_MEANS_CD IN ('fp','naverCHG','naverpoint','gd','gm')
+        AND     ORD_CLM_GB_CD = '20'
+        ) CLM_SVMN
+        ,
+        (
+            SELECT IFNULL(SUM(A.REAL_DLVR_AMT), 0) AS REAL_DLVR_AMT
+            FROM (
+                SELECT A2.REAL_DLVR_AMT
+                FROM ORDER_DETAIL A1
+                JOIN DELIVERY_CHARGE A2 ON A2.DLVRC_NO = A1.DLVRC_NO AND A2.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                WHERE A1.ORD_NO = #{ordNo}
+
+                UNION
+
+                SELECT A3.REAL_DLVR_AMT
+                FROM CLAIM_BASE A1
+                JOIN CLAIM_DETAIL A2 ON A2.CLM_NO = A1.CLM_NO
+                JOIN DELIVERY_CHARGE A3 ON A3.DLVRC_NO = A2.DLVRC_NO AND A3.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                WHERE A1.ORD_NO = #{ordNo}
+                    AND A1.CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}'
+
+                UNION
+
+                SELECT A3.REAL_DLVR_AMT
+                FROM CLAIM_BASE A1
+                JOIN CLAIM_DETAIL A2 ON A2.CLM_NO = A1.CLM_NO
+                JOIN DELIVERY_CHARGE A3 ON A3.DLVRC_NO = A2.RTN_DLVRC_NO AND A3.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                WHERE A1.ORD_NO = #{ordNo}
+                AND A1.CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}'
+            ) A
+        ) DLVR
+
+        <!-- 추가  -->
+        ,
+        (
+            SELECT
+            IFNULL((SELECT IFNULL(SUM((SALE_AMT - FN_GET_ORDER_DTL_PRMT_DC_AMT(ORD_NO, ORD_DTL_SEQ)) * CLM_QTY), 0) FROM CLAIM_DETAIL WHERE CLM_NO = AA.CLM_NO), 0)AS CLM_GOODS_AMT /* 상품 합계 금액 */
+            ,IFNULL(SUM(ORG_DLVRC_AMT), 0)AS CLM_ORG_DLVRC_AMT
+            ,IFNULL(SUM(CP_DC_AMT), 0)AS CLM_CP_DC_AMT
+            ,IFNULL(SUM(NEW_RTN_ORG_DLVRC_AMT), 0)AS CLM_NEW_RTN_ORG_DLVRC_AMT
+            ,IFNULL(SUM(CLM_DLVRC_AMT), 0)AS CLM_DLVRC_AMT
+            ,IFNULL(SUM(PAY_AMT), 0)AS CLM_PAY_AMT
+            FROM
+            (
+                SELECT
+                    PB.CLM_NO
+                    , (SELECT IFNULL(SUM(REAL_DLVR_AMT), 0) FROM DELIVERY_CHARGE WHERE CNC_CLM_NO = PB.CLM_NO) AS ORG_DLVRC_AMT  /* 원 취소된 배송 금액 */
+                    , (SELECT IFNULL(SUM((FN_GET_ORDER_DTL_CP_DC_AMT(ORD_NO, ORD_DTL_SEQ) * CLM_QTY)+(RMN_PAY_AMT * -1)), 0) FROM CLAIM_DETAIL WHERE CLM_NO = PB.CLM_NO) AS CP_DC_AMT  /* 쿠폰 할인 금액 */
+                    , (
+                            SELECT IFNULL(SUM(REAL_DLVR_AMT), 0)
+                            FROM DELIVERY_CHARGE
+                            WHERE DLVRC_NO IN (SELECT RTN_DLVRC_NO FROM CLAIM_DETAIL WHERE CLM_NO = PB.CLM_NO)) AS NEW_RTN_ORG_DLVRC_AMT  /* 신규 반품/교한 회수 배송비 금액 */
+                    , (
+                            SELECT IFNULL(SUM(REAL_DLVR_AMT), 0)
+                            FROM DELIVERY_CHARGE
+                            WHERE DLVRC_NO IN (SELECT DLVRC_NO FROM CLAIM_DETAIL WHERE CLM_NO = PB.CLM_NO)
+                    ) AS CLM_DLVRC_AMT  /* 추가 배송비 */
+                    , PB.PAY_AMT            /* 결제 금액 */
+                FROM    PAY_BASE PB /* 결제 기본 */
+                WHERE PB.CLM_NO in (SELECT CLM_NO FROM CLAIM_BASE WHERE ORD_NO = #{ordNo} AND CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}')
+            )AA
+        )CLMPAY
+        ,
+        (
+            SELECT  IFNULL(SUM(REAL_DLVR_AMT), 0) AS ORG_DLVR_AMT
+            FROM    DELIVERY_CHARGE
+                WHERE 	1=1
+                AND     DLVRC_NO IN (
+                    SELECT  DLVRC_NO AS DLVRC_NO
+                    FROM    ORDER_DETAIL
+                    WHERE   ORD_NO = #{ordNo}
+                )
+        )DLVR_ORG
+        ,
+        (
+            select  IFNULL(SUM(IF(PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}', PAY_AMT, 0)),0)AS ORD_PAY_AMT  from pay_base pb
+            where ORD_NO = #{ordNo}
+            and CNC_YN ='N'
+            AND PAY_MEANS_CD NOT IN ('fp','naverCHG','naverpoint','gd','gm')         /* 적립금(50), 포인트(80) 제외 */
+            AND (
+                    ORD_CLM_GB_CD = '10' OR
+                    (   ORD_CLM_GB_CD = '20'
+                            AND CLM_NO IN
+                                (
+                                    SELECT CLM_NO
+                                    FROM CLAIM_BASE
+                                    WHERE CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}'
+                                      AND ord_no = #{ordNo})))
+        ) ORDPAYAMT
+        WHERE IFNULL(PAY_INFO.PAY_MEANS_CD,'') != ''
+        <!-- 추가  -->
+    </select>
+
+    <select id="getFrontPayInfo" resultType="biz.app.order.model.OrderPayVO">
+        <!--
+            Query Name : order.getFrontPayInfo
+            Description : 프론트 결제 정보 조회
+        -->
+        SELECT /* 펫츠비 주문 이력 QUERYID(order.getFrontPayInfo) */
+        SUM(IF(A1.ORD_CLM_GB_CD = '10' AND A1.PAY_MEANS_CD NOT IN ('fp','naverCHG','naverpoint','gd','gm') , PAY_AMT, 0)) AS ORG_PAY_AMT /* 최초결제금액 */
+        , (SELECT SUM(SALE_AMT * ORD_QTY) FROM ORDER_DETAIL WHERE ORD_NO = A1.ORD_NO) AS ORG_GOODS_AMT /* 최초 상품금액 */
+        , (SELECT SUM(IFNULL(X1.REAL_DLVR_AMT, 0) + IFNULL(X1.CP_DC_AMT , 0))
+        FROM DELIVERY_CHARGE X1
+        WHERE X1.DLVRC_NO IN (SELECT DLVRC_NO FROM ORDER_DETAIL WHERE ORD_NO = A1.ORD_NO)) AS ORG_DLVR_AMT /* 최초 배송비 */
+        , IFNULL(((SELECT IFNULL(SUM(X2.APL_AMT * X1.ORD_QTY + X2.RMN_APL_AMT) * -1, 0)
+        FROM ORDER_DETAIL X1
+        JOIN APL_BNFT X2 ON X2.ORD_NO = X1.ORD_NO AND X2.ORD_DTL_SEQ = X1.ORD_DTL_SEQ AND X2.APL_BNFT_TP_CD IN ('210', '220')
+        WHERE X1.ORD_NO = A1.ORD_NO)
+        +
+        (SELECT IFNULL(SUM(IFNULL(CP_DC_AMT, 0)) * -1, 0)
+        FROM DELIVERY_CHARGE X1
+        WHERE X1.DLVRC_NO IN (SELECT DLVRC_NO FROM ORDER_DETAIL WHERE ORD_NO = A1.ORD_NO)
+        AND X1.CP_NO IS NOT NULL)
+        )
+        , 0) AS ORG_CP_DC_AMT /* 최초 쿠폰할인 */
+        , SUM(IF(A1.ORD_CLM_GB_CD = '10' AND A1.PAY_MEANS_CD IN ('fp','naverCHG','naverpoint','gd','gm'), PAY_AMT * -1, 0)) AS ORG_PNT /* 최초 포인트 */
+        , SUM(IF(A1.ORD_CLM_GB_CD = '20' AND A1.PAY_MEANS_CD NOT IN ('fp','naverCHG','naverpoint','gd','gm'), IF(A1.PAY_GB_CD = '10', PAY_AMT*-1, PAY_AMT), 0)) AS REFUND_AMT /* 환불금액 */
+        , IFNULL(SUM((SELECT IFNULL(SUM(IFNULL(X1.SALE_AMT * X1.CLM_QTY, 0)), 0) FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)), 0) AS REFUND_CNCL_GOODS_AMT /* 환불 취소상품금액 */
+        , (
+        SUM(
+        IF((SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE CNC_CLM_NO = A1.CLM_NO AND A1.RNUM = 1) > (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1))
+        , (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE CNC_CLM_NO = A1.CLM_NO AND A1.RNUM = 1) - (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1))
+        , 0)
+        )
+        ) AS REFUND_DLVR_AMT /* 환불 배송비 */
+        , IFNULL(SUM((SELECT IFNULL(SUM(IFNULL((FN_GET_ORDER_DTL_CP_DC_AMT(X1.ORD_NO, X1.ORD_DTL_SEQ) * X1.CLM_QTY) + (X1.RMN_PAY_AMT * -1), 0)), 0) FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)), 0) * -1 AS REFUND_CP_DC_AMT /* 환불 쿠폰할인 */
+        , (
+        SUM(
+        IF(
+        (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.RTN_DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) + (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) > 0
+        AND
+        (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.RTN_DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) + (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) > (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE CNC_CLM_NO = A1.CLM_NO AND A1.RNUM = 1)
+        , (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.RTN_DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) + (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO IN (SELECT X1.DLVRC_NO FROM CLAIM_DETAIL X1 JOIN CLAIM_BASE X2 ON X2.CLM_NO = X1.CLM_NO WHERE X1.CLM_NO = A1.CLM_NO AND X1.CLM_DTL_STAT_CD != '250' AND X2.CLM_STAT_CD != '40' AND A1.RNUM = 1)) - (SELECT IFNULL(SUM(IFNULL(REAL_DLVR_AMT, 0)), 0) FROM DELIVERY_CHARGE WHERE CNC_CLM_NO = A1.CLM_NO AND A1.RNUM = 1)
+        , 0)
+        ) * -1
+        ) AS REFUND_ADD_DLVR_AMT /* 환불 추가배송비, 신규 반품/교한 회수 배송비 금액 */
+        , SUM(IF(A1.ORD_CLM_GB_CD = '20' AND A1.PAY_MEANS_CD IN ('fp','naverCHG','naverpoint','gd','gm'), PAY_AMT * -1, 0)) AS REFUND_PNT /* 환불포인트 */
+        , SUM(CASE WHEN A1.PAY_MEANS_CD NOT IN ('fp','naverCHG','naverpoint','gd','gm') AND A1.PAY_GB_CD = '10' THEN A1.PAY_AMT
+        WHEN A1.PAY_MEANS_CD NOT IN('fp','naverCHG','naverpoint','gd','gm') AND A1.PAY_GB_CD = '20' THEN A1.PAY_AMT * -1
+        ELSE 0
+        END
+        ) AS FINAL_PAY_AMT /* 최종결제금액 (포인트제외)*/
+        , A1.ORD_NO
+        FROM (SELECT A.*
+        , ROW_NUMBER() OVER(PARTITION BY A.ORD_CLM_GB_CD, A.ORD_NO, A.CLM_NO ORDER BY A.ORD_CLM_GB_CD, A.ORD_NO, A.CLM_NO) AS RNUM
+        FROM PAY_BASE A
+        WHERE A.ORD_NO = #{ordNo}
+        AND (A.CLM_NO IS NULL OR
+        A.CLM_NO IS NOT NULL AND EXISTS (SELECT 1 FROM CLAIM_BASE WHERE CLM_NO = A.CLM_NO AND CLM_STAT_CD != '40')
+        ) /* 클레임 접수 취소건 제외 */
+        AND A.PAY_STAT_CD = IF(A.PAY_MEANS_CD IN ('eb','fv','pv') AND (SELECT ORD_STAT_CD FROM ORDER_BASE WHERE ORD_NO = A.ORD_NO) = '10' AND IF((SELECT CLM_TP_CD FROM CLAIM_BASE WHERE ORD_NO = A.ORD_NO AND CLM_TP_CD = '10' AND CLM_STAT_CD = '30') IS NULL, true, false), '00', '01') /* 2021.04.28, ssmvf01, 가상계좌 입금대기에도 결제금액이 노출되도록 수정, 2021.06.11 가상계좌 미입금취소시 금액 노출 안함 추가 수정 */
+        ) A1
+    </select>
+
+    <select id="getCashReceiptExistsCheck" resultType="java.lang.Integer">
+        <!--
+            Query Name : cashReceiptgetCashReceiptExistsCheck
+            Description : 현금영수증 기 접수/승인 건 체크
+        -->
+        SELECT /* 펫츠비 주문 이력 QUERYID(cashreceipt.getCashReceiptExistsCheck) */ COUNT(*)
+        FROM	CASH_RECEIPT CR
+        INNER JOIN CASH_RECEIPT_GOODS_MAP CRGM ON CRGM.CASH_RCT_NO = CR.CASH_RCT_NO
+        WHERE	1 = 1
+        <if test="cashRctNo != null">
+            AND		CR.CASH_RCT_NO = #{cashRctNo}
+        </if>
+        <if test="ordNo != null and ordNo != ''">
+            AND		CRGM.ORD_CLM_NO 			= #{ordNo}
+        </if>
+        AND		CR.CR_TP_CD = '${@framework.common.constants.CommonConstants@CR_TP_10}'	/* 발행요청 */
+        AND		CR.CASH_RCT_STAT_CD != '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_30}'
+    </select>
+</mapper>

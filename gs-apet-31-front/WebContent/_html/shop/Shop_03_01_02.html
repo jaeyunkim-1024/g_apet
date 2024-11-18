@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set6","tit":"바잇미 스튜디오","class":"noneAc"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop dm brand" id="container">
+			
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<!-- 21.06.08 APET-1135 lcm01 로고있음-->	
+					<section class="sect dm brand tops">
+						<div class="bts">
+							<button type="button" class="bt zzim on">찜하기</button>
+							<button type="button" class="bt shar">공유하기</button>
+						</div>
+						
+						<div class="info isLogo"><!-- 로고 있을때는 isLogo 추가 -->
+							<div class="blogo"><div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="바잇미 스튜디오"></div></div>
+							<div class="name-pet">
+								<div class="bname"> 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오</div>
+								<div class="bpet">강아지</div>
+							</div>
+						</div>
+						
+					</section>
+					<!-- //21.06.08 APET-1135 lcm01 -->
+					
+					<!-- 21.06.08 APET-1135 lcm01 로고없음 -->	
+					<section class="sect dm brand tops">
+						<div class="bts">
+							<button type="button" class="bt zzim on">찜하기</button>
+							<button type="button" class="bt shar">공유하기</button>
+						</div>
+						
+						<div class="info">
+							<div class="blogo"><div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="바잇미 스튜디오"></div></div>
+							<div class="name-pet">
+								<div class="bname"> 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오 바잇미 스튜디오</div>
+								<div class="bpet">강아지</div>
+							</div>
+						</div>
+						
+					</section>
+					<!-- //21.06.08 APET-1135 lcm01 로고없음 -->
+
+					<nav class="subtopnav cates relat"><!-- ui.disp.subnav.sld.using(); -->
+						<div class="inr">
+							<div class="swiper-container box">
+								<ul class="swiper-wrapper menu">
+									<li class="swiper-slide active"><a class="bt" href="javascript:;">전체</a></li>
+									<li class="swiper-slide"><a class="bt" href="javascript:;">사료</a></li>
+									<li class="swiper-slide"><a class="bt" href="javascript:;">간식</a></li>
+									<li class="swiper-slide"><a class="bt" href="javascript:;">장난감/훈련</a></li>
+									<li class="swiper-slide"><a class="bt" href="javascript:;">건강관리</a></li>
+									<li class="swiper-slide"><a class="bt" href="javascript:;">위생/배변</a></li>
+								</ul>
+							</div>
+						</div>
+					</nav>
+
+					<section class="sect dm brand">
+						
+						<div class="uioptsorts brand">
+							<div class="dx lt">
+								<div class="tot">총 <em class="n">9,999</em>개 상품</div>
+							</div>
+							<div class="dx rt">
+								<nav class="uisort">
+									<button type="button" class="bt st">최근1년</button>
+									<div class="list">
+										<ul class="menu">
+											<li class="active"><button type="button" class="bt" value="v_1">등록일순</button></li>
+											<li><button type="button" class="bt" value="v_2">판매인기순</button></li>
+											<li><button type="button" class="bt" value="v_3">낮은가격순</button></li>
+											<li><button type="button" class="bt" value="v_4">높은가격순</button></li>
+											<li><button type="button" class="bt" value="v_5">후기많은순</button></li>	<!-- CSR-1631 210901 lju02 -->
+											<li><button type="button" class="bt" value="v_6">추천순</button></li>
+										</ul>
+									</div>
+								</nav>
+							</div>
+						</div>
+						<div class="gdlist">
+							<ul class="list">
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+								<li><include data-include-html="./Shop_02_inc_gd_defgd.html"></include></li>
+							</ul>
+						</div>
+						
+					</section>
+					
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+
+	</div>
+</body>
+</html>

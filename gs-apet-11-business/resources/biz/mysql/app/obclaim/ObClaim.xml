@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 10. 17.
+	작성자 : schoi
+-->
+
+<mapper namespace="obclaim">
+
+	<select id="checkClmNoCnt" resultType="java.lang.Integer" >
+		<!--
+			Query Name : obclaim.checkClmNoCnt
+			Description : Outbound API 클레임 번호 확인
+		-->
+		SELECT COUNT(1)
+		  FROM CLAIM_BASE
+		 WHERE 1=1
+		   AND ORD_NO = (SELECT SHOP_ORD_NO 
+		                   FROM OB_CLAIM_BASE 
+		                  WHERE CLM_SEQ = #{clmSeq}
+		                 )
+		   
+	</select>
+	
+	<select id="getOrdNo" resultType="java.lang.String" >
+		<!--
+			Query Name : obclaim.getOrdNo
+			Description : Outbound API 주문 번호 확인
+		-->
+		SELECT A.ORD_NO
+		  FROM ORDER_BASE A,
+		       OB_CLAIM_BASE B
+		 WHERE 1=1
+		   AND A.ORD_NO = B.SHOP_ORD_NO
+		   AND B.CLM_SEQ = #{clmSeq}
+		 LIMIT 1
+		   
+	</select>
+	
+	<select id="checkClmNo" resultType="java.lang.String" >
+		<!--
+			Query Name : obclaim.checkClmNo
+			Description : Outbound API 클레임 번호 확인
+		-->
+		SELECT B.CLM_NO
+		  FROM ORDER_BASE A,
+		       CLAIM_BASE B,
+		       OB_CLAIM_BASE C
+		 WHERE 1=1
+		   AND A.ORD_NO = B.ORD_NO
+		   AND A.OUTSIDE_ORD_NO = C.ORD_NO
+		   AND C.CLM_SEQ = #{clmSeq}
+		 LIMIT 1
+		   
+	</select>		
+	
+	<insert id="insertMarketClaimCancelBase">
+		<!--
+			Query Name : obclaim.insertMarketClaimCancelBase
+			Description : Outbound API 클레임 취소 기본 정보 등록
+		-->
+		INSERT INTO CLAIM_BASE (
+		   CLM_NO,
+		   ST_ID,
+		   ORD_NO,
+		   ORG_CLM_NO,
+		   MBR_NO,
+		   CLM_TP_CD,
+		   CLM_STAT_CD,
+		   ORD_MDA_CD,
+		   CHNL_ID,
+		   SWAP_YN,
+		   ACPT_DTM,
+		   CNC_DTM,
+		   CPLT_DTM,
+		   ACPTR_NO,
+		   CNCR_NO,
+		   CPLTR_NO,
+		   OUTSIDE_CLM_NO,
+		   SYS_REGR_NO,
+		   SYS_REG_DTM,
+		   SYS_UPDR_NO,
+		   SYS_UPD_DTM
+		) 
+		SELECT #{clmNo} AS CLM_NO,
+		       #{stId} AS ST_ID,
+		       SHOP_ORD_NO AS ORD_NO,
+		       NULL AS ORG_CLM_NO,
+		       #{mbrNo} AS MBR_NO,
+		       #{clmTpCd} AS CLM_TP_CD,
+		       #{clmStatCd} AS CLM_STAT_CD, 
+		       #{ordMdaCd} AS ORD_MDA_CD, 
+		       #{chnlId} AS CHNL_ID, 
+		       #{swapYn} AS SWAP_YN, 
+		       CLM_REQ_DT AS ACPT_DTM, 
+		       NULL AS CNC_DTM, 
+		       CLM_REQ_DT AS CPLT_DTM, 
+		       NULL AS ACPTR_NO, 
+		       NULL AS CNCR_NO, 
+		       NULL AS CPLTR_NO, 
+		       NULL AS OUTSIDE_CLM_NO, 
+		       #{sysRegrNo} AS SYS_REGR_NO,
+		       NOW() AS SYS_REG_DTM, 
+		       #{sysUpdrNo} AS SYS_UPDR_NO, 
+		       NOW() AS SYS_UPD_DTM
+		  FROM OB_CLAIM_BASE
+		 WHERE 1=1
+		   AND PROC_CD = '10'
+		   AND CLM_SEQ = #{clmSeq}
+	</insert>
+	
+	<insert id="insertMarketClaimCancelDetail">
+		<!--
+			Query Name : obclaim.insertMarketClaimCancelDetail
+			Description : Outbound API 클레임 취소 상세 정보 등록
+		-->
+		INSERT INTO CLAIM_DETAIL (
+		   CLM_NO,
+		   CLM_DTL_SEQ,
+		   CLM_DTL_TP_CD,
+		   CLM_DTL_STAT_CD,
+		   CLM_RSN_CD,
+		   CLM_RSN_CONTENT,
+		   CLM_DENY_RSN_CONTENT,
+		   MBR_NO,
+		   ORD_NO,
+		   ORD_DTL_SEQ,
+		   ORG_CLM_NO,
+		   ORG_CLM_DTL_SEQ,
+		   GOODS_ID,
+		   GOODS_NM,
+		   ITEM_NO,
+		   ITEM_NM,
+		   DEAL_GOODS_ID,
+		   DISP_CLSF_NO,
+		   COMP_GOODS_ID,
+		   COMP_ITEM_ID,
+		   GOODS_PRC_NO,
+		   SALE_AMT,
+		   PAY_AMT,
+		   RMN_PAY_AMT,
+		   CLM_QTY,
+		   CMS,
+		   GOODS_CMSN_RT,
+		   TAX_GB_CD,
+		   DLVRC_NO,
+		   RTN_DLVRC_NO,
+		   DLVRA_NO,
+		   RTRNA_NO,
+		   DLVR_NO,
+		   COMP_NO,
+		   UP_COMP_NO,
+		   CLM_CPLT_DTM,
+		   RTN_MTD_CD,
+		   OUTSIDE_CLM_DTL_NO,
+		   STL_NO,
+		   SYS_REGR_NO,
+		   SYS_REG_DTM,
+		   SYS_UPDR_NO,
+		   SYS_UPD_DTM
+		)
+		SELECT CLM_NO,
+		       CLM_DTL_SEQ,
+		       CLM_DTL_TP_CD,
+		       CLM_DTL_STAT_CD,
+		       CLM_RSN_CD,
+		       CLM_RSN_CONTENT,
+		       CLM_DENY_RSN_CONTENT,
+		       MBR_NO,
+		       ORD_NO,
+		       ORD_DTL_SEQ,
+		       ORG_CLM_NO,
+		       ORG_CLM_DTL_SEQ,
+		       GOODS_ID,
+		       GOODS_NM,
+		       (SELECT ITEM_NO
+		          FROM ITEM
+		         WHERE GOODS_ID = C.GOODS_ID
+		           AND INSTR(C.SHOP_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 1), '/', -1)) > 0
+		           AND INSTR(C.SHOP_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 2), '/', -1)) > 0
+		       ) AS ITEM_NO,
+		       (SELECT ITEM_NM
+		          FROM ITEM
+		         WHERE GOODS_ID = C.GOODS_ID
+		           AND INSTR(C.SHOP_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 1), '/', -1)) > 0
+		           AND INSTR(C.SHOP_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 2), '/', -1)) > 0
+		       ) AS ITEM_NM,               
+		       DEAL_GOODS_ID,
+		       DISP_CLSF_NO,
+		       COMP_GOODS_ID,
+		       COMP_ITEM_ID,
+		       GOODS_PRC_NO,
+		       SALE_AMT,
+		       PAY_AMT,
+		       RMN_PAY_AMT,
+		       CLM_QTY,
+		       CMS,
+		       GOODS_CMSN_RT,
+		       TAX_GB_CD,
+		       DLVRC_NO,
+		       RTN_DLVRC_NO,
+		       DLVRA_NO,
+		       RTRNA_NO,
+		       DLVR_NO,
+		       COMP_NO,
+		       UP_COMP_NO,
+		       CLM_CPLT_DTM,
+		       RTN_MTD_CD,
+		       OUTSIDE_CLM_DTL_NO,
+		       STL_NO,
+		       SYS_REGR_NO,
+		       SYS_REG_DTM, 
+		       SYS_UPDR_NO, 
+		       SYS_UPD_DTM
+	      FROM ( SELECT #{clmNo} AS CLM_NO,
+						A.ORD_PRD_SEQ AS CLM_DTL_SEQ,
+						#{clmDtlTpCd} AS CLM_DTL_TP_CD,
+						#{clmDtlStatCd} AS CLM_DTL_STAT_CD,
+						#{clmRsnCd} AS CLM_RSN_CD,
+						#{clmRsnContent} AS CLM_RSN_CONTENT,
+						#{clmDenyRsnContent} AS CLM_DENY_RSN_CONTENT,
+						#{mbrNo} AS MBR_NO,
+						A.SHOP_ORD_NO AS ORD_NO,
+						A.ORD_PRD_SEQ AS ORD_DTL_SEQ,
+						NULL AS ORG_CLM_NO,
+						NULL AS ORG_CLM_DTL_SEQ,
+						(SELECT GOODS_ID
+						   FROM GOODS_BASE
+						  WHERE GOODS_NM = A.SHOP_PRD_NM
+						) AS GOODS_ID,
+						A.SHOP_PRD_NM AS GOODS_NM,
+						A.SHOP_PRD_OPT_NM,           
+						NULL AS DEAL_GOODS_ID,
+						NULL AS DISP_CLSF_NO,
+						NULL AS COMP_GOODS_ID,
+						NULL AS COMP_ITEM_ID,
+						NULL AS GOODS_PRC_NO,
+						B.SALE_AMT AS SALE_AMT,
+						B.PAY_AMT AS PAY_AMT,
+						#{rmnPayAmt} AS RMN_PAY_AMT,
+						A.ORD_CN_QTY AS CLM_QTY,
+						NULL AS CMS,
+						NULL AS GOODS_CMSN_RT,
+						#{taxGbCd} AS TAX_GB_CD,
+						#{dlvrcNo} AS DLVRC_NO,
+						#{rtnDlvrcNo} AS RTN_DLVRC_NO,
+						#{dlvraNo} AS DLVRA_NO,
+						#{rtrnaNo} AS RTRNA_NO,
+						#{dlvrNo} AS DLVR_NO,
+					    B.COMP_NO,
+						NULL AS UP_COMP_NO,
+						A.CLM_REQ_DT AS CLM_CPLT_DTM,
+						#{rtnMtdCd} AS RTN_MTD_CD,
+						NULL AS OUTSIDE_CLM_DTL_NO,
+						NULL AS STL_NO,
+						#{sysRegrNo} AS SYS_REGR_NO,
+						NOW() AS SYS_REG_DTM, 
+						#{sysUpdrNo} AS SYS_UPDR_NO, 
+						NOW() AS SYS_UPD_DTM
+				   FROM OB_CLAIM_BASE A,
+                        ORDER_DETAIL B
+				  WHERE 1=1
+          			AND A.ORD_NO = B.OUTSIDE_ORD_DTL_NO
+          			AND A.ORD_PRD_SEQ = B.ORD_DTL_SEQ
+					AND A.PROC_CD = '10'
+					AND A.CLM_SEQ = #{clmSeq}
+		      ) C
+
+	</insert>
+	
+	<select id="selectClaimConfirmGoodsInfo" resultType="biz.app.market.model.MarketClaimConfirmVO">
+		<!--
+			Query Name : obclaim.selectClaimConfirmGoodsInfo
+			Description : Outbound API 클레임 취소 등록 상품 정보
+		-->
+	    SELECT A.GOODS_ID,
+	           A.GOODS_NM,
+	           A.ITEM_NO,
+	           A.ITEM_NM
+	      FROM ORDER_DETAIL A,
+	           OB_CLAIM_BASE B
+	     WHERE A.OUTSIDE_ORD_DTL_NO = B.ORD_NO
+	       AND A.ORD_DTL_SEQ = B.ORD_PRD_SEQ
+	       AND A.ORD_NO = #{ordNo}
+	       AND B.CLM_SEQ = #{clmSeq}
+		   
+	</select>
+	
+	<update id="updateObClaimCancelProcCd">
+		<!--
+			Query Name : obclaim.updateObClaimCancelProcCd
+			Description : Outbound API 클레임 취소 처리 상태 변경
+		-->
+		UPDATE OB_CLAIM_BASE 
+		   SET CLM_NO = #{clmNo},
+		       CLM_STAT = #{clmStat},
+		       SELLER_PRD_CD = #{sellerPrdCd},
+		       SHOP_CLM_ID = #{sysUpdrNo},
+		       SHOP_CLM_DT = NOW(),
+		       PROC_CD = #{procCd},
+			   SYS_UPDR_NO = #{sysUpdrNo},
+			   SYS_UPD_DTM = NOW()
+		 WHERE 1=1
+		   AND CLM_SEQ = #{clmSeq}
+
+	</update>
+	
+</mapper>

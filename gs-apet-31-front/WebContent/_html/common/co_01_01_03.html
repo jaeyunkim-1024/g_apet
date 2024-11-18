@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업레이어 A 전체 덮는크기 -->
+		<article class="popLayer a dn popSample1" id="popSample1">
+			<div class="pbd width562">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">이용약관 동의</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct" data-h="517">
+					<main class="poptents">
+
+						<div class="fake-wrap">
+							<div class="result">
+								<span class="blue">GS&POINT</span>사용을 위해<br>
+								<span class="blue">이용약관에 동의</span>해주세요.
+							</div>
+							<div class="chk-wrap">
+								<dl>
+									<dt class="allchk mt10">
+										<label class="checkbox">
+											<input type="checkbox">
+											<span class="txt">약관 전체동의</span>
+										</label>
+									</dt>
+									<dd>
+										<ul>
+											<li>
+												<label class="checkbox">
+													<input type="checkbox">
+													<span class="txt">[필수] GS리테일 멤버십(THE POP) 회원약관</span>
+												</label>
+												<a href="javascript:;" title="내용보기" onclick="popServiceList()"></a>
+											</li>
+											<li>
+												<label class="checkbox">
+													<input type="checkbox">
+													<span class="txt">[필수] 개인정보 제3자제공동의(펫츠비/GS리테일)</span>
+												</label>
+												<a href="javascript:;" title="내용보기" onClick="popInfoList()"></a>
+											</li>
+										</ul>
+									</dd>
+								</dl>
+							</div>
+							<div class="info-txt pd">
+								<ul>
+									<li>
+										이용자는 위 약관에 대한 동의를 거부할 권리가 있으나, 미동의시 GS&POINT 사용이 불가합니다.
+									</li>
+								</ul>
+							</div>
+						</div>
+			
+					</main>
+				</div>
+				<div class="pbt fx">
+					<!-- 버튼 활성화시 -->
+					<div class="bts">
+						<button type="button" class="btn xl a">동의</button>
+					</div>
+
+					<!-- 버튼 비활성화시 -->
+					<div class="bts" style="display:none;">
+						<button type="button" class="btn xl gray a" disabeld>동의</button>
+					</div>
+				</div>
+				
+			
+				
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popSample1");
+		</script>
+
+</body>
+</html>

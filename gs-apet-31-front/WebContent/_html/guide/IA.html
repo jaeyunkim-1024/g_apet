@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8">
+	<title>IA</title>
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="stylesheet" href="IA.css">
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="IA.js"></script> 
+</head>
+
+<body>
+	<div class="overlay"></div>
+	<div class="previewImg"></div>
+	<div class="wrapper">
+		<div class="gdHead">
+			<h1><span>AboutPet HTML List</span></h1> 
+			<div class="stat">
+				<span class="txt">작업중 : </span><span data-mod="true" class="btn2">ing</span>
+				<span class="txt">완료 : </span><span data-mod="true" class="btn2">com</span>
+			</div>
+		</div>
+
+		<!-- 
+		<dl class="siteInfo">
+			<dt>진행상황</dt>
+			<dd>전체페이지 : <span class="button btn1 cntadd"></span></dd>
+			<dd>완료 페이지 : <b class="btn btn count1"></b></dd>
+			<dd>수정 페이지 : <span class="btn btn2 cntadd2"></span></dd>
+			<dd>대기 페이지 : <span class="btn btn3 count2"></span></dd>
+			<dd>진척율 : <b class="btn btn4 count3"></b></dd>
+			<dd>전체진척율 : <b class="btn btn4 tcount"></b></dd>
+			<dd><a class="btn" href="../../_html/guide/guide.html" target="_blank">샘플UI</a></dd>
+		</dl>
+		 -->
+
+		<div class="menuWrap">
+			<dl class="menu">
+				<dt class="viewAll"><a class="tm">전체보기</a></dt>
+				<dt><a href="javascript:;">공통/메인</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_com.html"></include>
+				</dd>
+				<dt><a href="javascript:;">펫TV</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_tv.html"></include>
+				</dd>
+				<dt><a href="javascript:;">펫로그</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_log.html"></include>
+				</dd>
+				<dt><a href="javascript:;">SHOP</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_shop.html"></include>
+				</dd>
+				<dt><a href="javascript:;">마이페이지</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_my.html"></include>
+				</dd>
+				<dt><a href="javascript:;">팝업(FO)</a></dt>
+				<dd>
+					<include data-include-html="./IA_inc_pop.html"></include>
+				</dd>
+			</dl>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	SKTMP LOG
+	작성자 		김진홍
+	작성일자  	2021. 07. 22.
+-->
+
+<mapper namespace="sktmp">
+	  <select id="pageSktmpLnkHist" resultType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+        <!--
+			Query Name : sktmp.pageSktmpLnkHist
+			Description : SKTMP 연동이력 조회
+		-->
+        SELECT   /* QUERYID(sktmp.pageSktmpLnkHist) */
+        	MLH.MP_LNK_HIST_NO
+        	 , MLH.PNT_NO
+        	 , MLH.ORD_NO
+        	 , MLH.CLM_NO
+        	 , MLH.ORG_MP_LNK_HIST_NO
+        	 , MLH.MP_LNK_GB_CD
+        	 , MLH.MP_REAL_LNK_GB_CD
+        	 , MLH.CARD_NO
+        	 , MLH.IF_GOODS_CD
+        	 , MLH.DEAL_NO
+        	 , MLH.DEAL_AMT
+        	 , MLH.USE_PNT
+        	 , MLH.ADD_USE_PNT
+        	 , MLH.SAVE_SCHD_PNT
+        	 , MLH.ADD_SAVE_SCHD_PNT
+        	 , MLH.PIN_NO
+        	 , MLH.REQ_STRING
+        	 , MLH.REQ_JSON
+        	 , MLH.REQ_DTM
+        	 , MLH.RES_CD
+        	 , MLH.RES_DTL_CD
+        	 , MLH.RES_DTM
+        	 , MLH.CFM_NO
+        	 , MLH.SAVE_PNT
+        	 , MLH.BOOST_UP_PNT
+        	 , MLH.REAL_USE_PNT
+        	 , MLH.RES_STRING
+        	 , MLH.RES_JSON
+        	 , MLH.USE_PSB_RES_CD
+        	 , MLH.USE_PSB_RES_MSG
+        	 , MLH.ERR_PRCS_REQ_DTM
+        	 , MLH.ERR_PRCS_SCSS_YN
+        	 , CASE WHEN MLH.MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_10}'
+        	 		THEN IFNULL(MLH.USE_PNT, 0) + IFNULL(MLH.ADD_USE_PNT, 0)
+        	 		ELSE NULL
+        	 	END AS VIEW_USE_PNT
+			 , CASE WHEN MLH.MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_10}'
+        	 		THEN IFNULL(MLH.SAVE_SCHD_PNT,0) + IFNULL(MLH.ADD_SAVE_SCHD_PNT, 0)
+        	 		ELSE NULL
+        	 	END AS VIEW_SAVE_PNT
+			 , CASE WHEN MLH.MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_20}'
+        	 		THEN IFNULL(MLH.USE_PNT, 0) + IFNULL(MLH.ADD_USE_PNT, 0)
+        	 		ELSE NULL
+        	 	END AS VIEW_USE_CNC_PNT
+       	 	 , CASE WHEN MLH.MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_20}'
+        	 		THEN IFNULL(MLH.SAVE_SCHD_PNT, 0) + IFNULL(MLH.ADD_SAVE_SCHD_PNT, 0)
+        	 		ELSE NULL
+        	 	END AS VIEW_SAVE_CNC_PNT
+			 , CASE WHEN MLH.RES_CD != '${@biz.interfaces.sktmp.constants.SktmpConstants@RES_SUCCESS_CODE}' AND MLH.RES_CD IS NOT NULL
+			 		THEN 'Y'
+			 		ELSE 'N'
+			 	END AS RE_REQ_PSB_YN
+        	 , MLH.SYS_REGR_NO
+        	 , MLH.SYS_REG_DTM
+        	 , MLH.SYS_UPDR_NO
+        	 , MLH.SYS_UPD_DTM
+        	 , OB.MBR_NO
+        	 , (SELECT SUM(IF(PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}' OR '${@framework.common.constants.CommonConstants@PAY_GB_30}', PAY_AMT, PAY_AMT * -1  )) 
+        	 	  FROM PAY_BASE WHERE ORD_NO = MLH.ORD_NO AND CNC_YN = 'N' AND PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_01}') AS PAY_AMT
+        	 , FN_GET_USER_NAME(MLH.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			 , FN_GET_USER_NAME(MLH.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			 , ORG_MLH.RES_CD AS ORG_RES_CD
+        FROM MP_LNK_HIST MLH
+   LEFT JOIN ORDER_BASE OB ON(OB.ORD_NO = MLH.ORD_NO)
+   LEFT JOIN MP_LNK_HIST ORG_MLH ON(ORG_MLH.MP_LNK_HIST_NO = MLH.ORG_MP_LNK_HIST_NO)
+        WHERE 1=1
+        <include refid="wherePageSktmpLnkHist"/>
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+    </select>
+
+    <select id="pageSktmpLnkHistCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(sktmp.pageSktmpLnkHistCount) */ COUNT(*)
+        FROM MP_LNK_HIST MLH
+   LEFT JOIN ORDER_BASE OB ON(OB.ORD_NO = MLH.ORD_NO)
+   	   WHERE 1=1
+        <include refid="wherePageSktmpLnkHist"/>
+    </select>
+	
+	
+	
+    <sql id="wherePageSktmpLnkHist">
+    	 AND OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}'
+        <if test="searchValueOrder == null or searchValueOrder == ''">
+        	<include refid="sktmp.pageCommonOrgAnd" />
+		</if>
+		<if test="searchValueOrder != null and searchValueOrder != ''">
+		    <choose>
+		        <when test="searchKeyOrder == 'type01'">
+		AND		OB.ORD_NO = #{searchValueOrder}
+		        </when>
+		        <when test="searchKeyOrder == 'type02'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		OB.ORD_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		        <when test="searchKeyOrder == 'type03'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		OB.ORDR_ID IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		        <when test="searchKeyOrder == 'type04'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		EXISTS(SELECT 1 FROM ORDER_DLVRA ODA WHERE ORD_NO = OB.ORD_NO AND ODA.ADRS_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder}))
+		        </when>
+		        <when test="searchKeyOrder == 'type09'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		(
+					OB.MBR_NO = #{searchValueOrder}
+					OR MLH.CARD_NO IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+					)
+		        </when>
+		        <when test="searchKeyOrder == 'type10'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		OB.MBR_NO = #{searchValueOrder}
+		        </when>
+		        <when test="searchKeyOrder == 'type11'">
+		        	<include refid="sktmp.pageCommonOrgAnd" />
+		AND 		MLH.CARD_NO IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		    </choose>
+		</if>
+    </sql>
+    
+    <sql id="pageCommonOrgAnd">
+    	<if test="reqStrtDtm != null">
+		AND MLH.REQ_DTM <![CDATA[>=]]> #{reqStrtDtm}
+		</if>
+		<if test="reqEndDtm != null">
+		AND MLH.REQ_DTM <![CDATA[<=]]> DATE_ADD(#{reqEndDtm},INTERVAL 1 DAY)
+		</if>
+		<if test="mpLnkHistNo != null and mpLnkHistNo != ''">
+		AND MLH.MP_LNK_HIST_NO = #{mpLnkHistNo}
+		</if>
+		<if test="mpLnkGbCd != null and mpLnkGbCd != ''">
+		AND MLH.MP_LNK_GB_CD = #{mpLnkGbCd}
+		</if>
+		<if test="clmNo != null and clmNo != ''">
+		AND MLH.CLM_NO = #{clmNo}
+		</if>
+		<if test="reqScssYn != null and reqScssYn != ''">
+			<choose>
+				<when test='reqScssYn.equals("Y")'>
+					AND MLH.RES_CD = '${@biz.interfaces.sktmp.constants.SktmpConstants@RES_SUCCESS_CODE}'
+				</when>
+				<otherwise>
+					AND MLH.RES_CD != '${@biz.interfaces.sktmp.constants.SktmpConstants@RES_SUCCESS_CODE}'
+				</otherwise>
+			</choose>
+		</if>
+		<if test="errPrcsScssYn != null and errPrcsScssYn != ''">
+		AND MLH.ERR_PRCS_SCSS_YN = #{errPrcsScssYn}
+		</if>
+		<if test="searchPnt != null and searchPnt != ''">
+		AND (IFNULL(MLH.USE_PNT, 0) + IFNULL(MLH.ADD_USE_PNT, 0) = #{searchPnt} OR IFNULL(MLH.SAVE_SCHD_PNT, 0) + IFNULL(MLH.ADD_SAVE_SCHD_PNT, 0) = #{searchPnt})
+		</if>
+		<if test="mpRealLnkGbCd != null and mpRealLnkGbCd != ''">
+		AND MLH.MP_REAL_LNK_GB_CD = #{mpRealLnkGbCd}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND MLH.ORD_NO = #{ordNo}
+		</if>
+		<if test='chkSaveYn != null and chkSaveYn.equals("Y")'>
+		AND MLH.RES_CD IN ('101')
+		</if>
+    </sql>
+    
+     <select id="listSktmpLnkHist" resultType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+        <!--
+			Query Name : sktmp.listSktmpLnkHist
+			Description : SKTMP 연동 이력 상세 조회
+		-->
+        SELECT   /* QUERYID(sktmp.listSktmpLnkHist) */
+             MLH.MP_LNK_HIST_NO
+        	 , MLH.PNT_NO
+        	 , MLH.ORD_NO
+        	 , MLH.CLM_NO
+        	 , MLH.ORG_MP_LNK_HIST_NO
+        	 , MLH.MP_LNK_GB_CD
+        	 , MLH.MP_REAL_LNK_GB_CD
+        	 , MLH.CARD_NO
+        	 , MLH.IF_GOODS_CD
+        	 , MLH.DEAL_NO
+        	 , MLH.DEAL_AMT
+        	 , MLH.USE_PNT
+        	 , MLH.ADD_USE_PNT
+        	 , MLH.SAVE_SCHD_PNT
+        	 , MLH.ADD_SAVE_SCHD_PNT
+        	 , MLH.PIN_NO
+        	 , MLH.REQ_STRING
+        	 , MLH.REQ_JSON
+        	 , MLH.REQ_DTM
+        	 , MLH.RES_CD
+        	 , MLH.RES_DTL_CD
+        	 , MLH.RES_DTM
+        	 , MLH.CFM_NO
+        	 , MLH.SAVE_PNT
+        	 , MLH.BOOST_UP_PNT
+        	 , MLH.REAL_USE_PNT
+        	 , MLH.RES_STRING
+        	 , MLH.RES_JSON
+        	 , MLH.USE_PSB_RES_CD
+        	 , MLH.USE_PSB_RES_MSG
+        	 , MLH.ERR_PRCS_REQ_DTM
+        	 , MLH.ERR_PRCS_SCSS_YN
+        	 , MLH.SYS_REGR_NO
+        	 , MLH.SYS_REG_DTM
+        	 , MLH.SYS_UPDR_NO
+        	 , MLH.SYS_UPD_DTM
+        FROM MP_LNK_HIST MLH
+        WHERE 1=1 
+		<if test="ordNo != null and ordNo != ''">
+		AND MLH.ORD_NO = #{ordNo}
+		</if>
+		<if test="clmNo != null and clmNo != ''">
+		AND MLH.CLM_NO = #{clmNo}
+		</if>
+    </select>
+
+    <select id="getSktmpLnkHist" resultType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+        <!--
+			Query Name : sktmp.getSktmpLnkHist
+			Description : SKTMP 연동 이력 상세 조회
+		-->
+        SELECT   /* QUERYID(sktmp.getSktmpLnkHist) */
+             MLH.MP_LNK_HIST_NO
+        	 , MLH.PNT_NO
+        	 , MLH.ORD_NO
+        	 , MLH.CLM_NO
+        	 , MLH.ORG_MP_LNK_HIST_NO
+        	 , MLH.MP_LNK_GB_CD
+        	 , MLH.MP_REAL_LNK_GB_CD
+        	 , MLH.CARD_NO
+        	 , MLH.IF_GOODS_CD
+        	 , MLH.DEAL_NO
+        	 , MLH.DEAL_AMT
+        	 , MLH.USE_PNT
+        	 , MLH.ADD_USE_PNT
+        	 , MLH.SAVE_SCHD_PNT
+        	 , MLH.ADD_SAVE_SCHD_PNT
+        	 , MLH.PIN_NO
+        	 , MLH.REQ_STRING
+        	 , MLH.REQ_JSON
+        	 , MLH.REQ_DTM
+        	 , MLH.RES_CD
+        	 , MLH.RES_DTL_CD
+        	 , MLH.RES_DTM
+        	 , MLH.CFM_NO
+        	 , MLH.SAVE_PNT
+        	 , MLH.BOOST_UP_PNT
+        	 , MLH.REAL_USE_PNT
+        	 , MLH.RES_STRING
+        	 , MLH.RES_JSON
+        	 , MLH.USE_PSB_RES_CD
+        	 , MLH.USE_PSB_RES_MSG
+        	 , MLH.ERR_PRCS_REQ_DTM
+        	 , MLH.ERR_PRCS_SCSS_YN
+        	 , PI.PNT_PRMT_GB_CD
+        	 , PI.USE_RATE
+        	 , PI.MAX_SAVE_PNT
+        	 , MLH.SYS_REGR_NO
+        	 , MLH.SYS_REG_DTM
+        	 , MLH.SYS_UPDR_NO
+        	 , MLH.SYS_UPD_DTM
+        	 , CASE WHEN MLH.MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_20}'
+        	 		THEN 0
+        	 		ELSE IFNULL(MLH.ADD_USE_PNT, 0)
+        	 	END AS RMN_ADD_USE_PNT
+        FROM MP_LNK_HIST MLH
+LEFT OUTER JOIN PNT_INFO PI 
+		  ON PI.PNT_NO = MLH.PNT_NO
+        WHERE 1=1 
+        <if test="mpLnkHistNo != null and mpLnkHistNo != ''">
+		AND MLH.MP_LNK_HIST_NO = #{mpLnkHistNo}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND MLH.MP_LNK_HIST_NO IN (SELECT MP_LNK_HIST_NO FROM ORDER_BASE WHERE ORD_NO = #{ordNo})
+		</if>
+		<if test="payOrdNo != null and payOrdNo != ''">
+		AND MLH.ORD_No = #{payOrdNo} AND CLM_NO IS NULL
+		</if>
+		LIMIT 1
+    </select>
+
+    <insert id="insertSktmpLnkHist" parameterType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+        INSERT INTO MP_LNK_HIST ( /* QUERYID(sktmp.insertSktmpLnkHist) */
+                MP_LNK_HIST_NO
+	        	 , PNT_NO
+	        	 , ORD_NO
+	        	 , CLM_NO
+	        	 , ORG_MP_LNK_HIST_NO
+	        	 , MP_LNK_GB_CD
+	        	 , MP_REAL_LNK_GB_CD
+	        	 , CARD_NO
+	        	 , IF_GOODS_CD
+	        	 , DEAL_NO
+	        	 , DEAL_AMT
+	        	 , USE_PNT
+	        	 , ADD_USE_PNT
+	        	 , SAVE_SCHD_PNT
+	        	 , ADD_SAVE_SCHD_PNT
+	        	 , PIN_NO
+	        	 , REQ_STRING
+	        	 , REQ_JSON
+	        	 , REQ_DTM
+	        	 , RES_CD
+	        	 , RES_DTL_CD
+	        	 , CFM_NO
+	        	 , SAVE_PNT
+	        	 , BOOST_UP_PNT
+	        	 , REAL_USE_PNT
+	        	 , RES_STRING
+	        	 , RES_JSON
+	        	 , RES_DTM
+	        	 , ERR_PRCS_REQ_DTM
+	        	 , ERR_PRCS_SCSS_YN
+	        	 , SYS_REGR_NO
+	        	 , SYS_REG_DTM
+	        	 , SYS_UPDR_NO
+	        	 , SYS_UPD_DTM
+        )VALUES(
+	        	#{mpLnkHistNo}
+	        	 , #{pntNo}
+	        	 , #{ordNo}
+	        	 , #{clmNo}
+	        	 , #{orgMpLnkHistNo}
+	        	 , #{mpLnkGbCd}
+	        	 , #{mpRealLnkGbCd}
+	        	 , #{cardNo}
+	        	 , #{ifGoodsCd}
+	        	 , #{dealNo}
+	        	 , #{dealAmt}
+	        	 , #{usePnt}
+	        	 , #{addUsePnt}
+	        	 , #{saveSchdPnt}
+	        	 , #{addSaveSchdPnt}
+	        	 , #{pinNo}
+	        	 , #{reqString}
+	        	 , #{reqJson}
+	        	 , #{reqDtm}
+	        	 , #{resCd}
+	        	 , #{resDtlCd}
+	        	 , #{cfmNo}
+	        	 , #{savePnt}
+	        	 , #{boostUpPnt}
+	        	 , #{realUsePnt}
+	        	 , #{resString}
+	        	 , #{resJson}
+	        	 , #{resDtm}
+	        	 , #{errPrcsReqDtm}
+	        	 , #{errPrcsScssYn}
+	        	 , #{sysRegrNo}		/* 시스템 등록자 번호 */
+				 , NOW()				/* 시스템 등록 일시 */
+				 , #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				 , NOW()				/* 시스템 수정 일시 */
+        )
+    </insert>
+    
+    <update id="updateResSktmpLnkHist" parameterType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+    	UPDATE MP_LNK_HIST	/* QUERYID(sktmp.updateSktmpLnkHist) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()						/* 시스템 수정 일시 */
+        	, DEAL_NO			= #{dealNo}
+        	, REQ_STRING        = #{reqString}
+        	, REQ_JSON          = #{reqJson}
+        	, REQ_DTM           = #{reqDtm}
+        	, RES_CD            = #{resCd}
+        	, RES_DTL_CD        = #{resDtlCd}
+        	, CFM_NO            = #{cfmNo}
+        	, SAVE_PNT          = #{savePnt}
+        	, BOOST_UP_PNT      = #{boostUpPnt}
+        	, REAL_USE_PNT      = #{realUsePnt}
+        	, RES_STRING        = #{resString}
+        	, RES_JSON          = #{resJson}
+        	, RES_DTM			= #{resDtm}
+        	<if test="ifGoodsCd != null and ifGoodsCd != ''">
+	        , IF_GOODS_CD			= #{ifGoodsCd}
+	        </if>
+        WHERE MP_LNK_HIST_NO = #{mpLnkHistNo}        
+    </update>
+    
+    <update id="updateSktmpLnkHist" parameterType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+    	UPDATE MP_LNK_HIST	/* QUERYID(sktmp.updateSktmpLnkHist) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()						/* 시스템 수정 일시 */
+			<if test="usePsbResCd != null and usePsbResCd != ''">
+			, USE_PSB_RES_CD = #{usePsbResCd}
+			</if>
+			<if test="usePsbResMsg != null and usePsbResMsg != ''">
+			, USE_PSB_RES_MSG = #{usePsbResMsg}
+			</if>
+        WHERE MP_LNK_HIST_NO = #{mpLnkHistNo}        
+    </update>
+    
+    
+      <select id="getSktmpPntHistTotal" resultType="biz.interfaces.sktmp.model.SktmpLnkHistVO">
+        <!--
+			Query Name : sktmp.getSktmpPntHistTotal
+			Description : SKTMP 연동 이력 총합계
+		-->
+        SELECT   /* QUERYID(sktmp.getSktmpPntHistTotal) */
+				SUM(IF(MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_10}', IFNULL(MLH.USE_PNT, 0) + IFNULL(MLH.ADD_USE_PNT, 0), 0)) AS TOTAL_USE_PNT 	/* 포인트 사용 */
+				, SUM(IF(MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_10}', IFNULL(SAVE_SCHD_PNT,0) + IFNULL(ADD_SAVE_SCHD_PNT, 0), 0)) AS TOTAL_SAVE_PNT 	/* 포인트 적립 */
+				, SUM(IF(MP_REAL_LNK_GB_CD = '${@framework.common.constants.CommonConstants@MP_REAL_LNK_GB_20}', IFNULL(MLH.USE_PNT, 0) + IFNULL(MLH.ADD_USE_PNT, 0), 0)) AS TOTAL_CNC_PNT 	/* 포인트 취소 */
+		FROM MP_LNK_HIST MLH
+LEFT JOIN ORDER_BASE OB ON(OB.ORD_NO = MLH.ORD_NO)
+	   WHERE 1=1
+		<include refid="wherePageSktmpLnkHist"/>
+    </select>
+    
+    <insert id="insertSktmpCardInfo" parameterType="biz.interfaces.sktmp.model.SktmpCardInfoPO">
+        INSERT INTO MP_CARD_INFO ( /* QUERYID(sktmp.insertSktmpCardInfo) */
+                CARD_INFO_NO
+	        	 , MBR_NO
+	        	 , CARD_NO
+	        	 , PIN_NO
+	        	 , USE_YN
+	        	 , DFLT_YN
+	        	 , SORT_SEQ
+	        	 , SYS_REGR_NO
+	        	 , SYS_REG_DTM
+	        	 , SYS_UPDR_NO
+	        	 , SYS_UPD_DTM
+        )VALUES(
+	        	#{cardInfoNo}
+	        	 , #{mbrNo}
+	        	 , #{cardNo}
+	        	 , #{pinNo}
+	        	 , #{useYn}
+	        	 , #{dfltYn}
+	        	 , #{sortSeq}
+	        	 , #{sysRegrNo}
+				 , NOW()
+				 , #{sysUpdrNo}
+				 , NOW()
+        )
+    </insert>
+    
+    <update id="updateSktmpCardInfo" parameterType="biz.interfaces.sktmp.model.SktmpCardInfoPO">
+    	UPDATE MP_CARD_INFO	/* QUERYID(sktmp.updateSktmpCardInfo) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}
+			, SYS_UPD_DTM		= NOW()
+		<if test="mbrNo != null and mbrNo != ''">
+        	, MBR_NO			= #{mbrNo}
+        </if>
+        <if test="cardNo != null and cardNo != ''">
+       		, CARD_NO			= #{cardNo}
+       	</if>
+       	<if test="pinNo != null and pinNo != ''">
+       	 	, PIN_NO			= #{pinNo}
+		</if>
+       	<if test="dfltYn != null and dfltYn != ''">
+        	, DFLT_YN			= #{dfltYn}
+        </if>
+        <if test="sortSeq != null and sortSeq != ''">
+        	, SORT_SEQ			= #{sortSeq}
+        </if>
+        WHERE 1=1
+        	AND CARD_INFO_NO = #{cardInfoNo}        
+    </update>
+    
+    <select id="getSktmpCardInfo" resultType="biz.interfaces.sktmp.model.SktmpCardInfoVO">
+    	SELECT	/* QUERYID(sktmp.getSktmpCardInfo) */
+    		CARD_INFO_NO
+        	 , MBR_NO
+        	 , CARD_NO
+        	 , PIN_NO
+        	 , USE_YN
+        	 , DFLT_YN
+        	 , SORT_SEQ
+        	 , SYS_REGR_NO
+        	 , SYS_REG_DTM
+        	 , SYS_UPDR_NO
+        	 , SYS_UPD_DTM
+		FROM MP_CARD_INFO
+		WHERE 1=1
+			AND MBR_NO = #{mbrNo}
+			AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		ORDER BY SYS_REG_DTM DESC
+		LIMIT 1
+    </select>
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	회원 주소록(배송지)Mapper 
+	작성자  	snw 
+	작성일자  	2016.02.16 
+-->
+
+<mapper namespace="memberAddress">
+
+	<!-- 회원 주소록(배송지) 목록 -->
+	<select id="listMemberAddress" resultType="biz.app.member.model.MemberAddressVO">		
+		SELECT  MBR_DLVRA_NO
+				,MBR_NO
+				,GB_NM
+				,ADRS_NM
+				,TEL
+				,MOBILE
+				,POST_NO_OLD
+				,POST_NO_NEW
+				,ROAD_ADDR
+				,ROAD_DTL_ADDR
+				,PRCL_ADDR
+				,PRCL_DTL_ADDR
+				,DFT_YN
+				,DLVR_DEMAND_YN
+				,GOODS_RCV_PST_CD
+				,(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@GOODS_RCV_PST}' AND DTL_CD = MA.GOODS_RCV_PST_CD) AS GOODS_RCV_PST_NM
+				,GOODS_RCV_PST_ETC
+				,PBL_GATE_ENT_MTD_CD
+				,(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@PBL_GATE_ENT_MTD}' AND DTL_CD = MA.PBL_GATE_ENT_MTD_CD) AS PBL_GATE_ENT_MTD_NM
+				,PBL_GATE_PSWD
+				,DLVR_DEMAND
+				,SYS_REGR_NO 
+				,SYS_REG_DTM
+				,SYS_UPD_DTM
+		FROM	MEMBER_ADDRESS MA
+		WHERE   MBR_NO = #{mbrNo}
+		ORDER BY DFT_YN DESC ,  SYS_REG_DTM DESC
+	</select>
+
+	<!-- 회원 주소록(배송지)상세 -->
+	<select id="getMemberAddress" resultType="biz.app.member.model.MemberAddressVO">	
+		SELECT	MBR_DLVRA_NO
+				,MBR_NO
+				,GB_NM
+				,ADRS_NM
+				,TEL
+				,MOBILE
+				,POST_NO_OLD
+				,POST_NO_NEW
+				,PRCL_ADDR
+				,PRCL_DTL_ADDR
+				,ROAD_ADDR
+				,ROAD_DTL_ADDR
+				,DFT_YN
+				,DLVR_DEMAND_YN
+				,GOODS_RCV_PST_CD
+				,GOODS_RCV_PST_ETC
+				,PBL_GATE_ENT_MTD_CD
+				,PBL_GATE_PSWD
+				,DLVR_DEMAND
+				,SYS_REGR_NO 
+				,SYS_REG_DTM
+				,SYS_UPDR_NO 
+				,SYS_UPD_DTM
+				<if test='mbrNo != null'>
+				,(SELECT EMAIL FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo}) AS EMAIL
+				</if>
+		FROM	MEMBER_ADDRESS
+		WHERE	1=1
+		<if test='mbrDlvraNo != null'>
+		AND		MBR_DLVRA_NO = #{mbrDlvraNo}
+		</if>
+		<if test='mbrNo != null'>
+		AND		MBR_NO = #{mbrNo}
+		</if>
+		<if test='dftYn != null and dftYn != ""'>
+		AND		DFT_YN = #{dftYn}
+		</if>
+		ORDER BY DFT_YN DESC LIMIT 1
+	</select>	
+
+	<!-- 회원 주소록(배송지) 등록 -->
+	<insert id="insertMemberAddress">
+		INSERT INTO MEMBER_ADDRESS
+			(
+				MBR_DLVRA_NO
+				,MBR_NO
+				,GB_NM
+				,ADRS_NM
+				,TEL
+				,MOBILE
+				,POST_NO_OLD
+				,POST_NO_NEW
+				,ROAD_ADDR
+				,ROAD_DTL_ADDR
+				,PRCL_ADDR
+				,PRCL_DTL_ADDR
+				,DFT_YN
+				,DLVR_DEMAND_YN
+				,GOODS_RCV_PST_CD
+				,GOODS_RCV_PST_ETC
+				,PBL_GATE_ENT_MTD_CD
+				,PBL_GATE_PSWD
+				,DLVR_DEMAND
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+			)
+			VALUES
+			(
+				#{mbrDlvraNo}
+				,#{mbrNo}
+				,#{gbNm}
+				,#{adrsNm}
+				,#{tel}
+				,#{mobile}
+				,#{postNoOld}
+				,#{postNoNew}
+				,#{roadAddr}
+				,#{roadDtlAddr}
+				,#{prclAddr}
+				,#{roadDtlAddr}		/* 지번 상세 주소 - 도로 상세주소와 같으니 도로상세주소로 210127 */
+				,#{dftYn}
+				,IFNULL(#{dlvrDemandYn}, 'N')
+				,#{goodsRcvPstCd}
+				,#{goodsRcvPstEtc}
+				,#{pblGateEntMtdCd}
+				,#{pblGatePswd}
+				,#{dlvrDemand}
+				,#{sysRegrNo}
+				,sysdate()
+			)
+	</insert>
+	
+	<!-- 회원 주소록(배송지) 수정 -->
+	<update id="updateMemberAddress">
+		UPDATE	MEMBER_ADDRESS
+		SET		GB_NM = #{gbNm}
+				,ADRS_NM = #{adrsNm}
+				,TEL = #{tel}
+				,MOBILE = #{mobile}
+				,POST_NO_OLD = #{postNoOld}
+				,POST_NO_NEW = #{postNoNew}
+				,PRCL_ADDR = #{prclAddr}
+				,PRCL_DTL_ADDR = #{prclDtlAddr}
+				,ROAD_ADDR = #{roadAddr}
+				,ROAD_DTL_ADDR = #{roadDtlAddr}
+				,DLVR_DEMAND_YN = IFNULL(#{dlvrDemandYn}, 'N')
+				,GOODS_RCV_PST_CD = #{goodsRcvPstCd}
+				,GOODS_RCV_PST_ETC = #{goodsRcvPstEtc}
+				,PBL_GATE_ENT_MTD_CD = #{pblGateEntMtdCd}
+				,PBL_GATE_PSWD = #{pblGatePswd}
+				,DLVR_DEMAND = #{dlvrDemand}
+				,SYS_UPDR_NO = #{sysUpdrNo}
+				,SYS_UPD_DTM = sysdate()
+		WHERE	MBR_DLVRA_NO = #{mbrDlvraNo}
+	</update>
+
+	<!-- 회원 주소록(배송지) 기본설정 -->
+	<update id="updateMemberAddressDefault">
+		UPDATE	MEMBER_ADDRESS
+		SET		DFT_YN = #{dftYn}
+				,SYS_UPDR_NO = #{sysUpdrNo}
+				,SYS_UPD_DTM = sysdate()
+		WHERE	1=1
+		<if test='mbrNo != null'>
+		AND		MBR_NO = #{mbrNo}
+		</if>
+		<if test='mbrDlvraNo != null'>
+		AND		MBR_DLVRA_NO = #{mbrDlvraNo}
+		</if>
+	</update>
+	
+	<!-- 회원 주소록(배송지)삭제 -->
+	<delete id="deleteMemberAddress">
+		DELETE	
+		FROM	MEMBER_ADDRESS
+		WHERE	1=1
+		<if test='mbrNo != null'>
+		AND		MBR_NO = #{mbrNo}
+		</if>
+		<if test='mbrDlvraNo != null'>
+		AND		MBR_DLVRA_NO = #{mbrDlvraNo}
+		</if>
+	</delete>
+</mapper>

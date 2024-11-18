@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="batch">
+
+	<parameterMap id="batchLog" type="biz.app.batch.model.BatchLogPO">
+		<parameter property="batchId" mode="IN" jdbcType="VARCHAR"/>
+		<parameter property="batchStrtDtm" mode="IN" jdbcType="TIMESTAMP"/>
+		<parameter property="batchEndDtm" mode="IN" jdbcType="TIMESTAMP"/>
+		<parameter property="batchRstCd" mode="IN" jdbcType="VARCHAR"/>
+		<parameter property="batchRstMsg" mode="IN" jdbcType="VARCHAR"/>
+		<parameter property="sysRegrNo" mode="IN" jdbcType="NUMERIC"/>
+		<parameter property="result" mode="OUT" jdbcType="NUMERIC"/>
+		
+	</parameterMap>
+	
+	<update id="insertBatchLog" statementType="CALLABLE" parameterMap="batchLog">
+		{ CALL SP_SET_BATCH_LOG(
+			#{batchId},
+			#{batchStrtDtm},
+			#{batchEndDtm},
+			#{batchRstCd},
+			#{batchRstMsg},
+			#{sysRegrNo},
+			#{result}
+		) }
+	</update>
+
+	<select id="selectBatchName" resultType="java.lang.String">
+		SELECT /* QUERYID(batch.selectBatchName) */
+			I.BTCH_NM
+		FROM BATCH_INFO I
+		WHERE 1=1
+		<if test="value != null and value != ''">
+		AND I.BTCH_ID = #{value}		
+		</if>
+	</select>
+</mapper>

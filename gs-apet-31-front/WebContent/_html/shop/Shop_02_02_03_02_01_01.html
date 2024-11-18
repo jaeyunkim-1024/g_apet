@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			ui.commentBox.open('.type01');
+			$(".bt.btOrde").click(function(){
+				$(".commentBoxAp .product-option").addClass("none");
+				$(".commentBoxAp .product-buy").removeClass("none");
+			})
+		})
+	</script>
+</head>
+<body class="body">
+	<!-- drop pop -->
+	<!-- 
+		data-priceh : 처음 오픈 시 높이
+	-->
+	<main class="container page" id="container"></main>
+		<div class="commentBoxAp type01 handHead  uiPdOrdPan" data-priceh="70%">
+			<div class="head pic">
+				<div class="con">
+					<button class="mo-header-backNtn t2" style="display:block;">뒤로</button>
+					<div class="small-pic"></div>
+					<div class="tit type-ab"><span></span></div><!--  04.13 -->
+					<a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+				</div>
+			</div>
+			<div class="con">
+				<!-- shop_02_02_03_02_01_01_펫샵_서브메인_LIVE_라이브상세_상품옵션 -->
+				
+				<div class="product-option over-auto k0430"><!-- 04.30 -->
+					<p class="pic">
+						<img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="">
+					</p>
+					<!-- <div class="btn-area">
+						<a href="javascript:;" class="btn round">상품정보 자세히 보기<span class="arrow"></span></a>
+					</div> -->
+					<div class="page shop view">
+						<section class="pdInfos p1">
+							<div class="share"><a href="javascript:;" class="bt shr">공유하기</a></div>
+							<div class="flag"><!-- @@ 03.03 수정 -->
+								<em class="fg a">강아지&amp;고양이</em>
+								<em class="fg b">사은품</em>
+								<em class="fg c">자체제작</em>
+							</div>
+							<div class="pstore"><a href="javascript:;" class="bt ">펫스토어</a></div>
+							<div class="names">반려견 습식사료 아미로 후코이단 20개 set</div>
+							<div class="starpoint">
+								<span class="stars sm p_2_5"></span>
+								<span class="point">4.1</span>
+								<span class="revew"><a href="javascript:;" class="lk">(999)</a></span>
+							</div>
+							<div class="prices">
+								<div class="price">
+									<span class="disc">20%</span>
+									<span class="prcs">23,000<i class="w">원</i></span>
+									<span class="ogpc">50,000<i class="w">원</i></span>
+								</div>
+								
+							</div>
+							<div class="checkpnt">
+								<div class="tit">Check Point!</div>
+								<div class="msg">
+									<div class="txt">영하 20℃의 온도에서 급속 동결 건조 시켜 부드러운 육질과 영양이 그대로 살아있는 간식입니다. 아이들이 가장 좋아하는 닭고기, 오리고기 위주로 구성된 상품입니다. <a class="bt more" href="javascript:;">더보기</a></div>
+								</div>
+							</div>
+							<div class="mdmsg">
+								<div class="ment">신선한 야채를 직접 가공하여 맛있는 식감과 다양한 섬유소를 제공하며, 그레인과 글루텐을 넣지 않아 알러지가 있는 반려동물도 급여 가능합니다.</div>
+							</div>
+							<div class="tags">
+								<div class="tit">연관태그</div>
+								<div class="box">
+									<ui class="tgs">
+										<li><a href="javascript:;" class="tg">#소화력증진</a></li>
+										<li><a href="javascript:;" class="tg">#면역력강화</a></li>
+										<li><a href="javascript:;" class="tg">#면역력강화</a></li>
+										<li><a href="javascript:;" class="tg">#면역력강화</a></li>
+										<li><a href="javascript:;" class="tg">#면역력강화</a></li>
+										<li><a href="javascript:;" class="tg">#면역력강화</a></li>
+									</ui>
+									<div class="more"><a href="javascript:;" class="bt">더보기</a></div>
+								</div>
+							</div>
+							<hr class="hbar">
+							<div class="benefit">
+								<div class="box">
+									<div class="tit">할인혜택</div>
+									<div class="ctn">
+										<p>THE POP 포인트 <em class="pt">123P</em> 적립 </p>
+										<p>VVIP 등급 회원 구매 시 <em class="pt">5%</em> 적립</p>
+									</div>
+									<a href="javascript:;" class="bt more">더보기</a>
+								</div>
+							</div>
+							<div class="deliys">
+								<div class="box">
+									<div class="tit">배송정보</div>
+									<div class="ctn">
+										<p><span class="dawn">새벽배송</span></p>
+										<p><span class="dpric">배송비 2,500원</span> <span class="free">(40,000원 이상 무료 배송)</span></p>
+									</div>
+									<a href="javascript:;" class="bt more">더보기</a>
+								</div>
+							</div>							
+						</section>
+					</div>
+					<div class="btn-area" style="padding-bottom:30px;">
+						<a href="javascript:;" class="btn round">상품정보 자세히 보기<span class="arrow"></span></a>
+					</div>
+				</div>	
+				<!-- // shop_02_02_03_02_01_01_펫샵_서브메인_LIVE_라이브상세_상품옵션 -->
+				<div class="product-buy none">
+					<div class="optpan">
+						<div class="inr">
+							
+							<div class="cdtwrap">
+								<div class="outof"><label class="checkbox"><input type="checkbox"><span class="txt">품절제외</span></label></div>
+								<div class="cdt cdt_l">
+									<div class="optsets">
+										<button type="button" class="btnsel">옵션을 선택해 주세요</button>
+										<ul class="list">
+											<li>
+												<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+													<div class="box">
+														<div class="thum">
+															<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+														</div>
+														<div class="infs">
+															<div class="cate">상품1</div>
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+													<div class="msgs"><!-- @@ 각인문구에 번호 추가 03.02  두자리번호일땐 n2추가-->
+														<span class="input"><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구"></span>
+														<span class="input nms coms"><i class="n">1.</i><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구" value="귀여운 빵꾸"></span>
+														<span class="input nms n2 coms"><i class="n">99.</i><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구" value="귀여운 빵꾸"></span>
+														<div class="gud">상품을 담기전에 입력하신 내용을 한번 더 확인해주세요.</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel gpic soldout"><!-- 품절일때 .sold 클래스 -->
+													<div class="box">
+														<div class="thum">
+															<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"><em class="sold">품절</em></div>
+														</div>
+														<div class="infs">
+															<div class="cate">상품2</div>
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><span class="bt sold">품절</span></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel soldout">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><button type="button" class="bt alim">입고알림</button></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">빨강</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">파랑</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+									<div class="optsets">
+										<button type="button" class="btnsel">옵션을 선택해 주세요</button>
+										<ul class="list">
+											<li>
+												<div class="unitSel gpic">
+													<div class="box">
+														<div class="thum">
+															<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"><em class="sold">품절</em></div>
+														</div>
+														<div class="infs">
+															<div class="cate">상품1</div>
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel soldout">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><button type="button" class="bt alim">입고알림</button></div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitSel">
+													<div class="box">
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+														<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+									<div class="optresul">
+										<ul class="list">
+											<li>
+												<div class="unitRes">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<em class="p">23,000</em><i class="w">원</i>
+														</div>
+													</div>
+													<div class="msgs">
+														<span class="input nms coms"><i class="n">1.</i><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구" value="귀여운 빵꾸"></span>
+														<span class="input nms"><i class="n">2.</i><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구" value=""></span>
+														<span class="input nms n2"><i class="n">99.</i><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구" value=""></span>
+														<div class="gud">상품을 담기전에 입력하신 내용을 한번 더 확인해주세요.</div>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+								<div class="cdt cdt_r">
+									<div class="optresul">
+										<ul class="list">
+											<li>
+												<div class="unitRes gpic">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="thum">
+															<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+														</div>
+														<div class="infs">
+															<div class="cate">상품1</div>
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<em class="p">23,000</em><i class="w">원</i>
+														</div>
+													</div>
+													<div class="msgs">
+														<span class="input"><input type="text" placeholder="각인문구를 입력해주세요" title="각인문구"></span>
+														<div class="gud">상품을 담기전에 입력하신 내용을 한번 더 확인해주세요.</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitRes gpic soldout">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="thum">
+															<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"><em class="sold">품절</em></div>
+														</div>
+														<div class="infs">
+															<div class="cate">상품1</div>
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<button type="button" class="bt alim">입고알림</button>
+														</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitRes soldout">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<span class="bt sold">판매중지</span>
+														</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitRes">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<em class="p">23,000</em><i class="w">원</i>
+														</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitRes">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<em class="p">23,000</em><i class="w">원</i>
+														</div>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="unitRes">
+													<div class="box">
+														<button type="button" class="bt del">삭제</button>
+														<div class="infs">
+															<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+														</div>
+													</div>
+													<div class="cots">
+														<div class="uispiner" data-max="5">
+															<input type="text" value="1" class="amt">
+															<button type="button" class="bt minus" disabled="disabled">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="price">
+															<em class="p">23,000</em><i class="w">원</i>
+														</div>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						
+							<div class="tots">
+								<div class="inr">
+									<div class="amts">
+										<i class="t">총 수량</i>
+										<em class="amt"><i class="i">0</i><i class="s">개</i></em>
+									</div>
+									<div class="price">
+										<i class="t">합계</i>
+										<em class="prc"><i class="i">23,000</i><i class="s">원</i></em>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<nav class="cartNavs"><!-- t2클래스 삭제 -->
+					<div class="inr">
+						<div class="pdinfo">
+							<div class="box">
+								<span class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt=""></span>
+								<div class="disc">
+									<div class="names">반려견 습식사료 아미로 후코이단 홀리티 20개 후코이단 홀리티 20개 </div>
+									<div class="price">
+										<em class="p">23,000</em><i class="w">원</i>
+									</div>
+								</div>
+							</div>
+						</div>
+				
+						<div class="btns">
+							<div class="zims">
+								<button type="button" class="bt btZZim on"><span class="t">찜하기</span></button><!-- .on class명 있으면 찜한 상태임 -->
+							</div>
+							<div class="obts">
+								<button type="button" class="bt btCart"><span class="t">장바구니</span></button>
+								<button type="button" class="bt btOrde"><span class="t">구매하기</span></button>
+								<!-- <button type="button" class="bt btAlim"><span class="t">입고알림</span></button> -->
+							</div>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</div>
+		<!-- //drop pop -->
+	</body>
+
+	<script>
+		/* 04.13 */
+		var check = "up";
+		var scrollWrap = $('.product-option.over-auto');
+		var pic = scrollWrap.find('.pic');
+		var tit = $(".tit.type-ab");
+		var currentScroll = 0;
+		var smallPic = $('.commentBoxAp .small-pic')
+		var img = scrollWrap.find('.pic').children().clone();
+		var point = 315;
+		smallPic.append(img)
+		tit.find("span").text($(".page.shop.view .pdInfos .names").text());
+		
+		scrollWrap.scroll(function(){
+			
+			var scroll = $(this).scrollTop();
+			if(scroll > point && check == "up"){
+				pic.stop().animate({
+					opacity : 0,
+				}, 100);
+				tit.stop().animate({
+					opacity : 1,
+				}, 100);
+				smallPic.stop().animate({
+					opacity : 1,
+				}, 100);
+				check = "down";
+			}else if(scroll <= point && check == "down") {
+				smallPic.stop().animate({
+					opacity : 0,
+				}, 100);
+				pic.stop().animate({
+					opacity : 1,
+				}, 100);
+				tit.stop().animate({
+					opacity : 0,
+				}, 100);
+				check = "up";
+			}
+			currentScroll = scroll;
+		});
+		/* // 04.13 */
+		
+		
+	</script>
+</body>
+</html>

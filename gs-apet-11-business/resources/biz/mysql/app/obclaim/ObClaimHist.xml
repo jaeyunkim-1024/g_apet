@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 10. 12.
+	작성자 : schoi
+-->
+
+<mapper namespace="obclaimhist">
+			
+	<insert id="insertObClaimHistory">
+		<!--
+			Query Name : obclaimhist.insertObClaimHistory
+			Description : Outbound API 주문 이력 상세 등록
+		-->
+			INSERT INTO OB_CLAIM_HISTORY (
+			   OB_API_SEQ
+			  ,CLM_CD
+			  ,CREATE_DT
+			  ,DLV_NO
+			  ,ORD_CN_DTLS_RSN
+			  ,ORD_CN_QTY
+			  ,ORD_CN_MNBD_CD
+			  ,ORD_CN_RSN_CD
+			  ,ORD_CN_STAT_CD
+			  ,ORD_NO
+			  ,ORD_PRD_CN_SEQ
+			  ,ORD_PRD_SEQ
+			  ,PRD_NO
+			  ,SLCT_PRD_OPT_NM
+			  ,REFER_SEQ
+			  ,AFFLIATE_BNDL_DLV_SEQ
+			  ,CLM_REQ_CONT
+			  ,CLM_REQ_QTY
+			  ,CLM_REQ_RSN
+			  ,CLM_REQ_SEQ
+			  ,CLM_STAT
+			  ,OPT_NAME
+			  ,REQ_DT
+			  ,ORD_NM
+			  ,ORD_TLPHN_NO
+			  ,ORD_PRTBL_TEL
+			  ,RCVR_MAIL_NO
+			  ,RCVR_MAIL_NO_SEQ
+			  ,RCVR_BASE_ADDR
+			  ,RCVR_DTLS_ADDR
+			  ,RCVR_TYPE_ADD
+			  ,RCVR_TYPE_BIL_NO
+			  ,TW_MTHD
+			  ,EXCH_NM
+			  ,EXCH_TLPHN_NO
+			  ,EXCH_PRTBL_TEL
+			  ,EXCH_MAIL_NO
+			  ,EXCH_MAIL_NO_SEQ
+			  ,EXCH_BASE_ADDR
+			  ,EXCH_DTLS_ADDR
+			  ,EXCH_TYPE_ADD
+			  ,EXCH_TYPE_BIL_NO
+			  ,CLM_LST_DLV_CST
+			  ,APPMT_DLV_CST
+			  ,CLM_DLV_CST_MTHD
+			  ,TW_PRD_INVC_NO
+			  ,DLV_ETPRS_CD
+			  ,KGL_USE_YN
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			   (SELECT MAX(OB_API_SEQ) 
+			      FROM OB_API_BASE 
+			     WHERE OB_API_GB = 30
+				   AND OB_API_CD = #{obApiCd}
+			   )
+			  ,#{clmCd}
+			  ,#{createDt}
+			  ,#{dlvNo}
+			  ,#{ordCnDtlsRsn}
+			  ,#{ordCnQty}
+			  ,#{ordCnMnbdCd}
+			  ,#{ordCnRsnCd}
+			  ,#{ordCnStatCd}
+			  ,#{ordNo}
+			  ,#{ordPrdCnSeq}
+			  ,#{ordPrdSeq}
+			  ,#{prdNo}
+			  ,#{slctPrdOptNm}
+			  ,#{referSeq}
+			  ,#{affliateBndlDlvSeq}
+			  ,#{clmReqCont}
+			  ,#{clmReqQty}
+			  ,#{clmReqRsn}
+			  ,#{clmReqSeq}
+			  ,#{clmStat}
+			  ,#{optName}
+			  ,#{reqDt}
+			  ,#{ordNm}
+			  ,#{ordTlphnNo}
+			  ,#{ordPrtblTel}
+			  ,#{rcvrMailNo}
+			  ,#{rcvrMailNoSeq}
+			  ,#{rcvrBaseAddr}
+			  ,#{rcvrDtlsAddr}
+			  ,#{rcvrTypeAdd}
+			  ,#{rcvrTypeBilNo}
+			  ,#{twMthd}
+			  ,#{exchNm}
+			  ,#{exchTlphnNo}
+			  ,#{exchPrtblTel}
+			  ,#{exchMailNo}
+			  ,#{exchMailNoSeq}
+			  ,#{exchBaseAddr}
+			  ,#{exchDtlsAddr}
+			  ,#{exchTypeAdd}
+			  ,#{exchTypeBilNo}
+			  ,#{clmLstDlvCst}
+			  ,#{appmtDlvCst}
+			  ,#{clmDlvCstMthd}
+			  ,#{twPrdInvcNo}
+			  ,#{dlvEtprsCd}
+			  ,#{kglUseYn}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			)
+
+	</insert>
+	
+	<insert id="insertObClaimResponse">
+		<!--
+			Query Name : obclaimhist.insertObClaimResponse
+			Description : Outbound API Response 이력 등록
+		-->
+			INSERT INTO OB_CLAIM_RESPONSE (
+			   OB_API_SEQ
+			  ,ORD_NO
+			  ,SHOP_ORD_NO
+			  ,CLM_RES_CD
+			  ,OPEN_MALL_ID
+			  ,OPEN_11ST_MALL
+			  ,OPEN_DONE_PAYMENT_INTERFACE
+			  ,RESULT_CODE
+			  ,RESULT_TEXT
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			   (SELECT MAX(OB_API_SEQ) 
+			      FROM OB_API_BASE 
+			     WHERE OB_API_GB = 30
+				   AND OB_API_CD = #{obApiCd}
+			   )
+			  ,#{ordNo}
+			  ,#{shopOrdNo}
+			  ,#{clmResCd}
+			  ,#{openMallId}
+			  ,#{open11stMall}
+			  ,#{openDonePaymentInterface}
+			  ,#{resultCode}
+			  ,#{resultText}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			)
+		
+	</insert>		
+	
+</mapper>

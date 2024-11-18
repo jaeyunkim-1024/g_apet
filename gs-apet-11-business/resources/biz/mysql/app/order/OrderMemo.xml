@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="orderMemo">
+
+	<select id="listOrderMemo" resultType="biz.app.order.model.OrderMemoVO" >
+		<!--
+			Query Name : orderMemo.listOrderMemo
+			Description : 주문 메모 목록 조회
+		-->
+		SELECT	/* QUERYID(orderMemo.listOrderMemo) */
+					ORD_NO			/* 주문 번호 */
+					, MEMO_SEQ			/* 메모 순번 */
+					, MEMO_CONTENT		/* 메모 내용 */
+					, SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		ORDER_MEMO
+		WHERE	1 = 1
+		AND		ORD_NO	= #{ordNo}
+	</select>
+
+	<insert id="insertOrderMemo" parameterType="biz.app.order.model.OrderMemoPO">
+		<!--
+			Query Name : orderMemo.insertOrderMemo
+			Description : 주문 메모 등록
+		-->
+		INSERT INTO ORDER_MEMO 
+		(
+			ORD_NO			/* 주문 번호 */
+			, MEMO_SEQ			/* 메모 순번 */
+			, MEMO_CONTENT		/* 메모 내용 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) 
+		SELECT
+			#{ordNo}			/* 주문 번호 */
+			, (SELECT IFNULL(MAX(MEMO_SEQ), 0) + 1 FROM ORDER_MEMO WHERE ORD_NO = #{ordNo})
+			, #{memoContent}	/* 메모 내용 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+	</insert>
+
+	<update id="updateOrderMemo" parameterType="biz.app.order.model.OrderMemoPO">
+		<!--
+			Query Name : orderMemo.updateOrderMemo
+			Description : 주문 메모 수정
+		-->
+		UPDATE	ORDER_MEMO SET
+					MEMO_CONTENT		= #{memoContent}	/* 메모 내용 */
+					, SYS_REGR_NO		= #{sysRegrNo}		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		= #{sysRegDtm}		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		MEMO_SEQ			= #{memoSeq}
+		AND		ORD_NO				= #{ordNo}
+	</update>
+			
+</mapper>

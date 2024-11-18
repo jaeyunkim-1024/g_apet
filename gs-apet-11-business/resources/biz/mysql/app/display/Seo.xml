@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="seo">
+	<select id="getSeoInfo" resultType="biz.app.display.model.SeoInfoVO" parameterType="java.lang.Long">
+		<!--
+			Query Name : seo.getSeoInfo
+			Description : SEO 정보조회
+			- BO
+		-->
+		SELECT		/* QUERYID(seo.getSeoInfo) */
+			A.SEO_INFO_NO
+			, A.SEO_SVC_GB_CD
+			, A.SEO_TP_CD
+			, A.PAGE_TTL
+			, A.PAGE_DSCRT
+			, A.PAGE_KWD
+			, A.PAGE_ATHR
+			, A.NO_INDEX_USE_YN
+			, A.CANONICAL_URL
+			, A.REDIRECT_URL
+			, A.OPEN_GRAPH_TTL
+			, A.OPEN_GRAPH_TP_CD
+			, A.OPEN_GRAPH_DSCRT
+			, A.OPEN_GRAPH_IMG
+			, A.OPEN_GRAPH_VD
+			, A.OPEN_GRAPH_SMLTTL
+			, A.DFT_SET_YN
+			, A.SYS_REGR_NO
+			, A.SYS_REG_DTM
+			, A.SYS_UPDR_NO
+			, A.SYS_UPD_DTM
+		FROM SEO_INFO A
+		WHERE 1 = 1
+		<if test="seoSvcGbCd != null and seoSvcGbCd != ''">
+			AND A.SEO_SVC_GB_CD = #{seoSvcGbCd}
+		</if>
+		<if test="dftSetYn != null and dftSetYn != ''">
+			AND A.DFT_SET_YN = #{dftSetYn}
+			AND A.SEO_TP_CD = #{seoTpCd}
+		</if>
+		<if test="dftSetYn == null or dftSetYn == ''">
+			AND A.SEO_INFO_NO = #{seoInfoNo}
+		</if>
+	</select>
+
+	<insert id="insertSeoInfo" parameterType="biz.app.display.model.SeoInfoPO">
+		<!--
+			Query Name : seo.insertSeoInfo
+			Description : SEO 정보등록
+			- BO
+		-->
+		<selectKey keyProperty="seoInfoNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+				FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_SEO_INFO_NO_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO SEO_INFO (
+			SEO_INFO_NO	/* SEO 정보 번호 */
+			, SEO_SVC_GB_CD  /* 사이트 구분 코드 */
+			, SEO_TP_CD		/* SEO 유형 */
+			, PAGE_TTL	/* 페이지 제목 */
+			, PAGE_DSCRT	/* 페이지 설명 */
+			, PAGE_KWD	/* 페이지 키워드 */
+			, PAGE_ATHR   /* 페이지 저자 */
+			, CANONICAL_URL	/* canonical url */
+			, REDIRECT_URL	/* redirect url */
+			, OPEN_GRAPH_TTL	/* OPEN GRAPH 제목 */
+			, OPEN_GRAPH_TP_CD	/* OPEN GRAPH 유형코드 */
+			, OPEN_GRAPH_DSCRT	/* OPEN GRAPH 설명 */
+			, OPEN_GRAPH_IMG		/* OPEN GRAPH 이미지 */
+			, OPEN_GRAPH_VD		/* OPEN GRAPH 동영상 */
+			, OPEN_GRAPH_SMLTTL	/* OPEN GRAPH 소제목 */
+			, DFT_SET_YN			/* 기본 설정 여부*/
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정일시 */
+		) VALUES (
+			#{seoInfoNo}
+			, #{seoSvcGbCd}
+			, #{seoTpCd}
+			, #{pageTtl}
+			, #{pageDscrt}
+			, #{pageKwd}
+			, #{pageAthr}
+			, #{canonicalUrl}
+			, #{redirectUrl}
+			, #{openGraphTtl}
+			, #{openGraphTpCd}
+			, #{openGraphDscrt}
+			, #{openGraphImg}
+			, #{openGraphVd}
+			, #{openGraphSmlttl}
+			, IFNULL(#{dftSetYn}, 'N')
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+
+	<update id="updateSeoInfo" parameterType="biz.app.display.model.SeoInfoPO">
+		<!--
+			Query Name : seo.updateSeoInfo
+			Description : SEO 정보수정
+			- BO
+		-->
+		UPDATE SEO_INFO SET
+			SEO_TP_CD = #{seoTpCd}		/* SEO 유형 */
+			, SEO_SVC_GB_CD = #{seoSvcGbCd}		/* 사이트 구분 코드 */
+			, SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = now()			/* 시스템 수정일시 */
+			<if test="pageTtl != null and pageTtl != ''">
+				, PAGE_TTL = #{pageTtl}	/* 페이지 제목 */
+			</if>
+			<if test="pageDscrt != null and pageDscrt != ''">
+				, PAGE_DSCRT = #{pageDscrt}	/* 페이지 설명 */
+			</if>
+			<if test="pageKwd != null and pageKwd != ''">
+				, PAGE_KWD = #{pageKwd}	/* 페이지 키워드 */
+			</if>
+			<if test="pageAthr != null and pageAthr != ''">
+				, PAGE_ATHR = #{pageAthr}  /* 페이지 저자 */
+			</if>
+			<if test="canonicalUrl != null and canonicalUrl != ''">
+				, CANONICAL_URL = #{canonicalUrl}	/* canonical url */
+			</if>
+			<if test="redirectUrl != null and redirectUrl != ''">
+				, REDIRECT_URL = #{redirectUrl}	/* redirect url */
+			</if>
+			<if test="openGraphTtl != null and openGraphTtl != ''">
+				, OPEN_GRAPH_TTL = #{openGraphTtl}	/* OPEN GRAPH 제목 */
+			</if>
+			<if test="openGraphTpCd != null and openGraphTpCd != ''">
+				, OPEN_GRAPH_TP_CD = #{openGraphTpCd}	/* OPEN GRAPH 유형코드 */
+			</if>
+			<if test="openGraphDscrt != null and openGraphDscrt != ''">
+				, OPEN_GRAPH_DSCRT = #{openGraphDscrt}	/* OPEN GRAPH 설명 */
+			</if>
+			<if test="openGraphImg != null and openGraphImg != ''">
+				, OPEN_GRAPH_IMG = #{openGraphImg}		/* OPEN GRAPH 이미지 */
+			</if>
+			<if test="openGraphVd != null and openGraphVd != ''">
+				, OPEN_GRAPH_VD = #{openGraphVd}		/* OPEN GRAPH 동영상 */
+			</if>
+			<if test="openGraphSmlttl != null and openGraphSmlttl != ''">
+				, OPEN_GRAPH_SMLTTL = #{openGraphSmlttl}	/* OPEN GRAPH 소제목 */
+			</if>
+			<if test="dftSetYn != null and dftSetYn != ''">
+				, DFT_SET_YN = #{dftSetYn}					/* 기본 설정 여부*/
+			</if>
+		WHERE 1 = 1
+		AND SEO_INFO_NO = #{seoInfoNo}
+	</update>
+</mapper>

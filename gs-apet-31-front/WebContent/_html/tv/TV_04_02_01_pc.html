@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout_sub</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.pc.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+    <style>
+        .popFixed{position:fixed; top:0; left:0; z-index:1000; width:100%; height:100%;}
+        .popFixed > .popup-wrap{height:100%;}
+        .popFixed .content{height:calc(100% - 46px); overflow:auto;}
+        .popFixed .content main img{width:100%; height:auto;}
+        .popFixed > .popup-wrap > .top{background:#fff;}
+    </style>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<!-- <include class="header mo" data-include-html="../inc/header_mo_tv.html"></include> -->
+		<!-- 헤더 PC-->
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+        
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page tv schoolDetail " id="container">
+			<div class="inr">			
+
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+                    <div class="inner-wrap">
+
+                        <!-- 모바일 서브헤드 -->
+                        <div class="pageHead black">
+							<div class="inr">
+								<div class="hdt">
+									<button class="back" type="button">뒤로가기</button>
+								</div>
+								<div class="cent"><h2 class="subtit">교육명 타이틀</h2></div>
+							</div>
+                        </div>
+                        
+                        <div class="pc-subtit"><h2>교육명 타이틀</h2></div>
+
+                        <div class="schoolD-wrap">
+
+                            <div class="swiper-div">
+                                <div class="swiper-container full">
+                                    <ul class="swiper-wrapper">
+                                        <li class="swiper-slide">
+                                            <div class="div-wrap">
+                                                <!-- video-area -->
+                                                <div class="video-area">
+                                                    <div class="video-palyer">
+                                                        <video id="movie1" title="동영상 타이틀" autoplay="" muted="">
+                                                            <source src="../../_images/tv/temp_flower.webm" type="video/webm">
+                                                            <source src="../../_images/tv/temp_flower.mp4" type="video/mp4">
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                                <!-- //video-area -->
+                        
+                                                <!-- info-zone -->
+                                                <div class="info-zone">
+                                                    <div class="info">
+                                                        <div class="top">
+                                                            <div class="tit">교육 소개</div>
+                                                            <div class="type" style="display:block"><!-- type 유/무  -->
+                                                                <ul> 
+                                                                    <li>
+                                                                        <strong>난이도</strong>
+                                                                        <span class="level lv2"><!-- 난이도별 class lv1, lv2, lv3 -->
+                                                                            <span>난이도1</span>
+                                                                            <span>난이도2</span>
+                                                                            <span>난이도3</span>
+                                                                        </span>
+                                                                    </li>
+                                                                    <li>
+                                                                        <strong>준비물</strong>
+                                                                        <div class="material">
+                                                                            <span>개껌, 리드줄</span>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <div class="cont">
+                                                            교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역
+                                                            교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역
+                                                        </div>
+                                                    </div>
+                                                    <!-- //info-zone -->
+
+                                                    <ul class="tip">
+                                                        <li>
+                                                            <a href="javascript:popLayer01();" class="txt-btn">
+                                                                <div class="round-img-pf pet"></div>
+                                                                <h2>이번 교육이 왜 필요할까요?</h2>
+                                                            </a>
+                                                        </li>
+                                                        <li class="btn-rnd">
+                                                            <button type="button" onclick="popLayer02();">Tip!</button>
+                                                            <button type="button" onclick="popLayer03();">Q&A</button>
+                                                        </li>
+                                                    </ul>
+
+                                                    <!-- 이하 레이어3개는 첫번째 li에만 있음 -->
+                                                    <!-- 교육 popLayer -->
+                                                    <article class="popup-layer typeA" id="popLayer01">
+                                                        <div class="popup-wrap">
+                                                            <div class="top">
+                                                                <h2 class="tit">이번 교육이 왜 필요할까요?</h2>
+                                                                <button type="button" class="btnPopClose"><span>닫기</span></button>
+                                                            </div>
+                                                            <div class="content">
+                                                                <main>
+                                                                    <img src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지명" />
+                                                                </main>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                                    <!-- //교육 popLayer -->
+
+                                                    <!-- 팁 popLayer -->
+                                                    <article class="popup-layer typeB noLock" id="popLayer02" style="height:50%;">
+                                                        <div class="popup-wrap">
+                                                            <div class="top">
+                                                                <h2 class="tit">교육 Tip!</h2>
+                                                                <button type="button" class="btnPopClose"><span>닫기</span></button>
+                                                            </div>
+                                                            <div class="content">
+                                                                <main>
+                                                                    <ul class="tip-list">
+                                                                        <li>
+                                                                            👉 이름에 반응했을 때 먹이를 주는 것 대신 장난감으로 놀아주는 것으로 보상을 해줘도 좋아요.
+                                                                        </li>
+                                                                        <li>
+                                                                            👉 일상생활에서 반려견이 다른 곳을 바라보고 있을 때 이름을 부르고, 먹이를 보상해보세요. 더욱 자연스럽고 빠르게 이름을 인지할 수 있을 거예요.
+                                                                        </li>
+                                                                        <li>
+                                                                            👉 집에서 숨바꼭질 놀이를 하면서 반려견의 이름을 불러보세요. 더욱 재미있고 신나는 교육이 될 거예요.
+                                                                        </li>
+                                                                    </ul>
+                                                                </main>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                                    <!-- //팁 popLayer -->
+
+                                                    <!-- QnA popLayer -->
+                                                    <article class="popup-layer typeB noLock" id="popLayer03" style="height:50%;">
+                                                        <div class="popup-wrap">
+                                                            <div class="top">
+                                                                <h2 class="tit">교육 Q&A</h2>
+                                                                <button type="button" class="btnPopClose"><span>닫기</span></button>
+                                                            </div>
+                                                            <div class="content">
+                                                                <main>
+                                                                    <ul class="uiAccd qna-list" data-accd="accd">
+                                                                        <li class="open">
+                                                                            <div class="hBox">
+                                                                                <span class="tit">이름을 부르는데도 반려견이 계속 다른 곳에 관심을 보여요.이름을 부르는데도 반려견이 계속 다른 곳에 관심을 보여요.</span> 
+                                                                                <button type="button" class="btnTog"><span>버튼</span></button>
+                                                                            </div>
+                                                                            <div class="cBox">
+                                                                                <p>높은 톤으로 반려견의 이름을 불러보세요. 손뼉을 치거나, 휘파람을 부는 등 반려견이 관심을 가질만한 소리를 내는 것도 좋아요. 이처럼 자연스럽게 반려견이 자연스럽게 보호자를 바라볼 수 있도록 만든 뒤, 곧바로 이름을 불러 먹이를 보상하세요.</p>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li>
+                                                                            <div class="hBox">
+                                                                                <span class="tit">이름을 부르는데도 반려견이 계속 다른 곳에 관심을 보여요.</span> 
+                                                                                <button type="button" class="btnTog"><span>버튼</span></button>
+                                                                            </div>
+                                                                            <div class="cBox">
+                                                                                <p>높은 톤으로 반려견의 이름을 불러보세요. 손뼉을 치거나, 휘파람을 부는 등 반려견이 관심을 가질만한 소리를 내는 것도 좋아요. 이처럼 자연스럽게 반려견이 자연스럽게 보호자를 바라볼 수 있도록 만든 뒤, 곧바로 이름을 불러 먹이를 보상하세요.</p>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </main>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                                    <!-- //QnA popLayer -->
+
+                                                </div>
+                                                <!-- //info-zone -->
+                                            </div>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <div class="div-wrap">
+                                                <!-- video-area -->
+                                                <div class="video-area">
+                                                    <div class="video-palyer">
+                                                        <video id="movie2" title="동영상 타이틀" autoplay="" muted="">
+                                                            <source src="../../_images/tv/temp_flower.webm" type="video/webm">
+                                                            <source src="../../_images/tv/temp_flower.mp4" type="video/mp4">
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                                <!-- //video-area -->
+                        
+                                                <!-- info-zone -->
+                                                <div class="info-zone">
+                                                    <div class="info">
+                                                        <div class="top">
+                                                            <div class="tit">교육 소개</div>
+                                                            <div class="type" style="display:block"><!-- type 유/무  -->
+                                                                <ul> 
+                                                                    <li>
+                                                                        <strong>난이도</strong>
+                                                                        <span class="level lv2"><!-- 난이도별 class lv1, lv2, lv3 -->
+                                                                            <span>난이도1</span>
+                                                                            <span>난이도2</span>
+                                                                            <span>난이도3</span>
+                                                                        </span>
+                                                                    </li>
+                                                                    <li>
+                                                                        <strong>준비물</strong>
+                                                                        <div class="material">
+                                                                            <span>개껌, 리드줄</span>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <div class="cont">
+                                                            교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역
+                                                            교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역교육내용스크롤영역
+                                                        </div>
+                                                    </div>
+                                                    <!-- //info-zone -->
+
+                                                    <ul class="tip">
+                                                        <li>
+                                                            <a href="javascript:popLayer01();" class="txt-btn">
+                                                                <div class="round-img-pf pet"></div>
+                                                                <h2>이번 교육이 왜 필요할까요?</h2>
+                                                            </a>
+                                                        </li>
+                                                        <li class="btn-rnd">
+                                                            <button type="button" onclick="popLayer02();">Tip!</button>
+                                                            <button type="button" onclick="popLayer03();">Q&A</button>
+                                                        </li>
+                                                    </ul>
+                                                   
+
+                                                </div>
+                                                <!-- //info-zone -->
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                                            
+    
+                        </div>
+                        <!-- //schoolD-wrap -->
+    
+                        <div class="paging-wrap">
+                            <button type="button" class="btn-prev">이전단계</button>
+                            <div class="swiper-pagination"></div>
+                            <!-- <button type="button" class="btn-next">다음단계</button> -->
+                            <button type="button" class="btn-blue">교육 시작하기</button>
+                        </div>
+
+                    </div><!-- //inner-wrap -->
+                </div><!-- //contents -->
+            </div><!-- //inr -->
+
+            
+            <!-- 하단바 -->
+            <div class="bottom-bar">
+            <div class="inner">
+                <ul class="bar-btn-area">
+                    <li>
+                        <button class="btn-like">299</button>
+                    </li>
+                    <li>
+                        <button class="btn-share"><span>공유</span></button>
+                    </li>
+                    <li>
+                        <button class="btn-bookmark"><span>북마크</span></button>
+                    </li>
+                </ul>
+
+                <!-- 2021.02.23 HTML 변경 -->
+                <div class="btn-with-wrap">
+                    <button class="btn-with-prd" onClick="ui.commentBox.open('.relation-pop');"><!-- 2021.02.04 : onClick이벤트 추가 -->
+                        <strong style="background-image:url(../../_images/tv/@temp01.jpg);"></strong>
+                    </button>
+                    <span class="num">5</span>
+                </div>
+                <!-- // 2021.02.23 HTML 변경 -->
+            </div>
+        </div>
+        <!-- //하단바 -->
+            
+            <!-- 관련상품 레이어-->
+            <div class="prd-layer">
+                <div class="top">
+                    <div class="inner">
+                        <h2>연관상품</h2>
+                        <button class="btn-close" type="button"><span>닫기</span></button>
+                    </div>
+                </div>
+                <div class="cont">
+                    <div class="swiper-div">
+                        <div class="swiper-container space">
+                            <ul class="swiper-wrapper">
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- //Swiper -->
+                </div>
+            </div>
+            <!-- // 관련상품 레이어-->
+        </main>
+
+        
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+        <!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+        
+        <!-- 20210126 변경 시작 -->
+        <script>
+            swiperFit = new Swiper('.schoolD-wrap .swiper-container', {
+                slidesPerView: 1,
+                simulateTouch:false,
+                watchOverflow:true,
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+            });
+            setHeight();
+            $(window).resize(function(){
+                setHeight();
+            });
+            function setHeight(){
+                var videoHeight = $(".video-area").outerHeight();
+                $(".info-zone").css("height", videoHeight);
+            };
+
+            // 교육 레이어팝업
+            var popLayer01 = function(){
+                ui.popLayer.open('popLayer01',{
+                    ocb:function(){
+                        console.log("popLayer01 열림");
+                    },
+                    ccb:function(){
+                        console.log("popLayer01 닫힘");
+                    }
+                });
+            }
+
+            // 팁 레이어팝업
+            var popLayer02 = function(){
+                ui.popLayer.open('popLayer02',{
+                    ocb:function(){
+                        console.log("popLayer02 열림");
+                    },
+                    ccb:function(){
+                        console.log("popLayer02 닫힘");
+                    }
+                });
+            }
+
+            // Q&A 레이어팝업
+            var popLayer03 = function(){
+                ui.popLayer.open('popLayer03',{
+                    ocb:function(){
+                        console.log("popLayer03 열림");
+                    },
+                    ccb:function(){
+                        console.log("popLayer03 닫힘");
+                    }
+                });
+            }
+
+            // 관련상품레이어
+           var swiperPrd = new Swiper('.prd-layer .swiper-container', {
+                slidesPerView: "auto",
+                spaceBetween: 20,
+                breakpoints: {
+					1023: {
+						spaceBetween: 8,				
+                    }
+                }
+            });
+            $(".prd-layer").css("bottom","-" + $(".prd-layer").height() + "px");
+            $(".btn-with-prd").click(function(){
+                $(".prd-layer").stop().animate({bottom:0},250);
+            });
+            $(".prd-layer .top .inner .btn-close").click(function(){
+                $(".prd-layer").stop().animate({bottom:"-" + $(".prd-layer").height() + "px"},250);
+            });
+
+            $(".btn-video-layer").click(function(){
+                $(this).toggleClass("on");
+                if($(this).hasClass("on")){
+                    $(this).parents(".videoAndListWrap").addClass("infoMode");
+                }else{
+                    $(this).parents(".videoAndListWrap").removeClass("infoMode");
+                };
+            });
+            $(".btnPopClose").click(function(){
+                $(this).parents(".popup-layer").hide();
+            })
+            /*
+            $(".popup-layer .btnPopClose").click(function(){
+                $("html").removeClass("lock");
+            });
+            */
+        </script>
+        <!-- //20210126 변경 끝 -->
+
+	</div>
+</body>
+</html>

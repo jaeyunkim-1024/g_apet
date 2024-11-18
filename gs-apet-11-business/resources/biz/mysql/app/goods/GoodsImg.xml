@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명
+	작성자  	valueFactory
+	작성일자  	2017.03.03
+-->
+
+<mapper namespace="goodsImg">
+
+	<insert id="insertGoodsImg" parameterType="biz.app.goods.model.GoodsImgPO" >
+		<!--
+			Query Name : goodsImg.insertGoodsImg
+			Description : 상품 이미지 등록
+		-->
+		INSERT INTO GOODS_IMG (
+			  GOODS_ID			/* 상품 아이디 */
+			, IMG_SEQ			/* 이미지 순번 */
+			, IMG_TP_CD			/* 이미지 타입 */
+			, IMG_PATH			/* 이미지 경로 */
+			, RVS_IMG_PATH		/* 반전 이미지 경로 */
+			, DLGT_YN			/* 대표 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsId }		/* 상품 아이디 */
+			, #{imgSeq }		/* 이미지 순번 */
+			, #{imgTpCd }		/* 이미지 타입 */
+			, #{imgPath }		/* 이미지 경로 */
+			, #{rvsImgPath }	/* 반전 이미지 경로 */
+			, #{dlgtYn }		/* 대표 여부 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+		ON DUPLICATE KEY
+		UPDATE SYS_UPDR_NO = #{sysUpdrNo }
+			 , SYS_UPD_DTM = NOW()
+		<if test="imgPath != null and imgPath != ''">
+			 , IMG_PATH = #{imgPath }
+		</if>
+		<if test="rvsImgPath != null and rvsImgPath != ''">
+			 , RVS_IMG_PATH = #{rvsImgPath }
+		</if>
+		<if test="dlgtYn != null and dlgtYn != ''">
+			 , DLGT_YN = #{dlgtYn }
+		</if>
+	</insert>
+
+
+	<insert id="insertGoodsImgChgHist" parameterType="biz.app.goods.model.GoodsImgChgHistPO" >
+		<!--
+			Query Name : goodsImg.insertGoodsImgChgHist
+			Description : 상품 이미지 이력 등록
+		-->
+		<selectKey keyProperty="goodsImgChgHistSeq" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_IMG_CHG_HIST_SEQ }') FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_IMG_CHG_HIST (
+			  GOODS_IMG_CHG_HIST_SEQ		/* 상품 이미지 변경 이력 순번 */
+			, GOODS_ID						/* 상품 아이디 */
+			, IMG_SEQ						/* 이미지 순번 */
+			, IMG_PATH						/* 이미지 경로 */
+			, RVS_IMG_PATH					/* 반전 이미지 경로 */
+			, DLGT_YN						/* 대표 여부 */
+			, SYS_REGR_NO					/* 시스템 등록자 번호 */
+			, SYS_REG_DTM					/* 시스템 등록 일시 */
+			, SYS_UPDR_NO					/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM					/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsImgChgHistSeq }	/* 상품 이미지 변경 이력 순번 */
+			, #{goodsId }				/* 상품 아이디 */
+			, #{imgSeq }				/* 이미지 순번 */
+			, #{imgPath }				/* 이미지 경로 */
+			, #{rvsImgPath }			/* 반전 이미지 경로 */
+			, #{dlgtYn }				/* 대표 여부 */
+			, #{sysRegrNo }				/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+			, #{sysUpdrNo }				/* 시스템 수정자 번호 */
+			, NOW()						/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<update id="updateGoodsImg" parameterType="biz.app.goods.model.GoodsImgPO" >
+		<!--
+			Query Name : goodsImg.updateGoodsImg
+			Description : 상품 이미지 수정
+		-->
+		UPDATE	GOODS_IMG SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		        <if test="imgPath != null and imgPath != ''">
+					, IMG_PATH			= #{imgPath }		/* 이미지 경로 */
+		        </if>
+				<if test="rvsImgPath  != null and rvsImgPath  != ''">
+				, RVS_IMG_PATH		= #{rvsImgPath }	/* 반전 이미지 경로 */
+				</if>
+				, DLGT_YN			= #{dlgtYn }		/* 대표 여부 */
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND		IMG_SEQ				= #{imgSeq }
+	</update>
+
+
+	<update id="updateGoodsImgDlgtYnN" parameterType="biz.app.goods.model.GoodsImgPO" >
+		<!--
+			Query Name : goodsImg.updateGoodsImgDlgtYnN
+			Description : 상품 이미지 대표여부 일괄 변경
+		-->
+		UPDATE	GOODS_IMG SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				, DLGT_YN			= #{dlgtYn}		/* 대표 여부 */
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND 	IMG_SEQ 			= #{imgSeq}
+	</update>
+
+
+	<select id="listGoodsImg" resultType="biz.app.goods.model.GoodsImgVO" >
+		<!--
+			Query Name : goodsImg.listGoodsImg
+			Description : 상품 이미지 조회
+			상품 이미지 10개로 변경. 2021.01.28
+		-->
+
+		SELECT
+			A.IMG_SEQ
+			, A.GOODS_ID
+			, A.IMG_TP_CD
+			, A.IMG_PATH
+			, A.RVS_IMG_PATH
+			, A.DLGT_YN
+		FROM GOODS_IMG A
+		WHERE GOODS_ID 	= #{goodsId }
+		<if test="imgTpCd != null and imgTpCd != ''" >
+			AND IMG_TP_CD 	= #{imgTpCd }
+		</if>
+		ORDER BY DLGT_YN DESC, IMG_SEQ
+	</select>
+
+
+	<update id="deleteGoodsImg" parameterType="biz.app.goods.model.GoodsImgPO" >
+		<!--
+			Query Name : goodsImg.deleteGoodsImg
+			Description : 상품 이미지 수정
+		-->
+		UPDATE	GOODS_IMG SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				<if test="imgPath != null and imgPath != ''" >
+				, IMG_PATH			= NULL		/* 이미지 경로 */
+				</if>
+				<if test="rvsImgPath != null and rvsImgPath != ''">
+				, RVS_IMG_PATH		= NULL	/* 반전 이미지 경로 */
+				</if>
+				<if test="dlgtYn != null and dlgtYn != ''">
+				, DLGT_YN			= #{dlgtYn }		/* 대표 여부 */
+				</if>
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND		IMG_SEQ				= #{imgSeq }
+	</update>
+
+	<delete id="deleteGoodsImgBySeq">
+		DELETE FROM GOODS_IMG
+		WHERE GOODS_ID = #{goodsId }
+		AND IMG_SEQ NOT IN
+		<foreach collection="imgSeqs" item="imgSeq" open=" (" close=")" separator=",">
+			#{imgSeq}
+		</foreach>
+	</delete>
+
+	<select id="listGoodsImaAll" resultType="biz.app.goods.model.GoodsImgVO" >
+		<!--
+			Query Name : goodsImg.listGoodsImaAll
+			Description : 상품 이미지 조회
+		-->
+		SELECT	/* QUERYID(goodsImg.listGoodsImaAll ) */
+				  GOODS_ID			/* 상품 아이디 */
+				, IMG_SEQ			/* 이미지 순번 */
+				, IMG_PATH			/* 이미지 경로 */
+				, RVS_IMG_PATH		/* 반전 이미지 경로 */
+				, DLGT_YN			/* 대표 여부 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_IMG
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+	</select>
+
+
+	<select id="getGoodsImage" resultType="biz.app.goods.model.GoodsImgVO" >
+		<!--
+			Query Name : goodsImg.getGoodsImage
+			Description : 상품 이미지 조회
+		-->
+		SELECT	/* QUERYID(goodsImg.listGoodsImaAll ) */
+				  GOODS_ID			/* 상품 아이디 */
+				, IMG_SEQ			/* 이미지 순번 */
+				, IMG_PATH			/* 이미지 경로 */
+				, RVS_IMG_PATH		/* 반전 이미지 경로 */
+		FROM	GOODS_IMG
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+		AND		IMG_SEQ			= #{imgSeq }
+	</select>
+
+	<select id="getGoodsMainImg" resultType="biz.app.goods.model.GoodsImgVO" >
+		<!--
+			Query Name : goodsImg.getGoodsMainImg
+			Description : 구성상품 메인이미지 조회
+		-->
+		SELECT	/* QUERYID(goodsImg.listGoodsMainImg ) */
+		GOODS_ID			/* 상품 아이디 */
+				, IMG_SEQ			/* 이미지 순번 */
+				, IMG_PATH			/* 이미지 경로 */
+				, RVS_IMG_PATH		/* 반전 이미지 경로 */
+		FROM	GOODS_IMG
+		WHERE	1 = 1
+		AND	GOODS_ID =#{goodsId }
+		AND  DLGT_YN='${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+</mapper>

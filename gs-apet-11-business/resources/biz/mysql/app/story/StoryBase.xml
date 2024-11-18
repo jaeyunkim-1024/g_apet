@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	스토리 기본 Mapper 
+	작성자  	muel 
+	작성일자  	2016.04.15 
+-->
+
+<mapper namespace="storyBase">
+
+	<!-- 스토리 기본항목 조회 -->
+	<select id="listStoryBase" resultType="biz.app.story.model.StoryBaseVO">		
+		SELECT  
+			STRY_NO
+			,STRY_NM
+		FROM	
+			STORY_BASE
+		WHERE
+		   1=1
+		<!-- AND 
+			ST_ID = #{stId} -->
+		AND
+			DISP_YN = #{dispYn}
+		ORDER BY ${sidx} ${sord}
+	</select>
+	
+	<!-- 스토리 기본항목 조회 -->
+	<select id="getStory" resultType="biz.app.story.model.StoryBaseVO">		
+		SELECT  
+			STRY_NO
+		FROM	
+			STORY_BASE
+		WHERE
+		   1=1
+		AND
+			STRY_NO = #{stryNo}
+	</select>
+
+</mapper>

@@ -1,0 +1,2273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 Mapper
+	작성자  	snw
+	작성일자  	2016.02.16
+-->
+
+<mapper namespace="member">
+    <resultMap type="biz.app.member.model.MemberBaseVO" id="memberBaseVoMap" >
+        <result property="mbrNm" column="MBR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="loginId" column="LOGIN_ID" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="birth" column="BIRTH" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="mobile" column="MOBILE" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="email" column="EMAIL" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="roadDtlAddr" column="ROAD_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="prclDtlAddr" column="PRCL_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="updrIp" column="UPDR_IP" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+    </resultMap>
+
+    <!-- 회원 비밀번호 실패 횟수 증가 -->
+    <update id="updateMemberLoginFailCnt">
+        UPDATE member_base
+        SET LOGIN_FAIL_CNT = LOGIN_FAIL_CNT + 1
+        WHERE MBR_NO = #{mbrNo}
+    </update>
+
+    <select id="pageMemberBase" resultMap="memberBaseVoMap">
+        <!--
+            Query Name : member.pageMemberBase
+            Description : pageMemberBase
+        -->
+        SELECT /* QUERYID(member.pageMemberBase) */
+        M.MBR_NO
+        , M.ST_ID
+        , S.ST_NM /* 사이트 명 */
+        , M.POLICY_NO
+        , M.LOGIN_ID
+        , M.MBR_NM
+        , M.NICK_NM
+        , M.MBR_GB_CD
+        , M.MBR_STAT_CD
+        , M.MBR_GRD_CD
+        , M.BIRTH
+        , M.GD_GB_CD
+        , M.NTN_GB_CD
+        , M.JOIN_DTM
+        , M.MOD_DTM
+        , M.JOIN_PATH_CD
+        , M.JOIN_ENV_CD
+        , M.CTF_YN
+        , M.CI_CTF_VAL
+        , M.DI_CTF_VAL
+        , M.GSPT_NO
+        , M.GSPT_USE_YN
+        , M.GSPT_STATE_CD
+        , M.GSPT_START_DTM
+        , M.GSPT_STOP_DTM
+        , M.PSWD
+        , M.PSWD_INIT_YN
+        , M.PSWD_CHG_DTM
+        , M.LOGIN_FAIL_CNT
+        , M.LAST_LOGIN_DTM
+        , M.PSWD_CHG_SCD_DTM
+        , M.TEL
+        , M.MOBILE
+        , M.MOBILE_CD
+        , M.EMAIL
+        , M.RCOM_LOGIN_ID
+        , M.MBR_LEV_RSN_CD
+        , M.MBR_LEV_CONTENT
+        , M.MBR_LEV_DTM
+        , M.RE_JOIN_PSB_DT
+        , M.DORMANT_APL_DTM
+        , M.MBR_STOP_DTM
+        , M.SYS_REGR_NO
+        , M.SYS_REG_DTM
+        , M.SYS_UPDR_NO
+        , M.SYS_UPD_DTM
+        , FN_GET_USER_NAME(M.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+        , FN_GET_USER_NAME(M.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+        FROM MEMBER_BASE M
+        INNER JOIN ST_STD_INFO S ON M.ST_ID = S.ST_ID
+        WHERE 1 = 1
+        <include refid="wherePageMember"/>
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="pageMemberBaseCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : member.pageMemberBaseCount
+            Description : pageMemberBaseCount
+        -->
+        SELECT /* QUERYID(member.pageMemberBaseCount) */
+        COUNT(M.MBR_NO)
+        FROM member_base M
+        INNER JOIN ST_STD_INFO S ON M.ST_ID = S.ST_ID
+        WHERE 1 = 1
+        <include refid="wherePageMember"/>
+    </select>
+
+    <sql id="wherePageMember">
+        <if test="mbrGbCd != '' and mbrGbCd != null">
+            AND M.MBR_GB_CD = #{mbrGbCd}
+        </if>
+        <if test="infoRcvYn != '' and infoRcvYn != null">
+            AND M.INFO_RCV_YN = #{infoRcvYn}
+        </if>
+        <if test="nickNm != '' and nickNm != null">
+            AND M.NICK_NM = #{nickNm}
+        </if>
+        <if test="stId != null and stId != ''">
+            AND M.ST_ID = #{stId}
+        </if>
+        <if test="mbrNm != null and mbrNm != ''">
+            AND M.MBR_NM LIKE CONCAT( #{mbrNm}, '%')
+        </if>
+        <if test="mbrGbCd != null and mbrGbCd != ''">
+            AND M.MBR_GB_CD = #{mbrGbCd}
+        </if>
+        <if test="mbrGrdCd != null and mbrGrdCd != ''">
+            AND M.MBR_GRD_CD = #{mbrGrdCd}
+        </if>
+        <if test="mbrStatCd != null and mbrStatCd != ''">
+            AND M.MBR_STAT_CD = #{mbrStatCd}
+        </if>
+        <if test="gdGbCd != null and gdGbCd != ''">
+            AND M.GD_GB_CD = #{gdGbCd}
+        </if>
+        <if test="petGbCd != null and petGbCd != ''">
+            <choose>
+                <when test="petGbCd.equals(@framework.common.constants.CommonConstants@PET_GB_00)">
+                    AND M.MBR_NO NOT IN (SELECT PB.MBR_NO FROM PET_BASE PB)
+                </when>
+                <otherwise>
+                    AND M.MBR_NO IN (SELECT PB.MBR_NO FROM PET_BASE PB WHERE PB.PET_GB_CD =#{petGbCd})
+                </otherwise>
+            </choose>
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND M.MOBILE = #{mobile, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="tel != null and tel != ''">
+            AND M.TEL = #{tel}
+        </if>
+        <if test="email != null and email != ''">
+            AND M.EMAIL = #{email, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="mkngRcvYn != '' and mkngRcvYn != null">
+            AND M.MKNG_RCV_YN = #{mkngRcvYn}
+        </if>
+        <if test="rcomLoginId != '' and rcomLoginId != null">
+            AND ( M.RCOM_LOGIN_ID IN (SELECT SUB.RCOM_CD FROM MEMBER_BASE SUB WHERE SUB.LOGIN_ID LIKE CONCAT('%',#{rcomLoginId},'%') ) AND M.RCOM_LOGIN_ID IS NOT NULL )
+        </if>
+        <if test="mbrNos != null">
+            <foreach collection="mbrNos" item="item" separator="," open="AND M.MBR_NO IN (" close=")">
+                #{item }
+            </foreach>
+        </if>
+        <if test="joinPathCd != null and joinPathCd != ''">
+            AND M.JOIN_PATH_CD = #{joinPathCd}
+        </if>
+        <if test="joinEnvCd != null and joinEnvCd != ''">
+            AND M.JOIN_ENV_CD = #{joinEnvCd}
+        </if>
+    </sql>
+
+    <select id="getMemberGradeInfo" resultType="biz.app.member.model.MemberGradeVO">
+        <!--
+            Query Name : member.getMemberGradeInfo
+            Description : 회원 등급 정보
+        -->
+        SELECT DTL_CD AS GRD_CD
+        ,DTL_NM AS GRD_NM
+        , USR_DFN1_VAL AS STD_ORD_AMT
+        , USR_DFN2_VAL AS STD_ORD_CNT
+        , USR_DFN3_VAL AS SVMN_RATE
+        , USR_DFN4_VAL AS SVMN_VLD_PRD_CD
+        , USR_DFN5_VAL AS SVMN_VLD_PRD
+        FROM code_detail
+        WHERE GRP_CD = '${@framework.common.constants.CommonConstants@MBR_GRD_CD}'
+        AND DTL_CD = (SELECT MBR_GRD_CD FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo})
+    </select>
+
+
+    <select id="listMemberAddress" resultType="biz.app.member.model.MemberAddressVO">
+        <!--
+            Query Name : member.listMemberGradePointHist
+            Description : listMemberGradePointHist
+        -->
+        SELECT /* QUERYID(member.listMemberAddress) */
+        MBR_NO /* 회원 번호 */
+        , MBR_DLVRA_NO /* 회원 배송지 번호 */
+        , GB_NM /* 구분 명 */
+        , ADRS_NM /* 수취인 명 */
+        , TEL /* 전화 */
+        , MOBILE /* 휴대폰 */
+        , DFT_YN /* 기본 여부 */
+        , PRCL_ADDR /* 지번 주소 */
+        , PRCL_DTL_ADDR /* 지번 상세 주소 */
+        , POST_NO_OLD /* 우편 번호 구 */
+        , POST_NO_NEW /* 우편 번호 신 */
+        , ROAD_ADDR /* 도로 주소 */
+        , ROAD_DTL_ADDR /* 도로 상세 주소 */
+        , SYS_REGR_NO /* 시스템 등록자 번호 */
+        , SYS_REG_DTM /* 시스템 등록 일시 */
+        , SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM /* 시스템 수정 일시 */
+        , IF(MBR_NO = SYS_REGR_NO , '본인',FN_GET_USER_NAME(SYS_REGR_NO) ) AS SYS_REGR_NM /* 시스템 등록자 */
+        , IF(MBR_NO = SYS_UPDR_NO , '본인',FN_GET_USER_NAME(SYS_UPDR_NO) ) AS SYS_REGR_NM /* 시스템 수정자 */
+        FROM member_address
+        WHERE MBR_NO = #{mbrNo}
+        <include refid="bizCommon.sortSql"/>
+    </select>
+
+    <select id="getMemberAddress" resultType="biz.app.member.model.MemberAddressVO">
+        <!--
+            Query Name : member.listMemberGradePointHist
+            Description : listMemberGradePointHist
+        -->
+        SELECT /* QUERYID(member.listMemberAddress) */
+        MBR_NO /* 회원 번호 */
+        , MBR_DLVRA_NO /* 회원 배송지 번호 */
+        , GB_NM /* 구분 명 */
+        , ADRS_NM /* 수취인 명 */
+        , TEL /* 전화 */
+        , MOBILE /* 휴대폰 */
+        , DFT_YN /* 기본 여부 */
+        , SYS_REGR_NO /* 시스템 등록자 번호 */
+        , SYS_REG_DTM /* 시스템 등록 일시 */
+        , SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM /* 시스템 수정 일시 */
+        , PRCL_ADDR /* 지번 주소 */
+        , PRCL_DTL_ADDR /* 지번 상세 주소 */
+        , POST_NO_OLD /* 우편 번호 구 */
+        , POST_NO_NEW /* 우편 번호 신 */
+        , ROAD_ADDR /* 도로 주소 */
+        , ROAD_DTL_ADDR /* 도로 상세 주소 */
+        , FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+        , FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+        FROM member_address
+        WHERE MBR_DLVRA_NO = #{mbrDlvraNo}
+    </select>
+
+
+    <update id="updateMemberHumanCancellation" parameterType="biz.app.member.model.MemberBasePO">
+        <!--
+            Query Name : member.updateMemberBase
+            Description : updateMemberBase
+        -->
+        UPDATE member_base SET
+        MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' /* 회원 상태 코드 */
+        , SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+        WHERE 1 = 1
+        AND MBR_NO = #{mbrNo}
+    </update>
+
+    <update id="updateMemberMbrGrdCd" parameterType="biz.app.member.model.MemberBasePO">
+        <!--
+            Query Name : member.updateMemberBase
+            Description : updateMemberBase
+        -->
+        UPDATE member_base SET
+        MBR_GRD_CD = #{mbrGrdCd}
+        , SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+        WHERE 1 = 1
+        AND MBR_NO = #{mbrNo}
+    </update>
+
+    <insert id="insertMemberAddress" parameterType="biz.app.member.model.MemberAddressPO">
+        <!--
+            Query Name : member.insertMemberAddress
+            Description : insertMemberAddress
+        -->
+        <selectKey keyProperty="mbrDlvraNo" resultType="java.lang.Long" order="BEFORE">
+            SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_ADDRESS_SEQ}') FROM DUAL
+        </selectKey>
+        INSERT INTO member_address (
+        MBR_NO /* 회원 번호 */
+        , MBR_DLVRA_NO /* 회원 배송지 번호 */
+        , GB_NM /* 구분 명 */
+        , ADRS_NM /* 수취인 명 */
+        , TEL /* 전화 */
+        , MOBILE /* 휴대폰 */
+        , DFT_YN /* 기본 여부 */
+        , PRCL_ADDR /* 지번 주소 */
+        , PRCL_DTL_ADDR /* 지번 상세 주소 */
+        , POST_NO_OLD /* 우편 번호 구 */
+        , POST_NO_NEW /* 우편 번호 신 */
+        , ROAD_ADDR /* 도로 주소 */
+        , ROAD_DTL_ADDR /* 도로 상세 주소 */
+        , SYS_REGR_NO /* 시스템 등록자 번호 */
+        , SYS_REG_DTM /* 시스템 등록 일시 */
+        , SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM /* 시스템 수정 일시 */
+        ) VALUES (
+        #{mbrNo} /* 회원 번호 */
+        , #{mbrDlvraNo} /* 회원 배송지 번호 */
+        , #{gbNm} /* 구분 명 */
+        , #{adrsNm} /* 수취인 명 */
+        , #{tel} /* 전화 */
+        , #{mobile} /* 휴대폰 */
+        , '${@framework.common.constants.CommonConstants@DFT_YN_N}' /* 기본 여부 */
+        , #{prclAddr} /* 지번 주소 */
+        , #{roadDtlAddr} /* 지번 상세 주소 - 도로 상세주소와 같으니 도로상세주소로 210127 */
+        , #{postNoOld} /* 우편 번호 구 */
+        , #{postNoNew} /* 우편 번호 신 */
+        , #{roadAddr} /* 도로 주소 */
+        , #{roadDtlAddr} /* 도로 상세 주소 */
+        , #{sysRegrNo} /* 시스템 등록자 번호 */
+        , NOW() /* 시스템 등록 일시 */
+        , #{sysUpdrNo} /* 시스템 수정자 번호 */
+        , NOW() /* 시스템 수정 일시 */
+        )
+    </insert>
+
+    <!-- 회원 주소록(배송지) 수정 -->
+    <update id="updateMemberAddress" parameterType="biz.app.member.model.MemberAddressPO">
+        UPDATE member_address
+        SET GB_NM         = #{gbNm} /* 구분 명 */
+          , ADRS_NM       = #{adrsNm} /* 수취인 명 */
+          , TEL           = #{tel} /* 전화 */
+          , MOBILE        = #{mobile} /* 휴대폰 */
+          , PRCL_ADDR     = #{prclAddr} /* 지번 주소 */
+          , PRCL_DTL_ADDR = #{prclDtlAddr} /* 지번 상세 주소 */
+          , POST_NO_OLD   = #{postNoOld} /* 우편 번호 구 */
+          , POST_NO_NEW   = #{postNoNew} /* 우편 번호 신 */
+          , ROAD_ADDR     = #{roadAddr} /* 도로 주소 */
+          , ROAD_DTL_ADDR = #{roadDtlAddr} /* 도로 상세 주소 */
+          , SYS_UPDR_NO   = #{sysUpdrNo} /* 시스템 수정자 번호 */
+          , SYS_UPD_DTM   = NOW() /* 시스템 수정 일시 */
+        WHERE MBR_DLVRA_NO = #{mbrDlvraNo}
+    </update>
+
+    <!-- 현재 진행중인 주문(구매확정이 되지 않은)이 있는지 체크. -->
+    <select id="getCheckMemberOrderComplete" resultType="java.lang.String">
+        <!--
+            Query Name : member.getCheckMemberOrderComplete
+            Description : 현재 진행중인 주문이 존재 시 Y / 없는경우 N 를 리턴
+        -->
+        SELECT CASE WHEN COUNT(OI.ORD_NO) = 0 THEN 'N'
+        ELSE 'Y'
+        END AS STAT_YN
+        FROM (
+        SELECT OB.ORD_NO, (OD.RMN_ORD_QTY - (OD.RTN_QTY - FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ))) AS
+        RMN_QTY
+        FROM order_base OB
+        INNER JOIN order_detail OD ON OB.ORD_NO = OD.ORD_NO
+        WHERE 1=1
+        AND OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+        AND OB.MBR_NO = #{mbrNo}
+        AND OD.ORD_DTL_STAT_CD IN ('110','120','130','140','150', '160')
+        ) OI
+        WHERE OI.RMN_QTY <![CDATA[>]]> 0
+    </select>
+
+    <!-- 현재 진행중인 클래임(구매확정이 되지 않은)이 있는지 체크. -->
+    <select id="getCheckMemberClaimComplete" resultType="java.lang.String">
+        <!--
+            Query Name : member.getCheckMemberClaimComplete
+            Description : 현재 진행중인 클래임이 존재 시 Y / 없는경우 N 를 리턴
+        -->
+        SELECT
+        CASE WHEN COUNT(*)=0
+        THEN 'N'
+        ELSE 'Y'
+        END AS STAT_YN
+        FROM claim_base CB
+        INNER JOIN claim_detail CD ON CB.CLM_NO = CD.CLM_NO
+        WHERE 1=1
+        AND (CB.CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_10}' /* 접수 */ OR CB.CLM_STAT_CD =
+        '${@framework.common.constants.CommonConstants@CLM_STAT_20}') /* 진행 */
+        AND CB.MBR_NO = #{mbrNo}
+        /* 제외 코드[취소완료:120, 회수완료:240, 반품거부완료:250, 반품승인완료:260, 회수완료:340, 교환거부완료:350, 교환승인완료:360, 배송완료:450] */
+    </select>
+
+    <update id="updateMemberLeave" parameterType="biz.app.member.model.MemberBasePO">
+        UPDATE member_base
+        SET MBR_LEV_RSN_CD = #{mbrLevRsnCd}
+          , MBR_LEV_CONTENT = #{mbrLevContent}
+          , RE_JOIN_PSB_DT = NOW()
+          /*, MBR_LEV_DTM = DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-%d'), INTERVAL 1 DAY)*/ /*기존 탈퇴일시를 남기는거에 대한 요건이 없었고 정보보호법(보관DB가 없는상황에서 배치가 돌던 상황이였을때)에 위배된다고하여 하루 텀을 줘야해서 탈퇴일+1을 했다.*/
+          , MBR_LEV_DTM = NOW()
+          , MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+          , SYS_UPDR_NO = #{sysUpdrNo}
+          , SYS_UPD_DTM = NOW()
+        WHERE MBR_NO = #{mbrNo}
+    </update>
+
+    <!-- 회원배송지 삭제. -->
+    <delete id="deleteMemberAddress">
+        DELETE
+        FROM member_address
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원등급이력 삭제. -->
+    <delete id="deleteMemberGradeHistory">
+        DELETE
+        FROM member_grade_history
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원등급포인트이력 삭제. -->
+    <delete id="deleteMemberGradePointHist">
+        DELETE
+        FROM member_grade_point_hist
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원적립금 삭제. -->
+    <delete id="deleteMemberSavedMoney">
+        DELETE
+        FROM member_saved_money
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원쿠폰 삭제. -->
+    <delete id="deleteMemberCoupon">
+        DELETE
+        FROM member_coupon
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원관심상품 삭제. -->
+    <delete id="deleteMemberInterestGoods">
+        DELETE
+        FROM member_interest_goods
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원로그인이력 삭제. -->
+    <delete id="deleteMemberLoginHist">
+        DELETE
+        FROM member_login_hist
+        WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 난수 쿠폰 삭제. -->
+    <delete id="deleteCouponIssue">
+		UPDATE COUPON_ISSUE
+			SET MBR_CP_NO = NULL
+		WHERE MBR_CP_NO IN  (SELECT MBR_CP_NO FROM MEMBER_COUPON WHERE MBR_NO = #{mbrNo})
+    </delete>
+
+    <!-- 회원 알림 수신 변경 이력 삭제. -->
+    <delete id="deleteMemberAlarmRcvHist">
+		DELETE FROM MEMBER_ALARM_RCV_HIST WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 동의 이력 삭제 -->
+    <delete id="deleteTermsRcvHistory">
+		DELETE FROM TERMS_RCV_HISTORY WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 인증 로그 삭제 -->
+    <delete id="deleteMemberCertifiedLog">
+		DELETE FROM MEMBER_CERTIFIED_LOG WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 태그 맵핑 삭제 -->
+    <delete id="deleteMbrTagMap">
+		DELETE FROM MBR_TAG_MAP WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 팔로우 맵 회원 삭제 -->
+    <delete id="deleteFollowMapMember">
+		DELETE FROM FOLLOW_MAP_MEMBER WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 팔로우 맵 태그 삭제 -->
+    <delete id="deleteFollowMapTag">
+		DELETE FROM FOLLOW_MAP_TAG WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 회사 정보 이력 삭제 -->
+    <delete id="deleteMemberBizStateHistory">
+		DELETE FROM MEMBER_BIZ_STATE_HISTORY WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 HISTORY 삭제 -->
+    <delete id="deleteMemberBaseHistory">
+		DELETE FROM MEMBER_BASE_HISTORY WHERE MBR_NO = #{mbrNo}
+    </delete>
+
+    <!-- 회원 비밀번호 변경 이력 삭제 -->
+    <delete id="deleteMemberPswdHist">
+		DELETE FROM MEMBER_PSWD_HIST WHERE MBR_NO = #{mbrNo}
+    </delete>
+    
+    <!-- 회원 반려동물 질환 삭제 -->
+    <delete id="deletePetDa">
+    	DELETE FROM PET_DA PD WHERE PET_NO IN (SELECT PET_NO FROM PET_BASE WHERE MBR_NO = #{mbrNo})
+    </delete>
+    
+    <!-- 회원 반려동물 예방접종 삭제 -->
+    <delete id="deletePetInclRecode">
+    	DELETE FROM PET_INCL_RECODE PIR WHERE PET_NO IN (SELECT PET_NO FROM PET_BASE WHERE MBR_NO = #{mbrNo})
+    </delete>
+    
+    <!-- 회원 반려동물 삭제 -->
+    <delete id="deletePetBase">
+    	DELETE FROM PET_BASE WHERE MBR_NO = #{mbrNo}
+    </delete>
+    
+    
+
+    <sql id="pageMemberSavedMoneyHistCondition">
+        <!--
+            Query Name : member.pageMemberSavedMoneyHistCondition
+            Description : 회원의 적립금 이력 조회 조건절
+        -->
+        FROM (
+        SELECT
+        'M' AS TBL_DVS, /* Table 구분 */
+        SYS_REG_DTM, /* 시스템 등록 일시 : 발생일자 */
+        VLD_DTM,
+        SYS_REGR_NO,
+        '${@framework.common.constants.CommonConstants@SVMN_PRCS_10}' AS SVMN_PRCS_CD, /* 적립*/
+        '' SVMN_PRCS_RSN_CD,
+        SVMN_RSN_CD, /* 적립금 사유 코드 */
+        ORD_NO, /* 주문 번호 */
+        SAVE_AMT, /* 적립 금액 */
+        SVMN_SEQ, /* 적립금 순번 */
+        ETC_RSN /* 기타 사유 */
+        FROM member_saved_money
+        WHERE MBR_NO = #{mbrNo} /* 회원번호 */
+        AND SYS_REG_DTM BETWEEN #{prcsDtmStart} AND #{prcsDtmEnd} /* 시스템 등록 일시 */
+        UNION ALL
+        SELECT
+        'D' AS TBL_DVS, /* Table 구분 */
+        PRCS_DTM, /* 처리 일시 */
+        (SELECT VLD_DTM FROM member_saved_money X WHERE X.MBR_NO = B.MBR_NO AND X.SVMN_SEQ = B.SVMN_SEQ) VLD_DTM ,
+        SYS_REGR_NO,
+        SVMN_PRCS_CD, /* 적립, 차감*/
+        SVMN_PRCS_RSN_CD, /* 적립금 처리 사유 코드 */
+        '' SVMN_RSN_CD,
+        (SELECT A.ORD_NO FROM pay_base A WHERE A.PAY_NO = B.PAY_NO ) AS ORD_NO, /* 주문 번호 */
+        PRCS_AMT, /* 처리 금액 */
+        SVMN_SEQ, /* 적립금 순번 */
+        ETC_RSN
+        FROM member_saved_money_detail B
+        WHERE MBR_NO = #{mbrNo} /* 회원번호 */
+        AND PRCS_DTM BETWEEN #{prcsDtmStart} AND #{prcsDtmEnd} /* 처리 일시 */
+        ) MSM
+    </sql>
+
+    <select id="pageMemberSavedMoneyHist" resultType="biz.app.member.model.MemberSavedMoneyVO">
+        <!--
+            Query Name : member.pageMemberSavedMoneyHist
+            Description : 회원의 적립금 이력 조회
+        -->
+        SELECT /* QUERYID(member.pageMemberSavedMoneyHist) */
+        MSM.TBL_DVS,
+        MSM.SYS_REG_DTM,
+        IF(MSM.SVMN_RSN_CD =
+        '${@framework.common.constants.CommonConstants@SVMN_RSN_110}',DATEDIFF(MSM.VLD_DTM,MSM.SYS_REG_DTM), '')
+        VLD_PRD,
+        MSM.SVMN_PRCS_CD,
+        MSM.SVMN_PRCS_RSN_CD,
+        MSM.SVMN_RSN_CD,
+        MSM.ORD_NO,
+        MSM.SAVE_AMT,
+        MSM.SVMN_SEQ,
+        MSM.ETC_RSN,
+        FN_GET_USER_NAME(MSM.SYS_REGR_NO) AS SYS_REGR_NM,
+        MSM.VLD_DTM
+        <include refid="member.pageMemberSavedMoneyHistCondition"/>
+        ORDER BY ${sidx} ${sord}
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="pageMemberSavedMoneyHistCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : member.pageMemberSavedMoneyHistCount
+            Description : 회원의 적립금 이력 조회 카운트
+        -->
+        SELECT /* QUERYID(member.pageMemberSavedMoneyHistCount) */
+        COUNT(*)
+        <include refid="member.pageMemberSavedMoneyHistCondition"/>
+    </select>
+
+    <select id="getLostExpectedMemberSavedMoney" resultType="Long">
+        <!--
+            Query Name : member.getLostExpectedMemberSavedMoney
+            Description : 회원의 1개월 이내의 소멸예정 적립금 취득
+        -->
+        SELECT SUM(RMN_AMT)
+        FROM member_saved_money
+        WHERE MBR_NO = #{mbrNo} /* 회원번호 */
+        AND RMN_AMT > 0
+        AND VLD_DTM BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 day)
+    </select>
+
+    <select id="pageMemberSavedMoney" resultType="biz.app.member.model.MemberSavedMoneyVO">
+        SELECT /* QUERYID(member.pageMemberSavedMoney) */
+        A.SVMN_SEQ /* 적립금 순번 */
+        , A.SVMN_RSN_CD /* 적립금 사유 코드 */
+        , A.ETC_RSN /* 기타 사유 */
+        , A.MBR_NO /* 회원 번호 */
+        , A.SAVE_AMT /* 적립 금액 */
+        , A.VLD_DTM /* 유효 일시 */
+        , A.RMN_AMT /* 잔여 금액 */
+        , A.ORD_NO /* 주문 번호 */
+        , A.GOODS_ESTM_NO /* 상품 평가 번호 */
+        , (
+        SELECT COUNT(*)
+        FROM member_saved_money_detail B
+        WHERE A.SVMN_SEQ = B.SVMN_SEQ
+        ) AS DETAIL_CNT
+        FROM member_saved_money A
+        WHERE MBR_NO = #{mbrNo}
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="pageMemberSavedMoneyCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(member.pageMemberSavedMoneyCount) */
+            COUNT(*)
+        FROM member_saved_money
+        WHERE MBR_NO = #{mbrNo}
+    </select>
+
+
+    <update id="updateMemberCertification" parameterType="biz.app.member.model.MemberBasePO">
+        <!--
+            Query Name : member.updateMemberCertification
+            Description : 회원의 본인인증 정보 갱신
+        -->
+        UPDATE /*QUERYID(member.updateMemberCertification) */ member_base SET
+        CTF_MTD_CD = #{ctfMtdCd} /* 인증 방법 코드 */
+        , CTF_CD = #{ctfCd} /* 인증 코드 */
+        , CTF_REQ_NO = #{ctfReqNo} /* 인증 요청 번호 */
+        , MBR_NM = #{mbrNm} /* 회원 명 */
+        , BIRTH = #{birth} /* 생일 */
+        , GD_GB_CD = #{gdGbCd} /* 성별 구분 코드 */
+        , NTN_GB_CD = #{ntnGbCd} /* 국적 구분 코드 */
+        WHERE 1 = 1
+        AND MBR_NO = #{mbrNo}
+    </update>
+
+    <insert id="insertMemberGradePointHist" parameterType="biz.app.member.model.MemberGradePointHistPO">
+        <!--
+            Query Name : member.insertMemberGradePointHist
+            Description : 회원 등급 포인트 이력
+        -->
+        INSERT /* QUERYID(member.insertMemberGradePointHist) */ INTO member_grade_point_hist (
+        MBR_NO /* 회원 번호 */
+        , GRD_PNT_HIST_NO /* 등급 포인트 이력번호 */
+        , PNT_GB_CD /* 포인트 구분 코드 */
+        , PNT /* 포인트 */
+        , BIGO /* 비고 */
+        , ORD_NO /* 주문 번호 */
+        , ORD_DTL_SEQ /* 주문 상세 순번 */
+        , SYS_REGR_NO /* 시스템 등록자 번호 */
+        , SYS_REG_DTM /* 시스템 등록 일시 */
+        , SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , SYS_UPD_DTM /* 시스템 수정 일시 */
+        ) SELECT
+        #{mbrNo} /* 회원 번호 */
+        , (SELECT IFNULL(MAX(GRD_PNT_HIST_NO), 0) + 1 FROM member_grade_point_hist WHERE MBR_NO = #{mbrNo}) /* 등급 포인트
+        이력번호 */
+        , #{pntGbCd} /* 포인트 구분 코드 */
+        , #{pnt} /* 포인트 */
+        , #{bigo} /* 비고 */
+        , #{ordNo} /* 주문 번호 */
+        , #{ordDtlSeq} /* 주문 상세 순번 */
+        , #{sysRegrNo} /* 시스템 등록자 번호 */
+        , NOW() /* 시스템 등록 일시 */
+        , #{sysUpdrNo} /* 시스템 수정자 번호 */
+        , NOW() /* 시스템 수정 일시 */
+        FROM DUAL
+    </insert>
+
+
+    <select id="getMemberMain" resultType="biz.app.member.model.MemberMainVO">
+        <!--
+            Query Name : member.getMemberMain
+            Description : 적립금 소멸 시킬 목록 조회(batch)
+        -->
+        SELECT /* QUERYID(member.getMemberMain) batch용 */
+        IFNULL(SUM(USE_CNT), 0) AS USE_CNT
+        ,IFNULL(SUM(HUMAN_CNT), 0) AS HUMAN_CNT
+        ,IFNULL(SUM(WITHDRAW_CNT), 0) AS WITHDRAW_CNT
+        ,IFNULL(SUM(NEW_CNT), 0) AS NEW_CNT
+        FROM (
+        SELECT
+        1 AS USE_CNT
+        , CASE
+        WHEN MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_30}'
+        THEN 1
+        ELSE 0
+        END AS HUMAN_CNT
+        , CASE
+        WHEN MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_40}'
+        THEN 1
+        ELSE 0
+        END AS WITHDRAW_CNT
+        , CASE
+        WHEN MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' AND JOIN_DTM BETWEEN
+        DATE_FORMAT(NOW(), '%Y%m%d') AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        THEN 1
+        ELSE 0
+        END AS NEW_CNT
+        FROM member_base
+        ) A
+    </select>
+
+    <select id="listMemberSavedMoneyHist" resultType="biz.app.member.model.MemberSavedMoneyVO">
+        <!--
+            Query Name : member.listMemberSavedMoneyHist
+            Description : 회원의 적립금 이력 조회
+        -->
+        SELECT /* QUERYID(member.listMemberSavedMoneyHist) */
+        MSM.TBL_DVS,
+        MSM.SYS_REG_DTM,
+        IF(MSM.SVMN_RSN_CD =
+        '${@framework.common.constants.CommonConstants@SVMN_RSN_110}',DATEDIFF(MSM.VLD_DTM,MSM.SYS_REG_DTM), '')
+        VLD_PRD,
+        MSM.SVMN_PRCS_CD,
+        MSM.SVMN_RSN_CD,
+        MSM.ORD_NO,
+        MSM.SAVE_AMT,
+        MSM.SVMN_SEQ,
+        MSM.VLD_DTM,
+        MSM.ETC_RSN
+        <include refid="member.listMemberSavedMoneyHistCondition"/>
+        ORDER BY ${sidx} ${sord}
+    </select>
+
+    <sql id="listMemberSavedMoneyHistCondition">
+        <!--
+            Query Name : member.listMemberSavedMoneyHistCondition
+            Description : 회원의 적립금 이력 조회 조건절
+        -->
+        FROM (
+        SELECT
+        'M' AS TBL_DVS, /* Table 구분 */
+        SYS_REG_DTM, /* 시스템 등록 일시 : 발생일자 */
+        VLD_DTM,
+        '${@framework.common.constants.CommonConstants@SVMN_PRCS_10}' AS SVMN_PRCS_CD, /* 적립*/
+        SVMN_RSN_CD, /* 적립금 사유 코드 */
+        ORD_NO, /* 주문 번호 */
+        SAVE_AMT, /* 적립 금액 */
+        SVMN_SEQ, /* 적립금 순번 */
+        ETC_RSN /* 기타 사유 */
+        FROM member_saved_money
+        WHERE MBR_NO = #{mbrNo} /* 회원번호 */
+        <if test="periodParam != null and periodParam !='' ">
+            AND SYS_REG_DTM BETWEEN DATE_SUB(CURDATE(), INTERVAL ${periodParam} MONTH ) AND NOW() /* 검색조건 기간 */
+        </if>
+        UNION ALL
+        SELECT
+        'D' AS TBL_DVS, /* Table 구분 */
+        PRCS_DTM, /* 처리 일시 */
+        PRCS_DTM,
+        '${@framework.common.constants.CommonConstants@SVMN_PRCS_20}' AS SVMN_PRCS_CD, /* 차감*/
+        SVMN_PRCS_RSN_CD, /* 적립금 처리 사유 코드 */
+        (SELECT A.ORD_NO FROM PAY_BASE A WHERE A.PAY_NO = B.PAY_NO ) AS ORD_NO, /* 주문 번호 */
+        PRCS_AMT, /* 처리 금액 */
+        SVMN_SEQ, /* 적립금 순번 */
+        ETC_RSN /* 기타 사유 */
+        FROM member_saved_money_detail B
+        WHERE MBR_NO = #{mbrNo} /* 회원번호 */
+        <if test="periodParam != null and periodParam !='' ">
+            AND PRCS_DTM BETWEEN DATE_SUB(CURDATE(), INTERVAL ${periodParam} MONTH ) AND NOW() /* 검색조건 기간 */
+        </if>
+        <if test="svmnPrcsRsnCd != null and svmnPrcsRsnCd !='' ">
+            AND SVMN_PRCS_RSN_CD = #{svmnPrcsRsnCd}
+        </if>
+        ) MSM
+        WHERE 1=1
+        <if test="svmnPrcsCd != null and svmnPrcsCd !='' ">
+            AND SVMN_PRCS_CD = #{svmnPrcsCd}
+        </if>
+    </sql>
+
+    <select id="getMemberRefundSchdAmt" resultType="Long">
+        <!--
+            Query Name : member.getMemberRefundSchdAmt
+            Description : 회원의 환불 대기 금액 합계 조회
+        -->
+        SELECT /* Query(member.getMemberRefundSchdAmt) */
+        IFNULL(SUM(SCHD_AMT),0) AS REFUND_SCHD_AMT
+        FROM pay_cash_refund
+        WHERE RFD_STAT_CD = '${@framework.common.constants.CommonConstants@RFD_STAT_20}' /* 진행중인 건 */
+        AND PAY_NO IN (
+        SELECT PAY_NO
+        FROM PAY_BASE
+        WHERE CLM_NO IN (
+        SELECT CLM_NO
+        FROM CLAIM_BASE
+        WHERE MBR_NO = #{mbrNo}
+        AND CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}' /* 클레임이 완료된 건 */
+        )
+        )
+
+    </select>
+
+    <update id="updateMemberOrderLeave">
+        <!--
+            Query Name : member.updateMemberOrder
+            Description : 회원 탈퇴 시 회원 주문정보를 모두 비회원 정보로 업데이트
+        -->
+        UPDATE order_base
+        SET MBR_NO = '${@framework.common.constants.CommonConstants@NO_MEMBER_NO}'
+        WHERE MBR_NO = #{mbrNo}
+    </update>
+
+
+    <select id="listMemberBaseHistory" parameterType="biz.app.member.model.MemberBaseSO"
+            resultType="biz.app.member.model.MemberBaseVO">
+        <!--
+            Query Name : member.listMemberBaseHistory
+            Description : listMemberBaseHistory
+        -->
+        SELECT /* QUERYID(member.listMemberBaseHistory) */
+        M.MBR_NO
+        , M.ST_ID
+        , FN_GET_SITE_NAME(M.ST_ID) AS ST_NM
+        , M.POLICY_NO
+        , M.LOGIN_ID
+        , M.MBR_NM
+        , M.NICK_NM
+        , M.MBR_GB_CD
+        , M.MBR_STAT_CD
+        , M.MBR_GRD_CD
+        , M.BIRTH
+        , M.GD_GB_CD
+        , M.NTN_GB_CD
+        , M.JOIN_DTM
+        , M.MOD_DTM
+        , M.JOIN_PATH_CD
+        , M.JOIN_ENV_CD
+        , M.CTF_YN
+        <!-- ,   M.CTF_MTD_CD
+        ,   M.CTF_CD
+        ,   M.CTF_REQ_NO -->
+        , M.CI_CTF_VAL
+        , M.DI_CTF_VAL
+        , M.GSPT_NO
+        , M.GSPT_USE_YN
+        , M.GSPT_STATE_CD
+        , M.GSPT_START_DTM
+        , M.GSPT_STOP_DTM
+        , M.PSWD
+        , M.PSWD_INIT_YN
+        , M.PSWD_CHG_DTM
+        , M.LOGIN_FAIL_CNT
+        , M.LAST_LOGIN_DTM
+        , M.PSWD_CHG_SCD_DTM
+        , M.TEL
+        , M.MOBILE
+        , M.MOBILE_CD
+        , M.EMAIL
+        , M.RCOM_LOGIN_ID
+        , M.MBR_LEV_RSN_CD
+        , M.MBR_LEV_CONTENT
+        , M.MBR_LEV_DTM
+        , M.RE_JOIN_PSB_DT
+        , M.DORMANT_APL_DTM
+        , M.MBR_STOP_DTM
+        , M.SYS_REGR_NO
+        , M.SYS_REG_DTM
+        , M.SYS_UPDR_NO
+        , M.SYS_UPD_DTM
+        , M.UPDR_IP /* 수정자 IP */
+        , FN_GET_USER_NAME(M.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+        , FN_GET_USER_NAME(M.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+        FROM member_base_history M
+        WHERE M.MBR_NO = #{mbrNo}
+        ORDER BY M.HIST_STRT_DTM DESC
+
+    </select>
+    <select id="saveMemberUse" parameterType="hashmap" statementType="CALLABLE">
+        <!--
+            Query Name : member.saveMemberNoUse
+            Description : 회원 휴면처리
+        -->
+        { CALL dcg_dormancy.SP_PROC_MEMBER_RESTORE (#{mbrNo}, #{mbrNo},
+        #{result, mode=OUT, javaType=Integer, jdbcType=INTEGER }) }
+    </select>
+    <select id="getMbrNo" resultType="Long">
+        <!--
+            Query Name : member.getMbrNo
+            Description : 본인인증 코드로 멤버번호 조회
+        -->
+        SELECT /* QUERYID(member.getMbrNo) */
+        MBR_NO
+        FROM member_base
+        WHERE CTF_CD = #{ctfCd}
+    </select>
+
+
+    <select id="listPopupMemberBase" resultMap="memberBaseVoMap">
+        <!--
+            Query Name : member.listPopupMemberBase
+            Description : 회원목록 팝업
+        -->
+        SELECT /* QUERYID(member.listPopupMemberBase) */
+        M.MBR_NO /* 회원번호*/
+        , M.LOGIN_ID /* 회원ID*/
+        , M.MBR_NM /* 회원명*/
+        , M.MBR_GB_CD /* 회원구분코드*/
+        , M.MBR_STAT_CD /* 회원상태코드*/
+        , M.MOBILE /* 핸드폰번호*/
+        <if test="petRegYn == null or petRegYn == ''"> 
+            , OP.PAY_CPLT_DTM 
+        </if>
+        , M.JOIN_DTM
+        , M.NICK_NM
+        , M.MBR_GRD_CD
+        , M.MBR_GRD_CD
+        , M.EMAIL
+        FROM MEMBER_BASE M
+        <if test="petRegYn == null or petRegYn == ''">
+            LEFT JOIN (
+            SELECT P.PAY_CPLT_DTM , P.MBR_NO , P.ORD_NO
+            FROM ORDER_BASE O
+            INNER JOIN (SELECT MAX(PAY_CPLT_DTM) AS PAY_CPLT_DTM , ORD_NO, (SELECT MBR_NO FROM ORDER_BASE WHERE ORD_NO =
+            PB.ORD_NO) MBR_NO
+            FROM PAY_BASE PB
+            WHERE ORD_CLM_GB_CD = 10
+            AND PAY_GB_CD = 10
+            AND PAY_STAT_CD = '01'
+            GROUP BY MBR_NO
+            ORDER BY MBR_NO DESC) P ON O.ORD_NO = P.ORD_NO ) OP ON OP.MBR_NO = M.MBR_NO
+        </if>
+        <if test="petRegYn != null and petRegYn != ''">
+            <!-- AND ( SELECT COUNT(*) FROM PET_LOG_BASE WHERE MBR_NO = M.MBR_NO) > 0 수정0405-->
+            INNER JOIN (SELECT  * FROM PET_LOG_BASE GROUP BY MBR_NO) P
+	        ON M.MBR_NO = P.MBR_NO
+        </if>
+        WHERE 1 = 1
+        AND M.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+        <if test='searchWord != null  and searchWord != ""'>
+            <choose>
+                <when test='searchType == "loginId"'>
+                    AND M.LOGIN_ID LIKE CONCAT('%' , LOWER(#{searchWord}), '%')
+                </when>
+                <when test='searchType == "memberNm"'>
+                    AND M.MBR_NM LIKE CONCAT('%' , #{searchWord}, '%')
+                </when>
+                <when test='searchType == "nickNm"'>
+                    AND M.NICK_NM LIKE CONCAT('%' , #{searchWord}, '%')
+                </when>
+                <when test='searchType == "mbrNo"'>
+                    AND M.MBR_NO =  #{searchWord}
+                </when>
+                <otherwise>
+                    AND (M.LOGIN_ID LIKE CONCAT('%' , LOWER(#{searchWord}), '%') OR M.MBR_NM LIKE CONCAT('%' ,#{searchWord}, '%') OR M.NICK_NM LIKE CONCAT('%' , #{nickNm}, '%') OR M.MBR_NO LIKE CONCAT('%' , #{searchWord}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        <if test="mbrGbCd != null and mbrGbCd != ''">
+            AND M.MBR_GB_CD = #{mbrGbCd}
+        </if>
+        <if test="mbrGrdCd != null and mbrGrdCd != ''">
+            AND M.MBR_GRD_CD = #{mbrGrdCd}
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND M.MOBILE = #{mobile}
+        </if>
+        <if test="mbrStatCd != null and mbrStatCd != ''">
+            AND M.MBR_STAT_CD = #{mbrStatCd}
+        </if>
+        <if test="searchDtmStart != null and searchDtmStart != ''">
+            AND DATE_FORMAT( OP.PAY_CPLT_DTM, '%Y-%m-%d') <![CDATA[>=]]> #{searchDtmStart}
+        </if>
+        <if test="searchDtmEnd != null and searchDtmEnd != ''">
+            AND DATE_FORMAT( OP.PAY_CPLT_DTM, '%Y-%m-%d') <![CDATA[<=]]> #{searchDtmEnd}
+        </if>
+
+        <if test="petRegYn == null or petRegYn == ''">
+            ORDER BY OP.PAY_CPLT_DTM DESC, M.MBR_NO DESC
+        </if>
+        <if test="petRegYn != null and petRegYn != ''">
+            <include refid="bizCommon.sortSql"/>
+        </if>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="listPopupMemberBaseCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : member.listPopupMemberBaseCount
+            Description : 회원목록 팝업 count
+        -->
+        SELECT /* QUERYID(member.listPopupMemberBaseCount) */
+        COUNT(*)
+        FROM MEMBER_BASE M
+        <if test="petRegYn == null or petRegYn == ''">
+            LEFT JOIN (
+            SELECT P.PAY_CPLT_DTM , P.MBR_NO , P.ORD_NO
+            FROM ORDER_BASE O
+            INNER JOIN (SELECT MAX(PAY_CPLT_DTM) AS PAY_CPLT_DTM , ORD_NO, (SELECT MBR_NO FROM ORDER_BASE WHERE ORD_NO =
+            PB.ORD_NO) MBR_NO
+            FROM PAY_BASE PB
+            WHERE ORD_CLM_GB_CD = 10
+            AND PAY_GB_CD = 10
+            AND PAY_STAT_CD = '01'
+            GROUP BY MBR_NO
+            ORDER BY MBR_NO DESC) P ON O.ORD_NO = P.ORD_NO ) OP ON OP.MBR_NO = M.MBR_NO
+        </if>
+        <if test="petRegYn != null and petRegYn != ''">
+       <!--      AND ( SELECT COUNT(*) FROM PET_LOG_BASE WHERE MBR_NO = M.MBR_NO) > 0 -->
+	        INNER JOIN (SELECT  * FROM PET_LOG_BASE GROUP BY MBR_NO) P
+	        ON M.MBR_NO = P.MBR_NO
+        </if>
+        WHERE 1 = 1
+        AND M.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+        <if test='searchWord != null  and searchWord != ""'>
+            <choose>
+                <when test='searchType == "loginId"'>
+                    AND M.LOGIN_ID LIKE CONCAT('%' , LOWER(#{searchWord}), '%')
+                </when>
+                <when test='searchType == "memberNm"'>
+                    AND M.MBR_NM LIKE CONCAT('%' , #{searchWord}, '%')
+                </when>
+                <when test='searchType == "nickNm"'>
+                    AND M.NICK_NM LIKE CONCAT('%' , #{searchWord}, '%')
+                </when>
+                <when test='searchType == "mbrNo"'>
+                    AND M.MBR_NO =  #{searchWord}
+                </when>
+                <otherwise>
+                    AND M.LOGIN_ID LIKE CONCAT('%' , LOWER(#{searchWord}), '%') OR M.MBR_NM LIKE CONCAT('%' ,#{searchWord}, '%') OR M.NICK_NM LIKE CONCAT('%' , #{nickNm}, '%') OR M.MBR_NO LIKE CONCAT('%' , #{searchWord}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- <if test="loginId != null and loginId != ''">
+            AND		(M.LOGIN_ID LIKE CONCAT(LOWER(#{loginId}), '%')
+                        OR
+                     M.MBR_NM LIKE CONCAT('%',#{loginId}, '%') )
+        </if> -->
+        <if test="mbrGbCd != null and mbrGbCd != ''">
+            AND M.MBR_GB_CD = #{mbrGbCd}
+        </if>
+        <if test="mbrGrdCd != null and mbrGrdCd != ''">
+            AND M.MBR_GRD_CD = #{mbrGrdCd}
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND M.MOBILE = #{mobile}
+        </if>
+        <if test="mbrStatCd != null and mbrStatCd != ''">
+            AND M.MBR_STAT_CD = #{mbrStatCd}
+        </if>
+        <if test="searchDtmStart != null and searchDtmStart != ''">
+            AND DATE_FORMAT( OP.PAY_CPLT_DTM, '%Y-%m-%d') <![CDATA[>=]]> #{searchDtmStart}
+        </if>
+        <if test="searchDtmEnd != null and searchDtmEnd != ''">
+            AND DATE_FORMAT( OP.PAY_CPLT_DTM, '%Y-%m-%d') <![CDATA[<=]]> #{searchDtmEnd}
+        </if>
+    </select>
+
+
+    <select id="getExistingSnsMemberCheck" resultType="biz.app.member.model.MemberBaseVO">
+        <!--
+            Query Name : member.getExistingSnsMemberCheck
+            Description : SNS로그인 시 기존 SNS회원체크
+            Date : 2021-01-15
+            Writer : 이지희
+         -->
+        SELECT /* QUERYID(member.getExistingSnsMemberCheck) */
+        M.MBR_NO /* 회원번호*/
+        , M.MBR_NM /* 회원명*/
+        , M.LOGIN_ID /* 로그인id*/
+        , M.NICK_NM  /* 닉네임*/
+        , M.EMAIL
+        , S.SNS_LNK_CD /* 가입경로*/
+        , S.SNS_STAT_CD /* sns상태코드*/
+        , S.SNS_UUID /* sns 식별자*/
+        , M.MBR_STAT_CD /* 회원 상태코드 */
+        , M.LOGIN_FAIL_CNT /* 로그인실패횟수*/
+        , M.PSWD_INIT_YN /* 비번 초기화 여부*/
+        , M.MBR_GB_CD /* 회원 구분코드*/
+        , M.PET_LOG_URL /* 펫로그 url*/
+        , M.MBR_GRD_CD /* 회원 등급코드 */
+        , M.GSPT_NO /* GS포인트 번호*/
+        , M.CTF_YN /* 인증여부*/
+        , M.DEVICE_TP_CD /* 디바이스 타입 코드*/
+        , M.DEVICE_TOKEN /* 디바이스 토큰*/
+        , M.INFO_RCV_YN /* 정보성 수신 여부*/
+        , M.DLGT_PET_GB_CD AS PET_GB_CD /* 대표 펫 구분코드 210209*/
+        , M.PRFL_IMG /* 프로필 이미지*/
+        , M.JOIN_PATH_CD
+        , M.MOBILE
+        ,(SELECT COUNT(MT.TAG_NO) FROM MBR_TAG_MAP MT WHERE M.MBR_NO = MT.MBR_NO GROUP BY MT.MBR_NO) as TAGS /*태그 정보210217*/
+        ,( SELECT GROUP_CONCAT( PET_NO SEPARATOR ',' ) FROM PET_BASE WHERE MBR_NO = M.MBR_NO ) AS PET_NOS /* 로그인 시 펫 리스트조회*/
+        FROM MEMBER_BASE M
+        INNER JOIN SNS_MEMBER_INFO S
+        ON M.MBR_NO = S.MBR_NO
+        AND S.SNS_LNK_CD = #{snsLnkCd}
+        AND S.SNS_UUID = #{snsUuid}
+        AND M.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+        WHERE 1=1
+    </select>
+
+    <select id="getMemberBaseInShort" resultMap="memberBaseVoMap">
+        <!--
+            Query Name : memberBase.getMemberBaseInShort
+            Description : 회원 조회
+            Writter : 김재윤
+        -->
+        SELECT /* QUERYID(memberBase.getMemberBaseInShort) */
+        A.MBR_NO
+        , A.ST_ID
+        , FN_GET_SITE_NAME(A.ST_ID) AS ST_NM
+        , A.LOGIN_ID
+        , A.MBR_NM
+        , A.NICK_NM
+        , A.MBR_GB_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@MBR_GB_CD}',A.MBR_GB_CD,'') AS MBR_GB_NM
+        , A.MBR_STAT_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@MBR_STAT_CD}',A.MBR_STAT_CD,'') AS MBR_STAT_NM
+        , A.MBR_GRD_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@MBR_GRD_CD}',A.MBR_GRD_CD,'') AS MBR_GRD_NM
+        , A.BIRTH
+        , A.GD_GB_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@GD_GB}',A.GD_GB_CD,'') AS GD_GB_NM
+        , A.NTN_GB_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@NTN_GB}',A.NTN_GB_CD,'') AS NTN_GB_NM
+        , A.JOIN_DTM
+        , A.TEL
+        , A.MOBILE
+        , A.MOBILE_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@MOBILE_CD}',A.MOBILE_CD,'') AS MOBILE_NM
+        , A.EMAIL
+        , A.SYS_REGR_NO /* 시스템 등록자 번호 */
+        , A.SYS_REG_DTM /* 시스템 등록 일시 */
+        , A.SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , A.SYS_UPD_DTM /* 시스템 수정 일시 */
+        , FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+        , FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+        , ( SELECT MA.ROAD_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 1 ) AS ROAD_ADDR
+        , ( SELECT MA.ROAD_DTL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 1 ) AS ROAD_DTL_ADDR
+        , ( SELECT MA.PRCL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 1 ) AS PRCL_ADDR
+        , ( SELECT MA.PRCL_DTL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 1 ) AS PRCL_DTL_ADDR
+        ,(
+            SELECT COUNT(MC.MBR_CP_NO)
+            FROM COUPON_BASE CB ,MEMBER_COUPON MC
+            WHERE CB.CP_NO = MC.CP_NO
+            AND MC.MBR_NO = A.MBR_NO
+        ) AS CP_CNT /* 보유 쿠폰 수 */
+        , A.DFFC_MBR_YN /* 강성 회원 여부 */
+        , (
+                SELECT COUNT(*)
+                FROM PRSN_CARD_BILLING_INFO PCBI
+                WHERE PCBI.PG_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                AND PCBI.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+                AND PCBI.MBR_NO = A.MBR_NO ) AS CARD_CNT /* 카드 개수 */
+        , (
+                SELECT COUNT(*)
+                FROM MP_CARD_INFO MCI
+                WHERE MCI.MBR_NO = A.MBR_NO ) AS SKTMP_CNT /* 우주멤버십카드 등록 이력 개수 */
+        , A.MKNG_RCV_UPD_DTM	/* 마케팅 수신 여부 변경일 */
+        , A.ALM_RCV_UPD_DTM		/* 알림 수신 여부 변경일 */
+        FROM MEMBER_BASE A
+        INNER JOIN ST_STD_INFO S ON A.ST_ID = S.ST_ID
+        WHERE 1=1
+        AND (A.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+                AND A.MBR_STAT_CD IN (      '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_30}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_60}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_80}'
+                                     )
+        )
+        <if test="stId != null and stId != 0">
+            AND A.ST_ID = #{stId}
+        </if>
+        <if test="mbrNo != null and mbrNo != 0">
+            AND A.MBR_NO = #{mbrNo}
+        </if>
+        <if test='loginId != null and loginId != ""'>
+            AND A.LOGIN_ID = #{loginId , jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test='email != null and email != ""'>
+            AND A.EMAIL = #{email ,  jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+            AND MBR_NO NOT IN (SELECT MBR_NO FROM MEMBER_BASE WHERE MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_30}' 
+            AND (MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_10}'
+            OR MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_20}'))
+        </if>
+        <if test='mobile != null and mobile != ""'>
+            AND A.MOBILE = #{mobile ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+            AND MBR_NO NOT IN (SELECT MBR_NO FROM MEMBER_BASE WHERE MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_30}' 
+            AND MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_20}')
+        </if>
+    </select>
+
+    <select id="getMemberBaseBO" resultMap="memberBaseVoMap">
+        <!--
+            Query Name : memberBase.getMemberBaseBO
+            Description : 회원 상세 조회
+            Writter : 김재윤
+        -->
+        SELECT /* QUERYID(memberBase.getMemberBaseBO) */
+        A.MBR_NO
+        , A.ST_ID
+        , S.ST_NM /* 사이트 명 */
+        , A.POLICY_NO
+        , A.LOGIN_ID
+        , A.MBR_NM
+        , A.NICK_NM
+        , A.MBR_GB_CD
+        , A.MBR_STAT_CD
+        , A.MBR_GRD_CD
+        , A.BIRTH
+        , A.GD_GB_CD
+        , A.NTN_GB_CD
+        , A.JOIN_DTM
+        , A.MOD_DTM
+        , A.JOIN_PATH_CD
+        , A.JOIN_ENV_CD
+        , A.INFO_RCV_YN
+        , A.MKNG_RCV_YN
+        , A.CTF_YN
+        , A.CI_CTF_VAL
+        , A.DI_CTF_VAL
+        , A.GSPT_NO
+        , A.GSPT_USE_YN
+        , A.GSPT_STATE_CD
+        , A.GSPT_START_DTM
+        , A.GSPT_STOP_DTM
+        , A.PSWD
+        , A.PSWD_INIT_YN
+        , A.PSWD_CHG_DTM
+        , A.LOGIN_FAIL_CNT
+        , A.LAST_LOGIN_DTM
+        , A.PSWD_CHG_SCD_DTM
+        , A.TEL
+        , A.MOBILE
+        , A.MOBILE_CD
+        , A.EMAIL
+        , A.RCOM_LOGIN_ID
+        , A.MBR_LEV_RSN_CD
+        , A.MBR_LEV_CONTENT
+        , A.MBR_LEV_DTM
+        , A.RE_JOIN_PSB_DT
+        , A.DORMANT_APL_DTM
+        , A.MBR_STOP_DTM
+        , A.SYS_REGR_NO /* 시스템 등록자 번호 */
+        , A.SYS_REG_DTM /* 시스템 등록 일시 */
+        , A.SYS_UPDR_NO /* 시스템 수정자 번호 */
+        , A.SYS_UPD_DTM /* 시스템 수정 일시 */
+        , (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@MBR_GRD_CD}' AND
+        DTL_CD = A.MBR_GRD_CD) AS MBR_GRD_NM
+        , ( SELECT MA.ROAD_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1 ) AS
+        ROAD_ADDR
+        , ( SELECT MA.ROAD_DTL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1
+        ) AS ROAD_DTL_ADDR
+        , ( SELECT MA.PRCL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1 ) AS
+        PRCL_ADDR
+        , ( SELECT MA.PRCL_DTL_ADDR FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1
+        ) AS PRCL_DTL_ADDR
+        , FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM /* 시스템 등록자 */
+        , FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+        ,(  SELECT COUNT(MC.MBR_CP_NO)
+            FROM COUPON_BASE CB ,MEMBER_COUPON MC
+            WHERE CB.CP_NO = MC.CP_NO
+            AND MC.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+            AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+            AND MC.MBR_NO = A.MBR_NO
+            AND NOW() BETWEEN MC.USE_STRT_DTM AND MC.USE_END_DTM
+            AND NOW() BETWEEN CB.APL_STRT_DTM AND CB.APL_END_DTM
+        ) AS CP_CNT /* 사용가능 쿠폰 수 */
+        , A.DFFC_MBR_YN /* 강성 회원 여부 */
+        , ( SELECT GROUP_CONCAT(FN_GET_CODE_NAME('SNS_LNK',SMI.SNS_LNK_CD,''))
+            FROM sns_member_info SMI
+            GROUP BY SMI.MBR_NO HAVING SMI.MBR_NO = A.MBR_NO ) AS SNS_LNK_NM
+        FROM MEMBER_BASE A
+        INNER JOIN ST_STD_INFO S ON A.ST_ID = S.ST_ID
+        WHERE 1=1
+        AND (A.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+                AND A.MBR_STAT_CD IN (      '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_30}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_60}'
+                                        ,   '${@framework.common.constants.CommonConstants@MBR_STAT_80}'
+                                    )
+        )
+        <if test="stId != null and stId != 0">
+            AND A.ST_ID = #{stId}
+        </if>
+        <if test="mbrNo != null and mbrNo != 0">
+            AND A.MBR_NO = #{mbrNo}
+        </if>
+        <if test='mbrNm != null and mbrNm != ""'>
+            AND A.MBR_NM = #{mbrNm ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test='loginId != null and loginId != ""'>
+            AND A.LOGIN_ID = #{loginId , jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test='email != null and email != ""'>
+            AND A.EMAIL = #{email ,  jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test='mobile != null and mobile != ""'>
+            AND A.MOBILE = #{mobile ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <!-- <if test="ctfCd != null and ctfCd != ''">
+            AND		A.CTF_CD = #{ctfCd}
+        </if> -->
+    </select>
+
+    <select id="listMemberTagFollow" resultType="biz.app.tag.model.TagBaseVO">
+        <!--
+            Query Name : memberBase.listMemberTagFollow
+            Description : Tag 팔로우 내역
+            Writter : 김재윤
+        -->
+        SELECT /* QUERYID(memberBase.listMemberTagFollow) */
+        FMT.MBR_NO /* 회원 번호 */
+        , FMT.TAG_NO_FOLLOWED AS TAG_NO /* 태그 번호 */
+        , (SELECT TAG_NM FROM TAG_BASE WHERE TAG_NO = FMT.TAG_NO_FOLLOWED) AS TAG_NM /* 태그 이름 */
+        , DATE_FORMAT(FMT.SYS_REG_DTM, '%Y-%m-%d' ) AS SYS_REG_DTM /* 팔로우 일시 */
+        FROM follow_map_tag FMT
+        WHERE FMT.MBR_NO = #{mbrNo}
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+    <select id="listMemberTagFollowCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : memberBase.listMemberTagFollowCount
+            Description : Tag 팔로우 내역 카운트
+            Writter : 김재윤
+        -->
+        SELECT COUNT(*)
+        FROM follow_map_tag FMT
+        WHERE FMT.MBR_NO = #{mbrNo}
+    </select>
+
+    <select id="listMemberGoodsIoList" resultType="biz.app.goods.model.GoodsBaseVO">
+        <!--
+            Query Name : memberBase.listMemberGoodsIoList
+            Description : 재입고 알림 내역
+            Writter : 김재윤
+        -->
+        SELECT	A.*, @ROWNUM := @ROWNUM+1 AS ROW_NUM
+        FROM
+        (
+	        SELECT /* QUERYID(memberBase.listMemberGoodsIoList) */
+			        GOODS_ID
+			        , (SELECT GOODS_NM FROM GOODS_BASE GB WHERE GB.GOODS_ID = GIA.GOODS_ID ) AS GOODS_NM
+			        , MBR_NO
+			        , SYS_REG_DTM
+			        , GIA.ALM_SND_DTM
+			        , GIA.PAK_GOODS_ID 
+	        FROM GOODS_IO_ALARM GIA , (SELECT @ROWNUM:= 0) TMP
+	        WHERE GIA.MBR_NO = #{mbrNo}
+	        AND ALM_YN = '${@framework.admin.constants.AdminConstants@COMM_YN_Y}'
+	        <include refid="wherelistMemberGoodsIoList"/>
+        	<include refid="bizCommon.sortSql"/>
+		) A
+		ORDER BY ROW_NUM DESC
+        <include refid="bizCommon.pageSql"/>
+    </select>
+    <select id="listMemberGoodsIoListCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM GOODS_IO_ALARM GIA
+        WHERE GIA.MBR_NO = #{mbrNo}
+        AND ALM_YN = '${@framework.admin.constants.AdminConstants@COMM_YN_Y}'
+        <include refid="wherelistMemberGoodsIoList"/>
+    </select>
+    <sql id="wherelistMemberGoodsIoList">
+        <if test="sysRegDtmStart != null and sysRegDtmEnd != null">
+            AND (GIA.SYS_REG_DTM &gt;= #{sysRegDtmStart} AND GIA.SYS_REG_DTM &lt;= #{sysRegDtmEnd})
+        </if>
+    </sql>
+
+
+    <select id="listMemberReportList" resultType="biz.app.contents.model.ContentsReplyVO">
+        <!--
+            Query Name : memberBase.listMemberPetLogReport
+            Description : 회원의 펫tv,펫로그,상품 후기 신고 된 내역
+            Writter : 김재윤
+        -->
+        SELECT T1.*
+        FROM (
+            <!-- 어바웃 tv -->
+            SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_10}' AS REPLY_GB_CD
+            ,	ACR.MBR_NO
+            ,	0 AS PET_LOG_NO
+            , 	AC.TTL
+            ,	ACR.APLY
+            ,	( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = ACR.MBR_NO) AS LOGIN_ID
+            ,   ACR.RPL
+            , 	ACR.APLY_SEQ
+            ,	'' AS CONTS_STAT_CD
+            ,   '' AS SNCT_YN
+            ,	'' AS PET_LOG_CHNL_CD
+            ,	(SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP ACRP WHERE ACRP.VD_ID = ACR.VD_ID AND ACRP.APLY_SEQ = ACR.APLY_SEQ) AS RPTP_CNT
+            ,	ACR.SYS_REG_DTM
+            FROM apet_contents_reply ACR
+            INNER JOIN apet_contents AC ON ACR.VD_ID = AC.VD_ID
+
+        UNION ALL
+
+            <!-- 펫 로그 -->
+            SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_20}' AS REPLY_GB_CD
+                ,   PLR.MBR_NO
+                ,   PLR.PET_LOG_NO
+                ,   ( SELECT PL.DSCRT FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO) AS TTL
+                ,    PLR.APLY
+                ,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = PLR.MBR_NO) AS LOGIN_ID
+                ,   '' AS RPL
+                , 	PLR.PET_LOG_APLY_SEQ AS APLY_SEQ
+                ,   ( SELECT PL.CONTS_STAT_CD FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS CONTS_STAT_CD
+                ,   ( SELECT PL.SNCT_YN FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS SNCT_YN
+                ,   ( SELECT PL.PET_LOG_CHNL_CD FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS PET_LOG_CHNL_CD
+                ,   (
+                        SELECT COUNT(*)
+                        FROM PET_LOG_RPTP SUB
+                        WHERE SUB.PET_LOG_APLY_SEQ IS NOT NULL
+                        AND SUB.PET_LOG_NO = PLR.PET_LOG_NO
+                        GROUP BY SUB.PET_LOG_NO ) AS RPTP_CNT
+                ,   PLRP.SYS_REG_DTM
+            FROM pet_log_reply PLR
+            INNER JOIN pet_log_rptp PLRP ON PLR.PET_LOG_NO = PLRP.PET_LOG_NO AND PLR.PET_LOG_APLY_SEQ = PLRP.PET_LOG_APLY_SEQ
+        UNION ALL
+            <!-- 상품 후기 -->
+            SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_30}' AS REPLY_GB_CD
+                    , 	GC.ESTM_MBR_NO AS MBR_NO
+                    ,   '' AS PET_LOG_NO
+                    ,  	GC.TTL AS TTL
+                    , 	GC.CONTENT AS APLY
+                    ,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = GC.ESTM_MBR_NO) AS LOGIN_ID
+                    ,   '' AS RPL
+                    , 	'' AS APLY_SEQ
+                    ,   '' AS CONTS_STAT_CD
+                    ,   '' AS SNCT_YN
+                    ,   '' AS PET_LOG_CHNL_CD
+                    ,	(SELECT COUNT(*) FROM goods_estm_actn GEA_1 WHERE GEA_1.GOODS_ESTM_NO = GC.GOODS_ESTM_NO AND GEA_1.GOODS_ESTM_ACTN_CD = 'RPT' ) AS RPTP_CNT
+                    , 	GC.SYS_REG_DTM
+            FROM GOODS_COMMENT GC
+            INNER JOIN goods_estm_actn GEA ON GC.GOODS_ESTM_NO = GEA.GOODS_ESTM_NO AND GEA.GOODS_ESTM_ACTN_CD = 'RPT'
+            INNER JOIN GOODS_COMMENT_LINK GCL ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO
+            INNER JOIN MEMBER_BASE B ON (GC.ESTM_MBR_NO = B.MBR_NO )
+            INNER JOIN ST_STD_INFO S ON GC.ST_ID = S.ST_ID
+            INNER JOIN COMPANY_BASE CP ON (GC.COMP_NO = CP.COMP_NO)
+        ) T1
+        WHERE T1.MBR_NO = #{mbrNo} AND T1.RPTP_CNT &gt; 0
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="listMemberReportListCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM (
+        <!-- 어바웃 tv -->
+        SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_10}' AS REPLY_GB_CD
+        ,	ACR.MBR_NO
+        ,	0 AS PET_LOG_NO
+        , 	AC.TTL
+        ,	ACR.APLY
+        ,	( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = ACR.MBR_NO) AS LOGIN_ID
+        ,   ACR.RPL
+        , 	ACR.APLY_SEQ
+        ,	'' AS CONTS_STAT_CD
+        ,   '' AS SNCT_YN
+        ,	'' AS PET_LOG_CHNL_CD
+        ,	(SELECT COUNT(*) FROM APET_CONTENTS_REPLY_RPTP ACRP WHERE ACRP.VD_ID = ACR.VD_ID AND ACRP.APLY_SEQ = ACR.APLY_SEQ) AS RPTP_CNT
+        ,	ACR.SYS_REG_DTM
+        FROM apet_contents_reply ACR
+        INNER JOIN apet_contents AC ON ACR.VD_ID = AC.VD_ID
+
+        UNION ALL
+
+        <!-- 펫 로그 -->
+        SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_20}' AS REPLY_GB_CD
+            ,   PLR.MBR_NO
+            ,   PLR.PET_LOG_NO
+            ,   ( SELECT PL.DSCRT FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO) AS TTL
+            ,    PLR.APLY
+            ,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = PLR.MBR_NO) AS LOGIN_ID
+            ,   '' AS RPL
+            , 	PLR.PET_LOG_APLY_SEQ AS APLY_SEQ
+            ,   ( SELECT PL.CONTS_STAT_CD FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS CONTS_STAT_CD
+            ,   ( SELECT PL.SNCT_YN FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS SNCT_YN
+            ,   ( SELECT PL.PET_LOG_CHNL_CD FROM PET_LOG_BASE PL WHERE PL.PET_LOG_NO = PLR.PET_LOG_NO ) AS PET_LOG_CHNL_CD
+            ,   (
+                    SELECT COUNT(*)
+                    FROM PET_LOG_RPTP SUB
+                    WHERE SUB.PET_LOG_APLY_SEQ IS NOT NULL
+                    AND SUB.PET_LOG_NO = PLR.PET_LOG_NO
+                    GROUP BY SUB.PET_LOG_NO ) AS RPTP_CNT
+            ,   PLRP.SYS_REG_DTM
+        FROM pet_log_reply PLR
+        INNER JOIN pet_log_rptp PLRP ON PLR.PET_LOG_NO = PLRP.PET_LOG_NO AND PLR.PET_LOG_APLY_SEQ = PLRP.PET_LOG_APLY_SEQ
+
+        UNION ALL
+
+        <!-- 상품 후기 -->
+        SELECT '${@framework.admin.constants.AdminConstants@REPLY_GB_30}' AS REPLY_GB_CD
+        , 	GC.ESTM_MBR_NO AS MBR_NO
+        ,   '' AS PET_LOG_NO
+        ,  	GC.TTL AS TTL
+        , 	GC.CONTENT AS APLY
+        ,   ( SELECT MB.LOGIN_ID FROM MEMBER_BASE MB WHERE MB.MBR_NO = GC.ESTM_MBR_NO) AS LOGIN_ID
+        ,   '' AS RPL
+        , 	'' AS APLY_SEQ
+        ,   '' AS CONTS_STAT_CD
+        ,   '' AS SNCT_YN
+        ,   '' AS PET_LOG_CHNL_CD
+        ,	(SELECT COUNT(*) FROM goods_estm_actn GEA_1 WHERE GEA_1.GOODS_ESTM_NO = GC.GOODS_ESTM_NO AND GEA_1.GOODS_ESTM_ACTN_CD = 'RPT' ) AS RPTP_CNT
+        , 	GC.SYS_REG_DTM
+        FROM GOODS_COMMENT GC
+        INNER JOIN goods_estm_actn GEA ON GC.GOODS_ESTM_NO = GEA.GOODS_ESTM_NO AND GEA.GOODS_ESTM_ACTN_CD = 'RPT'
+        INNER JOIN GOODS_COMMENT_LINK GCL ON GC.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO
+        INNER JOIN MEMBER_BASE B ON (GC.ESTM_MBR_NO = B.MBR_NO )
+        INNER JOIN ST_STD_INFO S ON GC.ST_ID = S.ST_ID
+        INNER JOIN COMPANY_BASE CP ON (GC.COMP_NO = CP.COMP_NO)
+        ) T1
+        WHERE T1.MBR_NO = #{mbrNo} AND T1.RPTP_CNT &gt; 0
+    </select>
+
+    <select id="getMemberSnsLoginYn" resultType="biz.app.login.model.SnsMemberInfoVO">
+        <!--
+            Query Name : memberBase.getMemberSnsLoginYn
+            Description : sns 연동 확인
+            Writter : 김재윤
+        -->
+        SELECT /* QUERYID(memberBase.listMemberPetLogReport) */
+        SNS_UUID
+        , SNS_LNK_CD
+        , FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@SNS_LNK_CD}',SNS_LNK_CD,'') AS SNS_LNK_NM
+        , SNS_JOIN_YN
+        , MBR_NO
+        , EMAIL
+        , SNS_STAT_CD
+        FROM SNS_MEMBER_INFO
+        WHERE MBR_NO = #{mbrNo}
+    </select>
+
+    <select id="getUnsubscribeMemberList" resultType="biz.app.member.model.MemberBaseVO">
+        <!--
+            Query Name : memberBase.getUnsubscribeMemberList
+            Description : 080 수신거부 회원목록
+            Writter : KSH
+        -->
+        SELECT /* QUERYID(memberBase.getUnsubscribeMemberList) */
+        MBR_NO
+        , MBR_NM
+        , LOGIN_ID
+        , MOBILE
+        , MKNG_RCV_YN
+        FROM MEMBER_BASE
+        <foreach collection="mobileNos" item="item" separator="," open="WHERE MOBILE IN  (" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getUnsubscribeMemberListCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(memberBase.getUnsubscribeMemberListCount) */
+        COUNT(MBR_NO)
+        FROM MEMBER_BASE
+        <foreach collection="mobileNos" item="item" separator="," open="WHERE MOBILE IN  (" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="listFollowerMe" resultType="biz.app.member.model.MemberBaseVO">
+    	SELECT	A.*, @ROWNUM := @ROWNUM+1 AS ROW_NUM
+    	FROM
+    	(
+	        SELECT /* QUERYID(memberBase.listFollowerMe) */
+	          MB.MBR_NO
+	        , MB.LOGIN_ID
+	        , MB.MBR_NM
+	        , MB.MBR_GB_CD
+	        , MB.MBR_STAT_CD
+	        , MB.JOIN_DTM
+	        , MB.LAST_LOGIN_DTM
+	        , MB.SYS_REG_DTM
+	        , (SELECT COUNT(*) FROM PET_BASE PB WHERE PB.MBR_NO = MB.MBR_NO ) AS PET_BASE_CNT
+	        , (SELECT COUNT(*) FROM FOLLOW_MAP_MEMBER SUB WHERE SUB.MBR_NO = #{mbrNoFollowed} AND SUB.MBR_NO_FOLLOWED = FMM.MBR_NO) AS RLT_CNT
+	        FROM FOLLOW_MAP_MEMBER FMM
+	        INNER JOIN MEMBER_BASE MB ON FMM.MBR_NO = MB.MBR_NO
+			, (SELECT @ROWNUM:=0) TMP
+	        WHERE FMM.MBR_NO_FOLLOWED = #{mbrNoFollowed}
+        	<include refid="bizCommon.sortSql"/>
+        ) A
+        ORDER BY ROW_NUM DESC
+        <include refid="bizCommon.pageSql"/>
+    </select>
+    <select id="listFollowerMeCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(memberBase.listFollowerMeCount) */
+            COUNT(*)
+        FROM FOLLOW_MAP_MEMBER FMM
+        INNER JOIN MEMBER_BASE MB ON FMM.MBR_NO = MB.MBR_NO
+        WHERE FMM.MBR_NO_FOLLOWED = #{mbrNoFollowed}
+    </select>
+
+    <select id="listImFollowing" resultType="biz.app.member.model.MemberBaseVO">
+    
+		SELECT A.*, @ROWNUM := @ROWNUM+1 	AS ROW_NUM
+		FROM 
+		(
+	        SELECT /* QUERYID(memberBase.listImFollowing) */
+	            MB.MBR_NO
+<!-- 	        , @ROWNUM := @ROWNUM+1 	AS ROW_NUM -->
+	        , MB.LOGIN_ID
+	        , MB.MBR_NM
+	        , MB.MBR_GB_CD
+	        , MB.MBR_STAT_CD
+	        , MB.JOIN_DTM
+	        , MB.LAST_LOGIN_DTM
+	        , MB.SYS_REG_DTM
+	        , (SELECT COUNT(*) FROM PET_BASE PB WHERE PB.MBR_NO = MB.MBR_NO ) AS PET_BASE_CNT
+	        , (SELECT COUNT(*) FROM FOLLOW_MAP_MEMBER SUB WHERE SUB.MBR_NO_FOLLOWED = #{mbrNo} AND SUB.MBR_NO = MB.MBR_NO) AS RLT_CNT
+	        FROM MEMBER_BASE MB , (SELECT @ROWNUM:=0) TMP
+	        WHERE MB.MBR_NO IN (
+	            SELECT MBR_NO_FOLLOWED
+	            FROM FOLLOW_MAP_MEMBER
+	            WHERE MBR_NO = #{mbrNo}
+	        )
+	        AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	        <include refid="bizCommon.sortSql"/>
+		) A	      
+		ORDER BY ROW_NUM DESC
+        <include refid="bizCommon.pageSql"/>
+    </select>
+    <select id="listImFollowingCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(memberBase.listImFollowing) */
+            COUNT(*)
+        FROM MEMBER_BASE MB
+        WHERE MB.MBR_NO IN (
+            SELECT MBR_NO_FOLLOWED
+            FROM FOLLOW_MAP_MEMBER
+            WHERE MBR_NO = #{mbrNo}
+        )
+        AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+    </select>
+
+    <update id="updateAlmRcvYn">
+        UPDATE
+            MEMBER_BASE
+        SET ALM_RCV_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+        WHERE MBR_NO = #{mbrNo}
+    </update>
+
+    <update id="createTempMarketingTable" statementType="CALLABLE">
+        { CALL SP_PROC_CREATE_TEMP_MARKETING_TABLE() }
+    </update>
+
+    <insert id="insertTempMarketingTable" parameterType="biz.app.member.model.MemberBasePO">
+        INSERT INTO TEMP_MARKETING_TABLE(MBR_NO,CHG_ACTR_CD,MOBILE,MKNG_RCV_YN)
+        VALUES
+        <foreach collection="mobileArr" item="mobile" separator="," >
+            (
+                (
+                    SELECT MBR_NO
+                    FROM MEMBER_BASE
+                    WHERE MOBILE = #{mobile ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                    AND MBR_STAT_CD IN ('${@framework.common.constants.CommonConstants@MBR_STAT_10}')
+                )
+                , #{chgActrCd}
+                , #{mobile ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                , #{mkngRcvYn}
+            )
+        </foreach>
+    </insert>
+
+    <update id="callProcedureMarketingChange" statementType="CALLABLE"
+            parameterType="biz.app.member.model.MemberBasePO">
+        <selectKey keyProperty="resultCnt" keyColumn="RESULT_CNT" resultType="java.lang.Integer" order="BEFORE">
+            SELECT COUNT(*) AS RESULT_CNT FROM TEMP_MARKETING_TABLE WHERE MBR_NO IS NOT NULL
+        </selectKey>
+        { CALL SP_PROC_BATCH_TEMP_MARKETING_TABLE(#{mkngRcvYn,mode=IN,jdbcType=VARCHAR}) }
+    </update>
+
+    <select id="getNickNameList" resultType="biz.app.member.model.MemberBaseVO">
+        SELECT /* QUERYID(member.getNickNameList) */
+            NICK_NM
+             , PRFL_IMG
+        FROM MEMBER_BASE
+        WHERE NICK_NM LIKE CONCAT(#{nickNm }, '%')
+    </select>
+
+    <select id="getMemberPaySaveInfo" resultType="biz.app.pay.model.PrsnPaySaveInfoVO">
+        SELECT *
+        FROM PRSN_PAY_SAVE_INFO
+        WHERE MBR_NO = #{mbrNo}
+    </select>
+
+    <select id="getMemberCardBillInfo" resultType="biz.app.pay.model.PrsnCardBillingInfoVO">
+        SELECT *
+        FROM PRSN_CARD_BILLING_INFO
+        WHERE MBR_NO = #{mbrNo}
+    </select>
+	
+	<select id="getMentionInfo" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT /* QUERYID(member.getMentionInfo) */
+				  MBR_NO
+				, PET_LOG_URL
+				, MBR_STAT_CD
+				, INFO_RCV_YN
+		FROM MEMBER_BASE
+		WHERE NICK_NM = #{nickNm }
+	</select>
+	
+	<select id="getMentionSearchInfo" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT /* QUERYID(member.getMentionInfo) */
+				  MBR_NO
+				, PET_LOG_URL
+				, MBR_STAT_CD
+				, INFO_RCV_YN
+		FROM MEMBER_BASE
+		 WHERE MBR_NO = #{mbrNo}
+	 	AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+	</select>
+
+    <select id="listMemberCardBillingInfo" resultType="biz.app.pay.model.PrsnCardBillingInfoVO">
+        SELECT /* QUERYID(member.listMemberCardBillingInfo) */
+            PCBI.*
+            , MB.BILL_INPUT_FAIL_CNT
+            , (SELECT CD.USR_DFN1_VAL FROM CODE_DETAIL CD WHERE CD.GRP_CD = '${@framework.common.constants.CommonConstants@CARDC}' AND CD.DTL_CD = PCBI.PG_CARD_CODE) AS CARD_COLOR
+        FROM
+            MEMBER_BASE MB,
+            PRSN_CARD_BILLING_INFO PCBI
+        WHERE MB.MBR_NO = PCBI.MBR_NO
+        <include refid="listMemberCardBillingInfoWhere" />
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="listMemberCardBillingInfoCount" resultType="Integer">
+        SELECT COUNT(*)
+        FROM
+        MEMBER_BASE MB,
+        PRSN_CARD_BILLING_INFO PCBI
+        WHERE MB.MBR_NO = PCBI.MBR_NO
+        <include refid="listMemberCardBillingInfoWhere" />
+    </select>
+
+    <sql id="listMemberCardBillingInfoWhere">
+        AND PCBI.PG_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+        AND PCBI.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+        AND PCBI.MBR_NO = #{mbrNo}
+    </sql>
+    
+    <select id="listMemberSktmpCardInfo" resultType="biz.interfaces.sktmp.model.SktmpCardInfoVO">
+        SELECT /* QUERYID(member.listMemberSktmpCardInfo) */
+            CARD_INFO_NO
+            , MBR_NO
+            , CARD_NO
+            , PIN_NO
+            , USE_YN
+            , DFLT_YN
+            , SORT_SEQ
+            , SYS_REGR_NO
+            , SYS_REG_DTM
+            , SYS_UPDR_NO
+            , SYS_UPD_DTM
+        FROM
+            MP_CARD_INFO MCI
+        WHERE 1=1
+        <include refid="listMemberSktmpCardInfoWhere" />
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="listMemberSktmpCardInfoCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM
+            MP_CARD_INFO MCI
+        WHERE 1=1
+        <include refid="listMemberSktmpCardInfoWhere" />
+    </select>
+
+    <sql id="listMemberSktmpCardInfoWhere">
+        AND MCI.MBR_NO = #{mbrNo}
+        AND MCI.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+    </sql>
+
+    <delete id="deleteSnsMemberInfo">
+        DELETE FROM SNS_MEMBER_INFO WHERE MBR_NO = #{mbrNo}
+    </delete>
+    
+    <select id="checkInDelivery" resultType="String">
+    	<!--
+			Query Name	: 
+			Description	: 배송중인 주문건 조회 
+			Writer		: 조은지
+			Date 		: 2021. 3. 25.
+		-->
+		SELECT	IF(COUNT(A.ORD_NO) > 0, 'Y', 'N') AS RESULT
+		FROM	ORDER_BASE A INNER JOIN ORDER_DETAIL B ON A.ORD_NO = B.ORD_NO 
+		WHERE	1=1
+			AND A.MBR_NO = #{mbrNo}
+			AND B.ORD_DTL_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}')
+			AND B.RMN_ORD_QTY != 0 
+    </select>
+    
+    <select id="checkInReturn" resultType="String">
+    	<!--
+			Query Name	: 
+			Description	: 반품 회수중인 주문건 조회 
+			Writer		: 조은지
+			Date 		: 2021. 3. 25.
+		-->
+		SELECT 	IF(COUNT(A.ORD_NO), 'Y', 'N') AS RESULT
+		FROM	CLAIM_BASE A INNER JOIN ORDER_BASE B ON A.ORD_NO = B.ORD_NO 
+		WHERE	1=1
+			AND A.MBR_NO = #{mbrNo}
+			AND A.CLM_TP_CD = '${@framework.common.constants.CommonConstants@CLM_TP_20}'
+			AND A.CLM_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@CLM_STAT_30}', '${@framework.common.constants.CommonConstants@CLM_STAT_40}')
+    </select>
+    
+    <select id="checkInRefund" resultType="String">
+    	<!--
+			Query Name	: 
+			Description	: 환불 대기중인 주문건 조회 
+			Writer		: 조은지
+			Date 		: 2021. 3. 25.
+		-->
+		SELECT	IF(COUNT(A.ORD_NO), 'Y', 'N') AS RESULT
+		FROM	PAY_BASE A INNER JOIN ORDER_BASE B ON A.ORD_NO = B.ORD_NO 
+		WHERE	1=1
+			AND B.MBR_NO = #{mbrNo}
+			AND A.PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_20}'
+			AND A.PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_00}'
+    </select>
+    
+    <select id="checkInExchange" resultType="String">
+    	<!--
+			Query Name	: 
+			Description	: 교환 진행중인 주문건 조회 
+			Writer		: 조은지
+			Date 		: 2021. 3. 25.
+		-->
+		SELECT 	IF(COUNT(A.ORD_NO), 'Y', 'N') AS RESULT
+		FROM	CLAIM_BASE A INNER JOIN ORDER_DETAIL B ON A.ORD_NO = B.ORD_NO 
+		WHERE	1=1
+			AND A.MBR_NO = #{mbrNo}
+			AND A.CLM_TP_CD = '${@framework.common.constants.CommonConstants@CLM_TP_30}'
+			AND A.CLM_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@CLM_STAT_30}', '${@framework.common.constants.CommonConstants@CLM_STAT_40}')
+    </select>
+
+    <select id="getBillCardInfo" resultType="biz.app.pay.model.PrsnCardBillingInfoVO">
+        SELECT  /* QUERYID(member.getBillCardInfo) */
+            PCBI.*
+            , (SELECT COUNT(*) FROM PRSN_CARD_BILLING_INFO PCBI2 WHERE PCBI2.MBR_NO = PCBI.MBR_NO AND PCBI2.PG_DEL_YN = 'N' AND PCBI2.USE_YN = 'Y') AS REGIST_CARD_CNT
+        FROM
+            PRSN_CARD_BILLING_INFO PCBI
+        WHERE
+            PCBI.MBR_NO = #{mbrNo}
+        AND
+            PCBI.PRSN_CARD_BILL_NO = #{prsnCardBillNo}
+    </select>
+
+    <select id="listMemberGrid" resultMap="memberBaseVoMap">
+        <!--
+            Query Name	: memberBase.listMemberGrid
+            Description	: BO - 회원 관리 - 회원 상세 조회
+            Writer		: 김재윤
+            Date 		: 2021. 04. 14.
+        -->
+        SELECT 	/* QUERYID(memberBase.listMemberGrid) */
+                MB.MBR_NO
+             ,  MB.LOGIN_ID
+             ,  MB.MBR_NM
+             ,  MB.NICK_NM
+             ,  MB.MBR_GB_CD
+             ,  MB.MBR_STAT_CD
+             ,  MB.MBR_GRD_CD
+             ,  MB.BIRTH
+             ,  MB.TEL
+             ,  MB.MOBILE
+             ,  MB.MOBILE_CD
+             ,  MB.EMAIL
+             ,  MB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+             ,  MB.SYS_REG_DTM			/* 시스템 등록 일시 */
+             ,  MB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+             ,  MB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+        FROM MEMBER_BASE MB
+        <include refid="listMemberGridJoin"/>
+        WHERE MB.MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}','${@framework.common.constants.CommonConstants@MBR_STAT_70}', '${@framework.common.constants.CommonConstants@MBR_STAT_80}' )
+        <include refid="allSearchWhere"/>
+        <include refid="memberBaseWhere"/>
+        <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/>
+    </select>
+
+    <select id="listMemberExcelDown" resultType="biz.app.member.model.MemberBaseVO">
+        <!--
+            Query Name	: memberBase.listMemberExcelDown
+            Description	: BO - 회원 관리 - 회원엑셀다운로드
+            Writer		: 김재윤
+            Date 		: 2021. 04. 14.
+        -->
+        SELECT 	/* QUERYID(memberBase.listMemberGrid) */
+                    MB.MBR_NO
+        FROM MEMBER_BASE MB
+        <include refid="listMemberGridJoin"/>
+        WHERE MB.MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}','${@framework.common.constants.CommonConstants@MBR_STAT_70}', '${@framework.common.constants.CommonConstants@MBR_STAT_80}' )
+        <include refid="allSearchWhere"/>
+        <include refid="memberBaseWhere"/>
+    </select>
+
+    <select id="listMemberGridCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM MEMBER_BASE MB
+        <include refid="listMemberGridJoin"/>
+        WHERE MB.MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}','${@framework.common.constants.CommonConstants@MBR_STAT_70}', '${@framework.common.constants.CommonConstants@MBR_STAT_80}' )
+        <include refid="allSearchWhere"/>
+        <include refid="memberBaseWhere"/>
+    </select>
+
+    <sql id="listMemberGridJoin">
+        <if test="visitStrtDtm != null and visitEndDtm != null">
+            <!-- 방문 횟수 -->
+            INNER JOIN (
+            SELECT MBR_NO,COUNT(*) AS CNT
+            FROM member_login_hist
+            WHERE LOGIN_DTM &gt;= #{visitStrtDtm} AND  LOGIN_DTM &lt; DATE_ADD(#{visitEndDtm},INTERVAL 1 DAY)
+            GROUP BY MBR_NO
+            HAVING 1 = 1
+            <if test="visitStrtCnt != null and visitStrtCnt != 0">
+                AND CNT &gt;= #{visitStrtCnt}
+            </if>
+            <if test="visitEndCnt != null and visitEndCnt != 0">
+                AND CNT &lt;= #{visitEndCnt}
+            </if>
+            ) SUB_1 ON MB.MBR_NO = SUB_1.MBR_NO
+        </if>
+        <if test="ordCntAcptStrtDtm != null and ordCntAcptEndDtm != null">
+            <!-- 주문 건수 -->
+            INNER JOIN (
+            SELECT SUB.MBR_NO,SUM(SUB.CNT) AS CNT
+            FROM (
+                SELECT OB.MBR_NO,OB.ORD_NO,( SELECT COUNT(*) FROM ORDER_DETAIL OD WHERE OD.ORD_NO = OB.ORD_NO AND OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}') AS CNT
+                FROM ORDER_BASE OB
+                WHERE ORD_ACPT_DTM IS NOT NULL AND ORD_ACPT_DTM &gt;= #{ordCntAcptStrtDtm} AND ORD_ACPT_DTM &lt; DATE_ADD(#{ordCntAcptEndDtm},INTERVAL 1 DAY)
+            ) SUB
+            GROUP BY SUB.MBR_NO
+            HAVING 1 = 1
+            <if test="ordCntStrtVal != null and ordCntStrtVal != 0 ">
+                AND CNT &gt;= #{ordCntStrtVal}
+            </if>
+            <if test="ordCntEndVal != null and ordCntEndVal != 0">
+                AND CNT &lt;= #{ordCntEndVal}
+            </if>
+            ) SUB_2 ON MB.MBR_NO = SUB_2.MBR_NO
+        </if>
+        <if test="ordAmtAcptStrtDtm != null and ordAmtAcptEndDtm != null">
+            <!-- 주문 금액 -->
+            INNER JOIN (
+            SELECT SUB.MBR_NO,SUM(SUB.ORD_AMT) AS ORD_AMT
+            FROM (
+                SELECT OB.MBR_NO,OB.ORD_NO,( SELECT SUM(PAY_AMT) FROM ORDER_DETAIL OD WHERE OD.ORD_NO = OB.ORD_NO AND OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}' ) AS ORD_AMT
+                FROM ORDER_BASE OB
+                WHERE ORD_ACPT_DTM IS NOT NULL AND ORD_ACPT_DTM &gt;= #{ordAmtAcptStrtDtm} AND ORD_ACPT_DTM &lt; DATE_ADD(#{ordAmtAcptEndDtm},INTERVAL 1 DAY)
+            ) SUB
+            GROUP BY SUB.MBR_NO
+            HAVING 1 = 1
+            <if test="ordAmtStrtVal != null and ordAmtStrtVal != 0 ">
+                AND ORD_AMT &gt;= #{ordAmtStrtVal}
+            </if>
+            <if test="ordAmtEndVal != null and ordAmtEndVal != 0">
+                AND ORD_AMT &lt;= #{ordAmtEndVal}
+            </if>
+            ) SUB_3 ON MB.MBR_NO = SUB_3.MBR_NO
+        </if>
+        <if test="snsLnkCd != null and snsLnkCd != '' and snsLnkCd != 'null'">
+            <!-- 소셜 로그인 , WHERE MBR_NO IN 검색 시 풀스캔 일어남 -->
+            INNER JOIN (
+            SELECT MBR_NO
+            FROM sns_member_info
+            WHERE SNS_STAT_CD = '${@framework.common.constants.CommonConstants@SNS_STAT_10}'
+            <choose>
+                <when test="!snsLnkCd.equals(@framework.common.constants.CommonConstants@SNS_LNK_CD_ALL)">
+                    AND SNS_LNK_CD = #{snsLnkCd}
+                </when>
+                <otherwise></otherwise>
+            </choose>
+            GROUP BY MBR_NO
+            HAVING COUNT(*) > 0
+            ) SUB_4 ON MB.MBR_NO = SUB_4.MBR_NO
+        </if>
+        <if test="tagNms != null and tagNms.length > 0 and tagNms[0] != 'null'">
+            <!-- -관심 태그 검색 -->
+            <choose>
+                <!-- 직접 입력  일 때 -->
+                <when test="tagNos != null and tagNos.length > 0 and tagNos[0] != 'null'">
+                    INNER JOIN (
+                            SELECT A.MBR_NO
+                            FROM MBR_TAG_MAP A
+                            WHERE A.TAG_NO IN
+                            <foreach item="item" collection="tagNos" open="(" separator="," close=")">
+                                #{item}
+                            </foreach>
+                    ) MTM ON MB.MBR_NO = MTM.MBR_NO
+                </when>
+                <!-- 태그 선택 시-->
+                <otherwise>
+                    INNER JOIN (
+                        SELECT MTM.MBR_NO
+                        FROM MBR_TAG_MAP MTM
+                        INNER JOIN (
+                            SELECT TB.TAG_NO
+                            FROM TAG_BASE TB
+                            WHERE TB.TAG_NM IN
+                            <foreach item="item" collection="tagNms" open="(" separator="," close=")">
+                                    #{item}
+                            </foreach>
+                        ) T ON MTM.TAG_NO = T.TAG_NO
+                    ) SUB_5 ON MB.MBR_NO = SUB_5.MBR_NO
+                </otherwise>
+            </choose>
+        </if>
+        <if test="petGbCd != null and petGbCd != '' and petGbCd != 'null'">
+            <!-- 반려 동물 -->
+            <choose>
+                <when test="petGbCd.equals(@framework.common.constants.CommonConstants@PET_GB_00)">
+                    <!-- 미등록 -->
+                    INNER JOIN (
+                                    SELECT A.MBR_NO
+                                    FROM MEMBER_BASE A
+                                    WHERE A.MBR_NO NOT IN (SELECT PB.MBR_NO FROM PET_BASE PB)
+                            ) SUB_6 ON SUB_6.MBR_NO = MB.MBR_NO
+                </when>
+                <otherwise>
+                    INNER JOIN PET_BASE PB ON MB.MBR_NO = PB.MBR_NO AND PB.PET_GB_CD = #{petGbCd}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="petLogRegsiterYn != null and petLogRegsiterYn != '' and petLogRegsiterYn != 'null'">
+            <!-- 펫 로그  등록 , 미등록 -->
+            INNER JOIN (
+                    SELECT B.MBR_NO
+                    FROM MEMBER_BASE B
+                    <choose>
+                        <when test="petLogRegsiterYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)">
+                            WHERE B.MBR_NO IN ( SELECT PLB.MBR_NO FROM PET_LOG_BASE PLB )
+                        </when>
+                        <otherwise>
+                            WHERE B.MBR_NO NOT IN ( SELECT PLB.MBR_NO FROM PET_LOG_BASE PLB )
+                        </otherwise>
+                    </choose>
+            ) SUB_7 ON SUB_7.MBR_NO = MB.MBR_NO
+        </if>
+    </sql>
+
+    <sql id="allSearchWhere">
+        <!-- *조건 : 전체 검색 일시 -->
+        <choose>
+            <when test="allSearchYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)">
+                <if test="  (loginId != null and loginId != '')  or ( nickNm != null and nickNm != '' )
+                            or (mobile != null and mobile != '')  or ( mbrNm != null and mbrNm != '' )
+                            or (email != null and email != '')  or ( rcomLoginId != null and rcomLoginId != '' )
+                        ">
+                    AND
+                    (
+                        MB.LOGIN_ID = #{loginId , jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                        OR  MB.NICK_NM = #{nickNm}
+                        OR  MB.MOBILE = #{mobile ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                        OR  MB.MBR_NM = #{mbrNm ,  jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                        OR  MB.EMAIL = #{email ,  jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                        OR  ( MB.RCOM_LOGIN_ID IS NOT NULL
+                                AND MB.RCOM_LOGIN_ID IN (
+                                    SELECT A.RCOM_CD
+                                    FROM MEMBER_BASE A
+                                    WHERE A.LOGIN_ID = #{rcomLoginId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                            )
+                        )
+                        <if test="mbrNo != 0 and mbrNo != null">
+                            OR MB.MBR_NO = #{mbrNo}
+                        </if>
+                    )
+                </if>
+            </when>
+            <otherwise>
+                <!-- *조건 : select 선택 항목 검색 -->
+                <if test="mbrNo != 0 and mbrNo != null">
+                    AND MB.MBR_NO = #{mbrNo}
+                </if>
+                <if test="loginId != null and loginId != ''">
+                    AND MB.LOGIN_ID = #{loginId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                </if>
+                <if test="nickNm != null and nickNm != ''">
+                    AND MB.NICK_NM = #{nickNm}
+                </if>
+                <if test="mobile != null and mobile != ''">
+                    AND MB.MOBILE = #{mobile, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                </if>
+                <if test="mbrNm != null and mbrNm != ''">
+                    AND MB.MBR_NM = #{mbrNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                </if>
+                <if test="email != null and email != ''">
+                    AND MB.EMAIL = #{email, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                </if>
+                <if test="rcomLoginId != null and rcomLoginId != ''">
+                    AND MB.RCOM_LOGIN_ID IS NOT NULL
+                    AND MB.RCOM_LOGIN_ID IN (
+                                SELECT A.RCOM_CD
+                                FROM MEMBER_BASE A
+                                WHERE A.LOGIN_ID = #{rcomLoginId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+                        )
+                </if>
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="memberBaseWhere">
+        <!-- *회원 유형, *회원 상태, *회원 등급, *성별, *가입 경로, 알림 수신 동의, 메일 수신 동의, 조건별 일자(생일,가입일,휴면 해제일,최종 로그인,정회원 전환일 ) , 장기 미로그인 , 휴면 전환 예정 -->
+        <if test="mbrGbCd != null and mbrGbCd != ''">
+            AND MB.MBR_GB_CD = #{mbrGbCd}
+        </if>
+        <if test="mbrStatCd != null and mbrStatCd != ''">
+            AND MB.MBR_STAT_CD = #{mbrStatCd}
+        </if>
+        <if test="mbrGrdCd != null and mbrGrdCd != ''">
+            AND MB.MBR_GRD_CD = #{mbrGrdCd}
+        </if>
+        <if test="gdGbCd != null and gdGbCd != ''">
+            AND MB.GD_GB_CD = #{gdGbCd}
+        </if>
+        <if test="joinPathCd != null and joinPathCd != '' ">
+            AND MB.JOIN_PATH_CD = #{joinPathCd}
+        </if>
+        <if test="joinEnvCd != null and joinEnvCd != '' ">
+            AND MB.JOIN_ENV_CD = #{joinEnvCd}
+        </if>
+        <if test="joinEnvCds != null">
+            <foreach item="item" collection="joinEnvCds" open="AND MB.JOIN_ENV_CD IN (" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="infoRcvYn != null and infoRcvYn != '' and infoRcvYn != 'null'">
+            AND MB.INFO_RCV_YN = #{infoRcvYn}
+        </if>
+        <if test="mkngRcvYn != null and mkngRcvYn != '' and mkngRcvYn != 'null'">
+            AND MB.MKNG_RCV_YN = #{mkngRcvYn}
+        </if>
+        <if test="birthStrtDtm != null and birthStrtDtm != '' and birthStrtDtm != 'null'">
+            AND MB.BIRTH &gt;= #{birthStrtDtm ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="birthEndDtm != null and birthEndDtm != '' and birthEndDtm != 'null'">
+            AND MB.BIRTH &lt;= #{birthEndDtm ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="joinStrtDtm != null">
+            AND MB.JOIN_DTM &gt;= #{joinStrtDtm}
+        </if>
+        <if test="joinEndDtm != null">
+            AND MB.JOIN_DTM &lt; DATE_ADD(#{joinEndDtm},INTERVAL 1 DAY)
+        </if>
+        <if test="dorantRlsStrtDtm != null">
+            AND MB.DORMANT_RLS_DTM &gt;= #{dorantRlsStrtDtm}
+        </if>
+        <if test="dorantRlsEndDtm != null">
+            AND MB.DORMANT_RLS_DTM &lt; DATE_ADD(#{dorantRlsEndDtm},INTERVAL 1 DAY)
+        </if>
+        <if test="lastLoginStrtDtm != null">
+            AND MB.LAST_LOGIN_DTM &gt;= #{lastLoginStrtDtm}
+        </if>
+        <if test="lastLoginEndDtm != null">
+            AND MB.LAST_LOGIN_DTM &lt; DATE_ADD(#{lastLoginEndDtm},INTERVAL 1 DAY)
+        </if>
+        <if test="gsptStartStrtDtm !=  null">
+            AND MB.GSPT_START_DTM &gt;= #{gsptStartStrtDtm}
+        </if>
+        <if test="gsptStartEndDtm != null">
+            AND MB.GSPT_START_DTM &lt; DATE_ADD(#{gsptStartEndDtm},INTERVAL 1 DAY )
+        </if>
+        <if test="dormantAplDay != null and dormantAplDay != 0">
+             AND (DATE_FORMAT(DATE_ADD(LAST_LOGIN_DTM, INTERVAL 1 YEAR),'%Y-%m-%d') &gt; CURDATE() 
+         	 AND DATE_FORMAT(DATE_ADD(LAST_LOGIN_DTM, INTERVAL 1 YEAR),'%Y-%m-%d') &lt;= DATE_ADD(CURDATE(),INTERVAL #{dormantAplDay} DAY ))
+        </if>
+        <if test="lastLoginDay != null and lastLoginDay != 0">
+            AND MB.LAST_LOGIN_DTM &lt; DATE_ADD(CURDATE(),INTERVAL -#{lastLoginDay}+1 DAY)
+        </if>
+
+        <!-- 펫 로그 등록 검색-->
+        <if test="petLogTagNm != null and petLogTagNm != '' and petLogTagNm != 'null' ">
+            AND MB.MBR_NO IN (
+                SELECT PB.MBR_NO
+                FROM PET_LOG_BASE PB
+                WHERE PB.PET_LOG_NO IN (
+                    SELECT TLTM.PET_LOG_NO
+                    FROM PET_LOG_TAG_MAP TLTM
+                    INNER JOIN TAG_BASE TB ON TLTM.TAG_NO = TB.TAG_NO
+                    WHERE TB.TAG_NM = #{petLogTagNm}
+                    <if test="petLogSysRegStrtDtm != null">
+                        AND TLTM.SYS_REG_DTM &gt;= #{petLogSysRegStrtDtm}
+                    </if>
+                    <if test="petLogSysRegEndDtm != null">
+                        AND TLTM.SYS_REG_DTM &lt; DATE_ADD(#{petLogSysRegEndDtm},INTERVAL 1 DAY)
+                    </if>
+                )
+            )
+        </if>
+    </sql>
+
+    <select id="getInfoRcvYnHistDtm" resultType="biz.app.member.model.MemberBaseVO">
+        SELECT MBR_NO,INFO_RCV_YN,MAX(ALM_RCV_UPD_DTM) AS INFO_RCV_YN_HIST_DTM
+        FROM member_base_history
+        WHERE MBR_NO = #{mbrNo} AND INFO_RCV_YN = #{infoRcvYn}
+        GROUP BY MBR_NO,INFO_RCV_YN
+        ORDER BY SYS_REG_DTM
+    </select>
+    <select id="getMkngRcvYnHistDtm" resultType="biz.app.member.model.MemberBaseVO">
+        SELECT MBR_NO,MKNG_RCV_YN,MAX(MKNG_RCV_UPD_DTM) AS MKNG_RCV_YN_HIST_DTM
+        FROM member_base_history
+        WHERE MBR_NO = #{mbrNo} AND MKNG_RCV_YN = #{mkngRcvYn}
+        GROUP BY MBR_NO,MKNG_RCV_YN
+        ORDER BY SYS_REG_DTM
+    </select>
+
+    <delete id="deletePrsnSavePayInfo">
+        <!--
+            Query Name	: member.deletePrsnSavePayInfo
+            Description	: 기본결제수단 삭제
+        -->
+        DELETE
+        FROM	PRSN_PAY_SAVE_INFO
+        WHERE
+        MBR_NO = #{mbrNo}
+
+    </delete>
+
+    <select id="getDuplicateChcekWhenBlur" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM MEMBER_BASE
+        WHERE MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+        <if test="mbrNo != 0 and mbrNo != null">
+            AND MBR_NO != #{mbrNo}
+        </if>
+        <if test="nickNm != null and nickNm != ''">
+            AND REPLACE(NICK_NM,' ','') = #{nickNm}
+        </if>
+        <if test="loginId != null and loginId != ''">
+            AND LOGIN_ID = #{loginId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="email != null and loginId != ''">
+            AND EMAIL = #{email, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+        <if test="rcomCd != null and rcomCd != ''">
+            AND RCOM_CD = #{rcomCd}
+        </if>
+        <if test="rcomLoginId != null and rcomLoginId != ''">
+            AND EMAIL = #{rcomLoginId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+        </if>
+    </select>
+    
+    <select id="getMemberBasePhoneList" resultMap="memberBaseVoMap">
+        <!--
+            Query Name : member.getMemberBasePhoneList
+        -->
+        SELECT * FROM (
+	        SELECT /* QUERYID(member.getMemberBasePhoneList) */
+	        	@ROWNUM := @ROWNUM + 1 AS SYS_REGR_NO,M.MBR_NO, M.MBR_NM, M.MOBILE, M.LOGIN_ID
+	        FROM MEMBER_BASE M
+	        INNER JOIN ST_STD_INFO S ON M.ST_ID = S.ST_ID
+	        , (SELECT @ROWNUM := 0) TMP
+	        WHERE 1 = 1
+	        <include refid="wherePageMember"/>
+        ) A
+        <!-- <include refid="bizCommon.sortSql"/>
+        <include refid="bizCommon.pageSql"/> -->
+    </select>
+
+    <select id="getMemberBasePhoneListCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : member.getMemberBasePhoneListCount
+        -->
+        SELECT /* QUERYID(member.getMemberBasePhoneListCount) */
+        	COUNT(*)
+        FROM MEMBER_BASE M
+        INNER JOIN ST_STD_INFO S ON M.ST_ID = S.ST_ID
+        WHERE 1 = 1
+        AND M.MBR_NO = #{mbrNo}
+    </select>
+</mapper>

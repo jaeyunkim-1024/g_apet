@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	스토리 글 Mapper 
+	작성자  	muel 
+	작성일자  	2016.04.15 
+-->
+
+<mapper namespace="storyLetter">
+
+	<sql id="pageStoryLetter-where">
+		AND 
+			STRY_NO = #{stryNo}
+		AND
+			SYS_DEL_YN = #{sysDelYn}
+		<if test='searchType != null and searchType != ""'>
+		<choose>
+			<when test='searchType == "ttl"'>
+				AND TTL LIKE CONCAT( '%', #{searchWord}, '%' )
+			</when>
+			<when test='searchType == "cont"'>
+				AND CONTENT LIKE CONCAT( '%', #{searchWord}, '%' )
+			</when>
+			<otherwise>
+				AND (TTL LIKE CONCAT( '%', #{searchWord}, '%' ) OR CONTENT LIKE CONCAT( '%', #{searchWord}, '%' ))
+			</otherwise>
+		</choose>
+		</if>
+	</sql> 
+	
+	<!-- 스토리글 항목 조회 -->
+	<select id="pageStoryLetter" resultType="biz.app.story.model.StoryLetterVO">		
+		SELECT  
+			STRY_NO
+			,STRY_LETT_NO
+			,TTL
+			,HITS
+			,DLGT_IMG_PATH
+			,SYS_REG_DTM
+		FROM	
+			STORY_LETTER
+		WHERE
+		   1=1
+		<include refid="pageStoryLetter-where" />
+		ORDER BY 
+			${sidx} ${sord}
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<!-- 스토리 리스트 데이터 수 조회 -->
+	<select id="pageStoryLetterCount" resultType="Integer">
+		SELECT
+			COUNT(*)
+		FROM	
+			STORY_LETTER
+		WHERE
+			1=1
+		<include refid="pageStoryLetter-where" />
+	</select>
+	
+	<!-- 스토리글 항목 조회 -->
+	<select id="getStoryDetail" resultType="biz.app.story.model.StoryLetterVO">		
+		SELECT  
+			STRY_NO
+			,STRY_LETT_NO
+			,TTL
+			,HITS
+			,CONTENT
+			,DLGT_IMG_PATH
+			,SYS_REG_DTM
+		FROM	
+			STORY_LETTER
+		WHERE
+		   1=1
+		AND
+			STRY_NO = #{stryNo}
+		AND
+			STRY_LETT_NO = #{stryLettNo}		
+	</select>
+</mapper>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="privacyCnct">
+
+    <insert id="insertPrivacyCnctHist" parameterType="biz.app.system.model.PrivacyCnctHistPO">
+        <selectKey keyProperty="cnctHistNo" resultType="java.lang.Long" order="AFTER">
+            SELECT CNCT_HIST_NO FROM PRIVACY_CNCT_HIST ORDER BY CNCT_HIST_NO DESC LIMIT 0,1;
+        </selectKey>
+        <!--
+            Query Name : privacyCnct.insertPrivacyCnctHistory
+            Description : 개인정보 조회 이력 INSERT
+        -->
+        INSERT INTO PRIVACY_CNCT_HIST(
+                ACT_NO
+            ,   MENU_NO
+            ,   ACS_DTM
+            ,   USR_NO
+            ,   IP
+            ,   SYS_REGR_NO
+            ,   SYS_REG_DTM
+        )
+        VALUES(
+                #{actNo}
+            ,   #{menuNo}
+            ,   NOW()
+            ,   #{usrNo}
+            ,   #{ip}
+            ,   #{sysRegrNo}
+            ,   NOW()
+        )
+    </insert>
+
+    <insert id="insertPrivacyCnctInquiry" parameterType="biz.app.system.model.PrivacyCnctHistPO">
+        <!--
+              Query Name : privacyCnct.insertPrivacyCnctInquiry
+              Description : 개인정보 접근 조회 내역
+          -->
+        <selectKey keyProperty="inqrHistNo" resultType="java.lang.Long" order="BEFORE">
+            SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PRIVACY_CNCT_INQUIRY_SEQ}') FROM DUAL
+        </selectKey>
+        INSERT INTO PRIVACY_CNCT_INQUIRY(
+                 INQR_HIST_NO
+             ,   MBR_NO
+             ,   CNCT_HIST_NO
+             ,   COL_GB_CD
+             ,   INQR_GB_CD
+             ,   APL_VAL
+             ,   SYS_REGR_NO
+             ,   SYS_REG_DTM
+        )
+        VALUES(
+               #{inqrHistNo}
+            ,   #{mbrNo}
+            ,   #{cnctHistNo}
+            ,   #{colGbCd}
+            ,   #{inqrGbCd}
+            ,   #{aplVal}
+            ,   #{sysRegrNo}
+            ,   NOW()
+        )
+    </insert>
+
+    <select id="pageLog" resultType="biz.app.system.model.PrivacyCnctHistVO">
+                <!--
+                    Query Name : privacyCnct.pageLog
+                    Description : 개인정보 접속 이력 조회
+                -->
+        SELECT /* QUERYID(privacyCnct.pageLog) */
+               T.*
+        FROM (
+            SELECT
+                   PCI.INQR_HIST_NO
+            ,      PCH.CNCT_HIST_NO
+            ,      PCH.ACT_NO
+            ,      PCH.MENU_NO
+            ,      PCH.ACS_DTM
+            ,      PCH.USR_NO
+            ,      FN_GET_USER_ID(PCH.USR_NO) AS ADMIN_LOGIN_ID
+            ,      FN_GET_USER_NAME(PCH.USR_NO) AS USR_NM
+            ,      MA.URL
+            ,       (
+                        SELECT
+                        CONCAT(
+                        IF(M3.MENU_NM IS NULL,'',CONCAT(M3.MENU_NM,' > '))
+                        ,    IF(M2.MENU_NM IS NULL,'',CONCAT(M2.MENU_NM,' > '))
+                        ,     IF(M1.MENU_NM IS NULL,'',CONCAT(M1.MENU_NM))
+                        ) AS MENU_PATH
+                        FROM MENU_BASE M1
+                        LEFT JOIN MENU_BASE M2 ON M2.MENU_NO = M1.UP_MENU_NO
+                        LEFT JOIN MENU_BASE M3 ON M3.MENU_NO = M2.UP_MENU_NO
+                        WHERE M1.MENU_NO =  MA.MENU_NO
+                    ) AS MENU_PATH
+            ,      PCI.INQR_GB_CD
+            ,      FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@INQR_GB_CD}',PCI.INQR_GB_CD,'') AS INQR_GB_NM
+            ,      PCH.IP
+            ,      PCI.SYS_REGR_NO
+            ,      PCI.SYS_REG_DTM
+            FROM PRIVACY_CNCT_INQUIRY PCI
+            INNER JOIN PRIVACY_CNCT_HIST PCH ON PCH.CNCT_HIST_NO = PCI.CNCT_HIST_NO
+            INNER JOIN MENU_ACTION MA ON PCH.MENU_NO = MA.MENU_NO AND PCH.ACT_NO = MA.ACT_NO
+        ) T
+        WHERE 1=1
+        <include refid="wherePageLog" />
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+    </select>
+    <select id="pageLogCount" resultType="java.lang.Integer">
+        <!--
+            Query Name : privacyCnct.pageLogCount
+            Description : 개인정보 접속 이력 총 개수
+        -->
+        SELECT /* QUERYID(privacyCnct.pageLogCount) */
+                COUNT(*)
+        FROM (
+            SELECT
+                   PCI.INQR_HIST_NO
+            ,      PCH.CNCT_HIST_NO
+            ,      PCH.ACT_NO
+            ,      PCH.MENU_NO
+            ,      PCH.ACS_DTM
+            ,      PCH.USR_NO
+            ,      FN_GET_USER_ID(PCH.USR_NO) AS ADMIN_LOGIN_ID
+            ,      FN_GET_USER_NAME(PCH.USR_NO) AS USR_NM
+            ,      MA.URL
+            ,      PCI.INQR_GB_CD
+            ,      FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@INQR_GB_CD}',PCI.INQR_GB_CD,'') AS INQR_GB_NM
+            ,      PCH.IP
+            ,      PCH.SYS_REGR_NO
+            ,      PCH.SYS_REG_DTM
+            FROM PRIVACY_CNCT_INQUIRY PCI
+            INNER JOIN PRIVACY_CNCT_HIST PCH ON PCH.CNCT_HIST_NO = PCI.CNCT_HIST_NO
+            INNER JOIN MENU_ACTION MA ON PCH.MENU_NO = MA.MENU_NO AND PCH.ACT_NO = MA.ACT_NO
+        ) T
+        WHERE 1=1
+        <include refid="wherePageLog" />
+    </select>
+
+    <sql id="wherePageLog">
+        <if test="inqrGbCd != null and inqrGbCd != '' ">
+            <choose>
+                <when test="inqrGbCd.equals(@framework.common.constants.CommonConstants@INQR_GB_10)">
+                    AND T.INQR_GB_CD IN( #{inqrGbCd} , '${@framework.common.constants.CommonConstants@INQR_GB_40}')
+                </when>
+                <otherwise>
+                    AND T.INQR_GB_CD = #{inqrGbCd}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="adminLoginId != null and adminLoginId != ''">
+            AND T.ADMIN_LOGIN_ID = #{adminLoginId}
+        </if>
+        <if test="usrNm != null and usrNm != ''">
+            AND T.USR_NM = #{usrNm}
+        </if>
+        <if test="acsStrtDtm != null">
+            AND T.ACS_DTM &gt; #{acsStrtDtm}
+        </if>
+        <if test="acsEndDtm != null">
+            AND T.ACS_DTM &lt; DATE_ADD(#{acsEndDtm}, INTERVAL 1 DAY)
+        </if>
+    </sql>
+
+    <select id="getDetailHistoryInfo" resultType="biz.app.system.model.PrivacyCnctHistVO">
+            <!--
+               Query Name : privacyCnct.getDetailHistoryInfo
+               Description : 개인정보 접속 이력 상세 정보
+           -->
+        SELECT /* QUERYID(privacyCnct.getDetailHistoryInfo) */
+                   T.*
+                ,  PCI.INQR_HIST_NO
+                ,  PCI.MBR_NO
+                ,  PCI.COL_GB_CD
+                ,  PCI.INQR_GB_CD
+                ,   PCI.APL_VAL
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@COL_GB_CD}',PCI.COL_GB_CD,'') AS COL_GB_NM
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@INQR_GB_CD}',PCI.INQR_GB_CD,'') AS INQR_GB_NM
+                ,  MB.MBR_NM
+                ,  MB.LOGIN_ID
+        FROM PRIVACY_CNCT_INQUIRY PCI
+        INNER JOIN (
+                SELECT
+                       PCH.CNCT_HIST_NO
+                ,      PCH.ACT_NO
+                ,      PCH.MENU_NO
+                ,      PCH.ACS_DTM
+                ,      PCH.USR_NO
+                ,      FN_GET_USER_ID(PCH.USR_NO) AS ADMIN_LOGIN_ID
+                ,      FN_GET_USER_NAME(PCH.USR_NO) AS USR_NM
+                ,      MA.URL
+                ,       (
+                            SELECT
+                                CONCAT(
+                                IF(M3.MENU_NM IS NULL,'',CONCAT(M3.MENU_NM,' > '))
+                                ,    IF(M2.MENU_NM IS NULL,'',CONCAT(M2.MENU_NM,' > '))
+                                ,     IF(M1.MENU_NM IS NULL,'',CONCAT(M1.MENU_NM))
+                                ) AS MENU_PATH
+                            FROM MENU_BASE M1
+                            LEFT JOIN MENU_BASE M2 ON M2.MENU_NO = M1.UP_MENU_NO
+                            LEFT JOIN MENU_BASE M3 ON M3.MENU_NO = M2.UP_MENU_NO
+                            WHERE M1.MENU_NO =  MA.MENU_NO
+                      ) AS MENU_PATH
+                ,      PCH.IP
+                ,      PCH.SYS_REGR_NO
+                ,      PCH.SYS_REG_DTM
+                FROM PRIVACY_CNCT_HIST PCH
+                INNER JOIN MENU_ACTION MA ON PCH.MENU_NO = MA.MENU_NO AND PCH.ACT_NO = MA.ACT_NO
+        ) T ON T.CNCT_HIST_NO = PCI.CNCT_HIST_NO
+        LEFT JOIN MEMBER_BASE MB ON PCI.MBR_NO = MB.MBR_NO
+        WHERE PCI.INQR_HIST_NO = #{inqrHistNo}
+    </select>
+
+
+    <update id="updateExecSql">
+        UPDATE PRIVACY_CNCT_INQUIRY
+        SET EXEC_SQL = #{execSql}
+        WHERE INQR_HIST_NO = #{inqrHistNo}
+        AND CNCT_HIST_NO = #{cnctHistNo}
+    </update>
+
+</mapper>

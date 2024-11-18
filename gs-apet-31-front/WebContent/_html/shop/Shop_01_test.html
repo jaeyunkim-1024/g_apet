@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Layout</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+    <link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+    <link rel="stylesheet" href="../../_css/style.mo.css">
+
+    <script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../../_script/jquery/jquery-ui.min.js"></script>
+    <script src="../../_script/swiper.min.js"></script>
+    <script src="../../_script/ui.js"></script>
+    <script src="../../_script/ui.mo.js"></script>
+    <script src="../../_html/guide/html.js"></script>
+    <!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+
+<body class="body">
+    <div class="wrap" id="wrap">
+
+        <!-- 헤더 -->
+        <include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set2","logo":"shop"}'></include>
+        <!-- 2021.03.16 : noneAc 클래스 삭제 -->
+
+        <!-- GNB -->
+        <include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+        <!-- LNB -->
+        <include class="lnb" data-include-html="../inc/lnb.html"></include>
+
+        <!-- 바디 - 여기위로 템플릿 -->
+        <main class="container lnb page shop hm main" id="container">
+            <div class="mnschbox">
+                <div class="inr">
+                    <!-- 04.13 수정 -->
+                    <div class="shop-search">
+                        <input type="text" placeholder="어바웃펫이 만든 깐깐사료 30% 할인">
+                        <button type="button" class="btnSch">검색</button>
+                    </div>
+                    <!-- <a href="javascript:;" class="lks">어바웃펫이 만든 깐깐사료 30% 할인</a> -->
+                    <!-- // 04.13 수정 -->
+                </div>
+            </div>
+            <div class="inr">
+                <!-- 본문 -->
+                <div class="contents" id="contents">
+
+                    <!-- 상단비쥬얼 -->
+                    <section class="sect mn visul">
+                        <div class="mn_visul_sld">
+                            <!-- ui.disp.sld.visul.using(); -->
+                            <div class="pgnav">
+                                <span class="pagination"></span> <a href="javascript:;" class="bt more">+</a>
+                            </div>
+                            <div class="swiper-container slide">
+                                <div class="sld-nav"><button type="button" class="bt prev">이전</button><button type="button" class="bt next">다음</button></div>
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_03_01.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_06_02.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_03_01.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_06_02.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_03_01.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_06_02.html" class="box"><img class="img mo" src="../../_images/_temp/mn_vis_1.jpg" alt="사진"><img class="img pc" src="../../_images/_temp/mn_vis_1_pc.jpg" alt="사진"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 바로가기 -->
+                    <section class="sect mn gogos">
+                        <div class="mn_gogos_sld">
+                            <!-- ui.disp.sld.gogos.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_01.html" class="box">
+                                            <div class="imo">☃️</div>
+                                            <div class="tt">윈터대전</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_02.html" class="box live">
+                                            <!-- 04.23 -->
+                                            <div class="thum onair">
+                                                <!-- 라이브시 .onair -->
+                                                <!-- 
+												<em class="rdo"></em>
+												<div class="pic"><img src="../../_images/common/img_default_thumbnail@2x.png" alt="썸네일" class="img"></div>
+												 -->
+                                                <em class="rdo k0423"></em>
+                                                <img src="../../_images/common/img_default_thumbnail@2x.png" alt="썸네일" class="img k0423">
+                                            </div>
+                                            <div class="tt">Live</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_03.html" class="box">
+                                            <div class="imo">👍</div>
+                                            <div class="tt">베스트</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_04.html" class="box">
+                                            <div class="imo">✨</div>
+                                            <div class="tt">신상품</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_05.html" class="box">
+                                            <div class="imo">🛍</div>
+                                            <div class="tt">기획전</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_05.html" class="box">
+                                            <div class="imo">🛍</div>
+                                            <div class="tt">기획전</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_05.html" class="box">
+                                            <div class="imo">🛍</div>
+                                            <div class="tt">기획전</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_01_01.html" class="box">
+                                            <div class="imo">🎁</div>
+                                            <div class="tt">이벤트</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/shop/Shop_02_07_01.html" class="box">
+                                            <div class="imo">🏷</div>
+                                            <div class="tt">카테고리</div>
+                                        </a>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <a href="../../_html/my/MY_15_01.html" class="box recent">
+                                            <div class="gds"></div>
+                                            <div class="tt">최근 본 상품</div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 자주구매 -->
+                    <section class="sect mn often">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_03.html"><span class="tit">자주구매한상품</span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_often_sld">
+                            <!-- ui.disp.sld.often.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_often.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_often.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_often.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_often.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_often.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide mbtn" id="viewmore-1">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 반려동물 등록 -->
+                    <section class="sect mn petsb">
+                        <div class="hdts">
+                            <div class="hdt"><span class="tit"><em class="b">반려동물</em>과 함께 하고 계신가요?</span></div>
+                        </div>
+                        <div class="bnbox dog">
+                            <div class="tit">펫 정보를 등록하시면 <br> 딱 맞는 콘텐츠와 상품을 추천해드릴게요.</div>
+                            <div class="bts"><a href="javascript:;" class="bt reg">마이펫 등록하기</a></div>
+                        </div>
+                    </section>
+
+                    <!-- 반려동물 등록
+					<section class="sect mn petsb">
+						<div class="hdts">
+							<div class="hdt" href="javascript:;"><span class="tit"><em class="b">냥냥</em>의 집사님이신가요?</span></div>
+						</div>
+						<div class="bnbox cat"> 
+							<div class="tit">반려동물 등록하고 <br>상품구매시 할인혜택 받아보세요.</div>
+							<div class="bts"><a href="javascript:;" class="bt reg">반려동물 등록하기</a></div>
+						</div>
+					</section>
+					 -->
+
+                    <!-- 미로그인 배너 -->
+                    <section class="sect mn nlogn">
+                        <div class="hdts">
+                            <div class="hdt"><span class="tit"><em class="b">어바웃펫</em>이 처음이신가요?</span></div>
+                        </div>
+                        <div class="bnbox">
+                            <div class="tit">회원가입하고 할인혜택을 받아보세요!</div>
+                            <div class="bts"><a href="javascript:;" class="bt reg">회원가입하기</a></div>
+                        </div>
+                    </section>
+
+                    <!-- 맞춤추천 -->
+                    <section class="sect mn recom">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_02.html"><span class="tit"><em class="b">시츄</em> 맞춤추천🐶</span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_recom_sld">
+                            <!-- ui.disp.sld.recom.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list k0425">
+                                    <!-- 04.26 -->
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_recom.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                                    </li>
+                                    <li class="swiper-slide mbtn" id="viewmore-2">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                       
+                    </section>
+<!-- 맞춤추천 -->
+<section class="sect mn recom">
+    <div class="hdts">
+        <a class="hdt" href="../../_html/shop/Shop_01_02.html"><span class="tit"><em class="b">시츄</em> 맞춤추천🐶</span> <span class="more"><b class="t">전체보기</b></span></a>
+    </div>
+    <div class="mn_recom_sldaaa">
+        <!-- ui.disp.sld.recom.using(); -->
+        <div class="sld-nav">
+            <button type="button" class="bt prev">이전</button>
+            <button type="button" class="bt next">다음</button>
+        </div>
+        <div class="swiper-container slide">
+            <ul class="swiper-wrapper list">
+                <!-- 04.26 -->
+                <li class="swiper-slide">
+                    <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                </li>
+                <li class="swiper-slide">
+                    <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                </li>
+                <li class="swiper-slide">
+                    <include data-include-html="./Shop_01_inc_gd_recom.html" data-soldout="true"></include>
+                </li>
+                <li class="swiper-slide">
+                    <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                </li>
+                <li class="swiper-slide">
+                    <include data-include-html="./Shop_01_inc_gd_recom.html"></include>
+                </li>
+                <li class="swiper-slide mbtn" id="viewmore-2">
+                    <a href="javascript:;" class="gotolist">더보기</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="bts bot">
+        <button type="button" class="bt refresh">다른 반려동물 추천상품</button>
+    </div>
+</section>
+
+                    <!-- 타임딜 -->
+                    <section class="sect mn tdeal">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_04.html"><span class="tit"> 망설이면 마감! <br> 파격특가 <em class="b">타임딜</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <ul class="uiTab f tmenu">
+                            <li class="active">
+                                <button type="button" class="btn" data-ui-tab-btn="tab_deal" data-ui-tab-val="tab_deal_a">진행중</button>
+                            </li>
+                            <li>
+                                <button type="button" class="btn" data-ui-tab-btn="tab_deal" data-ui-tab-val="tab_deal_b">다음 타임딜</button>
+                            </li>
+                        </ul>
+
+                        <div data-ui-tab-ctn="tab_deal" data-ui-tab-val="tab_deal_a" class="tbctn active">
+                            <div class="mn_tdeal_sld">
+                                <!-- ui.disp.sld.tdeal.using(); -->
+                                <div class="sld-nav">
+                                    <button type="button" class="bt prev">이전</button>
+                                    <button type="button" class="bt next">다음</button>
+                                </div>
+                                <div class="swiper-container slide">
+                                    <ul class="swiper-wrapper list">
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html" data-soldout="true"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                         <!-- 2021.05.18 더보기 -->
+                                        <li class="swiper-slide mbtn" id="viewmore-3">
+                                            <a href="javascript:;" class="gotolist">더보기</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-ui-tab-ctn="tab_deal" data-ui-tab-val="tab_deal_b" class="tbctn">
+                            <div class="mn_tdeal_sld">
+                                <!-- ui.disp.sld.tdeal.using(); -->
+                                <div class="sld-nav">
+                                    <button type="button" class="bt prev">이전</button>
+                                    <button type="button" class="bt next">다음</button>
+                                </div>
+                                <div class="swiper-container slide">
+                                    <ul class="swiper-wrapper list">
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html"></include>
+                                        </li>
+                                        <li class="swiper-slide">
+                                            <include data-include-html="./Shop_01_inc_gd_tdeal.html" data-soldout="true"></include>
+                                        </li>
+                                         <!-- 2021.05.18 더보기 -->
+                                        <li class="swiper-slide" id="viewmore">
+                                            <a href="javascript:;" class="gotolist">더보기</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 배너 @@ 02.24 위치변경 타임틸 아래로 -->
+                    <section class="sect mn bannr">
+                        <include data-include-html="../inc/banner.html"></include>
+                    </section>
+                    <!-- 배너 @@ 02.24 위치변경 타임틸 아래로 -->
+                    <section class="sect mn bannr">
+                        <include data-include-html="../inc/banner-2.html"></include>
+                    </section>
+                    <!-- 배너 @@ 02.24 위치변경 타임틸 아래로 -->
+                    <section class="sect mn bannr">
+                        <include data-include-html="../inc/banner-3.html"></include>
+                    </section>
+
+                    <!-- 할인상품 -->
+                    <section class="sect mn discn">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_05.html"><span class="tit"> 오늘까지 딱! <br> 폭풍 <em class="b">할인상품🌪 - 재고 임박</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_discn_sld">
+                            <!-- ui.disp.sld.discn.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                     <!-- 2021.05.18 더보기 -->
+                                    <li class="swiper-slide mbtn" id="viewmore-4">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- 할인상품 -->
+                    <section class="sect mn discn">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_05.html"><span class="tit"> 오늘까지 딱! <br> 폭풍 <em class="b">할인상품🌪 - 유통기한 임박</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_discn_sld">
+                            <!-- ui.disp.sld.discn.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_discn.html"></include>
+                                    </li>
+                                     <!-- 2021.05.18 더보기 -->
+                                    <li class="swiper-slide mbtn" id="viewmore-4">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- MD추천 -->
+                    <section class="sect mn mdpic">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_06.html"><span class="tit"> MD추천! <br> 이번주 <em class="b">주목할 만한 상품👀</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_mdpic_sld">
+                            <!-- ui.disp.sld.mdpic.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_mdpic.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_mdpic.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_mdpic.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_mdpic.html"></include>
+                                    </li>
+                                     <!-- 2021.05.18 더보기 -->
+                                    <li class="swiper-slide mbtn" id="viewmore-7">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 베스트 -->
+                    <section class="sect mn bests">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_02_03.html"><span class="tit"> 베스트랭킹 </span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_bests_sld">
+                            <!-- ui.disp.sld.bests.using(); -->
+                            <div class="swiper-container slide">
+                                <ul class="uiTab f swiper-wrapper list">
+                                    <li class="swiper-slide active">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">전체</button>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">사료</button>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">간식</button>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">장난감/훈련</button>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">건강관리</button>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <button type="button" class="btn" data-ui-tab-btn="tab_best" data-ui-tab-val="tab_best_b">위생/배변</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="ranklist">
+                            <!-- MO 5개, PC는 10개 네요 ㅡㅡ; -->
+                            <ul class="list">
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">1</em> <em class="udn up">1</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic">
+                                                <div class="soldouts"><em class="ts">품절</em></div><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">2</em> <em class="udn dn">2</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">3</em> <em class="udn nn">-</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">4</em> <em class="udn nn">-</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">5</em> <em class="udn dn">3</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">1</em> <em class="udn up">1</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">2</em> <em class="udn dn">2</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">3</em> <em class="udn nn">-</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">4</em> <em class="udn nn">-</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="gdset bests">
+                                        <div class="num"><em class="b">5</em> <em class="udn dn">3</em></div>
+                                        <div class="thum">
+                                            <a href="javascript:;" class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지"></a>
+                                            <button type="button" class="bt zzim">찜하기</button>
+                                        </div>
+                                        <div class="boxs">
+                                            <div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+                                            <a href="javascript:;" class="inf">
+                                                <span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+                                                <span class="pct"><em class="n">90</em><i class="w">%</i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="moreload">
+                                <button type="button" class="bt more">상품 더보기</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 배너 -->
+                    <section class="sect mn bannr">
+                        <include data-include-html="../inc/banner.html"></include>
+                    </section>
+
+                    <!-- 단독상품 -->
+                    <section class="sect mn exclu">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_07.html"><span class="tit"> 여기밖에 없어요~ <br> <em class="b">어바웃샵 단독 상품</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_exclu_sld">
+                            <!-- ui.disp.sld.exclu.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html" data-soldout="true"></include>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="moreload">
+                                <a href="javascript:;" class="bt more">베스트상품 더보기</a>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- 단독상품 -->
+                    <section class="sect mn exclu">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_07.html"><span class="tit"> 여기밖에 없어요~ <br> <em class="b">어바웃샵 단독 상품</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_exclu_sld">
+                            <!-- ui.disp.sld.exclu.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_exclu.html" data-soldout="true"></include>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="moreload">
+                                <a href="javascript:;" class="bt more">베스트상품 더보기</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 패키지 -->
+                    <section class="sect mn packg">
+                        <div class="hdts">
+                            <a class="hdt" href="../../_html/shop/Shop_01_08.html"><span class="tit"> 알찬구성<br> 장바구니 가득 <em class="b">패키지🛒</em></span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_packg_sld">
+                            <!-- ui.disp.sld.packg.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_packg.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_packg.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_packg.html" data-soldout="true"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_packg.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_packg.html"></include>
+                                    </li>
+                                    <li class="swiper-slide mbtn" id="viewmore-5">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 후기 -->
+                    <section class="sect mn reviw">
+                        <div class="hdts">
+                            <a class="hdt" href="javascript:;"><span class="tit"> 생생한 후기 상품</span> <span class="more"><b class="t">전체보기</b></span></a>
+                        </div>
+                        <div class="mn_reviw_sld">
+                            <!-- ui.disp.sld.reviw.using(); -->
+                            <div class="sld-nav">
+                                <button type="button" class="bt prev">이전</button>
+                                <button type="button" class="bt next">다음</button>
+                            </div>
+                            <div class="swiper-container slide">
+                                <ul class="swiper-wrapper list">
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_reviw.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_reviw.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_reviw.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_reviw.html"></include>
+                                    </li>
+                                    <li class="swiper-slide">
+                                        <include data-include-html="./Shop_01_inc_gd_reviw.html" data-soldout="true"></include>
+                                    </li>
+                                    <!-- 2021.05.18 더보기 -->
+                                    <li class="swiper-slide mbtn" id="viewmore-6">
+                                        <a href="javascript:;" class="gotolist">더보기</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+
+                </div>
+
+            </div>
+        </main>
+
+        <div class="layers">
+            <!-- 레이어팝업 넣을 자리 -->
+        </div>
+        <!-- 바디 - 여기 밑으로 템플릿 -->
+
+        <!-- 하단메뉴 -->
+        <include class="menubar" data-include-html="../inc/menubar.html"></include>
+        <!-- 푸터 -->
+        <include class="footer" data-include-html="../inc/footer.html"></include>
+        <!-- <include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"hide","talk_mo":"hide","foot_pc":"hide","talk_pc":"hide"}'></include> -->
+
+    </div>
+</body>
+
+</html>

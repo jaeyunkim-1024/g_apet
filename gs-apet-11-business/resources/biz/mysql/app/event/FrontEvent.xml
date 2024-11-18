@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	FO 이벤트
+	작성자  	김재윤
+	작성일자  	2021.03.30
+-->
+
+<mapper namespace="frontEvent">
+
+    <select id="listEvent" resultType="biz.app.event.model.EventBaseVO">
+        SELECT /* QUERYID(frontEvent.listEvent) */
+                    E.*
+                ,  (SELECT COUNT(*) FROM EVENT_ENTRY_INFO EEI WHERE EEI.EVENT_NO = E.EVENT_NO AND EEI.ENRY_APLY IS NOT NULL AND EEI.ENRY_APLY != '') APLY_CNT
+        FROM (
+            SELECT
+                    EB.EVENT_NO			/* 이벤트 번호 */
+                ,   EB.SEO_INFO_NO		/* SEO 정보 번호 */
+                ,   EB.TTL				/* 제목 */
+                ,   EB.EVENT_SUB_NM		/* 이벤트 서브명 */
+                ,   EB.EVENT_TP_CD		/* 이벤트 유형 코드 */
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_TP}',EB.EVENT_TP_CD,'') AS EVENT_TP_NM
+                ,   EB.EVENT_GB_CD		/* 이벤트 구분 코드 */
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB}',EB.EVENT_GB_CD,'') AS EVENT_GB_NM
+                ,   EB.EVENT_GB2_CD		/* 이벤트 구분2 코드 */
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB2_CD}',EB.EVENT_GB2_CD,'') AS EVENT_GB2_NM
+                ,   EB.EVENT_STAT_CD		/*  이벤트 상태 */
+                ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_STAT}',EB.EVENT_STAT_CD,'') AS EVENT_STAT_NM
+                ,   EB.EVENT_BNFTS		/* 이벤트 혜택 */
+                ,   EB.EVENT_DSCRT		/* 이벤트 설명(=참고 사항) */
+                ,   EB.DLGT_IMG_PATH		/* 대표 이미지 경로 */
+                ,   EB.CONTENT			/* 내용 */
+                ,   EB.APL_STRT_DTM		/* 이벤트 시작 일시 */
+                ,   EB.APL_END_DTM		/* 이벤트 종료 일시 */
+                ,   ( DATEDIFF(EB.APL_END_DTM,NOW()) ) AS LEFT_DAYS    /* 이벤트 D-DAY */
+                ,   DATE_FORMAT(EB.WIN_DT, '%Y-%m-%d') AS WIN_DT		/* 당첨 일자 */
+                ,   EB.APLY_USE_YN     /* 댓글 사용 여부 */
+                ,   EB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+                ,   EB.SYS_REG_DTM		/* 시스템 등록 일시 */
+                ,   EB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+                ,   EB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+                ,   FN_GET_USER_NAME(EB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+                ,   FN_GET_USER_NAME(EB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+            FROM EVENT_BASE EB
+        ) E
+        WHERE 1=1
+        <include refid="listEventWhere"/>
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+    </select>
+    <select id="listEventCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM (
+                SELECT
+                            EB.EVENT_NO			/* 이벤트 번호 */
+                        ,   EB.SEO_INFO_NO		/* SEO 정보 번호 */
+                        ,   EB.TTL				/* 제목 */
+                        ,   EB.EVENT_SUB_NM		/* 이벤트 서브명 */
+                        ,   EB.EVENT_TP_CD		/* 이벤트 유형 코드 */
+                        ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_TP}',EB.EVENT_TP_CD,'') AS EVENT_TP_NM
+                        ,   EB.EVENT_GB_CD		/* 이벤트 구분 코드 */
+                        ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB}',EB.EVENT_GB_CD,'') AS EVENT_GB_NM
+                        ,   EB.EVENT_GB2_CD		/* 이벤트 구분2 코드 */
+                        ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB2_CD}',EB.EVENT_GB2_CD,'') AS EVENT_GB2_NM
+                        ,   EB.EVENT_STAT_CD		/*  이벤트 상태 */
+                        ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_STAT}',EB.EVENT_STAT_CD,'') AS EVENT_STAT_NM
+                        ,   EB.EVENT_BNFTS		/* 이벤트 혜택 */
+                        ,   EB.EVENT_DSCRT		/* 이벤트 설명(=참고 사항) */
+                        ,   EB.DLGT_IMG_PATH		/* 대표 이미지 경로 */
+                        ,   EB.CONTENT			/* 내용 */
+                        ,   EB.APL_STRT_DTM		/* 이벤트 시작 일시 */
+                        ,   EB.APL_END_DTM		/* 이벤트 종료 일시 */
+                        ,   ( DATEDIFF(EB.APL_END_DTM,NOW()) ) AS LEFT_DAYS    /* 이벤트 D-DAY */
+                        ,   DATE_FORMAT(EB.WIN_DT, '%Y-%m-%d') AS WIN_DT		/* 당첨 일자 */
+                        ,   EB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+                        ,   EB.SYS_REG_DTM		/* 시스템 등록 일시 */
+                        ,   EB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+                        ,   EB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+                        ,   FN_GET_USER_NAME(EB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+                        ,   FN_GET_USER_NAME(EB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+                FROM EVENT_BASE EB
+        ) E
+        WHERE 1=1
+        <include refid="listEventWhere"/>
+    </select>
+
+    <sql id="listEventWhere">
+        AND ( E.EVENT_STAT_CD = #{eventStatCd}
+        <choose>
+            <when test="eventStatCd.equals(@framework.common.constants.CommonConstants@EVENT_STAT_20)">
+                AND DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') BETWEEN DATE_FORMAT(E.APL_STRT_DTM,'%Y%m%d%H%i%s') AND DATE_FORMAT(E.APL_END_DTM,'%Y%m%d%H%i%s') )
+            </when>
+            <otherwise> ) </otherwise>
+        </choose>
+
+        <if test="eventTpCd != null and eventTpCd != '' ">
+            AND E.EVENT_TP_CD = #{eventTpCd}
+        </if>
+        <if test="eventGb2Cd != null and eventGb2Cd != '' ">
+            <choose>
+                <when test="eventGb2Cd != @framework.common.constants.CommonConstants@EVENT_GB2_CD_10">
+                    AND E.EVENT_GB2_CD IN (
+                               #{eventGb2Cd}
+                        )
+                </when>
+                <otherwise>
+                    AND E.EVENT_GB2_CD =  #{eventGb2Cd}
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="eventWinYn != null and eventWinYn != ''">
+            <if test="eventWinYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)">
+                AND E.EVENT_NO IN (
+                SELECT EWL.EVENT_NO
+                FROM EVENT_WIN_LIST EWL
+                )
+            </if>
+            <if test="eventWinYn.equals(@framework.common.constants.CommonConstants@COMM_YN_N)">
+                AND E.EVENT_NO NOT IN (
+                SELECT EWL.EVENT_NO
+                FROM EVENT_WIN_LIST EWL
+                )
+            </if>
+        </if>
+    </sql>
+
+    <select id="getEventDetail" resultType="biz.app.event.model.EventBaseVO">
+        SELECT   /* QUERYID(frontEvent.getEventDetail) */
+                 EB.EVENT_NO			/* 이벤트 번호 */
+             ,   EB.SEO_INFO_NO		/* SEO 정보 번호 */
+             ,   EB.CP_NO           /* 쿠폰 번호 */
+             ,   EB.TTL				/* 제목 */
+             ,   EB.EVENT_SUB_NM		/* 이벤트 서브명 */
+             ,   EB.EVENT_TP_CD		/* 이벤트 유형 코드 */
+             ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_TP}',EB.EVENT_TP_CD,'') AS EVENT_TP_NM
+             ,   EB.EVENT_GB_CD		/* 이벤트 구분 코드 */
+             ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB}',EB.EVENT_GB_CD,'') AS EVENT_GB_NM
+             ,   EB.EVENT_GB2_CD		/* 이벤트 구분2 코드 */
+             ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_GB2_CD}',EB.EVENT_GB2_CD,'') AS EVENT_GB2_NM
+             ,   EB.EVENT_STAT_CD		/*  이벤트 상태 */
+             ,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVENT_STAT}',EB.EVENT_STAT_CD,'') AS EVENT_STAT_NM
+             ,   EB.EVENT_BNFTS		/* 이벤트 혜택 */
+             ,   EB.EVENT_DSCRT		/* 이벤트 설명(=참고 사항) */
+             ,   EB.DLGT_IMG_PATH		/* 대표 이미지 경로 */
+             ,   EB.CONTENT			/* 내용 */
+             ,   EB.APL_STRT_DTM		/* 이벤트 시작 일시 */
+             ,   EB.APL_END_DTM		/* 이벤트 종료 일시 */
+             ,   ( DATEDIFF(EB.APL_END_DTM,NOW()) ) AS LEFT_DAYS    /* 이벤트 D-DAY */
+             ,   DATE_FORMAT(EB.WIN_DT, '%Y-%m-%d') AS WIN_DT		/* 당첨 일자 */
+             ,   EB.APLY_USE_YN     /* 댓글 사용 여부 */
+             ,   EB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+             ,   EB.SYS_REG_DTM		/* 시스템 등록 일시 */
+             ,   EB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+             ,   EB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+             ,   FN_GET_USER_NAME(EB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+             ,   FN_GET_USER_NAME(EB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+             ,  (SELECT COUNT(*) FROM EVENT_ENTRY_INFO EEI WHERE EEI.EVENT_NO = EB.EVENT_NO AND EEI.ENRY_APLY IS NOT NULL AND EEI.ENRY_APLY != '') APLY_CNT
+        FROM EVENT_BASE EB
+        WHERE EB.EVENT_NO =  #{eventNo}
+    </select>
+
+    <select id="listEventReply" resultType="biz.app.event.model.EventEntryWinInfoVO">
+        SELECT 	/* QUERYID(frontEvent.listEventReply) */
+        	EEI.PATI_NO
+             ,  MB.PRFL_IMG
+             ,	EEI.MBR_NO
+             ,	EEI.PATIR_NM
+             ,  MB.PET_LOG_URL 
+             ,  IFNULL(MB.NICK_NM, '어바웃펫 회원') AS NICK_NM /*회원닉네임*/
+             ,	EEI.CTT
+             ,	EEI.EMAIL
+             ,	EEI.ADDR
+             ,	EEI.SNS
+             ,	EEI.CP_NO
+             ,  EEI.ENRY_APLY
+             ,	EEI.SYS_REG_DTM
+             ,	EEI.SYS_UPD_DTM
+             <![CDATA[
+				, CASE 	WHEN TIME_TO_SEC(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)) < 60 THEN '방금'
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)) < 3600 THEN CONCAT(MINUTE(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)), '분 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)) > 3600 AND TIME_TO_SEC(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)) < 86400 THEN CONCAT(HOUR(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)), '시간 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), EEI.SYS_REG_DTM)) > 86400 THEN DATE_FORMAT(EEI.SYS_REG_DTM, '%m월 %d일') 
+				END AS STR_DATE_DIFF
+			]]>             
+        FROM EVENT_ENTRY_INFO EEI
+        LEFT JOIN MEMBER_BASE MB ON EEI.MBR_NO = MB.MBR_NO
+        WHERE EEI.EVENT_NO = #{eventNo}
+        AND EEI.ENRY_APLY IS NOT NULL AND EEI.ENRY_APLY != ''
+        ORDER BY EEI.SYS_REG_DTM DESC
+    </select>
+
+    <insert id="insertEventEntryInfo" parameterType="biz.app.event.model.EventEntryWinInfoPO">
+        <selectKey keyProperty="patiNo" resultType="java.lang.Long" order="BEFORE">
+            SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_EVENT_ENTRY_INFO_SEQ}') FROM DUAL
+        </selectKey>
+        INSERT INTO EVENT_ENTRY_INFO(
+                PATI_NO
+            ,   EVENT_NO
+            ,   MBR_NO
+            ,   PATIR_NM
+            ,   CTT
+            ,   EMAIL
+            ,   ADDR
+            ,   SNS
+            ,   CP_NO
+            ,   ENRY_APLY
+            ,   SYS_REGR_NO
+            ,   SYS_REG_DTM
+            ,   SYS_UPDR_NO
+            ,   SYS_UPD_DTM
+        )
+        SELECT      #{patiNo} AS PATI_NO
+                ,   #{eventNo} AS EVENT_NO
+                ,   MBR_NO AS MBR_NO
+                ,   IFNULL(#{patirNm},MBR_NM) AS PATIR_NM
+                ,   IFNULL(#{ctt},MOBILE) AS CTT
+                ,   IFNULL(#{email},EMAIL) AS EMAIL
+                ,   IFNULL(#{addr},(SELECT CONCAT(ROAD_ADDR,';',ROAD_DTL_ADDR) FROM MEMBER_ADDRESS WHERE MBR_NO = #{mbrNo} ORDER BY DFT_YN DESC LIMIT 1) )AS ADDR
+                ,   #{sns} AS SNS
+                ,   (SELECT CP_NO FROM EVENT_BASE WHERE EVENT_NO = #{eventNo}) AS CP_NO
+                ,   #{enryAply} AS ENRY_APLY
+                ,   #{mbrNo} AS SYS_REGR_NO
+                ,   NOW() AS SYS_REG_DTM
+                ,   #{mbrNo} AS SYS_UPDR_NO
+                ,   NOW()  AS SYS_UPD_DTM
+        FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo}
+    </insert>
+    
+    <insert id="insertEventReplyMention" parameterType="biz.app.event.model.EventMentionMemberPO">
+    	INSERT INTO TB_EVENT_RPL_METN(
+    		EVENT_NO
+			, APLY_NO
+			, METN_SEQ
+			, METN_TG_MBR_NO
+			, METN_MBR_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)VALUES(
+			#{eventNo}
+			, #{aplyNo}
+			, #{metnSeq}
+			, #{metnTgMbrNo}
+			, #{metnMbrNo}
+			, #{metnMbrNo}
+			, NOW()
+			, #{metnMbrNo}
+			, NOW()
+    	)
+    </insert>
+    
+    <delete id = "deleteEventReplyMention" parameterType="biz.app.event.model.EventMentionMemberSO">
+    	DELETE FROM 
+    		TB_EVENT_RPL_METN
+    	WHERE 
+    		APLY_NO = #{aplyNo}
+    	AND 
+    		EVENT_NO = #{eventNo}
+    </delete>
+    
+    <update id="updateEventDetailReply" parameterType="biz.app.event.model.EventEntryWinInfoPO">
+    	UPDATE EVENT_ENTRY_INFO SET 
+			ENRY_APLY= #{enryAply}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE 1 = 1
+			AND PATI_NO = #{patiNo}
+			AND EVENT_NO= #{eventNo}
+			AND MBR_NO = #{mbrNo} 
+    </update>
+    
+    <select id="getMbrBaseInfo" parameterType="biz.app.member.model.MemberBaseSO" resultType="biz.app.member.model.MemberBaseVO" >
+    	 SELECT 
+    	 		MBR_NO
+    	 		, NICK_NM
+    	 		, MBR_STAT_CD
+    	 		FROM MEMBER_BASE T1 
+   	 		WHERE 1=1 
+   	 		<if test="nickNm != null and nickNm != ''">	 
+	   			AND T1.NICK_NM = #{nickNm}
+	 		</if>	 
+	 		LIMIT 0 , 1
+    </select>
+    
+    <select id="selectEventMentionList" resultType="biz.app.event.model.EventMentionMemberVO">
+    	SELECT 
+			A.SRL_NO /*순번*/
+		    , A.EVENT_NO /*이벤트 번호*/
+		    , A.APLY_NO /*댓글순번*/
+		    , A.METN_SEQ /*멘션순번*/
+		    , A.METN_TG_MBR_NO /*대상 회원번호(멘션당한 회원) */
+		    , A.METN_MBR_NO /*회원번호(로그인한 회원)*/
+		    , A.SYS_REGR_NO /*시스템 등록자*/
+		    , A.SYS_REG_DTM /*시스템 등록 일시*/
+		    , A.SYS_UPDR_NO /*시스템 수정자*/
+		    , A.SYS_UPD_DTM /*시스템 수정 일시*/
+		    , IFNULL(B.NICK_NM, '어바웃펫회원') AS NICK_NM /*대상 회원닉네임*/
+			, B.MBR_STAT_CD /*대상 회원 상태코드*/
+			FROM TB_EVENT_RPL_METN A
+			  INNER JOIN MEMBER_BASE B
+			     ON A.METN_TG_MBR_NO = B.MBR_NO
+			 WHERE A.EVENT_NO = #{eventNo}
+			  AND A.APLY_NO = #{aplyNo}
+    </select>
+    
+    <select id="eventReplyMentionList" resultType="biz.app.event.model.EventMentionMemberVO" parameterType="biz.app.event.model.EventMentionMemberSO">
+    	SELECT 
+    		SRL_NO
+    		, EVENT_NO
+    		, APLY_NO
+    		, METN_SEQ
+    		, METN_MBR_NO
+    		, SYS_REGR_NO
+    		, SYS_REG_DTM
+    		, SYS_UPDR_NO
+    		, SYS_UPD_DTM
+    		FROM
+    			TB_EVENT_RPL_METN
+    		WHERE 
+    			APLY_NO = #{aplyNo}
+    		AND
+    			EVENT_NO = #{eventNo}
+    </select>
+    
+    <delete id="deleteEventgMention" parameterType="biz.app.event.model.EventMentionMemberSO">
+    	DELETE FROM 
+    		TB_EVENT_RPL_METN
+    	WHERE 
+    		APLY_NO = #{aplyNo}
+    	AND
+    		EVENT_NO = #{eventNo}
+    </delete>
+    
+
+    <update id="updateEventEntryInfo" parameterType="biz.app.event.model.EventEntryWinInfoPO">
+        UPDATE EVENT_ENTRY_INFO
+        SET SYS_UPD_DTM = NOW()
+        <if test="enryAply != null and enryAply != ''">
+            , ENRY_APLY = #{enryAply}
+        </if>
+        <if test="sns != null and sns != ''">
+            , SNS = #{sns}
+        </if>
+        <if test="ctt != null and ctt != ''">
+            , CTT = #{ctt}
+        </if>
+        <if test="patirNm != null and patirNm != ''">
+            , PATIR_NM = #{patirNm}
+        </if>
+        WHERE PATI_NO = #{patiNo}
+    </update>
+
+    <delete id="deleteEventEntryInfo" parameterType="biz.app.event.model.EventEntryWinInfoPO">
+        DELETE FROM EVENT_ENTRY_INFO WHERE PATI_NO = #{patiNo}
+    </delete>
+</mapper>

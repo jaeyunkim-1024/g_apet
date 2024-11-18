@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상담
+	작성자  		snw
+	작성일자  	2017.01.25
+-->
+
+<mapper namespace="counsel">
+
+	<select id="listCounsel" resultType="biz.app.counsel.model.CounselVO">
+		<!--
+			Query Name : counsel.listCounsel
+			Description : 상담 목록 조회
+		-->
+		SELECT	/* QUERYID(counsel.listCounsel) */
+					CS.CUS_NO				/* 상담 번호 */
+					, CS.CUS_PATH_CD		/* 상담 경로 코드 */
+					, CS.CUS_STAT_CD		/* 상담 상태 코드 */
+					, CS.RESP_GB_CD		/* 응답 구분 코드 */
+					, CS.CALL_GB_CD		/* 통화자 구분 코드 */
+					, CS.EQRR_NM			/* 문의자 명 */
+					, CS.EQRR_TEL			/* 문의자 전화 */
+					, CS.EQRR_MOBILE		/* 문의자 휴대폰 */
+					, CS.EQRR_EMAIL		/* 문의자 이메일 */
+					, CS.EQRR_MBR_NO		/* 문의자 회원 번호 */
+					, CS.TTL					/* 제목 */
+					, CS.CONTENT			/* 내용 */
+					, CS.FL_NO				/* 파일 번호 */
+					, CS.CUS_CTG1_CD		/* 상담 카테고리1 코드 */
+					, CS.CUS_CTG2_CD		/* 상담 카테고리2 코드 */
+					, CS.CUS_CTG3_CD		/* 상담 카테고리3 코드 */
+					, CS.CUS_ACPT_DTM	/* 상담 접수 일시 */
+					, CS.CUS_CNC_DTM		/* 상담 취소 일시 */
+					, CS.CUS_CPLT_DTM		/* 상담 완료 일시 */
+					, CS.CUS_CHRG_NO		/* 상담 당당자 번호 */
+					, CS.CUS_ACPTR_NO	/* 상담 접수자 번호 */
+					, CS.CUS_CNCR_NO		/* 상담 취소자 번호 */
+					, CS.CUS_CPLTR_NO		/* 상담 완료자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CHRG_NO)	CUS_CHRG_NM	/* 상담 담당자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_ACPTR_NO)	CUS_ACPTR_NM	/* 상담 접수자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_CNCR_NO) CUS_CNCR_NM		/* 상담 취소자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_CPLTR_NO) CUS_CPLTR_NM		/* 상담 완료자 이름 */
+					, CS.SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, CS.SYS_REG_DTM		/* 시스템 등록 일시 */
+					, FN_GET_USER_NAME(CS.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, CS.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, CS.SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(CS.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, ST.ST_ID						/* 사이트 ID */
+					, ST.ST_NM					/* 사이트 명 */
+		FROM		COUNSEL CS
+					, ST_STD_INFO ST
+		WHERE	CS.ST_ID = ST.ST_ID
+
+		<if test="ordNo != null and ordNo != ''">
+		AND		CS.CUS_NO IN ( SELECT CUS_NO FROM COUNSEL_ORDER_DETAIL WHERE ORD_NO = #{ordNo})
+		</if>
+		<if test="mbrNo != null">
+        AND     CS.EQRR_MBR_NO       = #{mbrNo}
+        </if>
+
+		ORDER BY CS.CUS_NO DESC
+	</select>
+
+	<select id="listMOCounsel" resultType="biz.app.counsel.model.CounselVO">
+		<!--
+			Query Name : counsel.listMOCounsel
+			Description : MO 상담 목록 조회
+		-->
+		SELECT	/* QUERYID(counsel.listMOCounsel) */
+					CS.CUS_NO				/* 상담 번호 */
+					, CS.CUS_PATH_CD		/* 상담 경로 코드 */
+					, CS.CUS_STAT_CD		/* 상담 상태 코드 */
+					, CS.EQRR_NM			/* 문의자 명 */
+					, CS.EQRR_TEL			/* 문의자 전화 */
+					, CS.EQRR_MOBILE		/* 문의자 휴대폰 */
+					, CS.EQRR_EMAIL			/* 문의자 이메일 */
+					, CS.EQRR_MBR_NO		/* 문의자 회원 번호 */
+					, CS.TTL				/* 제목 */
+					, CS.CONTENT			/* 내용 */
+					, CS.FL_NO				/* 파일 번호 */
+					, CS.CUS_CTG1_CD		/* 상담 카테고리1 코드 */
+					, CS.CUS_CTG2_CD		/* 상담 카테고리2 코드 */
+					, CS.CUS_CTG3_CD		/* 상담 카테고리3 코드 */
+					, CS.CUS_ACPT_DTM		/* 상담 접수 일시 */
+					, CS.CUS_CNC_DTM		/* 상담 취소 일시 */
+					, CS.CUS_CPLT_DTM		/* 상담 완료 일시 */
+					, CS.CUS_ACPTR_NO		/* 상담 접수자 번호 */
+					, CS.CUS_CNCR_NO		/* 상담 취소자 번호 */
+					, CS.CUS_CPLTR_NO		/* 상담 완료자 번호 */
+					, CS.CUS_CHRG_NO		/* 상담 당당자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CHRG_NO)	CUS_CHRG_NM		/* 상담 담당자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_ACPTR_NO)	CUS_ACPTR_NM	/* 상담 접수자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_CNCR_NO) CUS_CNCR_NM		/* 상담 취소자 이름 */
+					, FN_GET_USER_NAME(CS.CUS_CPLTR_NO) CUS_CPLTR_NM	/* 상담 완료자 이름 */
+					, CS.SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, CS.SYS_REG_DTM		/* 시스템 등록 일시 */
+					, FN_GET_USER_NAME(CS.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, CS.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, CS.SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(CS.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, ST.ST_ID					/* 사이트 ID */
+					, ST.ST_NM					/* 사이트 명 */
+					, CP.PRCS_NO				/* 처리번호 */
+				    , CP.RPL_HD_CONTENT			/* 회신 헤더 내용 */
+				    , CP.RPL_CONTENT			/* 회신 내용 */
+				    , CP.RPL_FT_CONTENT			/* 회신 푸터 내용 */
+				    , CP.CUS_PRCS_DTM			/* 상담처리일시 */
+				    , CASE WHEN DATEDIFF(CP.CUS_PRCS_DTM,NOW()) &lt; 7 AND DATEDIFF(CP.CUS_PRCS_DTM,NOW()) &gt;= 0 THEN  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+       					ELSE '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+       				 END AS NEW_YN
+		FROM		COUNSEL CS INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+			LEFT OUTER JOIN MEMBER_BASE MB ON (CS.EQRR_MBR_NO = MB.MBR_NO)
+	  		LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+	  		        AND CP.PRCS_NO = (SELECT MAX(PRCS_NO) FROM COUNSEL_PROCESS WHERE CUS_NO = CS.CUS_NO)
+		WHERE 1=1
+		<if test="ordNo != null and ordNo != ''">
+		AND		CS.ORD_NO		= #{ordNo}
+		</if>
+		<if test="mbrNo != null and mbrNo != ''">
+        AND     CS.EQRR_MBR_NO       = #{mbrNo}
+        </if>
+        <if test="period != null and period != ''">
+		AND	CS.CUS_ACPT_DTM BETWEEN DATE_SUB(CURDATE(), INTERVAL #{period} MONTH ) AND NOW()
+		</if>
+		<if test="stId != null" >
+			AND CS.ST_ID = #{stId}
+		</if>
+		ORDER BY CS.CUS_NO DESC
+	</select>
+
+	<select id="pageCounsel" resultType="biz.app.counsel.model.CounselVO">
+		<!--
+			Query Name : counsel.pageCounsel
+			Description : 상담 목록 페이징 조회
+		-->
+		SELECT	/* QUERYID(counsel.pageCounsel) */
+					  CS.CUS_NO					/* 상담 번호 */
+					, CS.CUS_PATH_CD			/* 상담 경로 코드 */
+					, CS.CUS_STAT_CD			/* 상담 상태 코드 */
+					, CS.CUS_TP_CD				/* 상담 유형 코드 */
+					, CS.RESP_GB_CD				/* 응답 구분 코드 */
+					, CS.CALL_GB_CD				/* 통화자 구분 코드 */
+					, CS.PST_AGR_YN				/* 알림 수신 여부 */
+					, CS.EQRR_MBR_NO			/* 문의자 회원 번호 */
+					, IFNULL(MB.LOGIN_ID, '비회원') AS LOGIN_ID    /* 문의자 로그인 아이디 */
+					, CS.EQRR_NM				/* 문의자 명 */
+					, CS.EQRR_TEL				/* 문의자 전화 */
+					, CS.EQRR_MOBILE			/* 문의자 휴대폰 */
+					, CS.EQRR_EMAIL				/* 문의자 이메일 */
+					, CS.TTL					/* 제목 */
+					, CS.CONTENT				/* 내용 */
+					, CS.FL_NO					/* 파일 번호 */
+					, CS.CUS_CTG1_CD			/* 상담 카테고리1 코드 */
+					, CS.CUS_CTG2_CD			/* 상담 카테고리2 코드 */
+					, CS.CUS_CTG3_CD			/* 상담 카테고리3 코드 */
+					, CS.CUS_ACPT_DTM			/* 상담 접수 일시 */
+					, CS.CUS_CNC_DTM			/* 상담 취소 일시 */
+					, CS.CUS_CPLT_DTM			/* 상담 완료 일시 */
+					, CS.CUS_CHRG_NO			/* 상담 당당자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CHRG_NO)	CUS_CHRG_NM	/* 상담 담당자 이름 */
+					, CS.CUS_ACPTR_NO			/* 상담 접수자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_ACPTR_NO) AS CUS_ACPTR_NM
+					, CS.CUS_CNCR_NO			/* 상담 취소자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CNCR_NO) AS CUS_CNCR_NM
+					, CS.CUS_CPLTR_NO			/* 상담 완료자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CPLTR_NO) AS CUS_CPLTR_NM
+					, CS.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, CS.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, CS.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, CS.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(CS.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(CS.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, ST.ST_ID					/* 사이트 ID */
+					, ST.ST_NM					/* 사이트 명 */
+					, CP.PRCS_NO				/* 처리번호 */
+				    , CP.RPL_HD_CONTENT			/* 회신 헤더 내용 */
+				    , CP.RPL_CONTENT			/* 회신 내용 */
+				    , CP.RPL_FT_CONTENT			/* 회신 푸터 내용 */
+				    , CP.CUS_PRCS_DTM			/* 상담처리일시 */
+				    , (SELECT DISTINCT ORD_NO FROM COUNSEL_ORDER_DETAIL WHERE CUS_NO = CS.CUS_NO) AS ORD_NO
+				    , (SELECT CD.DTL_NM
+				          FROM code_detail CD
+				         WHERE CD.grp_cd = '${@framework.common.constants.CommonConstants@CUS_CTG1}'
+				           AND CD.dtl_cd = CS.CUS_CTG1_CD) AS DTL_NM
+				    , (SELECT CD.DTL_NM
+				          FROM code_detail CD
+				         WHERE CD.grp_cd = 'CUS_STAT'
+				           AND CD.dtl_cd = CS.CUS_STAT_CD) AS STAT_CD_NM
+				    ,CP.PRCS_CONTENT			/* 처리 내용 */
+		FROM		COUNSEL CS
+					INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+					LEFT OUTER JOIN MEMBER_BASE MB ON (CS.EQRR_MBR_NO = MB.MBR_NO)
+	  				LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+	  										          AND CP.PRCS_NO = (SELECT MAX(PRCS_NO) FROM COUNSEL_PROCESS WHERE CUS_NO = CS.CUS_NO)
+		WHERE	1=1
+		<include refid="counsel.pageCounselWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCounselCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : counsel.pageCounselCount
+			Description : 상담목록 페이징 데이터 전체 수
+		-->
+		SELECT	/* QUERYID(counsel.pageCounselCount) */
+					COUNT(*)
+		FROM		COUNSEL CS
+					INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+					LEFT OUTER JOIN MEMBER_BASE MB ON (CS.EQRR_MBR_NO = MB.MBR_NO)
+	  				LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+	  										          AND CP.PRCS_NO = (SELECT MAX(PRCS_NO) FROM COUNSEL_PROCESS WHERE CUS_NO = CS.CUS_NO)
+		WHERE	1=1
+		<include refid="counsel.pageCounselWhere" />
+	</select>
+	
+	<resultMap id="getCounselListMap" type="biz.app.counsel.model.CounselVO">
+		<id property="cusNo"			column="CUS_NO" />
+		<result property="stId"			column="ST_ID" />
+		<result property="cusStatCd"	column="CUS_STAT_CD" />
+		<result property="pstAgrYn"		column="PST_AGR_YN" />
+		<result property="eqrrMbrNo"	column="EQRR_MBR_NO" />
+		<result property="loginId"		column="LOGIN_ID" />
+		<result property="eqrrNm"		column="EQRR_NM" />
+		<result property="eqrrTel"		column="EQRR_TEL" />
+		<result property="eqrrMobile"	column="EQRR_MOBILE" />
+		<result property="eqrrEmail"	column="EQRR_EMAIL" />
+		<result property="ttl"			column="TTL" />
+		<result property="content"		column="CONTENT" />
+		<result property="flNo"			column="FL_NO" />
+		<result property="cusCtg1Cd"	column="CUS_CTG1_CD" />
+		<result property="cusCtg2Cd"	column="CUS_CTG2_CD" />
+		<result property="cusCtg3Cd"	column="CUS_CTG3_CD" />
+		<result property="cusAcptDtm"	column="CUS_ACPT_DTM" />
+		<result property="cusCncDtm"	column="CUS_CNC_DTM" />
+		<result property="cusCpltDtm"	column="CUS_CPLT_DTM" />
+		<result property="sysRegrNo"	column="SYS_REGR_NO" />
+		<result property="sysRegrNm"	column="SYS_REGR_NM" />
+		<result property="sysRegDtm"	column="SYS_REG_DTM" />
+		<result property="sysUpdrNo"	column="SYS_UPDR_NO" />
+		<result property="sysUpdrNm"	column="SYS_UPDR_NM" />
+		<result property="sysUpdDtm"	column="SYS_UPD_DTM" />
+		<result property="prcsNo"		column="PRCS_NO" />
+		<result property="rplHdContent"	column="RPL_HD_CONTENT" />
+		<result property="rplContent"	column="RPL_CONTENT" />
+		<result property="rplFtContent"	column="RPL_FT_CONTENT" />
+		<result property="cusPrcsDtm"	column="CUS_PRCS_DTM" />
+		<result property="dtlNm"		column="DTL_NM" />
+		<result property="statCdNm"		column="STAT_CD_NM" />
+		<result property="prcsContent"	column="PRCS_CONTENT" />
+
+		<collection property="fileList" column="FL_NO" javaType="java.util.ArrayList"
+		            ofType="biz.common.model.AttachFileVO" select="getCounselFile" />
+	</resultMap>
+	
+	<select id="getCounselListFO" resultMap="getCounselListMap">
+		<!--
+			Query Name : counsel.getCounselListFO
+			Description : 1:1 문의 목록(FO)
+		-->
+		SELECT	/* QUERYID(counsel.getCounselListFO) */
+					  CS.CUS_NO					/* 상담 번호 */
+					, CS.CUS_STAT_CD			/* 상담 상태 코드 */
+					, CS.PST_AGR_YN				/* 알림 수신 여부 */
+					, CS.EQRR_MBR_NO			/* 문의자 회원 번호 */
+					, IFNULL(MB.LOGIN_ID, '비회원') AS LOGIN_ID    /* 문의자 로그인 아이디 */
+					, CS.EQRR_NM				/* 문의자 명 */
+					, CS.EQRR_TEL				/* 문의자 전화 */
+					, CS.EQRR_MOBILE			/* 문의자 휴대폰 */
+					, CS.EQRR_EMAIL				/* 문의자 이메일 */
+					, CS.TTL					/* 제목 */
+					, CS.CONTENT				/* 내용 */
+					, CS.FL_NO					/* 파일 번호 */
+					, CS.CUS_CTG1_CD			/* 상담 카테고리1 코드 */
+					, CS.CUS_CTG2_CD			/* 상담 카테고리2 코드 */
+					, CS.CUS_CTG3_CD			/* 상담 카테고리3 코드 */
+					, CS.CUS_ACPT_DTM			/* 상담 접수 일시 */
+					, CS.CUS_CNC_DTM			/* 상담 취소 일시 */
+					, CS.CUS_CPLT_DTM			/* 상담 완료 일시 */
+					, CS.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, CS.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, CS.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, CS.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(CS.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(CS.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, ST.ST_ID					/* 사이트 ID */
+					, CP.PRCS_NO				/* 처리번호 */
+				    , CP.RPL_HD_CONTENT			/* 회신 헤더 내용 */
+				    , CP.RPL_CONTENT			/* 회신 내용 */
+				    , CP.RPL_FT_CONTENT			/* 회신 푸터 내용 */
+				    , CP.CUS_PRCS_DTM			/* 상담처리일시 */
+				    , (SELECT CD.DTL_NM
+				          FROM code_detail CD
+				         WHERE CD.grp_cd = '${@framework.common.constants.CommonConstants@CUS_CTG1}'
+				           AND CD.dtl_cd = CS.CUS_CTG1_CD) AS DTL_NM
+				    , (SELECT CD.DTL_NM
+				          FROM code_detail CD
+				         WHERE CD.grp_cd = 'CUS_STAT'
+				           AND CD.dtl_cd = CS.CUS_STAT_CD) AS STAT_CD_NM
+				    ,CP.PRCS_CONTENT			/* 처리 내용 */
+		FROM		COUNSEL CS
+					INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+					LEFT OUTER JOIN MEMBER_BASE MB ON (CS.EQRR_MBR_NO = MB.MBR_NO)
+	  				LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+	  										          AND CP.PRCS_NO = (SELECT MAX(PRCS_NO) FROM COUNSEL_PROCESS WHERE CUS_NO = CS.CUS_NO)
+		WHERE	1=1
+		<include refid="counsel.pageCounselWhere" />
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="getCounselFile" resultType="biz.common.model.AttachFileVO">
+	SELECT PHY_PATH
+		, SEQ
+	FROM ATTACH_FILE AF
+	WHERE 1 = 1 
+	<if test="flNo != null and flNo != ''">
+	AND FL_NO = #{flNo}
+	</if>
+	</select>
+
+	<sql id="pageCounselWhere">
+        <if test="mbrNo != null">
+        AND     CS.EQRR_MBR_NO = #{mbrNo}
+        </if>
+        <if test="cusChrgNo != null">
+        AND     CS.CUS_CHRG_NO = #{cusChrgNo}
+        </if>
+        <if test="cusChrgNm != null and cusChrgNm != '' ">
+		AND FN_GET_USER_NAME(CS.CUS_CHRG_NO) LIKE CONCAT('%', #{cusChrgNm}, '%')
+		</if>
+		<if test="cusCpltrNm != null and cusCpltrNm != '' ">
+		AND FN_GET_USER_NAME(CS.CUS_CPLTR_NO) LIKE CONCAT('%', #{cusCpltrNm}, '%')
+		</if>
+        <if test="eqrrEmail != null and eqrrEmail != ''">
+        AND     CS.EQRR_EMAIL = #{eqrrEmail}
+        </if>
+		<if test="cusPathCd != null and cusPathCd != ''">
+		AND		CS.CUS_PATH_CD = #{cusPathCd}
+		</if>
+		<if test="cusStatCd != null and cusStatCd != ''">
+		AND		CS.CUS_STAT_CD = #{cusStatCd}
+		</if>
+		<if test="content != null and content != ''">
+		AND		CS.CONTENT LIKE CONCAT('%', #{content} ,'%')
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND		CS.CUS_NO IN (SELECT ORD_NO FROM COUNSEL_ORDER_DETAIL WHERE ORD_NO = #{ordNo})
+		</if>
+		<if test="cusAcptDtmStart != null">
+		AND 	CS.CUS_ACPT_DTM <![CDATA[>=]]> #{cusAcptDtmStart}
+		</if>
+		<if test="cusAcptDtmEnd != null">
+		AND 	CS.CUS_ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{cusAcptDtmEnd},INTERVAL 1 DAY)
+		</if>
+		<if test="period != null and period != ''">
+		AND		CS.CUS_ACPT_DTM BETWEEN DATE_SUB(CURDATE(), INTERVAL #{period} MONTH ) AND NOW()
+		</if>
+
+		<if test="arrCusStatCd != null and arrCusStatCd != ''">
+			<foreach collection="arrCusStatCd" item="item" separator="," open="AND CS.CUS_STAT_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="arrCusTpCd != null and arrCusTpCd != ''">
+			<foreach collection="arrCusTpCd" item="item" separator="," open="AND CS.CUS_TP_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="eqrrNm != null and eqrrNm != ''">
+		AND		CS.EQRR_NM		= #{eqrrNm}
+		</if>
+
+		<if test="eqrrTel != null and eqrrTel != ''">
+		AND		CS.EQRR_TEL		= #{eqrrTel}
+		</if>
+
+		<if test="eqrrMobile != null and eqrrMobile != ''">
+		AND		CS.EQRR_MOBILE	= #{eqrrMobile}
+		</if>
+
+        <if test="loginId != null and loginId != ''">
+        AND MB.LOGIN_ID = #{loginId}
+        </if>
+
+		<if test="cusCtg1Cd != null and cusCtg1Cd != ''">
+		/* 상담 카테고리1 코드 */
+		AND		CS.CUS_CTG1_CD = #{cusCtg1Cd}
+		</if>
+		<if test="cusCtg2Cd != null and cusCtg2Cd != ''">
+		/* 상담 카테고리2 코드 */
+		AND		CS.CUS_CTG2_CD = #{cusCtg2Cd}
+		</if>
+		<if test="cusCtg3Cd != null and cusCtg3Cd != ''">
+		/* 상담 카테고리3 코드 */
+		AND		CS.CUS_CTG3_CD = #{cusCtg3Cd}
+		</if>
+		<if test="stId != null" >
+			AND ST.ST_ID = #{stId}
+		</if>
+
+		<if test="memberYn != null and memberYn != '' ">
+			<choose>
+				<when test='memberYn == "Y"'>
+					/* 회원 구분 Y */
+					AND IFNULL(CS.EQRR_MBR_NO,0)  > 0
+				</when>
+				<when test='memberYn == "N"'>
+				    /* 회원 구분 N */
+					AND IFNULL(CS.EQRR_MBR_NO,0)  = 0
+				</when>
+			</choose>
+		</if>
+
+	</sql>
+	
+	<select id="listCounselOrder" resultType="biz.app.order.model.OrderDetailVO">
+		<!--
+			Query Name : counsel.listCounselOrder
+			Description : 1:1문의 주문 정보 조회
+		-->
+		SELECT CUS.CUS_NO					/* 문의번호*/
+		     , CUS.CUS_CTG1_CD				/* 상담 카테고리1 코드 */
+		     , OD.ORD_NO					/* 주문번호 */
+		     , OD.ORD_DTL_SEQ				/* 주문 상세 순번 */
+		     , OD.GOODS_NM					/* 상품명 */
+		     , BB.BND_NM_KO					/* 브랜드명 국문 */
+		     , BB.BND_NM_EN					/* 브랜듬여 영문 */
+		FROM (
+		SELECT C.CUS_NO
+		     , C.CUS_CTG1_CD
+		     , COD.ORD_NO
+		     , COD.ORD_DTL_SEQ
+		FROM counsel C
+		JOIN counsel_order_detail COD ON C.CUS_NO = COD.CUS_NO
+		WHERE 1=1
+		AND C.EQRR_MBR_NO=#{mbrNo}
+		AND C.CUS_ACPT_DTM BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND NOW()
+		AND C.ST_ID=#{stId}
+		AND C.CUS_NO=#{cusNo}
+		) CUS
+		JOIN order_detail OD ON CUS.ORD_NO=OD.ORD_NO AND CUS.ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+		JOIN goods_base GB ON OD.GOODS_ID = GB.GOODS_ID
+    	JOIN brand_base BB ON GB.BND_NO = BB.BND_NO
+		ORDER BY CUS.CUS_NO DESC, CUS.ORD_DTL_SEQ DESC
+				
+	</select>
+
+	<insert id="insertCounsel">
+		<!--
+			Query Name : counsel.insertCounsel
+			Description : 상담 등록
+		-->
+		<selectKey keyProperty="cusNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COUNSEL_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COUNSEL (
+			CUS_NO				/* 상담 번호 */
+			, PST_AGR_YN		/* 알림 수신 여부 */
+			, CUS_PATH_CD		/* 상담 경로 코드 */
+			, CUS_STAT_CD		/* 상담 상태 코드 */
+			, CUS_TP_CD			/* 상담 유형 코드 */
+			, RESP_GB_CD		/* 응답 구분 코드 */
+			, CALL_GB_CD		/* 통화자 구분 코드 */
+			, EQRR_NM			/* 문의자 명 */
+			, EQRR_TEL			/* 문의자 전화 */
+			, EQRR_MOBILE		/* 문의자 휴대폰 */
+			, EQRR_EMAIL		/* 문의자 이메일 */
+			, EQRR_MBR_NO	/* 문의자 회원 번호 */
+			, TTL					/* 제목 */
+			, CONTENT			/* 내용 */
+			, FL_NO				/* 파일 번호 */
+			, CUS_CTG1_CD		/* 상담 카테고리1 코드 */
+			, CUS_CTG2_CD		/* 상담 카테고리2 코드 */
+			, CUS_CTG3_CD		/* 상담 카테고리3 코드 */
+			<if test="cusAcptrNo != null">
+			, CUS_ACPT_DTM		/* 상담 접수 일시 */
+			, CUS_ACPTR_NO		/* 상담 접수자 번호 */
+			</if>
+			, ST_ID				/* 사이트 ID */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			#{cusNo}				/* 상담 번호 */
+			, #{pstAgrYn}		/* 알림 수신 여부*/
+			, '${@framework.common.constants.CommonConstants@CUS_STAT_10}'		/* 상담 경로 코드 */
+			, '${@framework.common.constants.CommonConstants@CUS_STAT_10}'		/* 상담 상태 코드 */
+			, #{cusTpCd}			/* 상담 유형 코드 */
+			, #{respGbCd}		/* 응답 구분 코드 */
+			, #{callGbCd}			/* 통화자 구분 코드 */
+			, #{eqrrNm}			/* 문의자 명 */
+			, #{eqrrTel}			/* 문의자 전화 */
+			, #{eqrrMobile}		/* 문의자 휴대폰 */
+			, #{eqrrEmail}		/* 문의자 이메일 */
+			, #{eqrrMbrNo}		/* 문의자 회원 번호 */
+			, #{ttl}					/* 제목 */
+			, #{content}			/* 내용 */
+			, #{flNo}				/* 파일 번호 */
+			, #{cusCtg1Cd}		/* 상담 카테고리1 코드 */
+			, #{cusCtg2Cd}		/* 상담 카테고리2 코드 */
+			, #{cusCtg3Cd}		/* 상담 카테고리3 코드 */
+			<if test="cusAcptrNo != null">
+			, NOW()				/* 상담 접수 일시 */
+			, #{cusAcptrNo}		/* 상담 접수자 번호 */
+			</if>
+			, #{stId}				/* 사이트 ID */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<update id="updateFlCounsel" parameterType="biz.app.counsel.model.CounselPO">
+		UPDATE COUNSEL SET
+			FL_NO = #{cusNo}
+		WHERE 1 = 1 
+		AND CUS_NO = #{cusNo}
+			
+	</update>  
+	
+	<select id="getCounsel" resultType="biz.app.counsel.model.CounselVO">
+		<!--
+			Query Name : counsel.getCounsel
+			Description : 상담 단건 조회
+		-->
+		SELECT	/* QUERYID(counsel.getCounsel) */
+					  CS.CUS_NO				/* 상담 번호 */
+					, CS.PST_AGR_YN			/*알림 수신 여부*/
+					, MB.INFO_RCV_YN		/* 정보성 수신 동의*/
+					, CS.SYS_REG_DTM		/* 시스템 등록 일시 */
+					, CS.SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, CS.EQRR_MBR_NO		/* 문의자 회원 번호 */
+					, IFNULL(MB.LOGIN_ID, '비회원') AS  LOGIN_ID       /* 문의자 로그인 아이디 */
+					, CS.CUS_STAT_CD		/* 상담 상태 코드 */
+					, CS.CUS_TP_CD			/* 상담 유형 코드 */
+					, CS.RESP_GB_CD		/* 응답 구분 코드 */
+					, CS.CALL_GB_CD		/* 통화자 구분 코드 */
+					, CS.CONTENT			/* 내용 */
+					, CS.EQRR_NM			/* 문의자 명 */
+					, CS.EQRR_TEL			/* 문의자 전화 */
+					, CS.CUS_PATH_CD		/* 상담 경로 코드 */
+					, CS.TTL					/* 제목 */
+					, CS.FL_NO				/* 파일 번호 */
+					, CS.EQRR_EMAIL		/* 문의자 이메일 */
+					, CS.EQRR_MOBILE		/* 문의자 휴대폰 */
+					, CS.SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, CS.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, CS.CUS_CTG1_CD		/* 상담 카테고리1 코드 */
+					, CS.CUS_CTG2_CD		/* 상담 카테고리2 코드 */
+					, CS.CUS_CTG3_CD		/* 상담 카테고리3 코드 */
+					, CS.CUS_ACPT_DTM	/* 상담 접수 일시 */
+					, CS.CUS_CNC_DTM		/* 상담 취소 일시 */
+					, CS.CUS_CPLT_DTM		/* 상담 완료 일시 */
+					, CS.CUS_CHRG_NO		/* 상담 당당자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CHRG_NO)	CUS_CHRG_NM	/* 상담 담당자 이름 */
+					, CS.CUS_ACPTR_NO	/* 상담 접수자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_ACPTR_NO) AS CUS_ACPTR_NM
+					, CS.CUS_CNCR_NO		/* 상담 취소자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CNCR_NO) AS CUS_CNCR_NM
+					, CS.CUS_CPLTR_NO		/* 상담 완료자 번호 */
+					, FN_GET_USER_NAME(CS.CUS_CPLTR_NO) AS CUS_CPLTR_NM
+					, FN_GET_USER_NAME(CS.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(CS.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, ST.ST_ID					/* 사이트 ID */
+					, ST.ST_NM				/* 사이트 명 */
+		FROM		COUNSEL CS
+					INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+					LEFT OUTER JOIN MEMBER_BASE MB ON (CS.EQRR_MBR_NO = MB.MBR_NO)
+		WHERE	CUS_NO = #{cusNo}
+	</select>
+
+	<select id="getCounselAnswerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : counsel.getCounselAnswerCount
+			Description : 1:1 문의사항 답변등록 건수
+		-->
+		SELECT	/* QUERYID(counsel.getCounselAnswerCount) */
+				COUNT(*) /* 답변등록 건수 */
+		FROM	COUNSEL CS
+		INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+		LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+		WHERE	1 = 1
+		  AND CP.PRCS_NO is not null
+		<include refid="counsel.pageCounselWhere" />
+	</select>
+
+	<select id="getCounselWaitCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : counsel.getCounselWaitCount
+			Description : 1:1 문의사항 답변대기 건수
+		-->
+		SELECT	/* QUERYID(counsel.getCounselWaitCount) */
+				COUNT(*) /* 답변대기 건수 */
+		FROM	COUNSEL CS
+		INNER JOIN ST_STD_INFO ST ON (ST.ST_ID = CS.ST_ID)
+		LEFT OUTER JOIN COUNSEL_PROCESS CP ON CS.CUS_NO = CP.CUS_NO
+		WHERE	1 = 1
+		  AND CP.PRCS_NO is null
+		<include refid="counsel.pageCounselWhere" />
+	</select>
+
+	<update id="updateCounselCusStatCd">
+		<!--
+			Query Name : counsel.updateCounselCusStatCd
+			Description : 상담 상태 변경
+		-->
+		UPDATE	COUNSEL
+		SET		CUS_STAT_CD		= #{cusStatCd}
+					, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		CUS_NO		= #{cusNo}
+	</update>
+
+	<update id="updateCounselCancel">
+		<!--
+			Query Name : counsel.updateCounselCancel
+			Description : 상담 취소
+		-->
+		UPDATE 	COUNSEL
+		SET 		CUS_STAT_CD = '${@framework.common.constants.CommonConstants@CUS_STAT_40}'
+					, CUS_CNC_DTM = sysdate()	/* 상담 취소 일시 */
+					, CUS_CNCR_NO = #{cusCncrNo}/* 상담 취소자 번호 */
+					, SYS_UPD_DTM = sysdate()	/* 시스템 수정 일시 */
+					, SYS_UPDR_NO = #{sysUpdrNo}/* 시스템 수정자 번호 */
+		WHERE 	CUS_NO = #{cusNo}			/* 상담 번호 */
+	</update>
+	
+	<update id="updateCounselComplete">
+		<!--
+			Query Name : counsel.updateCounselComplete
+			Description : 상담 완료 처리
+		-->
+		UPDATE	COUNSEL
+		SET		CUS_STAT_CD = '${@framework.common.constants.CommonConstants@CUS_STAT_20}'
+					, CUS_CPLTR_NO	= #{cusCpltrNo}
+					, CUS_CPLT_DTM = NOW()
+					, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE	CUS_NO		= #{cusNo}
+	</update>
+	
+	<delete id="deleteInquiry" parameterType="biz.app.counsel.model.CounselPO">
+		DELETE FROM COUNSEL
+		WHERE 1 = 1 
+		<if test="cusNo != null and cusNo != ''">
+		AND CUS_NO = #{cusNo}
+		</if>
+	</delete>
+
+	<update id="updateCounselCtg">
+		<!--
+			Query Name : counsel.updateCounselCtg
+			Description : 상담 카테고리 수정
+		-->
+		UPDATE	COUNSEL
+		SET		CUS_CTG2_CD = #{cusCtg2Cd}		/* 상담 카테고리2 코드 */
+					, CUS_CTG3_CD = #{cusCtg3Cd}		/* 상담 카테고리3 코드 */
+					, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE	CUS_NO		= #{cusNo}
+	</update>
+	
+	<update id="updateCounselChrg">
+		<!--
+			Query Name : counsel.updateCounselChrg
+			Description : 상담 담당자 변경
+		-->
+		UPDATE	COUNSEL
+		SET		CUS_CHRG_NO = #{cusChrgNo}
+					, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE	CUS_NO		= #{cusNo}
+	</update>
+
+	<update id="updateInquiry" parameterType="biz.app.counsel.model.CounselPO">
+		<!--
+			Query Name : counsel.updateInquiry
+			Description : 1:1문의 수정
+		-->
+		UPDATE	COUNSEL
+		SET		PST_AGR_YN		= #{pstAgrYn}	/* 알림 수신 여부 */
+				, TTL			= #{ttl}		/* 제목 */
+				, CONTENT		= #{content}	/* 내용 */
+				, CUS_CTG1_CD	= #{cusCtg1Cd}	/* 상담 카테고리1 코드 */
+				, CUS_ACPT_DTM	= NOW()			/* 상담 접수 일시 */
+				, SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		CUS_NO	= #{cusNo}
+	</update>
+	
+	<delete id="deleteInquiryImg" parameterType="Long">
+		<!--
+			Query Name : counsel.updateInquiry
+			Description : 1:1문의 첨부파일 삭제
+		-->
+		DELETE 
+		FROM ATTACH_FILE 
+		WHERE FL_NO = #{flNo} 
+		AND SEQ = #{seq}
+	</delete>
+
+	<select id="getCsMain" resultType="biz.app.counsel.model.CsMainVO">
+		SELECT
+			IFNULL(SUM(INQUIRY_CNT), 0) AS INQUIRY_CNT
+			/* ,IFNULL(SUM(GOODS_CNT), 0) AS GOODS_CNT */
+			/* ,IFNULL(SUM(CLM_CNT), 0) AS CLM_CNT */
+			,IFNULL(SUM(FILE_CNT), 0) AS FILE_CNT
+		FROM (
+			SELECT
+				CASE
+					WHEN CUS_STAT_CD = '${@framework.common.constants.CommonConstants@CUS_STAT_10}'
+					THEN 1
+					ELSE 0
+					END AS INQUIRY_CNT
+					/*
+				, CASE
+					WHEN CUS_STAT_CD = '${@framework.common.constants.CommonConstants@CUS_STAT_10}' AND GOODS_ID IS NOT NULL
+					THEN 1
+					ELSE 0
+					END AS GOODS_CNT
+					*/
+				/* , CASE
+					WHEN CLM_NO IS NOT NULL AND CLM_DTL_SEQ IS NOT NULL
+					THEN 1
+					ELSE 0
+					END AS CLM_CNT */
+				, CASE
+					WHEN FL_NO IS NOT NULL
+					THEN 1
+					ELSE 0
+					END AS FILE_CNT
+			FROM COUNSEL
+		) A
+	</select>
+
+
+	<select id="getCounselStatusMem" resultType="biz.app.counsel.model.CounselStatusVO">
+		<!--
+			Query Name : counsel.getCounselStatusMem
+			Description : 상담 요약정보 조회(회원)
+		-->
+		SELECT
+				'회원' AS MBR_GB
+		        ,(
+		        SELECT  	COUNT(*) 
+		        FROM    	ORDER_BASE 
+		        WHERE   	1=1
+		        AND		MBR_NO = #{mbrNo}
+		        AND		DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		        ) AS ORDER_CNT
+		        , 
+		        ( 
+		        SELECT  COUNT(*)
+		        FROM    CLAIM_BASE
+		        WHERE   CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_20}'
+		        AND     MBR_NO = #{mbrNo}
+		        ) AS CLAIM_CNT
+		        , 
+		        (
+		        SELECT  COUNT(*)
+		        FROM    COUNSEL
+		        WHERE   CUS_PATH_CD = '${@framework.common.constants.CommonConstants@CUS_PATH_10}'
+		         AND     EQRR_MBR_NO = #{mbrNo}
+		        ) AS CUS_WEB_CNT
+		        ,
+		        (
+		        SELECT  COUNT(*)
+		        FROM    COUNSEL
+		        WHERE   CUS_PATH_CD =  '${@framework.common.constants.CommonConstants@CUS_PATH_20}' /* 상담경로 : CallCenter */
+		         AND    EQRR_MBR_NO = #{mbrNo}
+		        ) AS CUS_CC_CNT
+		        ,
+		        (
+		        SELECT  COUNT(*)
+		        FROM    GOODS_COMMENT
+		        WHERE   ESTM_MBR_NO = #{mbrNo}
+		        ) AS GOODS_CMT_CNT
+		        ,
+		        (
+		        SELECT  COUNT(*)
+		        FROM    GOODS_INQUIRY
+		        WHERE   EQRR_MBR_NO = #{mbrNo}
+		        AND     GOODS_IQR_STAT_CD ='${@framework.common.constants.CommonConstants@GOODS_IQR_STAT_10}'
+		        ) AS GOODS_IQR_CNT
+		        ,
+		        (
+		        SELECT  COUNT(*)
+		        FROM    PAY_CASH_REFUND
+		        WHERE   RFD_STAT_CD = '${@framework.common.constants.CommonConstants@RFD_STAT_20}'
+		        AND     PAY_NO IN (
+    									SELECT 	PAY_NO
+    									FROM 	PAY_BASE
+    									WHERE 	CLM_NO IN (
+    																SELECT 	CLM_NO
+    																FROM 	CLAIM_BASE
+    																WHERE 	MBR_NO = #{mbrNo}
+     																AND 		CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}' /* 클레임이 완료된 건 */
+    																)
+    									)   
+		        ) AS REFUND_CNT
+				,		        
+		        (
+	    		SELECT 	IFNULL(SUM(SCHD_AMT),0)
+	    		FROM    	PAY_CASH_REFUND
+	      		WHERE   	RFD_STAT_CD = '${@framework.common.constants.CommonConstants@RFD_STAT_20}' /* 진행중인 건 */
+	    		AND     	PAY_NO IN (
+	    									SELECT 	PAY_NO
+	    									FROM 	PAY_BASE
+	    									WHERE 	CLM_NO IN (
+	    																SELECT 	CLM_NO
+	    																FROM 	CLAIM_BASE
+	    																WHERE 	MBR_NO = #{mbrNo}
+	     																AND 		CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_30}' /* 클레임이 완료된 건 */
+	    																)
+	    									)          
+		        ) AS REFUND_AMT
+		FROM    DUAL   
+	</select>
+
+	<select id="getCounselStatusNoMem" resultType="biz.app.counsel.model.CounselStatusVO">
+		<!--
+			Query Name : counsel.getCounselStatusNoMem
+			Description : 상담 요약정보 조회(비회원)
+		-->
+		SELECT
+				'비회원' AS MBR_GB
+				,
+		        (
+		        SELECT  	COUNT(*) 
+		        FROM    	ORDER_BASE 
+		        WHERE   	MBR_NO =  ${@framework.common.constants.CommonConstants@NO_MEMBER_NO}
+		        AND		DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+				<if test="stId != null">
+				AND 		ST_ID = #{stId}
+				</if>
+				<if test="acptDtmStart != null">
+				AND 		ORD_ACPT_DTM <![CDATA[>=]]> #{acptDtmStart}
+				</if>
+				<if test="acptDtmEnd != null">
+				AND 		ORD_ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{acptDtmEnd},INTERVAL 1 DAY)
+				</if>
+				<if test="name != null and name != ''">
+				AND 		ORD_NM = #{name}
+				</if>
+				<if test="tel != null and tel != ''">
+				AND 		ORDR_TEL = #{tel}
+				</if>
+				<if test="mobile != null and mobile != ''">
+				AND 		ORDR_MOBILE = #{mobile}
+				</if>				
+		        ) AS ORDER_CNT
+		        , 
+		        ( 
+		        SELECT  COUNT(*)
+		        FROM    CLAIM_BASE
+		        WHERE   CLM_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_STAT_20}'
+		        AND   	MBR_NO =  ${@framework.common.constants.CommonConstants@NO_MEMBER_NO}
+				 <if test='stId != null'>
+			     AND 		ST_ID = #{stId}
+				</if>
+				<if test="acptDtmStart != null">
+				AND 		ACPT_DTM <![CDATA[>=]]> #{acptDtmStart}
+				</if>
+				<if test="acptDtmEnd != null">
+				AND 		ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{acptDtmEnd},INTERVAL 1 DAY)
+				</if>
+				<if test="name != null and name != ''">
+				AND 		ORD_NO IN ( SELECT ORD_NO FROM ORDER_BASE WHERE ORD_NM = #{name} )
+				</if>		 
+				<if test="tel != null and tel != ''">
+				AND 		ORD_NO IN ( SELECT ORD_NO FROM ORDER_BASE WHERE ORDR_TEL = #{tel} )
+				</if>
+				<if test="mobile != null and mobile != ''">
+				AND 		ORD_NO IN ( SELECT ORD_NO FROM ORDER_BASE WHERE ORDR_MOBILE = #{mobile} )
+				</if>
+		        ) AS CLAIM_CNT
+		        , 
+		        (
+		        SELECT  	COUNT(*)
+		        FROM    	COUNSEL
+		        WHERE   CUS_PATH_CD = '${@framework.common.constants.CommonConstants@CUS_PATH_10}'
+		        AND     	EQRR_MBR_NO =  ${@framework.common.constants.CommonConstants@NO_MEMBER_NO}
+			 	<if test='stId != null'>
+			    AND 		ST_ID = #{stId}
+				</if>				
+				<if test="acptDtmStart != null">
+				AND 		CUS_ACPT_DTM <![CDATA[>=]]> #{acptDtmStart}
+				</if>
+				<if test="acptDtmEnd != null">
+				AND 		CUS_ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{acptDtmEnd},INTERVAL 1 DAY)
+				</if>
+				<if test="name != null and name != ''">
+				AND		EQRR_NM		= #{name}
+				</if>
+				<if test="tel != null and tel != ''">
+				AND		EQRR_TEL		= #{tel}
+				</if>
+				<if test="mobile != null and mobile != ''">
+				AND		EQRR_MOBILE	= #{mobile}
+				</if>
+		        ) AS CUS_WEB_CNT
+		        ,
+		        (
+		        SELECT  COUNT(*)
+		        FROM    COUNSEL
+		        WHERE   CUS_PATH_CD =  '${@framework.common.constants.CommonConstants@CUS_PATH_20}' /* 상담경로 : CallCenter */
+		         AND    EQRR_MBR_NO =  ${@framework.common.constants.CommonConstants@NO_MEMBER_NO}
+				 <if test='stId != null'>
+			     AND 		ST_ID = #{stId}
+				</if>				
+				<if test="acptDtmStart != null">
+				AND 		CUS_ACPT_DTM <![CDATA[>=]]> #{acptDtmStart}
+				</if>
+				<if test="acptDtmEnd != null">
+				AND 		CUS_ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{acptDtmEnd},INTERVAL 1 DAY)
+				</if>
+				<if test="name != null and name != ''">
+				AND		EQRR_NM		= #{name}
+				</if>
+				<if test="tel != null and tel != ''">
+				AND		EQRR_TEL		= #{tel}
+				</if>
+				<if test="mobile != null and mobile != ''">
+				AND		EQRR_MOBILE	= #{mobile}
+				</if>
+		        ) AS CUS_CC_CNT
+		        , 0 AS REFUND_CNT
+		        , 0 AS REFUND_AMT
+		        , 0 AS GOODS_CMT_CNT
+		        , 0 AS GOODS_IQR_CNT
+		FROM    DUAL   
+	</select>
+
+	<update id="updateIqrImg">
+		<!--
+			Query Name : counsel.updateIqrImg
+			Description : 이미지 번호 업데이트
+		-->
+		UPDATE	COUNSEL
+		SET		FL_NO		= #{flNo}
+					, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		CUS_NO		= #{cusNo}
+	</update>
+
+</mapper>

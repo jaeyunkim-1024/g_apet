@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업레이어 A 전체 덮는크기 -->
+		<article class="popLayer a popSample1" id="popSample1">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">팝업레이어 POPUP 1</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+
+						<p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p><p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p> <p>sdfsdfsfsd</p>
+						
+					</main>
+				</div>
+				
+				<!-- 하단 고정 버튼 있을때 쓰세요
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl d" onclick="ui.popLayer.close('popSample1');">취소</button>
+						<button type="button" class="btn xl a">등록</button>
+					</div>
+				</div>
+				-->
+				
+				
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popSample1");
+		</script>
+
+</body>
+</html>

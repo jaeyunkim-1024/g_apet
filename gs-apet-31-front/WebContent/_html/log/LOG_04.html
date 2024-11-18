@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 사진선택 높이 */
+			var h = ($(window).height() + 18 - ($(".lmp_addpicBt:eq(0)").offset().top + $(".lmp_addpicBt:eq(0)").height() - $(window).scrollTop() - 14)) / ($(window).height() * 0.01) - 5;/* 2021.02.24 : 수정 */
+			$(".logCommentBox").data("priceh",h+"%");
+			$(".logCommentBox .btn_right,.logCommentBox .btn_left").click(function(){
+				$("body").removeClass("open_mode_both");
+			});
+			/* 2021.02.24 : 스크립트 추가 */
+			$(".log_tagTextBox textarea").focus(function(){
+				$(this).attr("placeholder","");
+				//$(this).css("max-height","150px"); /* 2021.06.30 수정함 */ 2021.07.16 수정함
+				ui.lock.using(true);
+				$(".log_makePicWrap").slideUp(250);
+				$("html,body").stop().animate({"scroll-top":0},300,function(){
+					$(".dim_box_w").css("top",($(".log_tagTextBox").offset().top + $(".log_tagTextBox").innerHeight() + 20)).removeClass("hide");
+				});
+				$(this).closest(".log_basicPw").css("margin-top",0).next().addClass("border_on");
+				$(".mo-header-close, .btnSet").hide();
+				if($(".dim_box_w").length == 0) $("body").append("<div class='dim_box_w hide'></div>");
+				$(".mo-header-rightBtn").show().find(".mo-header-btnType01").text("완료").show().click(function(){
+					ui.lock.using(false);
+					$(".log_makePicWrap").slideDown(250);
+					$(".log_basicPw").css("margin-top","").next().removeClass("border_on");
+					$(".mo-header-close, .btnSet").show();
+					$(".mo-header-rightBtn").hide().find(".mo-header-btnType01").hide()
+					$(".dim_box_w").remove();
+					$(".log_tagTextBox textarea").css("max-height","none").attr("placeholder","오늘은 어떤 추억이 있었나요?"); /* 2021.06.30 수정함 */
+				});
+				/* 04.21 */
+				$(".dim_box_w").click(function(){
+					ui.lock.using(false);
+					$(".log_makePicWrap").slideDown(250);
+					$(".log_basicPw").css("margin-top","").next().removeClass("border_on");
+					$(".mo-header-close, .btnSet").show();
+					$(".mo-header-rightBtn").hide().find(".mo-header-btnType01").hide()
+					$(".dim_box_w").remove();
+					$(".log_tagTextBox textarea").css("max-height","none").attr("placeholder","오늘은 어떤 추억이 있었나요?"); /* 2021.06.30 수정함 */
+				});
+				
+				// 2021.07.16추가함 starto
+				$(".log_tagTextBox").on("keypress", "textarea", function(e) {
+					if( $(".log_tagTextBox textarea").outerHeight() < 149 ) {
+						$(this).css("max-height","none");
+						document.ontouchmove = function(event){
+						    //event.preventDefault();
+							return false;
+						}
+						//alert("150보다 작음");
+					}else if( $(".log_tagTextBox textarea").outerHeight() > 149 ) {
+						document.ontouchmove = function(event){
+							return;
+						}
+					}
+		         });
+				// 2021.07.16 추가함 end
+			});
+			/* 바톰시트 끌어서 내릴때 일어나는 이벤트 */
+			$(".logCommentBox").bind("popCloseEvent",function(){
+				closePictureCon();
+			});
+			/* 스와이퍼 */
+			/*
+			var madePetlog = new Swiper(".log_makePicWrap .swiper-container", {
+      			slidesPerView: 'auto',
+				slidesPerGroup:1,
+				spaceBetween: 22,
+				freeMode: true,
+      			centeredSlides: true,
+			});
+			*/
+			$(".lttbTagArea ul li").click(function(){
+				let  txt = $(this).text();
+				$(".log_tagTextBox textarea").val(txt);
+			});
+			/* test script */
+			$(".exid").click(function(){
+//				window.open("LOG_01.html","pop");
+			});
+			resizeImg();
+			
+			// APETQA-5398 2021.07.20 추가함 start
+			$(".lttbTagArea").bind("touchstart",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("touchmove",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("touchend",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("mousedown",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("click",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			});
+			
+			$(".log_tagTextBox > textarea").bind("touchstart",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("touchmove",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("touchend",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("mousedown",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			}).bind("click",function(e){
+				document.ontouchmove = function(event){
+					return;
+				}
+			});
+			// APETQA-5398 2021.07.20 추가함 end
+		});
+		/* 바톰시트 오픈 시 */
+		function openPictureCon(){
+			$("body").addClass("open_mode_both");
+		};
+		/* 바톰시트 닫을 시 */
+		function closePictureCon(){
+			$("body").removeClass("open_mode_both");
+		};
+		/* img size */
+		function resizeImg(){
+			$(".log_makePicWrap .swiper-slide img").each(function(i,n){
+				let w = $(n).innerWidth();
+				let h = $(n).innerHeight();
+				let cl = (w<h)?"a w":"a h";
+				$(n).attr("class",cl);
+				if($(n).innerWidth() < $(n).parent().innerWidth()){
+					console.log("re class : " + i)
+					$(n).attr("class","a w");
+				}
+				if($(n).innerHeight() < $(n).parent().innerHeight()){
+					console.log("re class : " + i)
+					$(n).attr("class","a h");
+				}
+			})
+		}
+		//2021.07.02
+		$(document).ready(function() {	         
+	         var textAcont = $(".log_tagTextBox textarea");
+	         textAcont.css({"max-height":"none"});
+	         
+	         $(".log_tagTextBox").on("keypress", "textarea", function(e) {
+	             $(this).height(this.scrollHeight - 40);
+	         });
+	         $(".log_tagTextBox").find("textarea").keypress();
+	         
+      		// 2021.07.16 추가함 start
+	         if( $(".log_tagTextBox textarea").outerHeight() > 149 ) {
+				document.ontouchmove = function(event){
+					return;
+				}
+			 }
+
+	         $(".log_tagTextBox textarea").click(function(){
+		         textAcont.css({"max-height":"150px"});
+			 });
+			 // 2021.07.16 추가함 end
+         });
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set10","tit":"<b class=e>로그 만들기</b>","class":"noneAc"}' data-btn-rname="등록"></include>	<!-- APET-1250 210721 lju02 - 샵 서비스명 변경 -->
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log made" id="contents"><!-- 2021.01.18 : class 추가 -->
+					<div class="log_makePicWrap">
+						<div class="con swiper-container">
+							<ul class="swiper-wrapper">
+								<!--
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_addpicBt first" onClick="ui.commentBox.open('.logCommentBox');openPictureCon()">
+										<div>
+											<span class="lmp_addPicIcon"></span>
+											<div class="txt">사진 또는 영상을<br />등록해주세요.</div>
+										</div>
+									</a>
+								</li>
+								-->
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/plans_1_mo.jpg" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/video_test_2.jpg" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/log_logMade01.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/cate_1_pc.jpg" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/img_pc_900.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/temp_logDogImg02.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/temp_logDogImg01.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/MicrosoftTeams-image.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li class="swiper-slide block_area">
+									<a href="javascript:alert(12312312);" class="lmp_addpicBt">
+										<div>
+											<span class="lmp_addPicIcon"></span>
+											<div class="txt">추가/편집</div>
+										</div>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+                    <!-- // picture -->
+					<!-- bagic wrap
+					<div class="log_basicPw">
+						<div class="log_nBoxText">오늘은 어떤 추억이 있었나요?</div>
+					</div>
+					bagic wrap-->
+					<!-- bagic wrap-->
+					<div class="log_basicPw focus_on"><!-- 2021.02.24 : focus_on 클래스 추가 -->
+						<!-- tag -->
+						<div class="log_tagTextBox">
+							<!-- 2021-01-18 : 수정 -->
+							<!-- 입력창 -->
+							<textarea name="" id="" placeholder="오늘은 어떤 추억이 있었나요?"></textarea>
+							<!-- tag 셀렉터 부분 -->
+							<div class="lttbTagArea" style="display:none;">
+								<!-- 04.19 HTML 수정 -->
+								<ul>
+									<li>
+										<a href="javascript:;">#태그1</a>
+									</li>
+									<li>
+										<a href="javascript:;">#태그2</a>
+									</li>
+									<li>
+										<a href="javascript:;">#태그3</a>
+									</li>
+								</ul>
+								<!-- 04.19 HTML 수정 -->
+							</div>
+							<!-- // tag 셀렉터 부분 -->
+							<!-- // 2021-01-18 : 수정 -->
+						</div>
+						<!-- // tag -->
+					</div>
+					<!-- // bagic wrap-->
+					<div class="log_topBbox locaRegi">				<!-- locaRegi 클래스는 위치 등록 박스에 추가할 클래스 입니다. 2021.07.13 추가함 -->
+						<div class="top_tit exid"><div class="tit">위치 등록</div><a href="javascript:;" class="log_arrIcon"></a></div><!-- "위치 등록"으로 텍스트 변경해주세요! 실서버 "위치 정보"로 운영됨. 2021.06.30 수정함 -->
+					</div>
+					
+					<!-- 위치등록 리스트?? -->
+					<div class="log_pointEnterList ">
+						<ul>
+							<li>
+								<div class="tit">LG 아트센터</div>
+								<div class="con">534m 거리</div>
+								<a href="javascript:;" class="log_pelClose"></a>
+							</li>
+						</ul>
+					</div>
+					<!-- // 위치등록 리스트?? -->	
+					<!-- // top borader box-->
+					<!-- // tag -->
+					<!-- 위치등록 리스트??
+					<div class="log_pointEnterList mt16">
+						<ul>
+							<li>
+								<div class="tit">LG 아트센터</div>
+								<div class="con">534m 거리</div>
+								<a href="javascript:;" class="log_pelClose"></a>
+							</li>
+						</ul>
+					</div>
+					// 위치등록 리스트?? -->
+					<!-- top borader box-->
+					<div class="log_topBbox">
+						<div class="top_tit t2"><div class="tit">연관상품 추천받기</div></div><!-- 2021.02.23 : inline style 추가 -->
+						<div class="con_input">
+							<label class="checkbox"><input type="checkbox"><span class="txt">등록한 이미지와 비슷한 상품이 자동 추천됩니다.</span></label>
+						</div>
+					</div>	
+					<!-- // top borader box-->
+					<!-- 2021.03.04 : 추가 -->
+					<!-- btn -->
+					<div class="pbt pull log_basicPw mt60">
+						<div class="btnSet">
+							<a href="javascript:;" class="btn lg a">등록</a>
+						</div>
+					</div>
+					<!-- // btn -->
+					<!-- // 2021.03.04 : 추가 -->
+					<!-- 사진선택 -->
+					<div class="commentBoxAp logCommentBox" data-priceh="100%">
+						<div class="head">
+							<div class="con">
+								<div class="tit cen"></div>
+								<a href="javascript:;" class="btn_left" onClick="ui.commentBox.close(this);openPictureCon();">완료</a><!-- 2021.02.24 : 온클릭이벤트 "openPictureCon" 함수 추가  -->
+								<a href="javascript:;" class="btn_right logColorBlue" onClick="ui.commentBox.close(this);openPictureCon();" disabled>취소</a><!-- 'logColorBlue' 클래스 추가 시 파란색 글씨 //  'disabled' 제거 시 검정색 글씨 // 'disabled' attribute 있을 시 회식 글씨  --><!-- 2021.02.24 : 온클릭이벤트 "openPictureCon" 함수 추가  -->
+							</div>
+						</div>
+						<div class="con">
+							<div class="box full">
+								<!-- content -->
+
+								<!-- // content -->
+							</div>
+						</div>
+					</div>
+					<!-- //사진선택 -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

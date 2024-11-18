@@ -1,0 +1,148 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>platform</groupId>
+		<artifactId>main</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../gs-apet-00-platform</relativePath>
+	</parent>
+
+	<artifactId>front</artifactId>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>platform</groupId>
+			<artifactId>business</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+
+		<sourceDirectory>src</sourceDirectory>
+
+		<resources>
+			<resource>
+				<directory>resources</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+
+			<!-- 동적파일 생성(WAR) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<warSourceExcludes>
+						_css/**/*,
+						_error/**/*,
+						_font/**/*,
+						_images/**/*,
+						_html/**/*,
+						_template/**/*,
+						_script/**/*,
+						*.html
+					</warSourceExcludes>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+					<webResources>
+						<resource>
+							<directory>../gs-apet-11-business/profiles/${bizTarget}/resources</directory>
+							<targetPath>/WEB-INF/classes</targetPath>
+						</resource>
+						<resource>
+							<directory>profiles/${deployTarget}/resources</directory>
+							<targetPath>/WEB-INF/classes</targetPath>
+						</resource>
+						<resource>
+							<directory>profiles/${deployTarget}/WEB-INF</directory>
+							<targetPath>/WEB-INF</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<encoding>utf-8</encoding>
+							<outputDirectory>${basedir}/target/web-resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>WebContent</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>_css/**/*</include>
+										<include>_error/**/*</include>
+										<include>_font/**/*</include>
+										<include>_images/**/*</include>
+										<include>_script/**/*</include>
+										<include>_html/**/*</include>
+										<include>*.html</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+
+	</build>
+
+	<profiles>
+
+		<!-- 개발서버 -->
+		<profile>
+			<id>dev</id>
+			<properties>
+				<deployTarget>dev</deployTarget>
+				<bizTarget>dev</bizTarget>
+			</properties>
+		</profile>
+		<!-- //개발서버 -->
+
+		<!-- QA 서버 -->
+		<profile>
+			<id>stg</id>
+			<properties>
+				<deployTarget>stg</deployTarget>
+				<bizTarget>stg</bizTarget>
+			</properties>
+		</profile>
+		<!-- // QA 서버 -->
+
+		<!-- 운영서버 -->
+		<profile>
+			<id>prd</id>
+			<properties>
+				<deployTarget>prd</deployTarget>
+				<bizTarget>prd</bizTarget>
+			</properties>
+		</profile>
+		<!-- //운영서버 -->
+
+	</profiles>
+
+</project>

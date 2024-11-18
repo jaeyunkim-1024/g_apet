@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="filter">
+
+    <select id="filterGoodsBrand" resultType="biz.app.brand.model.BrandBaseVO">
+		SELECT T.* /* QUERYID(filter.filterGoodsBrand) */
+		 FROM 
+			(SELECT	
+				B.BND_NO
+				, COUNT(B.BND_NO) AS BND_CNT
+				,B.BND_NM_KO   AS BND_NM
+				, Q.GOODS_CNT
+				, Q.DISP_PRIOR_RANK
+				, Q.SALE_AMT
+	            ,IFNULL(Q.SALE_QTY, 0) AS SALE_QTY
+			FROM
+				(SELECT  
+					CASE WHEN FN_GET_GOODS_STOCK(T1.GOODS_ID,NULL) <![CDATA[<=]]> 0 
+						THEN 'Y' ELSE 'N' END AS SOLD_OUT_YN 
+					, T1.*
+						FROM 
+						GOODS_BASE T1 JOIN ITEM  I ON T1.GOODS_ID = I.GOODS_ID
+						<if test="dispClsfNo != null">
+							AND EXISTS (
+								SELECT 1
+								FROM DISPLAY_GOODS DG
+								WHERE GOODS_ID = T1.GOODS_ID
+								AND DISP_CLSF_NO IN (
+									SELECT DISP_CTG_NO
+									FROM JSON_TABLE( REPLACE(JSON_ARRAY(FN_GET_DISP_CTG_NO_LISTS(#{dispClsfNo})), ',', '","'), '$[*]' COLUMNS (DISP_CTG_NO BIGINT PATH '$')) J
+								)
+							)					
+						</if>
+	            ) G 
+	            INNER JOIN BRAND_BASE B ON G.BND_NO = B.BND_NO
+				LEFT OUTER JOIN BEST_BRAND_TOTAL Q ON Q.BND_NO = B.BND_NO AND Q.TOTAL_DT = DATE_FORMAT(NOW() - INTERVAL 1 DAY,'%Y%m%d')
+				<if test="tags != null">
+					INNER JOIN GOODS_TAG_MAP M ON M.GOODS_ID = G.GOODS_ID 
+					<foreach collection="tags" item="tag" separator="," open="AND TAG_NO IN (" close=")">
+						#{tag}
+					</foreach>
+				</if>
+			WHERE 1=1
+			<choose>
+				<when test='saleOutYn eq "N"'>
+					/* 품절상품 제외 */AND G.SOLD_OUT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+					/*AND G.OSTK_GOODS_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'*/
+				</when>
+				<otherwise>
+					/* 품절상품 포함 */AND (G.SOLD_OUT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+						OR (G.SOLD_OUT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' AND
+							G.OSTK_GOODS_SHOW_YN != '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+						)
+					)
+				</otherwise>
+			</choose>
+			AND B.USE_YN= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND G.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND CASE WHEN G.GOODS_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_TP_40}' THEN NOW() BETWEEN G.SALE_STRT_DTM AND G.SALE_END_DTM ELSE 1 = 1 END
+			AND CASE WHEN G.GOODS_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_TP_40}' THEN G.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+				ELSE G.GOODS_STAT_CD IN ('${@framework.common.constants.CommonConstants@GOODS_STAT_40}' , '${@framework.common.constants.CommonConstants@GOODS_STAT_50}') END
+			AND NOW() <![CDATA[>]]> G.SALE_STRT_DTM
+			GROUP BY BND_NO, BND_NM_KO, SALE_QTY, GOODS_CNT, DISP_PRIOR_RANK, SALE_AMT
+			) T
+		<include refid="bizCommon.sortSql" />
+    </select>
+    
+	<select id="getFilterGoodsBrand" resultType="biz.app.brand.model.BrandBaseVO">
+		SELECT	/* QUERYID(filter.getFilterGoodsBrand) */
+			B.BND_NO
+			,B.BND_TP_CD
+			,B.BND_NM_KO
+			,B.BND_NM_EN
+		FROM BRAND_BASE B
+		WHERE B.BND_NO IN <foreach collection="brandNos" item="bndNo" separator="," open=" (" close=")">#{bndNo}</foreach>
+    </select>
+	
+	<select id="filterGoodsCategory" resultType="biz.app.goods.model.FiltAttrMapVO">
+		SELECT /* QUERYID(filter.filterGoodsCategory) */
+			F.FILT_GRP_NO
+			,F.FILT_ATTR_SEQ
+			,F.FILT_ATTR_NM
+			, CONCAT(FILT_GRP_NO , '_', FILT_ATTR_SEQ) AS FILT_ID
+		FROM GOODS_FILT_ATTR F
+		WHERE CONCAT(FILT_GRP_NO , '_', FILT_ATTR_SEQ) 
+		IN (<foreach collection="filters" item="filter" separator="," open="" close="">#{filter}</foreach>)
+	</select>
+	
+</mapper>

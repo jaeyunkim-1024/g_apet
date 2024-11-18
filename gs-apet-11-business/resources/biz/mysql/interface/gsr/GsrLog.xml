@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	CRM LOG
+	작성자 		김재윤
+	작성일자  	2021. 03. 12.
+-->
+
+<mapper namespace="gsrLog">
+    <resultMap type="biz.app.member.model.MemberBaseVO" id="memberBaseVoMap" >
+        <result property="mbrNm" column="MBR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="loginId" column="LOGIN_ID" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="birth" column="BIRTH" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="mobile" column="MOBILE" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="email" column="EMAIL" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="roadDtlAddr" column="ROAD_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="prclDtlAddr" column="PRCL_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+        <result property="updrIp" column="UPDR_IP" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+    </resultMap>
+
+    <select id="listGsrLnkHist" resultType="biz.interfaces.gsr.model.GsrLnkHistVO">
+        <!--
+			Query Name : gsrLog.listGsrLnkHist
+			Description : CRM 호출 이력 조회
+			Writter : 김재윤
+		-->
+        SELECT   /* QUERYID(gsrLog.listGsrLnkHist) */
+                 GSR_LNK_HIST_NO
+             ,   GSR_LNK_CD
+             ,   PNT_RSN_CD
+             ,   REQ_PARAM
+             ,   REQ_DTM
+             ,   REQ_SCSS_YN
+             ,   RST_CD
+             ,   ERR_PRCS_REQ_DTM
+             ,   ERR_PRCS_SCSS_YN
+             ,   SYS_REGR_NO
+             ,   SYS_REG_DTM
+             ,   SYS_UPDR_NO
+             ,   SYS_UPD_DTM
+        FROM GSR_LNK_HIST
+        WHERE 1=1
+        <include refid="whereListGsrLnkHist"/>
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+    </select>
+
+    <select id="listGsrLnkHistCount" resultType="java.lang.Integer">
+        SELECT /* QUERYID(gsrLog.listGsrLnkHistCount) */ COUNT(*)
+        FROM GSR_LNK_HIST
+        <include refid="whereListGsrLnkHist"/>
+    </select>
+
+    <sql id="whereListGsrLnkHist">
+        <if test="reqStrtDtm != null">
+            AND REQ_DTM &gt; DATE_FORMAT(#{reqStrtDtm},'%Y-%m-%d')
+        </if>
+        <if test="reqEndDtm != null">
+            AND REQ_DTM &lt; DATE_FORMAT(#{reqEndDtm},'%Y-%m-%d')
+        </if>
+        <if test="errPrcsReqStrtDtm != null">
+            AND ERR_PRCS_REQ_DTM &gt; DATE_FORMAT(#{errPrcsReqStrtDtm},'%Y-%m-%d')
+        </if>
+        <if test="errPrcsReqEndDtm != null">
+            AND ERR_PRCS_REQ_DTM &lt; DATE_FORMAT(#{errPrcsReqEndDtm},'%Y-%m-%d')
+        </if>
+        <if test="reqScssYn != null and reqScssYn != '' ">
+            AND REQ_SCSS_YN = #{reqScssYn}
+        </if>
+        <if test="gsrLnkCd != null and gsrLnkCd != '' ">
+            AND GSR_LNK_CD = #{gsrLnkCd}
+        </if>
+    </sql>
+
+    <select id="getGsrLnkHistDetail" resultType="biz.interfaces.gsr.model.GsrLnkHistVO">
+        <!--
+			Query Name : gsrLog.getGsrLnkHistDetail
+			Description : CRM 호출 이력 상세 조회
+			Writter : 김재윤
+		-->
+        SELECT   /* QUERYID(gsrLog.getGsrLnkHistDetail) */
+                 GSR_LNK_HIST_NO
+             ,   GSR_LNK_CD
+             ,   PNT_RSN_CD
+             ,   REQ_PARAM
+             ,   REQ_DTM
+             ,   REQ_SCSS_YN
+             ,   RST_CD
+             ,   ERR_PRCS_REQ_DTM
+             ,   ERR_PRCS_SCSS_YN
+             ,   SYS_REGR_NO
+             ,   SYS_REG_DTM
+             ,   SYS_UPDR_NO
+             ,   SYS_UPD_DTM
+        FROM GSR_LNK_HIST
+        WHERE GSR_LNK_HIST_NO = #{gsrLnkHistNo}
+    </select>
+
+    <insert id="insertGsrLnkHist" parameterType="biz.interfaces.gsr.model.GsrLnkHistPO">
+        <selectKey keyProperty="gsrLnkHistNo" order="BEFORE" resultType="Long">
+            SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GSR_LNK_HIST_SEQ}') FROM DUAL;
+        </selectKey>
+        INSERT INTO GSR_LNK_HIST ( /* QUERYID(gsrLog.insertGsrLnkHist) */
+                    GSR_LNK_HIST_NO
+                ,   GSR_LNK_CD
+                ,   PNT_RSN_CD
+                ,   REQ_PARAM
+				,	REQ_DTM
+                ,   REQ_SCSS_YN
+                ,   RST_CD
+                ,   SYS_REG_DTM
+                ,   SYS_UPD_DTM
+                ,   SYS_REGR_NO
+                ,   SYS_UPDR_NO
+        )VALUES(
+                    #{gsrLnkHistNo}
+                ,   #{gsrLnkCd}
+                ,   #{pntRsnCd}
+                ,   #{reqParam}
+                ,   NOW()
+                ,   #{reqScssYn}
+                ,   #{rstCd}
+                ,   NOW()
+                ,   NOW()
+                <choose>
+                    <when test="sysRegrNo != null and sysRegrNo != 0">
+                        ,   #{sysRegrNo}
+                        ,   #{sysUpdrNo}
+                    </when>
+                    <when test="mbrNo != 0 and mbrNo != null">
+                        ,   #{mbrNo}
+                        ,   #{mbrNo}
+                    </when>
+                    <when test="gsptNo != null and gsptNo != '' ">
+                        ,   (SELECT MBR_NO FROM MEMBER_BASE WHERE GSPT_NO = #{gsptNo} AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' ORDER BY GSPT_START_DTM DESC LIMIT 1 )
+                        ,   (SELECT MBR_NO FROM MEMBER_BASE WHERE GSPT_NO = #{gsptNo} AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' ORDER BY GSPT_START_DTM DESC LIMIT 1 )
+                    </when>
+                    <when test="updrIp != null and updrIp != ''">
+                        ,   (SELECT MBR_NO FROM MEMBER_BASE WHERE UPDR_IP = #{updrIp ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler} AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' ORDER BY SYS_UPD_DTM DESC LIMIT 1 )
+                        ,   (SELECT MBR_NO FROM MEMBER_BASE WHERE UPDR_IP = #{updrIp ,jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler} AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' ORDER BY SYS_UPD_DTM DESC LIMIT 1 )
+                    </when>
+                    <otherwise>
+                        ,   NULL
+                        ,   NULL
+                    </otherwise>
+                </choose>
+        )
+    </insert>
+    
+    <select id ="gsrLinkedHistoryGrid" resultType ="biz.interfaces.gsr.model.GsrLnkHistVO">
+    	SELECT
+    		    GSR_LNK_HIST_NO
+    		,   GSR_LNK_CD
+    		,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@GSR_LNK}',GSR_LNK_CD,'') AS GSR_LNK_NM
+    		,   PNT_RSN_CD
+    		,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@PNT_RSN}',PNT_RSN_CD,'') AS PNT_RSN_NM
+    		,   REQ_PARAM
+            ,   IFNULL(JSON_UNQUOTE(JSON_EXTRACT(REQ_PARAM,'$.point')),'') AS POINT
+    		,   REQ_DTM
+    		,   REQ_SCSS_YN
+    		,   RST_CD
+    		,   ERR_PRCS_REQ_DTM
+    		,   ERR_PRCS_SCSS_YN
+    	FROM
+    		GSR_LNK_HIST
+    	WHERE 1 = 1
+    	<if test = "gsrLnkHistNo != null and gsrLnkHistNo != ''">
+    		AND GSR_LNK_HIST_NO = #{gsrLnkHistNo}
+    	</if>
+    	<if test = "gsrLnkCd != null and gsrLnkCd != ''">
+    		AND GSR_LNK_CD = #{gsrLnkCd}
+    	</if>
+    	<if test = "pntRsnCd != null and pntRsnCd != ''">
+    		AND pntRsnCd = #{pntRsnCd}
+    	</if>
+    	<if test = "reqScssYn != null and reqScssYn != ''">
+    		AND REQ_SCSS_YN = #{reqScssYn}
+    	</if>
+    	<if test = "errPrcsScssYn != null and errPrcsScssYn != ''">
+    		AND ERR_PRCS_SCSS_YN = #{errPrcsScssYn}
+    	</if>
+       <if test="reqStrtDtm != null ">
+            AND REQ_DTM &gt; DATE_FORMAT(#{reqStrtDtm},'%Y-%m-%d')
+        </if>
+        <if test="reqEndDtm != null ">
+            AND REQ_DTM &lt; DATE_FORMAT(#{reqEndDtm},'%Y-%m-%d')
+        </if>
+        <include refid="bizCommon.sortSql" />
+        <include refid="bizCommon.pageSql" />
+    </select>
+    
+    
+    <select id ="gsrLinkedHistoryGridCount" resultType ="java.lang.Integer">
+    	SELECT COUNT(*)
+    	FROM GSR_LNK_HIST
+    	WHERE 1 = 1
+        <if test = "gsrLnkHistNo != null and gsrLnkHistNo != ''">
+    		AND GSR_LNK_HIST_NO = #{gsrLnkHistNo}
+    	</if>
+    	<if test = "gsrLnkCd != null and gsrLnkCd != ''">
+    		AND GSR_LNK_CD = #{gsrLnkCd}
+    	</if>
+    	<if test = "pntRsnCd != null and pntRsnCd != ''">
+    		AND pntRsnCd = #{pntRsnCd}
+    	</if>
+    	<if test = "reqScssYn != null and reqScssYn != ''">
+    		AND REQ_SCSS_YN = #{reqScssYn}
+    	</if>
+    	<if test = "errPrcsScssYn != null and errPrcsScssYn != ''">
+    		AND ERR_PRCS_SCSS_YN = #{errPrcsScssYn}
+    	</if>
+       <if test="reqStrtDtm != null">
+            AND REQ_DTM &gt; DATE_FORMAT(#{reqStrtDtm},'%Y-%m-%d')
+        </if>
+        <if test="reqEndDtm != null ">
+            AND REQ_DTM &lt; DATE_FORMAT(#{reqEndDtm},'%Y-%m-%d')
+        </if> 	
+    </select>
+
+    <insert id="insertGsrLnkMap" >
+        INSERT INTO GSR_LNK_MAP( /* QUERYID(gsrLog.insertGsrLnkMap) */
+                RCPT_NO
+            ,   ORD_NO
+            ,   PET_LOG_NO
+            ,   GOODS_ESTM_NO
+            ,   APPR_NO
+            ,   APPR_DATE
+            ,   ORG_APPR_NO
+            ,   ORG_APPR_DATE
+            ,   SYS_REGR_NO
+            ,   SYS_REG_DTM
+        )VALUES(
+                #{rcptNo}
+            ,   #{ordNo}
+            ,   #{petLogNo}
+            ,   #{goodsEstmNo}
+            ,   #{apprNo}
+            ,   #{apprDate}
+            ,   #{orgApprNo}
+            ,   #{orgApprDate}
+            <choose>
+                <when test="sysRegrNo != null and sysRegrNo != 0">
+                    ,   #{sysRegrNo}
+                </when>
+                <otherwise>
+                    ,   (SELECT MBR_NO FROM MEMBER_BASE WHERE GSPT_NO = #{gsptNo} AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' ORDER BY GSPT_START_DTM DESC LIMIT 1 )
+                </otherwise>
+            </choose>
+            ,   NOW()
+        )
+    </insert>
+
+    <select id="getGsrLnkMap" resultType="biz.interfaces.gsr.model.GsrLnkMapVO">
+        SELECT RCPT_NO, ORD_NO, PET_LOG_NO, GOODS_ESTM_NO, APPR_NO, APPR_DATE, ORG_APPR_NO, ORG_APPR_DATE, SYS_REGR_NO, SYS_REG_DTM
+        FROM GSR_LNK_MAP
+        WHERE 1=1
+        <if test="ordNo != null and ordNo != ''">
+            AND ORD_NO = #{ordNo}
+            AND GOODS_ESTM_NO IS NULL
+        </if>
+        <if test="petLogNo != null and petLogNo != 0 ">
+            AND PET_LOG_NO = #{petLogNo}
+        </if>
+        <if test="goodsEstmNo != null and goodsEstmNo != 0 ">
+            AND ORD_NO IS NOT NULL
+            AND GOODS_ESTM_NO = #{goodsEstmNo}
+        </if>
+        <if test="apprNo != null and apprNo != ''">
+            AND APPR_NO = #{apprNo}
+        </if>
+        <if test="apprDate != null and apprDate != ''">
+            AND APPR_DATE = #{apprDate}
+        </if>
+    </select>
+
+    <select id="getRcptNoCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM GSR_LNK_MAP
+        WHERE 1=1
+        <if test="ordNo != null and ordNo != ''">
+            AND ORD_NO = #{ordNo}
+        </if>
+        <if test="petLogNo != null and petLogNo != 0 ">
+            AND PET_LOG_NO = #{petLogNo}
+        </if>
+        <if test="goodsEstmNo != null and goodsEstmNo != 0 ">
+            AND ORD_NO = #{ordNo}
+            AND GOODS_ESTM_NO IS NOT NULL
+        </if>
+        <if test="apprNo != null and apprNo != ''">
+            AND APPR_NO = #{apprNo}
+        </if>
+        <if test="apprDate != null and apprDate != ''">
+            AND APPR_DATE = #{apprDate}
+        </if>
+    </select>
+
+    <select id="listCheckMember" resultMap="memberBaseVoMap">
+        SELECT DISTINCT GLH.SYS_REGR_NO AS MBR_NO
+                      , IF(JSON_UNQUOTE(JSON_EXTRACT(REQ_PARAM,'$.sex_code'))='M','10','20') AS GD_GB_CD
+        FROM GSR_LNK_HIST GLH
+        WHERE SYS_REGR_NO IN (
+            SELECT MBR_NO
+            FROM MEMBER_BASE
+            WHERE MBR_GB_CD ='10' AND GD_GB_CD IS NULL AND (GSPT_NO IS NULL OR GSPT_NO = '')
+        ) AND JSON_UNQUOTE(JSON_EXTRACT(REQ_PARAM,'$.sex_code')) IS NOT NULL
+        order by sys_regr_no
+    </select>
+
+    <update id="updateGsptState" parameterType="biz.app.member.model.MemberBasePO">
+        <choose>
+            <when test="gsptNo != null and gsptNo != '' ">
+                UPDATE MEMBER_BASE
+                SET    GSPT_STATE_CD = #{gsptStateCd}
+                <choose>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_10)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+                        , GSPT_START_DTM = NOW()
+                    </when>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_20)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                        , GSPT_STOP_DTM = NOW()
+                    </when>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_30)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                    </when>
+                    <otherwise></otherwise>
+                </choose>
+                WHERE GSPT_NO = #{gsptNo}
+            </when>
+            <when test="mbrNo != null and mbrNo != 0L">
+                UPDATE MEMBER_BASE
+                SET    GSPT_STATE_CD = #{gsptStateCd}
+                <choose>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_10)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+                        , GSPT_START_DTM = NOW()
+                    </when>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_20)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                        , GSPT_STOP_DTM = NOW()
+                    </when>
+                    <when test="gsptStateCd.equals(@framework.common.constants.CommonConstants@GSPT_STATE_30)">
+                        , GSPT_USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                    </when>
+                    <otherwise></otherwise>
+                </choose>
+                WHERE MBR_NO = #{mbrNo}
+            </when>
+            <otherwise></otherwise>
+        </choose>
+    </update>
+
+    <insert id="insertMemberBaseHistroyByGsptNo">
+        <choose>
+            <when test="gsptNo != null and gsptNo != '' ">
+                INSERT /* QUERYID(MemberBase.insertMemberBaseHistory) */
+                INTO member_base_history (
+                MBR_NO
+                ,	UPDR_IP
+                ,	HIST_STRT_DTM
+                ,   ST_ID
+                ,   POLICY_NO
+                ,   LOGIN_ID
+                ,   MBR_NM
+                ,   NICK_NM
+                ,   PET_LOG_URL
+                ,   PET_LOG_SRT_URL
+                ,   RCOM_CD
+                ,   RCOM_URL
+                ,   MBR_GB_CD
+                ,   MBR_STAT_CD
+                ,   MBR_GRD_CD
+                ,   BIRTH
+                ,   GD_GB_CD
+                ,   NTN_GB_CD
+                ,   JOIN_DTM
+                ,   MOD_DTM
+                ,   JOIN_PATH_CD
+                ,   JOIN_ENV_CD
+                ,   CTF_YN
+                ,   CI_CTF_VAL
+                ,   DI_CTF_VAL
+                ,   GSPT_NO
+                ,   GSPT_USE_YN
+                ,   GSPT_STATE_CD
+                ,   GSPT_START_DTM
+                ,   GSPT_STOP_DTM
+                ,   DEVICE_TOKEN
+                ,   DEVICE_TP_CD
+                ,   INFO_RCV_YN
+                ,   MKNG_RCV_YN
+                ,   PST_INFO_AGR_YN
+                ,   ALM_RCV_YN
+                ,   DFFC_MBR_YN
+                ,   PET_SCHL_YN
+                <!-- , EMAIL_RCV_YN
+                , EMAIL_RCV_DT
+                , SMS_RCV_YN -->
+                <!--  , SMS_RCV_DT -->
+                , PSWD
+                , PSWD_INIT_YN
+                , PSWD_CHG_DTM
+                , LOGIN_FAIL_CNT
+                , LAST_LOGIN_DTM
+                , PSWD_CHG_SCD_DTM
+                <!-- , TEL -->
+                , MOBILE
+                , MOBILE_CD
+                , EMAIL
+                , RCOM_LOGIN_ID
+                , MBR_LEV_RSN_CD
+                , MBR_LEV_CONTENT
+                , MBR_LEV_DTM
+                , RE_JOIN_PSB_DT
+                , DORMANT_APL_DTM
+                , MBR_STOP_DTM
+                , DLGT_PET_GB_CD
+                , PET_LOG_ITRDC
+                , PRFL_IMG
+                , DORMANT_RLS_DTM
+                , BUY_CNT
+                , SYS_REGR_NO
+                , SYS_REG_DTM
+                , SYS_UPDR_NO
+                , SYS_UPD_DTM
+                , SIMP_SCR_NO
+                , BILL_INPUT_FAIL_CNT
+                , mig_memNo
+                , ALM_RCV_UPD_DTM
+                , MKNG_RCV_UPD_DTM
+                )
+                SELECT
+                MBR_NO
+                , #{updrIp}	    /* 수정자 IP            */
+                ,	NOW()
+                ,   ST_ID
+                ,   POLICY_NO
+                ,   LOGIN_ID
+                ,   MBR_NM
+                ,   NICK_NM
+                ,   PET_LOG_URL
+                ,   PET_LOG_SRT_URL
+                ,   RCOM_CD
+                ,   RCOM_URL
+                ,   MBR_GB_CD
+                ,   MBR_STAT_CD
+                ,   MBR_GRD_CD
+                ,   BIRTH
+                ,   GD_GB_CD
+                ,   NTN_GB_CD
+                ,   JOIN_DTM
+                ,   MOD_DTM
+                ,   JOIN_PATH_CD
+                ,   JOIN_ENV_CD
+                ,   CTF_YN
+                ,   CI_CTF_VAL
+                ,   DI_CTF_VAL
+                ,   GSPT_NO
+                ,   GSPT_USE_YN
+                ,   GSPT_STATE_CD
+                ,   GSPT_START_DTM
+                ,   GSPT_STOP_DTM
+                ,   DEVICE_TOKEN
+                ,   DEVICE_TP_CD
+                ,   INFO_RCV_YN
+                ,   MKNG_RCV_YN
+                ,   PST_INFO_AGR_YN
+                ,   ALM_RCV_YN
+                ,   DFFC_MBR_YN
+                ,   PET_SCHL_YN
+                , PSWD
+                , PSWD_INIT_YN
+                , PSWD_CHG_DTM
+                , LOGIN_FAIL_CNT
+                , LAST_LOGIN_DTM
+                , PSWD_CHG_SCD_DTM
+                <!-- , TEL -->
+                , MOBILE
+                , MOBILE_CD
+                , EMAIL
+                , RCOM_LOGIN_ID
+                , MBR_LEV_RSN_CD
+                , MBR_LEV_CONTENT
+                , MBR_LEV_DTM
+                , RE_JOIN_PSB_DT
+                , DORMANT_APL_DTM
+                , MBR_STOP_DTM
+                , DLGT_PET_GB_CD
+                , PET_LOG_ITRDC
+                , PRFL_IMG
+                , DORMANT_RLS_DTM
+                , BUY_CNT
+                , SYS_UPDR_NO AS 'SYS_REGR_NO'
+                , SYS_UPD_DTM AS 'SYS_REG_DTM'
+                , SYS_UPDR_NO
+                , SYS_UPD_DTM
+                , SIMP_SCR_NO
+                , BILL_INPUT_FAIL_CNT
+                , mig_memNo
+                , ALM_RCV_UPD_DTM
+                , MKNG_RCV_UPD_DTM
+                FROM member_base
+                WHERE GSPT_NO =  #{gsptNo}
+            </when>
+            <when test="mbrNo != null and mbrNo != 0L">
+                INSERT /* QUERYID(MemberBase.insertMemberBaseHistory) */
+                INTO member_base_history (
+                MBR_NO
+                ,	UPDR_IP
+                ,	HIST_STRT_DTM
+                ,   ST_ID
+                ,   POLICY_NO
+                ,   LOGIN_ID
+                ,   MBR_NM
+                ,   NICK_NM
+                ,   PET_LOG_URL
+                ,   PET_LOG_SRT_URL
+                ,   RCOM_CD
+                ,   RCOM_URL
+                ,   MBR_GB_CD
+                ,   MBR_STAT_CD
+                ,   MBR_GRD_CD
+                ,   BIRTH
+                ,   GD_GB_CD
+                ,   NTN_GB_CD
+                ,   JOIN_DTM
+                ,   MOD_DTM
+                ,   JOIN_PATH_CD
+                ,   JOIN_ENV_CD
+                ,   CTF_YN
+                ,   CI_CTF_VAL
+                ,   DI_CTF_VAL
+                ,   GSPT_NO
+                ,   GSPT_USE_YN
+                ,   GSPT_STATE_CD
+                ,   GSPT_START_DTM
+                ,   GSPT_STOP_DTM
+                ,   DEVICE_TOKEN
+                ,   DEVICE_TP_CD
+                ,   INFO_RCV_YN
+                ,   MKNG_RCV_YN
+                ,   PST_INFO_AGR_YN
+                ,   ALM_RCV_YN
+                ,   DFFC_MBR_YN
+                ,   PET_SCHL_YN
+                <!-- , EMAIL_RCV_YN
+                , EMAIL_RCV_DT
+                , SMS_RCV_YN -->
+                <!--  , SMS_RCV_DT -->
+                , PSWD
+                , PSWD_INIT_YN
+                , PSWD_CHG_DTM
+                , LOGIN_FAIL_CNT
+                , LAST_LOGIN_DTM
+                , PSWD_CHG_SCD_DTM
+                <!-- , TEL -->
+                , MOBILE
+                , MOBILE_CD
+                , EMAIL
+                , RCOM_LOGIN_ID
+                , MBR_LEV_RSN_CD
+                , MBR_LEV_CONTENT
+                , MBR_LEV_DTM
+                , RE_JOIN_PSB_DT
+                , DORMANT_APL_DTM
+                , MBR_STOP_DTM
+                , DLGT_PET_GB_CD
+                , PET_LOG_ITRDC
+                , PRFL_IMG
+                , DORMANT_RLS_DTM
+                , BUY_CNT
+                , SYS_REGR_NO
+                , SYS_REG_DTM
+                , SYS_UPDR_NO
+                , SYS_UPD_DTM
+                , SIMP_SCR_NO
+                , BILL_INPUT_FAIL_CNT
+                , mig_memNo
+                , ALM_RCV_UPD_DTM
+                , MKNG_RCV_UPD_DTM
+                )
+                SELECT
+                MBR_NO
+                , #{updrIp}	    /* 수정자 IP            */
+                ,	NOW()
+                ,   ST_ID
+                ,   POLICY_NO
+                ,   LOGIN_ID
+                ,   MBR_NM
+                ,   NICK_NM
+                ,   PET_LOG_URL
+                ,   PET_LOG_SRT_URL
+                ,   RCOM_CD
+                ,   RCOM_URL
+                ,   MBR_GB_CD
+                ,   MBR_STAT_CD
+                ,   MBR_GRD_CD
+                ,   BIRTH
+                ,   GD_GB_CD
+                ,   NTN_GB_CD
+                ,   JOIN_DTM
+                ,   MOD_DTM
+                ,   JOIN_PATH_CD
+                ,   JOIN_ENV_CD
+                ,   CTF_YN
+                ,   CI_CTF_VAL
+                ,   DI_CTF_VAL
+                ,   GSPT_NO
+                ,   GSPT_USE_YN
+                ,   GSPT_STATE_CD
+                ,   GSPT_START_DTM
+                ,   GSPT_STOP_DTM
+                ,   DEVICE_TOKEN
+                ,   DEVICE_TP_CD
+                ,   INFO_RCV_YN
+                ,   MKNG_RCV_YN
+                ,   PST_INFO_AGR_YN
+                ,   ALM_RCV_YN
+                ,   DFFC_MBR_YN
+                ,   PET_SCHL_YN
+                , PSWD
+                , PSWD_INIT_YN
+                , PSWD_CHG_DTM
+                , LOGIN_FAIL_CNT
+                , LAST_LOGIN_DTM
+                , PSWD_CHG_SCD_DTM
+                <!-- , TEL -->
+                , MOBILE
+                , MOBILE_CD
+                , EMAIL
+                , RCOM_LOGIN_ID
+                , MBR_LEV_RSN_CD
+                , MBR_LEV_CONTENT
+                , MBR_LEV_DTM
+                , RE_JOIN_PSB_DT
+                , DORMANT_APL_DTM
+                , MBR_STOP_DTM
+                , DLGT_PET_GB_CD
+                , PET_LOG_ITRDC
+                , PRFL_IMG
+                , DORMANT_RLS_DTM
+                , BUY_CNT
+                , SYS_UPDR_NO AS 'SYS_REGR_NO'
+                , SYS_UPD_DTM AS 'SYS_REG_DTM'
+                , SYS_UPDR_NO
+                , SYS_UPD_DTM
+                , SIMP_SCR_NO
+                , BILL_INPUT_FAIL_CNT
+                , mig_memNo
+                , ALM_RCV_UPD_DTM
+                , MKNG_RCV_UPD_DTM
+                FROM member_base
+                WHERE MBR_NO =  #{mbrNo}
+            </when>
+            <otherwise></otherwise>
+        </choose>
+    </insert>
+
+    <select id="getCodeDetailVO" resultType="biz.app.system.model.CodeDetailVO">
+        SELECT 	    CD.GRP_CD			/* 그룹 코드 */
+                ,   CD.DTL_CD          /* 상세 코드*/
+                ,   CD.DTL_NM          /* 상세 명 */
+                ,   CD.DTL_SHT_NM      /* 약어 명 */
+                ,   CD.SORT_SEQ        /* 정렬 순서 */
+                ,   CD.USE_YN          /* 사용 여부 */
+                ,   CD.USR_DFN1_VAL		/* 사용자 정의1 명 */
+                ,   CD.USR_DFN2_VAL		/* 사용자 정의2 명 */
+                ,   CD.USR_DFN3_VAL		/* 사용자 정의3 명 */
+                ,   CD.USR_DFN4_VAL		/* 사용자 정의4 명 */
+                ,   CD.USR_DFN5_VAL		/* 사용자 정의5 명 */
+                ,   CD.SYS_DEL_YN      /* 삭제 여부 */
+        FROM CODE_DETAIL CD
+        INNER JOIN CODE_GROUP CG ON CD.GRP_CD = CG.GRP_CD AND CG.SYS_DEL_YN = 'N'
+        WHERE CD.GRP_CD = #{grpCd}
+        <if test="dtlCd != null and dtlCd != ''">
+            AND CD.DTL_CD = #{dtlCd}
+        </if>
+    </select>
+
+    <select id="getGsrPointAccumeForPetLogReview" resultType="biz.interfaces.gsr.model.GsrMemberPointPO">
+        SELECT      (SELECT GSPT_NO FROM MEMBER_BASE WHERE MBR_NO =  GC.ESTM_MBR_NO ) AS CUST_NO
+             ,      CONCAT(OD.ORD_NO,OD.ORD_DTL_SEQ) AS ORD_NO_FOR_CHECK
+             ,      500 AS POINT
+             ,      GC.GOODS_ESTM_NO AS RCPT_NO
+             ,      DATE_FORMAT(GC.SYS_REG_DTM,'%Y%m%d') AS SALE_DATE
+             ,      DATE_FORMAT(GC.SYS_REG_DTM,'%H%i%s') AS SALE_END_DT
+        FROM goods_comment GC
+                 INNER JOIN order_detail OD ON GC.GOODS_ESTM_NO = OD.GOODS_ESTM_NO AND OD.ORD_DTL_STAT_CD = '170'
+        WHERE GC.GOODS_ESTM_TP = 'PLG'
+        AND GC.SYS_DEL_YN = 'N'
+        AND GC.SYS_REG_DTM BETWEEN '2021-08-01 00:00:00' AND '2021-08-09 09:10:00'
+        AND GC.GOODS_ESTM_NO NOT IN (
+            SELECT GLM.GOODS_ESTM_NO
+            FROM GSR_LNK_MAP GLM
+            WHERE IFNULL(GLM.GOODS_ESTM_NO,'') != ''
+        )
+    </select>
+
+    <select id="findMemberBaseByMobile" resultType="biz.app.member.model.MemberBasePO">
+        <!--
+			Query Name : gsrLog.findMemberBaseByMobile
+			Description : 핸드폰 번호
+			Writer : 김재윤
+			Date : 2021.08.31
+ 		-->
+        SELECT	MBR_NO , LOGIN_ID , CI_CTF_VAL
+        FROM	member_base
+        WHERE	MOBILE = #{mobile}
+        AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+    </select>
+</mapper>

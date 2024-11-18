@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"취소신청"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop my" id="container">
+			<div class="inr">			
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="pc-tit">
+						<h2>취소신청</h2>
+					</div>
+					<div class="oder-cancel border-on">
+						<ul>
+							<li>
+								<div class="untcart cancel">
+									<label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+									<div class="box">
+										<div class="tops">
+											<div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+											<div class="name">
+												<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+												<div class="stt">2개 / 옵션명</div>
+												<div class="price">
+													<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+												</div>
+											</div>
+										</div>
+										<div class="amount">
+											<div class="uispiner">
+												<input type="text" value="1" class="amt" disabled="">
+												<button type="button" class="bt minus">수량더하기</button>
+												<button type="button" class="bt plus">수량빼기</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="untcart">
+									<label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+									<div class="box">
+										<div class="tops">
+											<div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+											<div class="name">
+												<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+												<div class="stt">2개 / 옵션명</div>
+												<div class="price">
+													<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+												</div>
+											</div>
+										</div>
+										<div class="amount">
+											<div class="uispiner">
+												<input type="text" value="1" class="amt" disabled="">
+												<button type="button" class="bt minus">수량더하기</button>
+												<button type="button" class="bt plus">수량빼기</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="exchange-area pc-reposition">
+						<div class="item-box pc-reposition">
+							<p class="tit">취소 사유 </p>
+							<div class="sub-tit">사유 선택</div>
+							<div class="flex-wrap">
+								<label class="radio"><input type="radio" name="radio1"><span class="txt">단순 변심</span></label>
+								<label class="radio"><input type="radio" name="radio1" checked=""><span class="txt">주문 실수</span></label>
+								<label class="radio"><input type="radio" name="radio1"><span class="txt">배송 지연</span></label>
+								<label class="radio"><input type="radio" name="radio1"><span class="txt">상품 품절</span></label>
+							</div>
+							<!-- <p class="info-t2">옵션(사이즈, 색상 등) 변경을 원하시는 경우는 마이페이지에서 신청이 불가합니다. 고객센터로 연락주시기 바랍니다.</p> -->
+							<p class="sub-tit pc-reposition">상세 사유 입력</p>
+							<div class="textarea">
+								<textarea placeholder="내용을 입력해주세요."></textarea>
+							</div>
+							
+						</div>
+						<div class="item-box pc-reposition">
+							<p class="tit">예상 환불 금액</p>
+							<div class="price-area">
+								<!-- <div class="gray-box">
+									<div class="list">
+										<ul>
+											<li>
+												<p class="txt1">환불 금액</p>
+												<p class="txt2">50,000원</p>
+											</li>
+											<li>
+												<p class="txt1">환불 포인트</p>
+												<p class="txt2">2,500P</p>
+											</li>
+										</ul>
+									</div>
+								</div> -->
+								<!--  APET-1258 210803 lju02 -->
+								<ul class="addPoint delivery mb0">
+									<li class="ttl"><span>환불 금액</span>	<span class="savePoint">60,000원</span></li>
+									<li><span>신용카드 환불</span>			<span class="savePoint">57,500원</span></li>
+									<li><span>GS&POINT 환불</span>			<span class="savePoint">2,000P</span></li>
+								</ul>
+								<!--  //APET-1258 210803 lju02 -->
+								<div class="list">
+									<ul>
+										<li>
+											<p class="txt1">취소 상품금액</p>
+											<p class="txt2">10,000원</p>
+										</li>
+										<li>
+											<p class="txt1">쿠폰 할인</p>
+											<p class="txt2 color">-5,000원</p>
+										</li>
+										<li>
+											<p class="txt1">배송비</p>
+											<p class="txt2 color">-2,500원</p>
+										</li>
+										<li>
+											<p class="txt1">추가 배송비 
+												<!-- alert -->
+												<span class="alert_pop" data-pop="popCpnGud"><!-- 04.20 : 추가 -->
+													<span class="bubble_txtBox" style="width:267px;">
+														<span class="tit">추가 배송비</span>
+														<span class="info-txt">
+															<span>
+																<span>
+																	취소/반품/교환 시 발생한 배송비 금액입니다.
+																</span>
+																<span>
+																	도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+																</span>
+																<span>
+																	취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+																</span>
+															</span>
+														</span>
+													</span>
+												</span>
+												<!-- // alert -->
+											</p>
+											<p class="txt2 color">-2,500원</p>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="item-box pc-reposition pdb">
+							<p class="tit">환불계좌 입력</p>
+							<div class="member-input">
+								<ul class="list">
+									<li>
+										<strong class="tit ">예금주</strong>
+										<div class="input disabled">
+											<input type="text" value="홍길동" disabled="">
+										</div>
+									</li>
+									<li>
+										<strong class="tit">은행선택</strong>
+										<div class="select">
+											<select>
+												<option>선택</option>
+												<option>선택1</option>
+												<option>선택2</option>
+												<option>선택3</option>
+											</select>
+										</div>
+									</li>
+									<li>
+										<strong class="tit">계좌번호</strong>
+										<div class="input flex">
+											<input type="text" placeholder="-없이 번호만 입력">
+											<a href="javascript:;" class="btn md">계좌인증</a>
+										</div>
+									</li>
+								</ul>
+							</div>
+							
+						</div>
+						
+						
+						<div class="info-txt t2 pc-reposition">
+							<ul>
+								<li>
+									주문 시 결제 수단으로 환불됩니다. <br>단, 가상계좌의 경우 입력하신 환불 계좌로 환불됩니다.
+								</li>
+							</ul>
+						</div>
+						<div class="btnSet space pc-reposition">
+							<a href="javascript:;" class="btn lg d">취소</a>
+							<a href="javascript:;" class="btn lg b">취소 신청</a>
+						</div>
+						
+					</div>
+					
+					
+				</div>
+
+			</div>
+		</main>
+
+		
+		<div class="layers">
+			<!-- 04.20 : 추가 -->
+			<!-- 쿠폰이용안내 -->
+			<!-- @@ PC에선 하단 팝업.  MO에선 툴팁으로 해달래요 ㅜㅜ -->
+			<article class="popBot popCpnGud" id="popCpnGud">
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit">추가 배송비</h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							
+							<ul class="tplist">
+								<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>
+								<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>
+							</ul>
+						</main>
+					</div>
+				</div>
+			</article>
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+
+		</script>
+	</div>
+</body>
+</html>

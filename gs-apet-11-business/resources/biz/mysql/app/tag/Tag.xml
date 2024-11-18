@@ -1,0 +1,1593 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tag">
+
+	<select id="listTagGroupTree" resultType="biz.app.tag.model.TagGroupTreeVO">
+		<!--
+			Query Name : tag.listTagGroupTree
+			Description : listTagGroupTree
+		-->
+		SELECT	/* QUERYID(tag.listTagGroupTree) */
+				 TAG_GRP_NO		AS	ID				
+				, GRP_NM		AS	TEXT			
+				, UP_GRP_NO		AS PARENT	
+				, FN_GET_TAG_GRP_PATH_NM(TAG_GRP_NO)	AS 	PATH_TEXT
+		FROM	TAG_GROUP 	T1
+		WHERE	1 = 1
+		ORDER BY T1.SORT_SEQ
+	</select>
+
+	<select id="getTagGroup" resultType="biz.app.tag.model.TagGroupVO">
+		<!--
+			Query Name : tag.getTagGroup
+			Description : getTagGroup
+		-->
+		SELECT	/* QUERYID(tag.getTagGroup) */
+				  GRP_NM			/* 그룹 명 */
+				, SORT_SEQ			/* 정렬 순서 */
+				, STAT				/* 상태 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, TAG_GRP_NO		/* 그룹 번호 */
+				, UP_GRP_NO			/* 상위 그룹 번호 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	TAG_GROUP
+		WHERE	1 = 1
+		AND		TAG_GRP_NO = #{tagGrpNo}
+	</select>
+	
+	<select id="getCheckTagGroup" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.getCheckTagGroup
+			Description : getCheckTagGroup
+		-->
+		SELECT	/* QUERYID(tag.getCheckTagGroup) */
+				COUNT(*)
+		FROM	TAG_GROUP
+		WHERE	UP_GRP_NO = #{upGrpNo}
+	</select>	
+	
+	<select id="listTagGroup" resultType="biz.app.tag.model.TagGroupVO">
+		<!--
+			Query Name : tag.listTagGroup
+			Description : listTagGroup
+		-->
+		SELECT	/* QUERYID(tag.listTagGroup) */
+				TAG_GRP_NO			/* 그룹 번호 */		
+				, GRP_NM			/* 그룹 명 */
+				, UP_GRP_NO			/* 상위 그룹 번호 */
+				, SORT_SEQ			/* 정렬 순서 */
+				, STAT				/* 상태 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	TAG_GROUP
+		WHERE	UP_GRP_NO		= #{tagGrpNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+
+	<insert id="insertTagGroup" parameterType="biz.app.tag.model.TagGroupPO">
+		<!--
+			Query Name : tag.insertTagGroup
+			Description : insertTagGroup
+		-->	
+		<selectKey keyProperty="tagGrpNo" resultType="java.lang.String" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_TAG_GROUP_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO TAG_GROUP (
+			  TAG_GRP_NO		/* 그룹 번호 */
+			, GRP_NM			/* 그룹 명 */
+			, UP_GRP_NO			/* 상위 그룹 번호 */
+			, SORT_SEQ			/* 정렬 순서 */
+			, STAT				/* 상태 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{tagGrpNo}		/* 그룹 번호 */
+			, #{grpNm}			/* 그룹 명 */
+			, #{upGrpNo}		/* 상위 그룹 번호 */
+			, #{sortSeq}		/* 정렬 순서 */
+			, #{stat}			/* 상태 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateTagGroup" parameterType="biz.app.tag.model.TagGroupPO">
+		UPDATE	TAG_GROUP SET
+				  GRP_NM			= #{grpNm}			/* 그룹 명 */
+				, SORT_SEQ			= #{sortSeq}		/* 정렬 순서 */
+				, STAT				= #{stat}			/* 상태 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		TAG_GRP_NO			= #{tagGrpNo}
+	</update>
+
+	<delete id="deleteTagGroup" parameterType="biz.app.tag.model.TagGroupPO">
+		<!--
+			Query Name : tag.deleteTagGroup
+			Description : deleteTagGroup
+		-->
+		DELETE
+		FROM	TAG_GROUP
+		WHERE	TAG_GRP_NO			= #{tagGrpNo}
+	</delete>
+	
+	
+	<select id="listDisplayTagGroup" resultType="biz.app.tag.model.TagGroupVO">
+		<!--
+			Query Name : tag.listDisplayTagGroup
+			Description : 전시 카테고리 조회
+			- BO
+		-->
+		SELECT  /* QUERYID(tag.listDisplayTagGroup) */
+				TAG_GRP_NO			/* 그룹 번호 */		
+				, GRP_NM			/* 그룹 명 */
+				, UP_GRP_NO			/* 상위 그룹 번호 */
+				, SORT_SEQ			/* 정렬 순서 */
+				, STAT				/* 상태 */
+		FROM  TAG_GROUP T1
+		WHERE 1=1		
+		<if test="upGrpNo != null and upGrpNo != ''">
+			AND T1.UP_GRP_NO = #{upGrpNo}
+		</if>		
+		<if test="stat != null and stat != ''">
+			AND T1.STAT = #{stat}
+		</if>
+		ORDER BY T1.SORT_SEQ
+	</select>
+	
+	
+	
+	<select id="getTagDetail" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.getTagDetail
+			Description : getTagDetail
+		-->
+		SELECT	/* QUERYID(tag.getTagDetail) */
+				  T1.TAG_NM				/* 태그 명 */
+				, T1.TAG_NO				/* 태그 번호 */
+				, T1.STAT_CD			/* 상태 코드 */
+				, T1.SRC_CD				/* 출처 코드 */
+				, T1.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, T1.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, T1.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, T1.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, GROUP_CONCAT(T2.TAG_GRP_NO SEPARATOR ',')  AS TAG_GRP_NO
+				, GROUP_CONCAT(FN_GET_TAG_GRP_PATH_NM(T2.TAG_GRP_NO) SEPARATOR '\r\n')  AS GRP_NM
+		FROM	TAG_BASE T1
+				LEFT OUTER JOIN TAG_GROUP_MAP T2 ON T1.TAG_NO = T2.TAG_NO
+		WHERE	1 = 1
+		AND		T1.TAG_NO = #{tagNo}
+		GROUP BY T1.TAG_NO
+	</select>
+	
+	<insert id="insertTagBase" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.insertTagBase
+			Description : insertTagBase
+		-->	
+		<selectKey keyProperty="tagNo" resultType="java.lang.String" order="BEFORE">
+			SELECT CONCAT('T', LPAD(FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_TAG_BASE_SEQ}'), 9, '0')) FROM DUAL
+		</selectKey>
+		INSERT IGNORE INTO TAG_BASE (
+			  TAG_NO			/* 태그 번호 */
+			, TAG_NM			/* 태그 명 */
+			, STAT_CD			/* 상태 코드 */
+			, SRC_CD			/* 출처 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{tagNo}			/* 태그 번호 */
+			, #{tagNm}			/* 태그 명 */
+			, #{statCd}			/* 상태 코드 */
+			, #{srcCd}			/* 출처 코드 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<select id="listTagGroupMap" resultType="biz.app.tag.model.TagGroupVO">
+		<!--
+			Query Name : tag.listTagGroupMap
+			Description : listTagGroupMap
+		-->
+		SELECT	/* QUERYID(tag.listTagGroupMap) */
+				T1.TAG_GRP_NO										/* 그룹 번호 */	
+				, FN_GET_TAG_GRP_PATH_NM(T1.TAG_GRP_NO)	AS GRP_NM	/* 태그 그룹  명 */
+		FROM	TAG_GROUP_MAP T1
+		INNER JOIN TAG_GROUP T2 ON (T2.TAG_GRP_NO = T1.TAG_GRP_NO)
+		WHERE	T1.TAG_NO		= #{tagNo}
+	</select>
+	
+	
+	<insert id="insertTagGroupMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.insertTagGroupMap
+			Description : insertTagGroupMap
+		-->	
+		INSERT INTO TAG_GROUP_MAP (
+			  TAG_GRP_NO		/* 그룹 번호 */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{tagGrpNo}		/* 그룹 번호 */		
+			, #{tagNo}			/* 태그 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+	
+	
+	<delete id="deleteTagGroupMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.deleteTagGroupMap
+			Description : deleteTagGroupMap
+		-->
+		DELETE
+		FROM	TAG_GROUP_MAP
+		WHERE	1=1
+		<if test="tagGrpNo != null and tagGrpNo != ''">
+		AND TAG_GRP_NO			= #{tagGrpNo}
+		</if>
+		AND 	TAG_NO				= #{tagNo}
+	</delete>
+	
+	
+	<select id="listTagRelationMap" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.listTagRelationMap
+			Description : listTagRelationMap
+		-->
+		SELECT	/* QUERYID(tag.listTagRelationMap) */
+				T1.RLT_TAG_NO AS TAG_NO		/* 연관태그 번호 */		
+				, T2.TAG_NM					/* 연관태그  명 */
+		FROM	TAG_RELATION_MAP T1
+		INNER JOIN TAG_BASE T2 ON (T2.TAG_NO = T1.RLT_TAG_NO)
+		WHERE	T1.TAG_NO		= #{tagNo}
+	</select>
+	
+	
+	<select id="listTagSynonymMap" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.listTagSynonymMap
+			Description : listTagSynonymMap
+		-->
+		SELECT	/* QUERYID(tag.listTagSynonymMap) */
+				T1.SYN_TAG_NO  AS TAG_NO	/* 동의태그 번호 */		
+				, T2.TAG_NM					/* 동의태그  명 */
+		FROM	TAG_SYNONYM_MAP T1
+		INNER JOIN TAG_BASE T2 ON (T2.TAG_NO = T1.SYN_TAG_NO)
+		WHERE	T1.TAG_NO		= #{tagNo}
+	</select>
+	
+	<insert id="insertTagRelationMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.insertTagRelationMap
+			Description : insertTagRelationMap
+		-->	
+		INSERT INTO TAG_RELATION_MAP (
+			  RLT_TAG_NO		/* 연관 태그 번호 */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{rltTagNo}		/* 연관 태그 코드 */		
+			, #{tagNo}			/* 태그 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>	
+	
+	<delete id="deleteTagRelationMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.deleteTagRelationMap
+			Description : deleteTagRelationMap
+		-->
+		DELETE
+		FROM	TAG_RELATION_MAP
+		WHERE	1=1
+		<if test="rltTagNo != null and rltTagNo != ''">
+		AND RLT_TAG_NO			= #{rltTagNo}
+		</if>
+		AND 	TAG_NO				= #{tagNo}
+	</delete>
+	
+	
+	<insert id="insertTagSynonymMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.insertTagSynonymMap
+			Description : insertTagSynonymMap
+		-->	
+		INSERT INTO TAG_SYNONYM_MAP (
+			  SYN_TAG_NO		/* 동의 태그 번호 */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{synTagNo}		/* 동의 태그 번호 */		
+			, #{tagNo}			/* 태그 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+	
+	<delete id="deleteTagSynonymMap" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.deleteTagSynonymMap
+			Description : deleteTagSynonymMap
+		-->
+		DELETE
+		FROM	TAG_SYNONYM_MAP
+		WHERE	1=1
+		<if test="synTagNo != null and synTagNo != ''">
+		AND 	SYN_TAG_NO			= #{synTagNo}
+		</if>
+		AND 	TAG_NO				= #{tagNo}
+	</delete>
+
+	<update id="updateTagBase" parameterType="biz.app.tag.model.TagBasePO">
+		UPDATE	TAG_BASE SET
+				<if test='reSaveYn == "Y"'>
+				SYS_REGR_NO = #{sysRegrNo}			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM = NOW()				/* 시스템 등록 일시 */
+				, SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+				</if>
+				<if test='reSaveYn != "Y"'>
+				SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+				</if>
+		<if test="tagNm != null and tagNm != ''">		
+				, TAG_NM		= #{tagNm}			/* 태그 명 */
+		</if>
+		<if test="statCd != null and statCd != ''">				  
+				, STAT_CD		= #{statCd}			/* 상태 코드 */
+		</if>		
+		<if test="srcCd != null and srcCd != ''">
+				, SRC_CD		= #{srcCd}			/* 출처 코드 */
+		</if>
+		<if test="useCnt != null and useCnt != 0">
+				, USE_CNT		= USE_CNT+1			/* 출처 코드 */
+		</if>		
+		WHERE	1 = 1
+		AND		TAG_NO			= #{tagNo}
+	</update>
+
+	<delete id="deleteTagBase" parameterType="biz.app.tag.model.TagBasePO">
+		<!--
+			Query Name : tag.deleteTagBase
+			Description : deleteTagBase
+		-->
+		DELETE
+		FROM	TAG_BASE
+		WHERE	TAG_NO			= #{tagNo}
+	</delete>
+	
+	<sql id="pageTagBaseWhere_backup">
+		<if test="srchWord != null and srchWord != ''">
+			AND	(T1.TAG_NO LIKE CONCAT( '%', #{srchWord}, '%' ) 
+				OR T1.TAG_NM LIKE CONCAT( '%', #{srchWord}, '%' ))
+		</if>
+		<choose>
+			<when test="statCd == null or statCd == ''">
+			<if test='popYn != null and popYn != "Y"'>
+			AND T1.STAT_CD IN ('Y', 'N') /* 상태 코드 */
+			</if>
+			</when>
+			<otherwise>
+			AND T1.STAT_CD = #{statCd } /* 상태 코드 */
+			</otherwise>
+		</choose>
+		<if test="sysRegDtmStart != null">
+			AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="srcCd != null and srcCd != ''">
+			AND T1.SRC_CD = #{srcCd }
+		</if>
+	</sql>
+	
+	<select id="pageTagBase_backup" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageTagBase_backup
+			Description : pageTagBase_backup
+		-->
+		SELECT
+			@rownum := @rownum+1 AS ROW_INDEX
+			, X.*
+		  FROM (
+			SELECT	/* QUERYID(tag.pageTagBase_backup) */
+					MAX(T1.TAG_NO) AS TAG_NO				/*태그 번호*/
+					, MAX(T1.TAG_NM) AS TAG_NM				/*태그 명*/
+					, MAX(T1.STAT_CD) AS STAT_CD			/*상태 코드*/
+					, MAX(T1.STAT_CD) AS STAT_NM			/*상태 코드*/
+					, MAX(T1.SRC_CD) AS SRC_CD				/*출처 코드*/
+					, MAX(T1.SYS_REGR_NO) AS SYS_REGR_NO	/*시스템 등록자 번호*/
+					, FN_GET_USER_NAME(MAX(T1.SYS_REGR_NO)) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, MAX(T1.SYS_REG_DTM) AS SYS_REG_DTM	/*시스템 등록 일시*/
+					, DATE_FORMAT(MAX(T1.SYS_REG_DTM), '%Y-%m-%d') AS SYS_REG_DT /* 등록일 */
+					, MAX(T1.SYS_UPDR_NO) AS SYS_UPDR_NO	/*시스템 수정자 번호*/
+					, FN_GET_USER_NAME(MAX(T1.SYS_UPDR_NO)) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, MAX(T1.SYS_UPD_DTM) AS SYS_UPD_DTM	/*시스템 수정 일시*/
+					, DATE_FORMAT(MAX(T1.SYS_UPD_DTM), '%Y-%m-%d') AS SYS_UPD_DT /* 수정일 */
+					, MIN(T2.TAG_GRP_NO) AS TAG_GRP_NO
+					, CASE WHEN COUNT(T2.TAG_GRP_NO)-1 > 0 THEN CONCAT(FN_GET_TAG_GRP_PATH_NM(MIN(T2.TAG_GRP_NO)), ' (외 ', COUNT(T2.TAG_GRP_NO)-1, '건)') 
+						   ELSE FN_GET_TAG_GRP_PATH_NM(MIN(T2.TAG_GRP_NO))
+					  END AS GRP_NM
+				<choose>
+					<when test='popYn == "Y"'>
+					, (SELECT GROUP_CONCAT(TT2.TAG_NM SEPARATOR ',') AS SYN_TAG_NO
+						FROM 	TAG_SYNONYM_MAP TT1
+						INNER JOIN TAG_BASE TT2 ON (TT2.TAG_NO = TT1.SYN_TAG_NO)
+						WHERE TT1.TAG_NO	= T1.TAG_NO
+						GROUP BY TT1.TAG_NO
+						) AS SYN_TAG
+					</when>
+					<otherwise>
+					, (SELECT COUNT(1)
+						FROM (
+							SELECT 1
+							FROM PET_LOG_BASE  C1
+							WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+										  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+										  AND C2.TAG_NO = T1.TAG_NO
+										  )
+							UNION ALL
+							SELECT 1
+							FROM APET_CONTENTS  C1
+							WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_TAG_MAP C2
+										  WHERE C1.VD_ID = C2.VD_ID
+										  AND C2.TAG_NO = T1.TAG_NO
+										  )
+							UNION ALL
+							SELECT 1
+							FROM APET_CONTENTS_SERIES  C1
+							WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_SERIES_TAG_MAP C2
+										  WHERE C1.SRIS_NO = C2.SRIS_NO
+										  AND C2.TAG_NO = T1.TAG_NO
+										  )
+							) C3				
+					) AS RLT_CNTS_CNT 
+					, (SELECT COUNT(1)
+						FROM  GOODS_TAG_MAP G1
+						WHERE G1.TAG_NO = T1.TAG_NO) AS RLT_GOODS_CNT 	
+					, (SELECT COUNT(1)
+						FROM TAG_RELATION_MAP R1
+	                    WHERE R1.TAG_NO =T1.TAG_NO) AS RLT_TAG_CNT					
+					</otherwise>
+				</choose>								  
+			FROM	TAG_BASE T1
+				<choose>
+					<when test="tagGrpNo != null and tagGrpNo != ''">
+					INNER JOIN 
+						(SELECT T3.TAG_NO,T3.TAG_GRP_NO
+							FROM TAG_GROUP_MAP T3							
+							INNER JOIN (SELECT TAG_GRP_NO
+										FROM TAG_GROUP  
+										JOIN (SELECT @PV:=#{tagGrpNo}) TMP
+										WHERE FIND_IN_SET(UP_GRP_NO, @PV) > 0
+										AND  @PV:=CONCAT( @PV, ',', TAG_GRP_NO)
+										UNION ALL SELECT #{tagGrpNo} FROM DUAL ) T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)	
+						) T2 ON T1.TAG_NO = T2.TAG_NO
+					</when>
+					<otherwise>
+					LEFT OUTER JOIN 
+						(SELECT T3.TAG_NO,T3.TAG_GRP_NO
+							FROM TAG_GROUP_MAP T3							
+							INNER JOIN TAG_GROUP T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)	
+						) T2 ON T1.TAG_NO = T2.TAG_NO
+					</otherwise>
+				</choose>
+			WHERE	1=1
+			<include refid="tag.pageTagBaseWhere" />
+			GROUP BY T1.TAG_NO
+			<include refid="bizCommon.sortSql" />
+		  ) X , (SELECT @rownum :=0) AS R
+		ORDER BY ROW_INDEX DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageTagBaseCount_backup" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageTagBaseCount_backup
+			Description : pageTagBaseCount_backup
+		-->
+		SELECT	/* QUERYID(tag.pageTagBaseCount_backup) */
+				COUNT(*)
+		FROM 
+		(		
+		SELECT T1.TAG_NO
+		FROM	TAG_BASE T1
+	<choose>
+		<when test="tagGrpNo != null and tagGrpNo != ''">
+		INNER JOIN 
+			(SELECT T3.TAG_NO,T3.TAG_GRP_NO
+				FROM TAG_GROUP_MAP T3							
+				INNER JOIN (SELECT TAG_GRP_NO
+							FROM TAG_GROUP  
+							JOIN (SELECT @PV:=#{tagGrpNo}) TMP
+							WHERE FIND_IN_SET(UP_GRP_NO, @PV)  >0
+							AND  @PV:=CONCAT( @PV, ',', TAG_GRP_NO)
+							UNION ALL SELECT #{tagGrpNo} FROM DUAL ) T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)	
+			) T2 ON T1.TAG_NO = T2.TAG_NO
+		</when>
+		<otherwise>
+		LEFT OUTER JOIN 
+			(SELECT T3.TAG_NO,T3.TAG_GRP_NO
+				FROM TAG_GROUP_MAP T3							
+				INNER JOIN TAG_GROUP T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)	
+			) T2 ON T1.TAG_NO = T2.TAG_NO
+		</otherwise>
+	</choose>
+		WHERE	1=1
+		<include refid="tag.pageTagBaseWhere" />
+		GROUP BY T1.TAG_NO
+		) T3
+	</select>
+	
+	<sql id="pageTagBaseWhere">
+		<if test="srchWord != null and srchWord != ''">
+			AND	(T1.TAG_NO LIKE CONCAT( '%', #{srchWord}, '%' ) 
+				OR T1.TAG_NM LIKE CONCAT( '%', #{srchWord}, '%' ))
+		</if>
+		<if test='statCd != null and statCd != ""'>
+			AND T1.STAT_CD = #{statCd } /* 상태 코드 */
+		</if>
+		<if test="sysRegDtmStart != null">
+			AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="srcCd != null and srcCd != ''">
+			AND T1.SRC_CD = #{srcCd }
+		</if>
+			<if test="srchWords != null">
+				AND (
+    			<foreach collection="srchWords" item="srchWord" separator="or" open="" close="">
+       				TAG_NM LIKE CONCAT('%', #{srchWord}, '%')
+    			</foreach>
+   				 )
+		</if>
+	</sql>
+	
+	<select id="pageTagBase" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageTagBase
+			Description : pageTagBase
+		-->
+		SELECT
+			@rownum := @rownum+1 AS ROW_INDEX
+			, X.*
+		  FROM (
+			SELECT	/* QUERYID(tag.pageTagBase) */
+					T1.TAG_NO AS TAG_NO				/*태그 번호*/
+					, T1.TAG_NM AS TAG_NM				/*태그 명*/
+					, T1.STAT_CD AS STAT_CD			/*상태 코드*/
+					, T1.STAT_CD AS STAT_NM			/*상태 코드*/
+					, T1.SRC_CD AS SRC_CD				/*출처 코드*/
+					, T1.SYS_REGR_NO AS SYS_REGR_NO	/*시스템 등록자 번호*/
+					, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, T1.SYS_REG_DTM AS SYS_REG_DTM	/*시스템 등록 일시*/
+					, DATE_FORMAT(T1.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /* 등록일 */
+					, T1.SYS_UPDR_NO AS SYS_UPDR_NO	/*시스템 수정자 번호*/
+					, FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, T1.SYS_UPD_DTM AS SYS_UPD_DTM	/*시스템 수정 일시*/
+					, DATE_FORMAT(T1.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /* 수정일 */
+					, T2.TAG_GRP_NO
+					, T2.GRP_NM
+					, IFNULL(C3.CNT, 0) AS RLT_CNTS_CNT 
+					, IFNULL(G1.CNT, 0) AS RLT_GOODS_CNT
+					, IFNULL(R1.CNT, 0) AS RLT_TAG_CNT
+			FROM	TAG_BASE T1
+					LEFT OUTER JOIN (SELECT TAG_NO, COUNT(*) AS CNT FROM GOODS_TAG_MAP GROUP BY TAG_NO) G1 ON G1.TAG_NO = T1.TAG_NO
+					LEFT OUTER JOIN (SELECT TAG_NO, COUNT(*) AS CNT FROM TAG_RELATION_MAP GROUP BY TAG_NO) R1 ON R1.TAG_NO = T1.TAG_NO
+					LEFT OUTER JOIN (
+						SELECT X.TAG_NO, COUNT(X.TAG_NO) AS CNT 
+						  FROM (
+							SELECT TAG_NO
+							  FROM PET_LOG_BASE C1
+								INNER JOIN PET_LOG_TAG_MAP C2
+									ON C1.PET_LOG_NO = C2.PET_LOG_NO
+							UNION ALL
+							SELECT TAG_NO
+							  FROM APET_CONTENTS  C1
+								INNER JOIN APET_CONTENTS_TAG_MAP C2
+									ON C1.VD_ID = C2.VD_ID
+							UNION ALL
+							SELECT TAG_NO
+							  FROM APET_CONTENTS_SERIES  C1
+								INNER JOIN APET_CONTENTS_SERIES_TAG_MAP C2
+									ON C1.SRIS_NO = C2.SRIS_NO
+						  ) X
+						GROUP BY X.TAG_NO
+					) C3 ON C3.TAG_NO = T1.TAG_NO
+				<choose>
+					<when test="tagGrpNo != null and tagGrpNo != ''">
+					INNER JOIN (
+						SELECT
+							T3.TAG_NO
+							, T3.TAG_GRP_NO
+							, CASE WHEN COUNT(T3.TAG_GRP_NO)-1 > 0 THEN CONCAT(FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO), ' (외 ', COUNT(T3.TAG_GRP_NO)-1, '건)') 
+							   	   ELSE FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO)
+							END AS GRP_NM
+						  FROM TAG_GROUP_MAP T3							
+							INNER JOIN (
+								SELECT TAG_GRP_NO
+								  FROM TAG_GROUP  
+									JOIN (SELECT @PV:=#{tagGrpNo}) TMP
+								 WHERE FIND_IN_SET(UP_GRP_NO, @PV) > 0
+								   AND  @PV:=CONCAT( @PV, ',', TAG_GRP_NO)
+								UNION ALL
+								SELECT #{tagGrpNo} FROM DUAL
+							) T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)
+						GROUP BY T3.TAG_NO
+					) T2 ON T1.TAG_NO = T2.TAG_NO
+					</when>
+					<otherwise>
+					LEFT OUTER JOIN (
+						SELECT
+							T3.TAG_NO
+							, T3.TAG_GRP_NO
+							, CASE WHEN COUNT(T3.TAG_GRP_NO)-1 > 0 THEN CONCAT(FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO), ' (외 ', COUNT(T3.TAG_GRP_NO)-1, '건)') 
+							   	   ELSE FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO)
+							END AS GRP_NM
+						  FROM TAG_GROUP_MAP T3							
+							INNER JOIN TAG_GROUP T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)
+						GROUP BY T3.TAG_NO
+					) T2 ON T1.TAG_NO = T2.TAG_NO
+					</otherwise>
+				</choose>
+			WHERE	1=1
+			  AND T1.STAT_CD IN ('Y', 'N') /* 상태 코드 */
+			<include refid="tag.pageTagBaseWhere" />
+			<include refid="bizCommon.sortSql" />
+		  ) X , (SELECT @rownum :=0) AS R
+		ORDER BY ROW_INDEX DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageTagBaseCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageTagBaseCount
+			Description : pageTagBaseCount
+		-->
+		SELECT	/* QUERYID(tag.pageTagBaseCount) */
+			COUNT(*)
+		FROM (
+			SELECT T1.TAG_NO
+			FROM	TAG_BASE T1
+					LEFT OUTER JOIN (SELECT TAG_NO, COUNT(*) AS CNT FROM GOODS_TAG_MAP GROUP BY TAG_NO) G1 ON G1.TAG_NO = T1.TAG_NO
+					LEFT OUTER JOIN (SELECT TAG_NO, COUNT(*) AS CNT FROM TAG_RELATION_MAP GROUP BY TAG_NO) R1 ON R1.TAG_NO = T1.TAG_NO
+					LEFT OUTER JOIN (
+						SELECT X.TAG_NO, COUNT(X.TAG_NO) AS CNT 
+						  FROM (
+							SELECT TAG_NO
+							  FROM PET_LOG_BASE C1
+								INNER JOIN PET_LOG_TAG_MAP C2
+									ON C1.PET_LOG_NO = C2.PET_LOG_NO
+							UNION ALL
+							SELECT TAG_NO
+							  FROM APET_CONTENTS  C1
+								INNER JOIN APET_CONTENTS_TAG_MAP C2
+									ON C1.VD_ID = C2.VD_ID
+							UNION ALL
+							SELECT TAG_NO
+							  FROM APET_CONTENTS_SERIES  C1
+								INNER JOIN APET_CONTENTS_SERIES_TAG_MAP C2
+									ON C1.SRIS_NO = C2.SRIS_NO
+						  ) X
+						GROUP BY X.TAG_NO
+					) C3 ON C3.TAG_NO = T1.TAG_NO
+				<choose>
+					<when test="tagGrpNo != null and tagGrpNo != ''">
+					INNER JOIN (
+						SELECT T3.TAG_NO,T3.TAG_GRP_NO
+						  FROM TAG_GROUP_MAP T3							
+							INNER JOIN (
+								SELECT TAG_GRP_NO
+								  FROM TAG_GROUP  
+									JOIN (SELECT @PV:=#{tagGrpNo}) TMP
+								 WHERE FIND_IN_SET(UP_GRP_NO, @PV) > 0
+								   AND  @PV:=CONCAT( @PV, ',', TAG_GRP_NO)
+								UNION ALL
+								SELECT #{tagGrpNo} FROM DUAL
+							) T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)	
+					) T2 ON T1.TAG_NO = T2.TAG_NO
+					</when>
+					<otherwise>
+					LEFT OUTER JOIN (
+						SELECT
+							T3.TAG_NO
+							, T3.TAG_GRP_NO
+							, CASE WHEN COUNT(T3.TAG_GRP_NO)-1 > 0 THEN CONCAT(FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO), ' (외 ', COUNT(T3.TAG_GRP_NO)-1, '건)') 
+							   	   ELSE FN_GET_TAG_GRP_PATH_NM(T3.TAG_GRP_NO)
+							END AS GRP_NM
+						  FROM TAG_GROUP_MAP T3							
+							INNER JOIN TAG_GROUP T4 ON (T4.TAG_GRP_NO = T3.TAG_GRP_NO)
+						GROUP BY T3.TAG_NO
+					) T2 ON T1.TAG_NO = T2.TAG_NO
+					</otherwise>
+				</choose>
+			WHERE	1=1
+			  AND T1.STAT_CD IN ('Y', 'N') /* 상태 코드 */
+			<include refid="tag.pageTagBaseWhere" />
+		) T3
+	</select>	
+	
+	<select id="pageUnmatchedTagBase" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageUnmatchedTagBase
+			Description : pageUnmatchedTagBase
+		-->
+		SELECT T10.*, (RLT_CNTS_CNT + RLT_GOODS_CNT+ RLT_LOG_CNT) AS NBR_CNT
+		FROM(
+			SELECT	/* QUERYID(tag.pageUnmatchedTagBase) */
+					  T1.TAG_NO				/*태그 번호*/
+					, T1.TAG_NM				/*태그 명*/
+					, T1.STAT_CD			/*상태 코드*/
+					, T1.STAT_CD AS STAT_NM	/*상태 코드(엑셀다운로드)*/
+					, T1.SRC_CD				/*출처 코드*/
+					, T1.SRC_CD AS TAG_SRC_CD	/*출처 코드(엑셀다운로드)*/
+					, (SELECT COUNT(1)
+							FROM (							
+								SELECT 1
+								FROM APET_CONTENTS  C1
+								WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_TAG_MAP C2
+											  WHERE C1.VD_ID = C2.VD_ID
+											  AND C2.TAG_NO = T1.TAG_NO
+											  )
+								/* UNION ALL
+								SELECT 1
+								FROM APET_CONTENTS_SERIES  C1
+								WHERE EXISTS (SELECT 1 FROM APET_CONTENTS_SERIES_TAG_MAP C2
+											  WHERE C1.SRIS_NO = C2.SRIS_NO
+											  AND C2.TAG_NO = T1.TAG_NO
+											  ) */
+								) C3				
+						) AS RLT_CNTS_CNT
+						,(SELECT COUNT(*)
+						  FROM 	(
+						  		SELECT GOODS_ID
+								FROM  GOODS_TAG_MAP G1
+								WHERE G1.TAG_NO = T1.TAG_NO
+								UNION ALL
+								SELECT CMT.GOODS_ID  /* 상품후기 펫로그 */
+								FROM PET_LOG_BASE PLB
+									JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = PLB.PET_LOG_NO)	
+								    JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+								WHERE PLB.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+								AND CMT.GOODS_ESTM_TP = 'PLG'
+								AND EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+											  WHERE PLB.PET_LOG_NO = C2.PET_LOG_NO
+											  AND C2.TAG_NO = T1.TAG_NO
+											)						
+								) god
+						) AS RLT_GOODS_CNT
+						, (SELECT COUNT(*)
+							FROM PET_LOG_BASE  C1
+							WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+										  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+										  AND C2.TAG_NO = T1.TAG_NO
+										  )
+							  and PET_LOG_CHNL_CD != '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'			  
+						  ) as RLT_LOG_CNT
+					, T1.SYS_REGR_NO		/*시스템 등록자 번호*/
+					, T1.SYS_REG_DTM		/*시스템 등록 일시*/
+					, DATE_FORMAT(T1.SYS_REG_DTM ,'%Y.%m.%d') AS SYS_REG_DT	/*시스템 등록 일시(엑셀용)*/
+					, T1.SYS_UPDR_NO		/*시스템 수정자 번호*/
+					, T1.SYS_UPD_DTM		/*시스템 수정 일시*/
+					, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			FROM	TAG_BASE T1		
+			WHERE	1=1
+			AND T1.STAT_CD = #{statCd } /* 상태 코드 */
+			<if test="srchWord != null and srchWord != ''">
+			AND TAG_NM LIKE CONCAT('%' , #{srchWord}, '%')
+			</if>
+			<if test="sysRegDtmStart != null">
+				AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+				AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>
+			<if test="srcCd != null and srcCd != ''">
+				AND SRC_CD		= #{srcCd}			/* 출처 코드 */
+			</if>
+			<!-- <include refid="bizCommon.sortSql" /> -->
+			<if test="sort == 'tagNm'">
+			ORDER BY (CASE WHEN ASCII(SUBSTRING(T1.TAG_NM,1)) BETWEEN 48 AND 57 THEN 3 WHEN ASCII(SUBSTRING(T1.TAG_NM,1)) &lt; 128 THEN 2 ELSE 1 END), T1.TAG_NM
+			</if>
+			<if test="sort == 'sysRegDtm'">
+			ORDER BY SYS_REG_DTM DESC
+			</if>
+			) T10			
+		<include refid="bizCommon.pageSql" />
+	</select>		
+	
+	<select id="pageUnmatchedTagBaseCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageUnmatchedTagBaseCount
+			Description : pageUnmatchedTagBaseCount
+		-->
+		SELECT	/* QUERYID(tag.pageUnmatchedTagBaseCount) */
+				COUNT(*)
+		FROM	TAG_BASE T1
+		WHERE	1=1
+		AND T1.STAT_CD = #{statCd } /* 상태 코드 */
+		<if test="sysRegDtmStart != null">
+			AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="srcCd != null and srcCd != ''">
+			AND SRC_CD		= #{srcCd}			/* 출처 코드 */
+		</if>
+	</select>
+	
+	
+	
+	<sql id="pageTagTrendWhere">
+		<if test="srchWord != null and srchWord != ''">
+			AND	(T3.TRD_NO LIKE CONCAT( '%', #{srchWord}, '%' ) 
+				OR T3.TRD_TAG_NM LIKE CONCAT( '%', #{srchWord}, '%' ))
+		</if>
+		<if test="useYn != null and useYn != ''">
+			AND T3.USE_YN = #{useYn } /* 상태 코드 */
+		</if>		
+		<if test="sysRegDtmStart != null">
+			AND T3.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND T3.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		GROUP BY T3.TRD_NO
+	</sql>	
+
+	<select id="pageTagTrend" resultType="biz.app.tag.model.TagTrendVO">
+		<!--
+			Query Name : tag.pageTagTrend
+			Description : pageTagTrend
+		-->
+		SELECT	/* QUERYID(tag.pageTagTrend) */
+				@ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+				, T3.TRD_NO											/*트랜드 태그 번호*/
+				, T3.TRD_TAG_NM
+				, GROUP_CONCAT(T1.TAG_NO SEPARATOR ',')  AS TAG_NO
+				, GROUP_CONCAT(CONCAT(T1.TAG_NO, ',', T1.TAG_NM) SEPARATOR '|') AS TAG_NM
+				, T1.TAG_NM AS TAG_NM_EXCEL							/*태그 명(엑셀다운로드)*/
+				, MAX(T3.USE_YN) AS	USE_YN							/*사용 여부*/
+				, CONCAT(DATE_FORMAT(MAX(T3.USE_STRT_DTM),'%Y-%m-%d %H:%i:%s') , ' ~ ', DATE_FORMAT(MAX(T3.USE_END_DTM),'%Y-%m-%d %H:%i:%s') ) AS USE_DTM
+				, MAX(T3.USE_STRT_DTM) AS USE_STRT_DTM				/*사용 시작 일시 */
+				, MAX(T3.USE_END_DTM) AS USE_END_DTM				/*사용 종료 일시 */
+				, MAX(T3.SYS_REGR_NO) AS SYS_REGR_NO				/*시스템 등록자 번호*/
+				, MAX(T3.SYS_REG_DTM) AS SYS_REG_DTM				/*시스템 등록 일시*/
+				, MAX(T3.SYS_UPDR_NO) AS SYS_UPDR_NO				/*시스템 수정자 번호*/
+				, MAX(T3.SYS_UPD_DTM) AS SYS_UPD_DTM				/*시스템 수정 일시*/
+				, FN_GET_USER_NAME(T3.SYS_REGR_NO) AS SYS_REGR_NM	/*시스템 등록자 */
+				, FN_GET_USER_NAME(T3.SYS_UPDR_NO) AS SYS_UPDR_NM	/*시스템 수정자 */
+		FROM	TAG_TREND T3
+				INNER JOIN TAG_TREND_MAP T4 ON T4.TRD_NO = T3.TRD_NO
+				INNER JOIN TAG_BASE T1 ON T1.TAG_NO = T4.TAG_NO
+				, (SELECT @ROWNUM:=0) TMP
+		WHERE	1=1
+		<include refid="tag.pageTagTrendWhere" />		
+		<if test="sort == 'trdTagNm'">
+		ORDER BY (CASE WHEN ASCII(SUBSTRING(T3.TRD_TAG_NM,1)) BETWEEN 48 AND 57 THEN 3 WHEN ASCII(SUBSTRING(T3.TRD_TAG_NM,1)) &lt; 128 THEN 2 ELSE 1 END), T3.TRD_TAG_NM
+		</if>
+		<if test="sort == 'sysRegDtm'">
+		ORDER BY SYS_REG_DTM DESC
+		</if>
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageTagTrendCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageTagTrendCount
+			Description : pageTagTrendCount
+		-->
+		SELECT	/* QUERYID(tag.pageTagTrendCount) */
+				COUNT(1)
+		FROM 
+		(		
+			SELECT T1.TAG_NO
+			FROM	TAG_TREND T3
+					INNER JOIN TAG_TREND_MAP T4 ON T4.TRD_NO = T3.TRD_NO
+					INNER JOIN TAG_BASE T1 ON T1.TAG_NO = T4.TAG_NO
+			WHERE	1=1		
+			<include refid="tag.pageTagTrendWhere" />
+		) T		
+	</select>
+
+
+	<insert id="insertTagTrend" parameterType="biz.app.tag.model.TagTrendPO">
+		<!--
+			Query Name : tag.insertTagTrend
+			Description : insertTagTrend
+		-->	
+		<selectKey keyProperty="trdNo" resultType="java.lang.String" order="BEFORE">		
+			SELECT CONCAT('R', LPAD(FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_TAG_TREND_SEQ}'), 9, '0')) FROM DUAL
+		</selectKey>
+		INSERT INTO TAG_TREND (
+			  TRD_NO			/* 트랜드 태그 번호 */
+			, TRD_TAG_NM     	/* 트랜드 태그 명 */
+			, USE_YN			/* 상태 코드 */
+			, USE_STRT_DTM		/* 사용 기간(from) */
+			, USE_END_DTM		/* 사용 기간(to) */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{trdNo}			/* 트랜드 태그 번호 */
+			, #{trdTagNm}		/* 트랜드 태그 명 */
+			, #{useYn}			/* 상태 코드 */
+			, #{useStrtDtm}		/* 사용 기간(from) */
+			, #{useEndDtm}		/* 사용 기간(to) */		
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	
+	<insert id="insertTagTrendMap" parameterType="biz.app.tag.model.TagTrendPO">
+		<!--
+			Query Name : tag.insertTagTrendMap
+			Description : insertTagTrendMap
+		-->	
+		INSERT INTO TAG_TREND_MAP (
+			  TRD_NO			/* 트랜드 태그 번호 */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{trdNo}			/* 트랜드 태그 번호 */	
+			, #{tagNo}			/* 태그 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+
+	<update id="updateTagTrend" parameterType="biz.app.tag.model.TagTrendPO">
+		UPDATE	TAG_TREND SET
+				 SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+		<if test="useYn != null and useYn != ''">				  
+				, USE_YN		= #{useYn}			/* 상태 코드 */
+		</if>		
+		WHERE	1 = 1
+		AND		TRD_NO			= #{trdNo}
+	</update>
+
+	<delete id="deleteTagTrend" parameterType="biz.app.tag.model.TagTrendPO">
+		<!--
+			Query Name : tag.deleteTagTrend
+			Description : deleteTagTrend
+		-->
+		DELETE
+		FROM	TAG_TREND
+		WHERE	TRD_NO			= #{trdNo}
+	</delete>
+	
+	<delete id="deleteTagTrendMap" parameterType="biz.app.tag.model.TagTrendPO">
+		<!--
+			Query Name : tag.deleteTagTrendMap
+			Description : deleteTagTrendMap
+		-->
+		DELETE
+		FROM	TAG_TREND_MAP
+		WHERE	TRD_NO			= #{trdNo}
+	</delete>
+
+	<select id="listTagBase" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name	: petLog.pageTag
+			Description	: 태그 리스트
+		-->
+		SELECT
+		TAG_NO
+		,	TAG_NM
+		,	STAT_CD
+		,	SRC_CD
+		,	SYS_REGR_NO
+		,	SYS_REG_DTM
+		,	SYS_UPDR_NO
+		,	SYS_UPD_DTM
+		FROM TAG_BASE
+		WHERE 1=1
+		<if test="petLogNo != null and petLogNo != 0">
+			AND TAG_NO IN ( SELECT PLTM.TAG_NO FROM PET_LOG_TAG_MAP PLTM WHERE PLTM.PET_LOG_NO = #{petLogNo} )
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+			AND TAG_NO IN ( SELECT MTM.TAG_NO FROM MBR_TAG_MAP MTM WHERE MTM.MBR_NO = #{mbrNo} )
+		</if>
+		<if test="statCd != null and statCd != '' ">
+			AND STAT_CD = #{statCd}
+		</if>
+		<if test="tagNos != null"><foreach collection="tagNos" item="tag" separator="," open="AND TAG_NO IN (" close=")">#{tag}</foreach></if>
+	</select>	
+	
+	<select id="pageTagGoodsList" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageTagGoodsList
+			Description : pageTagGoodsList
+		-->
+		SELECT	/* QUERYID(tag.pageTagGoodsList) */
+				T2.GOODS_ID AS RLT_ID
+				, T2.GOODS_NM AS RLT_NM
+				, '어바웃샵' AS RLT_GB 
+				, '상품' AS RLT_TP
+				, T2.SYS_REGR_NO
+				, FN_GET_USER_NAME(T2.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+				, T2.SYS_REG_DTM
+				, T2.SYS_UPDR_NO
+				, FN_GET_USER_NAME(T2.SYS_UPDR_NO) AS SYS_UPDR_NM /*시스템 수정자 명*/
+				, T2.SYS_UPD_DTM
+		FROM	GOODS_TAG_MAP T1
+				INNER JOIN GOODS_BASE T2 ON (T1.GOODS_ID = T2.GOODS_ID)
+		WHERE 1=1
+		AND T1.TAG_NO = #{tagNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="pageTagGoodsListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageTagGoodsListCount
+			Description : pageTagGoodsListCount
+		-->
+		SELECT	/* QUERYID(tag.pageTagGoodsListCount) */
+				COUNT(*)
+		FROM 	GOODS_TAG_MAP T1
+				INNER JOIN GOODS_BASE T2 ON (T1.GOODS_ID = T2.GOODS_ID)
+		WHERE 1=1
+		AND T1.TAG_NO = #{tagNo}
+	</select>
+	
+	
+	<sql id="pageTagContentsWhere">
+		(
+		SELECT 
+			'펫로그' AS RLT_GB
+			, 'P' AS RLT_GB_CD
+			, PET_LOG_NO AS RLT_ID
+			, DSCRT  AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, CONTS_STAT_CD
+			, PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD
+		FROM PET_LOG_BASE  T1
+		WHERE EXISTS (SELECT 1
+					  FROM PET_LOG_TAG_MAP T2
+					  WHERE T1.PET_LOG_NO = T2.PET_LOG_NO
+					  AND T2.TAG_NO = #{tagNo}
+					  )
+		UNION ALL
+		SELECT 
+			'어바웃TV' AS RLT_GB
+			, 'T' AS RLT_GB_CD
+			, VD_ID AS RLT_ID
+			, TTL  AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, VD_GB_CD
+		FROM APET_CONTENTS  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_TAG_MAP T2
+					  WHERE T1.VD_ID = T2.VD_ID
+					  AND T2.TAG_NO = #{tagNo}
+					  )
+		UNION ALL
+		SELECT 
+			'어바웃TV' AS RLT_GB
+			, 'S' AS RLT_GB_CD
+			, SRIS_NO AS RLT_ID
+			, SRIS_NM  AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD
+		FROM APET_CONTENTS_SERIES  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_SERIES_TAG_MAP T2
+					  WHERE T1.SRIS_NO = T2.SRIS_NO
+					  AND T2.TAG_NO = #{tagNo}
+					  )
+		) T3
+	</sql>		
+		
+	<select id="pageTagContentsList" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageTagContentsList
+			Description : pageTagContentsList
+		-->
+		SELECT	/* QUERYID(tag.pageTagContentsList) */
+				T3.RLT_ID
+				, T3.RLT_NM
+				, T3.SYS_REGR_NO
+				, FN_GET_USER_NAME(T3.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+				, T3.SYS_REG_DTM
+				, T3.RLT_GB
+				, T3.RLT_GB_CD
+				, '영상' AS RLT_TP
+				, T3.CONTS_STAT_CD
+				, T3.PET_LOG_CHNL_CD
+				, T3.VD_GB_CD
+		FROM	
+		<include refid="tag.pageTagContentsWhere" />
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="pageTagContentsListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageTagContentsListCount
+			Description : pageTagContentsListCount
+		-->
+		SELECT	/* QUERYID(tag.pageTagContentsListCount) */
+				COUNT(1)
+		FROM 	
+		<include refid="tag.pageTagContentsWhere" />		
+	</select>	
+		
+	<select id="tagNmCheck" resultType="java.lang.Integer">
+		SELECT
+			COUNT(1)
+		FROM TAG_BASE
+		WHERE TAG_NM = #{tagNm}
+	</select>
+	
+	<select id="getTagInfo" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.getTagInfo
+			Description : getTagInfo
+		-->
+		SELECT	/* QUERYID(tag.getTagDetail) */
+				  T1.TAG_NM				/* 태그 명 */
+				, T1.TAG_NO				/* 태그 번호 */
+				, T1.STAT_CD			/* 상태 코드 */
+				, T1.SRC_CD				/* 출처 코드 */
+				, T1.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, T1.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, T1.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, T1.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM	TAG_BASE T1
+		WHERE	1 = 1
+		<if test="tagNo != null and tagNo != ''">
+		AND		T1.TAG_NO = #{tagNo}
+		</if>
+		<if test="tagNm != null and tagNm != ''">
+		AND		T1.TAG_NM = #{tagNm}
+		</if>	
+	</select>
+
+	<select id="listTagGoodsId" resultType="biz.app.tag.model.TagBaseVO">
+		SELECT T1.TAG_NM			/* 태그 명 	*/
+			, T1.TAG_NO				/* 태그 번호 */
+			, T1.STAT_CD			/* 상태 코드 */
+			, T1.SRC_CD				/* 출처 코드 */
+		FROM goods_tag_map A
+		LEFT JOIN tag_base T1
+		ON A.TAG_NO = T1.TAG_NO
+		WHERE 1=1
+		AND T1.STAT_CD = 'Y'
+		AND A.GOODS_ID = #{goodsId}
+		ORDER BY A.SYS_REG_DTM ASC 
+	</select>
+	
+	<select id="unmatchedGrid" resultType="biz.app.tag.model.TagBaseVO">
+		SELECT 
+			@ROWNUM := @ROWNUM+1 		AS ROW_INDEX	
+			, TAG_NO				/* 태그 번호 */
+			, TAG_NM			/* 태그 명 */
+			, STAT_CD			/* 상태 코드 */
+			, SRC_CD			/* 출처 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM TAG_BASE 
+		, (SELECT @ROWNUM:=0) TMP			
+		WHERE 1 = 1
+		AND STAT_CD = 'P' 
+		<if test="tagNm != null and tagNm != ''">
+		AND TAG_NM LIKE CONCAT('%' , #{tagNm}, '%')
+		</if>
+		ORDER BY (CASE 
+		WHEN ASCII(SUBSTRING(TAG_NM,1)) BETWEEN 48 AND 57 THEN 3
+		WHEN ASCII(SUBSTRING(TAG_NM,1)) &lt; 128 THEN 2 ELSE 1 END), TAG_NM
+	</select>
+	
+	<select id="unmatchedGridCount" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM TAG_BASE 
+		WHERE 1 = 1
+		AND STAT_CD = 'P' 
+		<if test="tagNm != null and tagNm != ''">
+		AND TAG_NM LIKE CONCAT('%' , #{tagNm}, '%')
+		</if>
+	</select>
+	
+	<delete id="deleteUnmatched" parameterType="biz.app.tag.model.TagBasePO">
+		DELETE
+			FROM	TAG_BASE
+		WHERE 1 = 1 
+		<if test="tagNo != null and tagNo != ''">
+		AND TAG_NO			= #{tagNo}
+		</if>
+		AND STAT_CD = 'P'
+	</delete>
+	
+	<select id="pageUnmatched" resultType="biz.app.tag.model.TagBaseVO">
+		SELECT
+			TAG_NO
+			, TAG_NM
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		FROM TAG_BASE
+		WHERE 1 = 1
+		AND STAT_CD = 'P' 
+		<if test="tagNm != null and tagNm != ''">
+		AND TAG_NM LIKE CONCAT('%' , #{tagNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageUnmatchedCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM (
+			SELECT
+				TAG_NO
+			, TAG_NM
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		FROM TAG_BASE
+		WHERE 1 = 1 
+		AND STAT_CD = 'P'
+		<if test="tagNm != null and tagNm != ''">
+		AND TAG_NM LIKE CONCAT('%' , #{tagNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />		
+		) CNT
+	</select>
+	
+	<select id="tagGrpSortSeqChk" resultType="java.lang.Integer">
+		SELECT COUNT(1) 
+		  FROM TAG_GROUP
+		 WHERE UP_GRP_NO = #{upGrpNo}
+		   AND SORT_SEQ = #{sortSeq};
+	</select>
+	
+	<select id="pageUmTagContsLayer" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageUmTagContsLayer
+			Description : pageUmTagContsLayer
+		-->		
+		SELECT /* QUERYID(tag.pageTagContentsList) */
+			'펫TV' AS RLT_GB
+			, 'T' AS RLT_GB_CD
+			, VD_ID AS RLT_ID
+			, TTL  AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, VD_GB_CD
+			, '영상' AS RLT_TP
+			, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+		FROM APET_CONTENTS  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_TAG_MAP T2
+					  WHERE T1.VD_ID = T2.VD_ID
+					  AND T2.TAG_NO = #{tagNo}
+					  )		
+		
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="pageUmTagContsLayerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageUmTagContsLayerCount
+			Description : pageUmTagContsLayerCount
+		-->
+		SELECT /* QUERYID(tag.pageUmTagContsLayerCount) */
+			COUNT(*)
+		FROM APET_CONTENTS  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_TAG_MAP T2
+					  WHERE T1.VD_ID = T2.VD_ID
+					  AND T2.TAG_NO = #{tagNo}
+					  )	
+	</select>
+	
+	<select id="pageUmTagLogLayer" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageUmTagLogLayer
+			Description : pageUmTagLogLayer
+		-->
+		SELECT /* QUERYID(tag.pageUmTagLogLayer) */
+			'펫로그' AS RLT_GB
+			, '피드' AS RLT_TP
+			, '' AS RLT_GB_CD
+			, CAST(C1.PET_LOG_NO AS CHAR(20)) AS RLT_ID
+			, '' AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD	
+			, FN_GET_MEMBER_NAME(C1.MBR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+		FROM PET_LOG_BASE  C1
+		WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					  )
+		AND PET_LOG_CHNL_CD != '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'			  
+		
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="pageUmTagLogLayerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageUmTagLogLayerCount
+			Description : pageUmTagLogLayerCount
+		-->
+		SELECT /* QUERYID(tag.pageUmTagLogLayerCount) */
+			COUNT(1)
+		FROM PET_LOG_BASE  C1
+		WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					  )
+		AND PET_LOG_CHNL_CD != '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+		
+	</select>
+	
+	<select id="pageUmTagGoodsLayer" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageUmTagGoodsLayer
+			Description : pageUmTagGoodsLayer
+		-->
+		SELECT 
+	    *
+	    FROM (
+	  		SELECT 
+		  		'펫샵' AS RLT_GB
+				, '상품' AS RLT_TP 
+				, '' AS RLT_GB_CD
+				, G1.GOODS_ID AS RLT_ID
+				, '' AS RLT_NM
+				, G1.SYS_REGR_NO
+				, G1.SYS_REG_DTM
+				, '' AS CONTS_STAT_CD
+				, '' AS PET_LOG_CHNL_CD
+				, '' AS VD_GB_CD	
+				, FN_GET_USER_NAME(G1.SYS_REGR_NO) AS SYS_REGR_NM 
+			FROM  GOODS_TAG_MAP G1
+			WHERE G1.TAG_NO = #{tagNo}
+			UNION ALL
+			SELECT 
+				'펫샵' AS RLT_GB
+				, '후기' AS RLT_TP
+				, '' AS RLT_GB_CD
+				, CAST(PLB.PET_LOG_NO AS CHAR(20)) AS RLT_ID
+				, '' AS RLT_NM
+				, PLB.SYS_REGR_NO
+				, PLB.SYS_REG_DTM
+				, '' AS CONTS_STAT_CD
+				, '' AS PET_LOG_CHNL_CD
+				, '' AS VD_GB_CD	
+				, FN_GET_MEMBER_NAME(PLB.MBR_NO) AS SYS_REGR_NM 
+			FROM PET_LOG_BASE PLB
+				JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = PLB.PET_LOG_NO)	
+			    JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+			WHERE PLB.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+			AND CMT.GOODS_ESTM_TP = 'PLG'
+			AND EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+						  WHERE PLB.PET_LOG_NO = C2.PET_LOG_NO
+						  AND C2.TAG_NO = #{tagNo}
+						)						
+			) C1		  
+		
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="pageUmTagGoodsLayerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageUmTagGoodsLayerCount
+			Description : pageUmTagGoodsLayerCount
+		-->
+		SELECT /* QUERYID(tag.pageUmTagGoodsLayerCount) */
+			COUNT(1)
+		FROM (
+	  		SELECT 1
+			FROM  GOODS_TAG_MAP G1
+			WHERE G1.TAG_NO = #{tagNo}
+			UNION ALL
+			SELECT 1
+			FROM PET_LOG_BASE PLB
+				JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = PLB.PET_LOG_NO)	
+			    JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+			WHERE PLB.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+			AND CMT.GOODS_ESTM_TP = 'PLG'
+			AND EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+						  WHERE PLB.PET_LOG_NO = C2.PET_LOG_NO
+						  AND C2.TAG_NO = #{tagNo}
+						)						
+			) C1
+		
+	</select>
+	
+	<select id="pageUmTagTotalLayer" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : tag.pageUmTagTotalLayer
+			Description : pageUmTagTotalLayer
+		-->
+		SELECT	/* QUERYID(tag.pageUmTagTotalLayer) */
+				T3.RLT_ID
+				, T3.RLT_NM
+				, T3.SYS_REGR_NO
+				, T3.SYS_REGR_NM /*시스템 등록자 명*/
+				, T3.SYS_REG_DTM
+				, T3.RLT_GB
+				, T3.RLT_GB_CD
+				, T3.RLT_TP
+				, T3.CONTS_STAT_CD
+				, T3.PET_LOG_CHNL_CD
+				, T3.VD_GB_CD
+		FROM	
+		(		
+		SELECT 
+			'펫TV' AS RLT_GB
+			, 'T' AS RLT_GB_CD
+			, '게시글' AS RLT_TP
+			, VD_ID AS RLT_ID
+			, TTL  AS RLT_NM
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, VD_GB_CD
+			, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+		FROM APET_CONTENTS  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_TAG_MAP T2
+					  WHERE T1.VD_ID = T2.VD_ID
+					  AND T2.TAG_NO = #{tagNo}
+					  )		
+		UNION ALL
+		SELECT 
+			'펫로그' AS RLT_GB
+			, 'L' AS RLT_GB_CD
+			, '게시글' AS RLT_TP
+			, CAST(C1.PET_LOG_NO as char(20)) AS RLT_ID
+			, '' AS RLT_NM
+			, C1.MBR_NO AS SYS_REGR_NO
+			, SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD	
+			, FN_GET_MEMBER_NAME(C1.MBR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/		
+		FROM PET_LOG_BASE  C1
+		WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					  )
+		AND PET_LOG_CHNL_CD != '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'		
+		UNION ALL
+		SELECT 
+	  		'펫샵' AS RLT_GB
+			, 'S' AS RLT_GB_CD
+			, '상품' AS RLT_TP
+			, G1.GOODS_ID AS RLT_ID
+			, '' AS RLT_NM
+			, G1.SYS_REGR_NO
+			, G1.SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD
+			, FN_GET_USER_NAME(G1.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+		FROM  GOODS_TAG_MAP G1
+		WHERE G1.TAG_NO = #{tagNo}
+		UNION ALL
+		SELECT 
+			'펫샵' AS RLT_GB
+			, 'S' AS RLT_GB_CD
+			, '후기' AS RLT_TP
+			, CMT.GOODS_ID AS RLT_ID
+			, '' AS RLT_NM
+			, PLB.MBR_NO AS SYS_REGR_NO
+			, PLB.SYS_REG_DTM
+			, '' AS CONTS_STAT_CD
+			, '' AS PET_LOG_CHNL_CD
+			, '' AS VD_GB_CD
+			, FN_GET_MEMBER_NAME(PLB.MBR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+		FROM PET_LOG_BASE PLB
+			JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = PLB.PET_LOG_NO)	
+		    JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+		WHERE PLB.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+		AND CMT.GOODS_ESTM_TP = 'PLG'
+		AND EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE PLB.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					)			  
+		) T3
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="pageUmTagTotalLayerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tag.pageUmTagTotalLayerCount
+			Description : pageUmTagTotalLayerCount
+		-->
+		SELECT	/* QUERYID(tag.pageUmTagTotalLayerCount) */
+			COUNT(*)
+		FROM	
+		(		
+		SELECT 1
+		FROM APET_CONTENTS  T1
+		WHERE EXISTS (SELECT 1
+					  FROM APET_CONTENTS_TAG_MAP T2
+					  WHERE T1.VD_ID = T2.VD_ID
+					  AND T2.TAG_NO = #{tagNo}
+					  )		
+		UNION ALL
+		SELECT 1			
+		FROM PET_LOG_BASE  C1
+		WHERE EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE C1.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					  )
+		AND PET_LOG_CHNL_CD != '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'		
+		UNION ALL
+		SELECT 1
+		FROM  GOODS_TAG_MAP G1
+		WHERE G1.TAG_NO = #{tagNo}
+		UNION ALL
+		SELECT 1
+		FROM PET_LOG_BASE PLB
+			JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = PLB.PET_LOG_NO)	
+		    JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+		WHERE PLB.PET_LOG_CHNL_CD = '${@framework.common.constants.CommonConstants@PETLOG_CHNL_20}'
+		AND CMT.GOODS_ESTM_TP = 'PLG'
+		AND EXISTS (SELECT 1 FROM PET_LOG_TAG_MAP C2
+					  WHERE PLB.PET_LOG_NO = C2.PET_LOG_NO
+					  AND C2.TAG_NO = #{tagNo}
+					)			  
+		) T3
+		
+	</select>
+</mapper>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMessage">
+
+	<select id="pageUserMessage" resultType="biz.app.system.model.UserMessageBaseVO">
+		<!--
+			Query Name : userMessage.pageUserMessage
+			Description : 메세지 리스트 
+		-->
+		SELECT	/* QUERYID(userMessage.pageUserMessage) */
+				 A.USR_NO	/*수신자 번호*/
+				,FN_GET_USER_NAME(A.USR_NO) AS USR_NM	/* 시스템 등록자 */
+				,A.NOTE_NO	/*쪽지 번호*/
+				,A.RCV_YN	/*수신 여부*/
+				,A.RCV_DTM	/*수신 일시*/
+				,A.DEL_YN	/*삭제 여부*/
+				,B.SNDR_NO	/*발신자 번호*/
+				,FN_GET_USER_NAME(B.SNDR_NO) AS SNDR_NM	/* 발신자 번호 */
+				,B.TTL	/*제목*/
+				,B.CONTENT	/*내용 */
+				,B.FL_NO	/*파일 번호 */
+				,A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				,A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				,A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				,A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				,FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				,FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		  FROM	NOTE_RCVR_LIST A  INNER JOIN USER_NOTE B ON( B.NOTE_NO = A.NOTE_NO)
+		 WHERE
+		 <choose>
+		     <when test='"SND" eq mode'>
+		      /* 보낸이 */ 
+		     B.SNDR_NO = #{usrNo}
+		     AND B.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		     </when>
+		     <otherwise>
+		     A.USR_NO = #{usrNo}
+		     AND A.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		     </otherwise>
+		 </choose>
+		   
+		ORDER BY A.NOTE_NO DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageUserMessageCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : userMessage.pageUserMessageCount
+			Description : 메세지 리스트  카운트
+		-->
+		SELECT	/* QUERYID(userMessage.pageUserMessageCount) */
+				COUNT(*)
+		 FROM	NOTE_RCVR_LIST A  INNER JOIN USER_NOTE B ON( B.NOTE_NO = A.NOTE_NO)
+		 WHERE 
+		 <choose>
+            <when test='"SND" eq mode'>
+		      /* 보낸이 */ 
+		     B.SNDR_NO = #{usrNo}
+		     AND B.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		     </when>
+		     <otherwise>
+		     A.USR_NO = #{usrNo}
+		     AND A.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		     </otherwise>
+         </choose>
+	</select>
+
+	<select id="getUserMessage" resultType="biz.app.system.model.UserMessageBaseVO">
+		<!--
+			Query Name : userMessage.getUserMessage
+			Description : 관리자 상세조회
+		-->
+		SELECT	/* QUERYID(userMessage.getUserMessage) */
+				 A.USR_NO	/*수신자 번호*/
+				,FN_GET_USER_NAME(A.USR_NO) AS USR_NM	/* 시스템 등록자 */
+				,A.NOTE_NO	/*쪽지 번호*/
+				,A.RCV_YN	/*수신 여부*/
+				,A.RCV_DTM	/*수신 일시*/
+				,A.DEL_YN	/*삭제 여부*/
+				,B.SNDR_NO	/*발신자 번호*/
+				,FN_GET_USER_NAME(B.SNDR_NO) AS SNDR_NM	/* 발신자 번호 */
+				,B.TTL	/*제목*/
+				,B.CONTENT	/*내용 */
+				,B.FL_NO	/*파일 번호 */
+				,A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				,A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				,A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				,A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				,FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				,FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		  FROM	NOTE_RCVR_LIST A  INNER JOIN USER_NOTE B ON( B.NOTE_NO = A.NOTE_NO)
+		 WHERE A.USR_NO = #{usrNo}
+		   AND A.NOTE_NO= #{noteNo}
+		  
+	</select>
+
+	 <select id="existsUserMessage"  resultType="java.lang.Integer">
+		<!--
+			Query Name : userMessage.existsUserMessage
+			Description : 신규 메세지 존재 여부 
+		--> 
+		SELECT /* QUERYID(userMessage.existsUserMessage) */
+		       COUNT(*) 
+		  FROM NOTE_RCVR_LIST  
+		 WHERE USR_NO = #{usrNo}
+		   AND RCV_YN = 'N'
+		   AND DEL_YN = 'N'
+  	</select>
+
+	<insert id="insertNoteRcvrList" parameterType="biz.app.system.model.UserMessageBasePO">
+		<!--
+			Query Name : userMessage.insertNoteRcvrList
+			Description : 쪽지 수신자목록 등록
+		-->
+		INSERT INTO NOTE_RCVR_LIST (
+					  USR_NO	/* 수신자 번호   key  */
+					, NOTE_NO	/* 쪽지 번호       key */
+					, DEL_YN	/* 삭제 여부 */
+					, SYS_REGR_NO	/* 시스템 등록자 번호 */
+					, SYS_REG_DTM	/* 시스템 등록 일시 */
+					, SYS_UPDR_NO	/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	/* 시스템 수정 일시 */
+					) VALUES (
+					  #{usrNo}				/* 수신자 번호   key  */
+					, #{noteNo}				/* 쪽지 번호       key */
+					, '${@framework.common.constants.CommonConstants@COMM_YN_N}' /* 삭제 여부 */ 
+					, #{sysRegrNo}			/* 시스템 등록자 번호 */
+					, NOW()					/* 시스템 등록 일시 */
+					, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, NOW()					/* 시스템 수정 일시 */
+					)
+	</insert>
+	
+	<insert id="insertUserNote" parameterType="biz.app.system.model.UserMessageBasePO">
+		<!--
+			Query Name : userMessage.insertUserNote
+			Description : 사용자쪽지 등록
+		-->
+		INSERT INTO USER_NOTE (
+					  NOTE_NO	    /*쪽지 번호*/
+					, SNDR_NO	    /*발신자 번호*/
+					, TTL	        /*제목*/
+					, CONTENT	    /*내용*/
+					, FL_NO	        /*파일 번호*/
+					, DEL_YN	    /*삭제 여부*/
+					, SYS_REGR_NO	/* 시스템 등록자 번호 */
+					, SYS_REG_DTM	/* 시스템 등록 일시 */
+					, SYS_UPDR_NO	/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	/* 시스템 수정 일시 */
+					) VALUES (
+					  #{noteNo}				/* 쪽지 번호       key */
+					, #{sndrNo}				/* 발신자 번호 */
+					, #{ttl}				/* 제목 */
+					, #{content}				/* 내용 */
+					, #{flNo}				/* 파일 번호 */
+					, '${@framework.common.constants.CommonConstants@COMM_YN_N}'			/* 삭제 여부 */
+					, #{sysRegrNo}			/* 시스템 등록자 번호 */
+					, NOW()					/* 시스템 등록 일시 */
+					, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+					, NOW()					/* 시스템 수정 일시 */
+					)			
+ 
+	</insert>
+	
+	
+	<update id="updateNoteRcvrList" parameterType="biz.app.system.model.UserMessageBasePO">
+		<!--
+			Query Name : userMessage.updateNoteRcvrList
+			Description : 수신자 쪽지 업데이트 (수신일시 등록)
+		-->
+    	UPDATE	NOTE_RCVR_LIST SET
+				  RCV_YN            = #{rcvYn}
+			    , RCV_DTM           = NOW()				/* 수신 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		USR_NO				= #{usrNo}
+		AND     NOTE_NO             = #{noteNo}				/* 쪽지 번호       key */ 
+		
+	</update>
+	<update id="deleteNoteRcvrList" parameterType="biz.app.system.model.UserMessageBasePO">
+		<!--
+			Query Name : userMessage.updateNoteRcvrList
+			Description : 수신자 쪽지 업데이트 (삭제 등록)
+		-->
+    	UPDATE	NOTE_RCVR_LIST SET
+				  DEL_YN            = #{delYn} 
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		USR_NO				= #{usrNo}
+		AND     NOTE_NO             = #{noteNo}			/* 쪽지 번호       key */ 
+	</update>
+	
+	  
+	<update id="deleteUserNote" parameterType="biz.app.system.model.UserMessageBasePO">
+		<!--
+			Query Name : userMessage.deleteUserNote
+			Description : 발신자 쪽지 업데이트 (삭제 등록)
+		-->
+    	UPDATE	USER_NOTE SET
+				  DEL_YN            = #{delYn} 
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		SNDR_NO = #{usrNo}
+		AND     NOTE_NO             = #{noteNo}			/* 쪽지 번호       key */ 
+	</update>
+	
+	
+	  
+</mapper>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	주문 배송 권역
+	일자 : 2021. 03. 01.
+	작성자 : kjh
+-->
+
+<mapper namespace="orderDlvrArea">
+
+	<select id="listDlvrAreaClsdDt" resultType="biz.app.order.model.OrderDlvrAreaVO" >
+		<!--
+			Query Name : orderDlvrArea.listDlvrAreaClsdDt
+			Description : 배송 권역 휴무 일자 조회
+		-->
+		SELECT	/* QUERYID(orderDlvrArea.listDlvrAreaClsdDt) */
+				CLSD_STRT_DT
+				,DLVR_PRCS_TP_CD
+				,CLSD_END_DT
+		  FROM DLVR_AREA_CLSD_DT 
+		 WHERE 1=1 
+<if test='dlvrPrcsTpCd != null and dlvrPrcsTpCd != ""'>
+ 		   AND DLVR_PRCS_TP_CD = #{dlvrPrcsTpCd}
+</if>
+<if test='timeCheckYn != null and timeCheckYn != ""'>
+			AND	 (DATE_FORMAT(#{nowDateTime}, '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+		   		OR
+		   		DATE_FORMAT(DATE_ADD(#{nowDateTime}, INTERVAL 1 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+		   		OR
+		   		DATE_FORMAT(DATE_ADD(#{nowDateTime}, INTERVAL 2 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+	   		)
+</if>
+	</select>
+	
+	<select id="dlvrAreaClsdDt" resultType="biz.app.order.model.OrderDlvrAreaVO" >
+		<!--
+			Query Name : orderDlvrArea.dlvrAreaClsdDt
+			Description : 상품 배송 휴무 일자 조회
+		-->
+		SELECT	/* QUERYID(orderDlvrArea.dlvrAreaClsdDt) */
+				CLSD_STRT_DT
+				,DLVR_PRCS_TP_CD
+				,CLSD_END_DT
+		  FROM DLVR_AREA_CLSD_DT 
+		 WHERE 1=1 
+ 		   AND DLVR_PRCS_TP_CD = #{dlvrPrcsTpCd}
+		   AND (DATE_FORMAT(#{nowDateTime}, '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+		   		OR
+		   		DATE_FORMAT(DATE_ADD(#{nowDateTime}, INTERVAL 1 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+	   		)
+	</select>
+	
+	<select id="listDlvrAreaInfo" resultType="biz.app.order.model.OrderDlvrAreaVO" >
+		<!--
+			Query Name : orderDlvrArea.listDlvrAreaInfo
+			Description : 배송 권역 정보 조회
+		-->
+		SELECT	/* QUERYID(orderDlvrArea.listDlvrAreaInfo) */
+				DAPM.DLVR_AREA_NO
+				, DAPM.POST_NO
+				, DAPM.SIDO
+				, DAPM.GUGUN
+				, DAPM.DONG
+				, DAI.DLVR_PRCS_TP_CD
+				, DAI.DLVR_AREA_CD
+				, DAPM.DLVR_AREA_NM
+				, DAPM.DLVR_CNTR_CD
+				, DAPM.DLVR_CNTR_NM
+				, DAI.SLOT_QTY
+				, DAI.USE_YN
+		  FROM DLVR_AREA_POST_MAP DAPM
+	INNER JOIN DLVR_AREA_INFO DAI 
+			ON DAI.DLVR_AREA_NO = DAPM.DLVR_AREA_NO
+		 WHERE DAPM.POST_NO = #{postNo}
+		   AND DAI.USE_YN = 'Y'
+<if test='dlvrPrcsTpCd != null and dlvrPrcsTpCd != ""'>
+ 		   AND DLVR_PRCS_TP_CD = #{dlvrPrcsTpCd}
+</if> 
+<if test='arrDlvrPrcsTpCd != null'>
+			AND DAI.DLVR_PRCS_TP_CD IN (
+				<foreach item="arrDlvrPrcsTpCd" separator="," collection="item" >
+				#{item}
+				</foreach>
+			)
+</if>
+<if test='postNo != null and postNo != ""'>
+ 		   AND DAPM.POST_NO = #{postNo}
+</if>
+	</select>
+	
+	
+	<select id="getDlvrAreaInfo" resultType="biz.app.order.model.OrderDlvrAreaVO" >
+		<!--
+			Query Name : orderDlvrArea.getDlvrAreaInfo
+			Description : 배송 권역 정보 조회
+		-->
+		SELECT	/* QUERYID(orderDlvrArea.getDlvrAreaInfo) */
+				DAPM.DLVR_AREA_NO
+				, DAPM.POST_NO
+				, DAPM.SIDO
+				, DAPM.GUGUN
+				, DAPM.DONG
+				, DAI.DLVR_PRCS_TP_CD
+				, DAI.DLVR_AREA_CD
+				, DAPM.DLVR_AREA_NM
+				, DAPM.DLVR_CNTR_CD
+				, DAPM.DLVR_CNTR_NM
+				, DAI.SLOT_QTY
+				, DAI.USE_YN
+		  FROM DLVR_AREA_POST_MAP DAPM
+	INNER JOIN DLVR_AREA_INFO DAI 
+			ON DAI.DLVR_AREA_NO = DAPM.DLVR_AREA_NO
+		 WHERE 1=1
+		   AND DAI.USE_YN = 'Y'
+<if test='postNo != null and postNo != ""'>
+		   AND DAPM.POST_NO = #{postNo}
+</if>
+<if test='dlvrPrcsTpCd != null and dlvrPrcsTpCd != ""'>
+ 		   AND DAI.DLVR_PRCS_TP_CD = #{dlvrPrcsTpCd}
+</if>
+<if test='dlvrAreaNo != null and dlvrAreaNo != ""'>
+ 		   AND DAI.DLVR_AREA_NO = #{dlvrAreaNo}
+</if>
+	LIMIT 1
+	</select>
+	
+	<update id="deleteOrderDlvrAreaMap">
+		<!--
+			Query Name	: orderDlvrArea.deleteOrderDlvrAreaMap
+			Description	: 주문 배송 권역 삭제
+		-->
+		UPDATE ORD_DLVR_AREA_MAP	/* QUERYID(orderDlvrArea.deleteOrderDlvrAreaMap) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()						/* 시스템 수정 일시 */
+			, DEL_YN = 'Y'
+		WHERE
+			ORD_NO = #{ordNo}
+	</update>
+	
+	<insert id="insertOrderDlvrAreaMap">
+		<!--
+			Query Name : orderDlvrArea.insertOrderDlvrAreaMap
+			Description : 주문 배송 권역 매핑 등록
+		-->
+		INSERT INTO ORD_DLVR_AREA_MAP 
+		(
+			ORD_DT				/* 배송 일자 */
+			, DLVR_AREA_NO			/* 배송 권역 번호 */
+			, ORD_NO				/* 주문 번호 */
+			, DEL_YN				/* 삭제 여부 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{ordDt}				/* 배송 일자 */
+			, #{dlvrAreaNo}			/* 배송 권역 번호 */
+			, #{ordNo}				/* 주문 번호 */
+			, 'N'					/* 삭제 여부 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<select id="getOrdDlvrAreaInfo" resultType="biz.app.order.model.OrderDlvrAreaVO" >
+		<!--
+			Query Name : orderDlvrArea.getOrdDlvrAreaInfo
+			Description : 주문 배송 권역 매핑 단건 조회
+		-->
+		SELECT	/* QUERYID(orderDlvrArea.getOrdDlvrAreaInfo) */
+				ODAM.ORD_DT
+				, ODAM.DLVR_AREA_NO
+				, ODAM.ORD_NO
+				, ODAM.DEL_YN
+				, ODA.POST_NO_NEW AS POST_NO
+		  FROM ORD_DLVR_AREA_MAP ODAM
+	INNER JOIN ORDER_DLVRA ODA 
+			ON (ODA.ORD_NO = ODAM.ORD_NO)
+		 WHERE ODAM.ORD_NO = #{ordNo}
+	</select>
+
+	<select id="getDlvrPrcsListForGoodsDetail" resultType="biz.app.order.model.OrderDlvrAreaVO">
+		SELECT
+			CD.DTL_NM AS DLVR_PRCS_TP_NM,
+			A.*
+		FROM (
+			SELECT
+				A.*
+				, IF(A.IS_HOLIDAY = 1
+					, IF(CLSD_STRT_DT = CLSD_END_DT
+						,CONCAT(DATE_FORMAT(DATE(CLSD_STRT_DT), '%m/%d'), ' 배송 휴무')
+						,CASE
+							WHEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') = BASE_DATE
+							AND BASE_DATE <![CDATA[<]]> DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d')
+							THEN CONCAT(DATE_FORMAT(DATE(CLSD_STRT_DT), '%m/%d'), '~', DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+							WHEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') <![CDATA[<]]> DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d')
+							AND BASE_DATE <![CDATA[<]]> DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d')
+							THEN CONCAT(DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d'), '~', DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+							WHEN DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d') = DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d')
+							THEN CONCAT(DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+							ELSE CONCAT(IF(ADD_DAY = 0, '오늘', '내일'), '밤 도착예정')
+						END
+					)
+				, CONCAT(IF(ADD_DAY = 0, '오늘', '내일'), '밤 도착예정')
+				) AS DLVR_TIME_SHOW_SHOW_TEXT
+				FROM (
+					SELECT	/* QUERYID(orderDlvrArea.listDlvrAreaClsdDt) */
+						CLSD_STRT_DT
+						,DLVR_PRCS_TP_CD
+						,CLSD_END_DT
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '113000')
+						    , 0
+						    , 1
+						) AS ADD_DAY
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '113000')
+						    , DATE_FORMAT(NOW(), '%Y%m%d')
+						    , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+						) AS BASE_DATE
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '113000')
+							, IF(DATE_FORMAT(NOW(), '%Y%m%d') BETWEEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') AND DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d'), 1, 0)
+							, IF(DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d') BETWEEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') AND DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d'), 1, 0)
+						) AS IS_HOLIDAY
+					FROM dlvr_area_clsd_dt  DACD
+					LEFT JOIN code_detail CD
+					ON CD.GRP_CD = 'DLVR_PRCS_TP'
+					AND CD.DTL_CD = DACD.DLVR_PRCS_TP_CD
+					WHERE 1=1
+					AND DLVR_PRCS_TP_CD = '20'
+					AND
+					(
+						DATE_FORMAT(NOW(), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+						OR
+						DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+						OR
+						DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 2 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+					)
+				) A
+				UNION ALL
+				SELECT
+					A.*
+					, IF(A.IS_HOLIDAY = 1
+						, IF(CLSD_STRT_DT = CLSD_END_DT
+							,CONCAT(DATE_FORMAT(DATE(CLSD_STRT_DT), '%m/%d'), ' 배송 휴무')
+							,CASE
+								WHEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') = BASE_DATE
+								AND BASE_DATE <![CDATA[<]]> DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d')
+								THEN CONCAT(DATE_FORMAT(DATE(CLSD_STRT_DT), '%m/%d'), '~', DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+								WHEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') <![CDATA[<]]> DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d')
+								AND BASE_DATE <![CDATA[<]]> DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d')
+								THEN CONCAT(DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d'), '~', DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+								WHEN DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d') = DATE_FORMAT(DATE(BASE_DATE), '%Y%m%d')
+								THEN CONCAT(DATE_FORMAT(DATE(CLSD_END_DT), '%m/%d'), ' 배송 휴무')
+
+								ELSE CONCAT(IF(ADD_DAY = 1, '내일', '모레'), '  새벽 도착예정')
+							END
+						)
+						, CONCAT(IF(ADD_DAY = 1, '내일', '모레'), ' 새벽 도착예정')
+					) AS DLVR_TIME_SHOW_SHOW_TEXT
+				FROM (
+					SELECT	/* QUERYID(orderDlvrArea.listDlvrAreaClsdDt) */
+						CLSD_STRT_DT
+						,DLVR_PRCS_TP_CD
+						,CLSD_END_DT
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '210000')
+						    , 1
+						    , 2
+						) AS ADD_DAY
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '210000')
+						    , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+						    , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 2 DAY), '%Y%m%d')
+						) AS BASE_DATE
+						, IF(DATE_FORMAT(NOW(), '%H%i%s')<![CDATA[<]]>IFNULL(CD.USR_DFN1_VAL, '210000')
+							, IF(DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d') BETWEEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') AND DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d'), 1, 0)
+							, IF(DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 2 DAY), '%Y%m%d') BETWEEN DATE_FORMAT(DATE(CLSD_STRT_DT), '%Y%m%d') AND DATE_FORMAT(DATE(CLSD_END_DT), '%Y%m%d'), 1, 0)
+						) AS IS_HOLIDAY
+					FROM dlvr_area_clsd_dt  DACD
+					LEFT JOIN code_detail CD
+					ON CD.GRP_CD = 'DLVR_PRCS_TP'
+					AND CD.DTL_CD = DACD.DLVR_PRCS_TP_CD
+					WHERE 1=1
+					AND DLVR_PRCS_TP_CD = '21'
+					AND
+					(
+						DATE_FORMAT(NOW(), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+						OR
+						DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+						OR
+						DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 2 DAY), '%Y%m%d') BETWEEN CLSD_STRT_DT AND CLSD_END_DT
+					)
+				) A
+		) A
+		LEFT JOIN code_detail CD
+		ON GRP_CD = 'DLVR_PRCS_TP'
+		AND DTL_CD = A.DLVR_PRCS_TP_CD
+
+	</select>
+
+	
+</mapper>

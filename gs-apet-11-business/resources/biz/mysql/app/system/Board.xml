@@ -1,0 +1,1550 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<select id="pageBoardBase" resultType="biz.app.system.model.BbsBaseVO">
+		<!--
+			Query Name : board.pageBoardBase
+			Description : 게시판 관리 리스트
+		-->
+		SELECT						/* QUERYID(board.pageBoardBase) */
+				  A.BBS_ID			/* 게시판 아이디 */
+				, A.BBS_NM			/* 게시판 명 */
+				, A.BBS_TP_CD			/* 게시판 유형 코드 */
+				, A.UPLOAD_EXT		/* 업로드 확장자 */
+				, A.ATCH_FL_CNT		/* 첨부 파일 수 */
+				, A.GB_USE_YN			/* 구분 사용 여부 */
+				, A.SCR_USE_YN		/* 비밀 사용 여부 */
+				, A.FL_USE_YN			/* 파일 사용 여부 */
+				, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, B.ST_ID						/* 사이트 ID */
+				, B.ST_NM						/* 사이트 명 */
+		FROM	bbs_base A
+		INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+		WHERE	1 = 1
+		<if test="bbsId != null and bbsId != ''">
+		AND		BBS_ID LIKE CONCAT('%', #{bbsId}, '%')
+		</if>
+		<if test="bbsNm != null and bbsNm != ''">
+		AND		BBS_NM LIKE CONCAT('%', #{bbsNm}, '%')
+		</if>
+		<if test="stId != null" >
+			AND B.ST_ID = #{stId}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageBoardBaseCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : board.pageBoardGroupCount
+			Description : 게시판 관리 글 총 카운트
+		-->
+		SELECT /* QUERYID(board.pageBoardGroupCount) */
+				COUNT(*)
+		FROM	bbs_base A
+		INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+		WHERE 1 = 1
+		<if test="bbsId != null and bbsId != ''">
+		AND		BBS_ID LIKE CONCAT('%', #{bbsId}, '%')
+		</if>
+		<if test="bbsNm != null and bbsNm != ''">
+		AND		BBS_NM LIKE CONCAT('%', #{bbsNm}, '%')
+		</if>
+		<if test="stId != null" >
+			AND B.ST_ID = #{stId}
+		</if>
+	</select>
+
+	<select id="getBbsIdCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : board.getBbsIdCheck
+			Description : 아이디 중복검사
+		-->
+		SELECT	/* QUERYID(board.getBbsIdCheck) */
+				COUNT(*)
+		FROM	bbs_base
+		WHERE	1 = 1
+		AND		UPPER(BBS_ID)	=	UPPER(#{bbsId})
+	</select>
+
+	<select id="getBoardBase" resultType="biz.app.system.model.BbsBaseVO">
+		<!--
+			Query Name : board.getBoardBase
+			Description : 게시판 관리 글 상세
+		-->
+		SELECT						/* QUERYID(board.getBoardBase) */
+				  A.BBS_ID			/* 게시판 아이디 */
+				, A.BBS_NM			/* 게시판 명 */
+				, A.BBS_TP_CD			/* 게시판 유형 코드 */
+				, A.UPLOAD_EXT		/* 업로드 확장자 */
+				, A.ATCH_FL_CNT		/* 첨부 파일 수 */
+				, A.GB_USE_YN			/* 구분 사용 여부 */
+				, A.SCR_USE_YN		/* 비밀 사용 여부 */
+				, A.FL_USE_YN			/* 파일 사용 여부 */
+				, A.BBS_IMG_PATH    /* 게시판 이미지경로 */
+				, A.BBS_DSCRT       /* 게시판 설명 */
+				, A.COMP_NO         /* 업체 번호(FK) */
+				, C.COMP_NM         /* 업체 이름  */
+				, CASE WHEN D.USR_DFN1_VAL   = 'GOODS' THEN '${@framework.common.constants.CommonConstants@USE_YN_Y}'  
+				                                       ELSE '${@framework.common.constants.CommonConstants@USE_YN_N}'  
+				   END AS GOODS_USE_YN
+				, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, B.ST_ID						/* 사이트 ID */
+				, B.ST_NM						/* 사이트 명 */
+		FROM	bbs_base  A
+		INNER JOIN st_std_info B ON (B.ST_ID = A.ST_ID)
+		LEFT OUTER JOIN company_base C ON (A.COMP_NO = C.COMP_NO)
+		LEFT OUTER JOIN code_detail  D ON (D.GRP_CD  = '${@framework.common.constants.CommonConstants@BBS_TP}'  AND A.BBS_TP_CD = D.DTL_CD)
+		WHERE	BBS_ID	=	#{bbsId}
+	</select>
+
+	<select id="listBoardGb" resultType="biz.app.system.model.BbsGbVO">
+		<!--
+			Query Name : board.listBoardGb
+			Description : 게시판 구분 리스트
+		-->
+		SELECT						/* QUERYID(board.listBoardGb) */
+				  BBS_ID			/* 게시판 아이디 */
+				, BBS_GB_NO			/* 게시판 구분 번호 */
+				, BBS_GB_NM			/* 게시판 구분 명 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	bbs_gb
+		WHERE	1=1
+		<if test='bbsId != null and bbsId != ""'>
+		AND		BBS_ID	=	#{bbsId}
+		</if>
+		<if test='bbsGbNo != null and bbsGbNo != ""'>
+		AND		BBS_GB_NO	=	#{bbsGbNo}
+		</if>
+	</select>
+
+	<insert id="insertBoardBase" parameterType="biz.app.system.model.BbsBaseVO">
+		<!--
+			Query Name : board.insertBoardBase
+			Description : 게시판 관리 등록
+		-->
+		INSERT INTO bbs_base (	/* QUERYID(board.insertBoardBase) */
+			  BBS_ID			/* 게시판 아이디 */
+			, BBS_NM			/* 게시판 명 */
+			, BBS_TP_CD			/* 게시판 유형 코드 */
+			, UPLOAD_EXT		/* 업로드 확장자 */
+			, ATCH_FL_CNT		/* 첨부 파일 수 */
+			, GB_USE_YN			/* 구분 사용 여부 */
+			, SCR_USE_YN		/* 비밀 사용 여부 */
+			, FL_USE_YN			/* 파일 사용 여부 */
+			, BBS_IMG_PATH    /* 게시판 이미지경로 */
+			, BBS_DSCRT       /* 게시판 설명 */
+			<if test='compNo != null and compNo != ""'>
+			, COMP_NO         /* 업체 번호(FK) */
+			</if>
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, ST_ID				/* 사이트 ID */
+		) VALUES (
+			  #{bbsId}			/* 게시판 아이디 */
+			, #{bbsNm}			/* 게시판 명 */
+			, #{bbsTpCd}		/* 게시판 유형 코드 */
+			, #{uploadExt}		/* 업로드 확장자 */
+			, #{atchFlCnt}		/* 첨부 파일 수 */
+			, #{gbUseYn}		/* 구분 사용 여부 */
+			, #{scrUseYn}		/* 비밀 사용 여부 */
+			, #{flUseYn}		/* 파일 사용 여부 */
+			, #{bbsImgPath}		/* 게시판 이미지경로 */
+			, #{bbsDscrt}		/* 게시판 설명 */
+			<if test='compNo != null and compNo != ""'>
+			, #{compNo}		/* 업체 번호(FK) */
+			</if>
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{stId}				/* 사이트 ID */
+		)
+	</insert>
+
+	<insert id="insertBoardGb" parameterType="biz.app.system.model.BbsGbPO">
+		<!--
+			Query Name : board.insertBoardGb
+			Description : 구분자 리스트 등록
+		-->
+		<selectKey keyProperty="bbsGbNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_BBS_GB_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO bbs_gb (	/* QUERYID(board.insertBoardGb) */
+			  BBS_ID			/* 게시판 아이디 */
+			, BBS_GB_NO			/* 게시판 구분 번호 */
+			, BBS_GB_NM			/* 게시판 구분 명 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{bbsId}			/* 게시판 아이디 */
+			, #{bbsGbNo}		/* 게시판 구분 번호 */
+			, #{bbsGbNm}		/* 게시판 구분 명 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateBoardBase" parameterType="biz.app.system.model.BbsBasePO">
+		<!--
+			Query Name : board.updateBoardBase
+			Description : 게시판 관리 글 수정
+		-->
+		UPDATE	bbs_base SET							/* QUERYID(board.updateBoardBase) */
+				  BBS_NM			= #{bbsNm}			/* 게시판 명 */
+				, BBS_TP_CD			= #{bbsTpCd}		/* 게시판 유형 코드 */
+				, UPLOAD_EXT		= #{uploadExt}		/* 업로드 확장자 */
+				, ATCH_FL_CNT		= #{atchFlCnt}		/* 첨부 파일 수 */
+				, GB_USE_YN			= #{gbUseYn}		/* 구분 사용 여부 */
+				, SCR_USE_YN		= #{scrUseYn}		/* 비밀 사용 여부 */
+				, FL_USE_YN			= #{flUseYn}			/* 파일 사용 여부 */
+				, BBS_IMG_PATH   	= #{bbsImgPath} 	/* 게시판 이미지경로 */
+				, BBS_DSCRT       	= #{bbsDscrt}	    /* 게시판 설명 */
+				<if test='compNo != null and compNo != ""'>
+				, COMP_NO         	= #{compNo}		    /* 업체 번호(FK) */
+				</if>
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				, ST_ID				= #{stId}				/* 사이트 ID */
+		WHERE	BBS_ID = #{bbsId}
+	</update>
+
+	<!-- 2017.2.2, 게시판 글을 삭제하도록 수정함.
+	update id="deleteBoardLetter" parameterType="biz.app.system.model.BbsLetterPO">
+	
+		Query Name : board.deleteBoardLetter
+		Description : 게시판 글 삭제
+	
+		UPDATE	BBS_LETTER	SET
+				  SYS_DEL_YN  = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' /* 시스템 삭제자 여부 */
+				, SYS_DELR_NO = #{sysDelrNo}		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM = NOW()				/* 시스템 삭제 일시 */
+		WHERE	BBS_ID = #{bbsId}
+		AND 	LETT_NO = #{lettNo}
+	</update -->
+	
+	<delete id="deleteBoardLetter" parameterType="biz.app.system.model.BbsLetterPO">
+	<!--
+		Query Name : board.deleteBoardLetter
+		Description : 게시판 글 삭제
+	-->
+		DELETE FROM bbs_letter
+		WHERE
+			BBS_ID = #{bbsId} AND LETT_NO = #{lettNo}
+	</delete>
+
+	<delete id="deleteBoardBase" parameterType="biz.app.system.model.BbsBasePO">
+		<!--
+			Query Name : board.deleteBoardBase
+			Description : 게시판 관리 글 삭제
+		-->
+		DELETE	/* QUERYID(board.deleteBoardBase) */
+		FROM	bbs_base
+		WHERE	BBS_ID = #{bbsId}
+	</delete>
+
+	<select id="selectBoardCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : board.selectBoardCheck
+			Description : 게시판 글 카운트(삭제)
+		-->
+		SELECT	COUNT(*)	/* QUERYID(board.selectBoardGbCheck) */
+		FROM	bbs_letter
+		WHERE	BBS_ID		=	#{bbsId}
+	</select>
+
+	<delete id="deleteBoardGb" parameterType="biz.app.system.model.BbsGbPO">
+		<!--
+			Query Name : board.deleteBoardGb
+			Description : 게시판 구분 삭제
+		-->
+		DELETE	/* QUERYID(board.deleteBoardGb) */
+		FROM	bbs_gb
+		WHERE	BBS_ID		=	#{bbsId}
+		AND		BBS_GB_NO	=	#{bbsGbNo}
+	</delete>
+
+	<select id="selectBoardGbCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : board.selectBoardGbCheck
+			Description : 게시판 글 카운트(삭제)
+		-->
+		SELECT	COUNT(*)	/* QUERYID(board.selectBoardGbCheck) */
+		FROM	bbs_letter
+		WHERE	BBS_ID		=	#{bbsId}
+		AND		BBS_GB_NO	=	#{bbsGbNo}
+	</select>
+
+	<insert id="insertBbsLetter" parameterType="biz.app.system.model.BbsLetterPO">
+		<!--
+			Query Name : board.insertBbsLetter
+			Description : 게시 글 등록
+		-->
+		<selectKey keyProperty="lettNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_BBS_LETTER_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO bbs_letter (
+			  LETT_NO			/* 글 번호 */
+			, BBS_ID			/* 게시판 아이디 */
+			, BBS_GB_NO			/* 게시판 구분 코드 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, HITS				/* 조회수 */
+			, FL_NO				/* 파일 번호 */
+			, SCR_YN			/* 비밀 여부 */
+			, OPEN_YN			/* 공개 여부 */
+			/* , SYS_DEL_YN		시스템 삭제 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, RCOM_YN			/* 추천 여부 */
+			, IMG_PATH			/* 이미지 경로 */
+			, USR_DFN1_VAL		/* 사용자 정의1 값 */
+			, USR_DFN2_VAL		/* 사용자 정의2 값 */
+			, USR_DFN3_VAL		/* 사용자 정의3 값 */
+			, USR_DFN4_VAL		/* 사용자 정의4 값 */
+			, USR_DFN5_VAL		/* 사용자 정의5 값 */
+			<if test='bbsId=="dwNotice"'>
+				, BBS_STAT_CD	/* 게시 상태코드*/
+				, TOP_FIX_YN	/* 상단 고정여부*/
+				, BBS_STRT_DTM	/* 게시 시작일자*/
+				, BBS_END_DTM	/* 게시 종료일자*/
+				, ALM_SND_YN	/* 알림 발송여부*/
+				, WEB_LNK		/*  웹 링크*/
+				, APP_LNK		/*  앱 링크*/
+			</if>
+			<if test='bbsId=="bonotice"'>
+				, BBS_STAT_CD	/* 게시 상태코드*/
+				, TOP_FIX_YN	/* 상단 고정여부*/
+				, BBS_STRT_DTM	/* 게시 시작일자*/
+				, BBS_END_DTM	/* 게시 종료일자*/
+				, ALM_SND_YN	/* 알림 발송여부*/
+				, WEB_LNK		/*  웹 링크*/
+				, APP_LNK		/*  앱 링크*/
+			</if>
+			<if test='bbsId=="csnotice"'>
+				, BBS_STAT_CD	/* 게시 상태코드*/
+				, TOP_FIX_YN	/* 상단 고정여부*/
+				, BBS_STRT_DTM	/* 게시 시작일자*/
+				, BBS_END_DTM	/* 게시 종료일자*/
+				, ALM_SND_YN	/* 알림 발송여부*/
+				, WEB_LNK		/*  웹 링크*/
+				, APP_LNK		/*  앱 링크*/
+			</if>
+		) VALUES (
+			  #{lettNo}			/* 글 번호 */
+			, #{bbsId}			/* 게시판 아이디 */
+			, #{bbsGbNo}		/* 게시판 구분 코드 */
+			, #{ttl}			/* 제목 */
+			, #{content}		/* 내용 */
+			, #{hits}			/* 조회수 */
+			, #{flNo}			/* 파일 번호 */
+			, #{scrYn}			/* 비밀 여부 */
+			, #{openYn}			/* 공개 여부 */
+			/*, '${@framework.common.constants.CommonConstants@DEL_YN_N}'		 시스템 삭제 여부 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{rcomYn}			/* 추천 여부 */
+			, #{imgPath}		/* 이미지 경로 */
+			, #{usrDfn1Val}		/* 사용자 정의1 값 */
+			, #{usrDfn2Val}		/* 사용자 정의2 값 */
+			, #{usrDfn3Val}		/* 사용자 정의3 값 */
+			, #{usrDfn4Val}		/* 사용자 정의4 값 */
+			, #{usrDfn5Val}		/* 사용자 정의5 값 */
+			<if test='bbsId=="dwNotice"'>
+				, #{bbsStatCd}	/* 게시 상태코드*/
+				, #{topFixYn}	/* 상단 고정여부*/
+				, #{bbsStrtDtm}	/* 게시 시작일자*/
+				, #{bbsEndDtm}	/* 게시 종료일자*/
+				, #{almSndYn}	/* 알림 발송여부*/
+				, #{webLnk}		/*  웹 링크*/
+				, #{appLnk}		/*  앱 링크*/
+			</if>
+			<if test='bbsId=="bonotice"'>
+				, #{bbsStatCd}	/* 게시 상태코드*/
+				, #{topFixYn}	/* 상단 고정여부*/
+				, #{bbsStrtDtm}	/* 게시 시작일자*/
+				, #{bbsEndDtm}	/* 게시 종료일자*/
+				, #{almSndYn}	/* 알림 발송여부*/
+				, #{webLnk}		/*  웹 링크*/
+				, #{appLnk}		/*  앱 링크*/
+			</if>
+			<if test='bbsId=="csnotice"'>
+				, #{bbsStatCd}	/* 게시 상태코드*/
+				, #{topFixYn}	/* 상단 고정여부*/
+				, #{bbsStrtDtm}	/* 게시 시작일자*/
+				, #{bbsEndDtm}	/* 게시 종료일자*/
+				, #{almSndYn}	/* 알림 발송여부*/
+				, #{webLnk}		/*  웹 링크*/
+				, #{appLnk}		/*  앱 링크*/
+			</if>
+		)
+	</insert>
+
+	<update id="updateBbsLetter" parameterType="biz.app.system.model.BbsLetterPO">
+		<!--
+			Query Name : board.updateBbsLetter
+			Description : 게시판 글 등록
+		-->
+		UPDATE	bbs_letter SET
+				  BBS_GB_NO			= #{bbsGbNo}		/* 게시판 구분 코드 */
+				, TTL				= #{ttl}			/* 제목 */
+				, CONTENT			= #{content}		/* 내용 */
+				, SCR_YN			= #{scrYn}			/* 비밀 여부 */
+				, OPEN_YN			= #{openYn}			/* 공개 여부 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				, RCOM_YN			= #{rcomYn}			/* 추천 여부 */
+				, IMG_PATH			= #{imgPath}		/* 이미지 경로 */
+				, USR_DFN1_VAL		= #{usrDfn1Val}		/* 사용자 정의1 값 */
+				, USR_DFN2_VAL		= #{usrDfn2Val}		/* 사용자 정의2 값 */
+				, USR_DFN3_VAL		= #{usrDfn3Val}		/* 사용자 정의3 값 */
+				, USR_DFN4_VAL		= #{usrDfn4Val}		/* 사용자 정의4 값 */
+				, USR_DFN5_VAL		= #{usrDfn5Val}		/* 사용자 정의5 값 */
+				<if test='bbsId=="dwNotice"'>
+				, BBS_STAT_CD		= #{bbsStatCd}/* 게시 상태코드*/
+				, TOP_FIX_YN		= #{topFixYn}/* 상단 고정여부*/
+				, BBS_STRT_DTM		= #{bbsStrtDtm}/* 게시 시작일자*/
+				, BBS_END_DTM		= #{bbsEndDtm}/* 게시 종료일자*/
+				, ALM_SND_YN		= #{almSndYn}/* 알림 발송여부*/
+				, WEB_LNK			= #{webLnk}	/*  웹 링크*/
+				, APP_LNK			= #{appLnk}/*  앱 링크*/
+			</if>
+			<if test='bbsId=="bonotice"'>
+				, BBS_STAT_CD		= #{bbsStatCd}/* 게시 상태코드*/
+				, TOP_FIX_YN		= #{topFixYn}/* 상단 고정여부*/
+				, BBS_STRT_DTM		= #{bbsStrtDtm}/* 게시 시작일자*/
+				, BBS_END_DTM		= #{bbsEndDtm}/* 게시 종료일자*/
+				, ALM_SND_YN		= #{almSndYn}/* 알림 발송여부*/
+				, WEB_LNK			= #{webLnk}	/*  웹 링크*/
+				, APP_LNK			= #{appLnk}/*  앱 링크*/
+			</if>
+			<if test='bbsId=="csnotice"'>
+				, BBS_STAT_CD		= #{bbsStatCd}/* 게시 상태코드*/
+				, TOP_FIX_YN		= #{topFixYn}/* 상단 고정여부*/
+				, BBS_STRT_DTM		= #{bbsStrtDtm}/* 게시 시작일자*/
+				, BBS_END_DTM		= #{bbsEndDtm}/* 게시 종료일자*/
+				, ALM_SND_YN		= #{almSndYn}/* 알림 발송여부*/
+				, WEB_LNK			= #{webLnk}	/*  웹 링크*/
+				, APP_LNK			= #{appLnk}/*  앱 링크*/
+			</if>
+		WHERE	LETT_NO				= #{lettNo}
+		AND		BBS_ID				= #{bbsId}			/* 게시판 아이디 */
+	</update>
+
+	<select id="flickBbsLetter" resultType="biz.app.system.model.BbsLetterVO">
+		<!--
+			Query Name : board.flickBbsLetter
+			Description : Bbs Next/Prev 목록
+		-->
+		SELECT 
+			  LETT_NO			/* 글 번호 */
+			, BBS_ID			/* 게시판 아이디 */
+			, BBS_GB_NO			/* 게시판 구분 코드 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, HITS				/* 조회수 */
+			, FL_NO				/* 파일 번호 */
+			, SCR_YN			/* 비밀 여부 */
+			, OPEN_YN			/* 공개 여부 */
+			, SYS_DEL_YN		/* 시스템 삭제 여부 */
+			, SYS_DELR_NO		/* 시스템 삭제자 번호 */
+			, SYS_DEL_DTM		/* 시스템 삭제 일시 */
+			, SYS_DEL_RSN		/* 시스템 삭제 사유 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, RCOM_YN			/* 추천 여부 */
+			, IMG_PATH			/* 이미지 경로 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, (
+				SELECT COUNT(*) FROM bbs_reply WHERE B.LETT_NO = LETT_NO
+			) AS BBS_REPLY_CNT
+			 
+		FROM 
+		(
+			<include refid="board.fromFlickBbsLetter"/>
+		) B 
+		ORDER BY SYS_REG_DTM DESC 
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="flickBbsLetterCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : board.flickBbsLetterCount
+			Description : Bbs Next/Prev 목록
+		-->
+		SELECT COUNT(*)
+		FROM 
+		(
+			<include refid="board.fromFlickBbsLetter"/>
+		) B 
+	</select>
+
+	<sql id="fromFlickBbsLetter">
+			/* NEXT BBS */
+			SELECT NEXT_B.* 
+			FROM 
+			(
+				SELECT B.* 
+				FROM bbs_letter B 
+				RIGHT OUTER JOIN 
+				(
+					<include refid="board.selectSubBbs"/> 
+				) SUB ON (SUB.SYS_REG_DTM <![CDATA[ < ]]> B.SYS_REG_DTM) 
+				WHERE 1=1 
+			    <include refid="board.whereBbsId"/> 
+				ORDER BY B.SYS_REG_DTM ASC 
+				<include refid="bizCommon.pageSql" />
+			) NEXT_B 
+			UNION 
+			/* PREV BBS */
+			SELECT PREV_B.* 
+			FROM 
+			(
+				SELECT B.* 
+				FROM bbs_letter B 
+				RIGHT OUTER JOIN 
+				(
+					<include refid="board.selectSubBbs"/> 
+				) SUB ON (SUB.SYS_REG_DTM <![CDATA[ > ]]> B.SYS_REG_DTM) 
+				WHERE 1=1 
+			    <include refid="board.whereBbsId"/> 
+				ORDER BY B.SYS_REG_DTM DESC 
+				<include refid="bizCommon.pageSql" />
+			) PREV_B 
+	</sql>
+	<sql id="selectSubBbs">
+		SELECT * 
+	    FROM bbs_letter B 
+	    WHERE 1=1 
+	    <include refid="board.whereBbsId"/>
+		<include refid="board.whereBbsLetterNo"/>
+	</sql>
+	<sql id="whereBbsId">
+		<if test='bbsId != null and bbsId != ""'>
+			AND B.BBS_ID = #{bbsId} 
+		</if> 
+	</sql>
+	<sql id="whereBbsLetterNo">
+		<if test='lettNo != null and lettNo != ""'>
+			AND B.LETT_NO = #{lettNo} 
+		</if> 
+	</sql>
+
+	<!-- 게시판 글 목록 -->
+	<select id="pageBbsLetter" resultType="biz.app.system.model.BbsLetterVO">
+		<!--
+			Query Name : board.pageBbsLetter
+			Description : 게시판 글 목록
+		-->
+		SELECT	/* QUERYID(board.pageBbsLetter) */
+				  A.LETT_NO				/* 글 번호 */
+				, A.BBS_ID				/* 게시판 아이디 */
+				, A.BBS_GB_NO			/* 게시판 구분 코드 */
+				, A.TTL					/* 제목 */
+				, A.CONTENT				/* 내용 */
+				, A.HITS				/* 조회수 */
+				, A.FL_NO				/* 파일 번호 */
+				, A.SCR_YN				/* 비밀 여부 */
+				, A.OPEN_YN				/* 공개 여부 */
+				, A.SYS_DEL_YN			/* 시스템 삭제 여부 */
+				, A.SYS_DELR_NO			/* 시스템 삭제자 번호 */
+				, A.SYS_DEL_DTM			/* 시스템 삭제 일시 */
+				, A.SYS_DEL_RSN			/* 시스템 삭제 사유 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, A.RCOM_YN				/* 추천 여부 */
+				, A.IMG_PATH			/* 이미지 경로 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, (
+					SELECT COUNT(*) FROM bbs_reply WHERE A.LETT_NO = LETT_NO
+				) AS BBS_REPLY_CNT
+				, B.BBS_TP_CD        	/* 게시판유형코드 */
+				, C.DISP_PRIOR_RANK     /* 전시우선순위 */
+				, BG.BBS_GB_NM			/* 게시판 구분 명 */
+				<!-- , (SELECT FIN.PAGE 
+		             FROM (
+		                  SELECT FLOOR(PNUM.RNUM/10)+1 AS PAGE
+		                       , PNUM.LETT_NO
+		                    FROM (
+		                          SELECT @rownum:=@rownum+1 AS RNUM
+		                               , IBL.LETT_NO
+		                            FROM bbs_letter IBL
+		                               , (SELECT @rownum:=-1) TMP
+		                           WHERE 1=1
+		                             AND BBS_ID = '${@framework.front.constants.FrontConstants@BBS_ID_NOTICE}'
+		                             AND OPEN_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		                           ORDER BY LETT_NO DESC
+		                         ) PNUM
+		                 ) FIN
+		           WHERE FIN.LETT_NO = A.LETT_NO ) AS FAQ_PAGE		/* 글 페이징 값 */ -->
+		        <if test="bbsId == 'dwNotice'" >   
+		        , A.BBS_STAT_CD				/* 게시 상태코드 */
+		        , CONCAT(DATE_FORMAT(A.BBS_STRT_DTM, '%Y-%m-%d') ," ~ ",DATE_FORMAT(A.BBS_END_DTM, '%Y-%m-%d') ) AS BBS_DTM	/* 공지 기간 */
+                , A.ALM_SND_YN				/* 알림발송여부 */
+                , (SELECT GROUP_CONCAT( POC_GB_CD SEPARATOR ',' ) AS POC_GB FROM BBS_POC WHERE LETT_NO = A.LETT_NO AND POC_MENU_CD = '01') AS POC_GB_CD /* POC번호 문자열*/
+                , A.TOP_FIX_YN   /* 상단고정여부*/
+                , A.APP_LNK		/*앱링크*/
+                , A.WEB_LNK		/*웹링크*/
+                </if>
+		FROM	bbs_letter A
+		INNER JOIN bbs_base B ON (A.BBS_ID = B.BBS_ID) 
+		LEFT OUTER JOIN bbs_letter_disp C ON(A.BBS_ID = C.BBS_ID AND A.LETT_NO = C.LETT_NO)
+		LEFT OUTER JOIN bbs_gb BG ON( A.BBS_ID = BG.BBS_ID AND A.BBS_GB_NO = BG.BBS_GB_NO)
+		<if test='compNo != null and compNo != ""'>
+        JOIN company_base CB ON (A.COMP_NO = CB.COMP_NO AND CB.COMP_NO = #{compNo}) 
+        </if>
+		WHERE	1 = 1
+		<if test='stId != null and stId != ""'>
+		  AND B.ST_ID = #{stId}
+		</if>
+		<include refid="pageBbsLetterCondition" />
+		
+		<!-- 공지사항 화면 검색조건 -->
+		<if test="bbsId == 'dwNotice'">
+			<include refid="pageBbsNoticeCondition" />
+		</if>
+	
+		<if test="bbsId == 'dwNotice'" >   
+			ORDER BY	TOP_FIX_YN DESC, LETT_NO DESC
+		</if>
+		<if test="bbsId != 'dwNotice'" >   
+			<include refid="bizCommon.sortSql" />
+		</if>		
+			<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 게시판 글 목록 : 데이터 수 -->
+	<select id="pageBbsLetterCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : board.pageBbsLetterCount
+			Description : 게시판 글 목록 카운트 조회
+		-->
+		SELECT	/* QUERYID(board.pageBbsLetterCount) */
+				COUNT(A.BBS_ID)
+		FROM	bbs_letter  A
+		INNER JOIN bbs_base B ON (A.BBS_ID = B.BBS_ID) 
+		<if test='compNo != null and compNo != ""'>
+        JOIN company_base CB ON (A.COMP_NO = CB.COMP_NO AND CB.COMP_NO = #{compNo}) 
+        </if>
+		WHERE	1 = 1
+		<if test='stId != null and stId != ""'>
+		  AND B.ST_ID = #{stId}
+		</if>
+		<include refid="pageBbsLetterCondition" />
+		<!-- 공지사항 화면 검색조건 -->
+		<if test="bbsId == 'dwNotice'">
+			<include refid="pageBbsNoticeCondition" />
+		</if>
+	</select>
+	
+	<!-- 게시판 글 목록 : 조건절 -->
+	<sql id="pageBbsLetterCondition">
+		/* AND		A.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}' */
+		<if test='bbsId != null and bbsId != ""'>
+		AND		A.BBS_ID = #{bbsId}
+		</if>
+		<if test='bbsGbNo != null and bbsGbNo != ""'>
+		AND		A.BBS_GB_NO = #{bbsGbNo}
+		</if>
+ 
+		<if test='openYn != null and openYn != ""'>
+		AND		A.OPEN_YN = #{openYn}
+		</if>
+		<!-- <if test='lettNo != null and lettNo != ""'>
+		AND		A.LETT_NO = #{lettNo}
+		</if> -->
+		<if test='searchType != null and searchType != "" and searchWord != ""'>
+			<choose>
+				<when test='searchType == "ttl"'>
+					AND A.TTL LIKE CONCAT( '%', #{searchWord}, '%' )
+				</when>
+				<when test='searchType == "cont"'>
+					AND A.CONTENT LIKE CONCAT( '%', #{searchWord}, '%' )
+				</when>
+				<otherwise>
+					AND (A.TTL LIKE CONCAT( '%', #{searchWord}, '%' ) OR A.CONTENT LIKE CONCAT( '%', #{searchWord}, '%' ))
+				</otherwise>
+			</choose>
+		</if>
+		<if test="bbsId != 'dwNotice'">
+			<if test="searchDtmStart != null and searchDtmStart!=''">
+			AND 	DATE_FORMAT(A.SYS_REG_DTM, '%Y-%m-%d') <![CDATA[>=]]> #{searchDtmStart}
+			</if>
+			<if test="searchDtmEnd != null and searchDtmEnd!=''">
+			AND 	DATE_FORMAT(A.SYS_REG_DTM, '%Y-%m-%d') <![CDATA[<=]]> #{searchDtmEnd}
+			</if>
+		</if>
+		<if test ="ttl != null and ttl !=''">
+			AND A.TTL LIKE CONCAT('%' , #{ttl} , '%')
+		</if>
+		<if test ="sysRegrNm != null and sysRegrNm !=''">
+			AND A.SYS_REGR_NO IN (SELECT USR_NO FROM USER_BASE WHERE USR_NM = #{sysRegrNm})
+		</if>
+	</sql>
+	
+	<!-- 공지사항 게시판 화면에서 쓸 조건절 -->
+	<sql id="pageBbsNoticeCondition">
+		<if test='bbsGbNo != null and bbsGbNo != ""' >
+			AND A.BBS_GB_NO = #{bbsGbNo}
+		</if>
+		<if test='bbsStatCd != null and bbsStatCd != ""' >
+			AND A.BBS_STAT_CD = #{bbsStatCd}
+		</if>
+		<if test='almSndYn != null and almSndYn != ""' >
+			AND A.ALM_SND_YN = #{almSndYn}
+		</if>
+		<if test='listPocGb != null and listPocGb.size > 0' >
+			AND (
+				SELECT COUNT(*)
+				FROM (SELECT POC_GB_CD FROM BBS_POC WHERE LETT_NO = A.LETT_NO AND POC_MENU_CD = '01') PG
+				<foreach collection="listPocGb" item="item" separator=" " >
+					INNER JOIN ( SELECT #{item.pocGbCd} AS pocItem FROM DUAL) ${item.viewNm}
+				</foreach>
+				<foreach collection="listPocGb" item="item" separator="OR" open="ON" > 
+					PG.POC_GB_CD = ${item.viewNm}.pocItem
+				</foreach>
+				
+			) > 0
+		</if>
+		
+		<if test='dateType != null and dateType != ""'>
+			<choose>
+				<when test='dateType == "regDtm"'>
+					<if test="searchDtmStart != null and searchDtmEnd != null and searchDtmStart!='' and searchDtmEnd!=''">
+					AND
+					(
+						#{searchDtmStart} BETWEEN DATE_FORMAT(A.BBS_STRT_DTM, '%Y-%m-%d')  AND DATE_FORMAT(A.BBS_END_DTM, '%Y-%m-%d')
+	                    OR
+	                    #{searchDtmEnd} BETWEEN DATE_FORMAT(A.BBS_STRT_DTM, '%Y-%m-%d')  AND DATE_FORMAT(A.BBS_END_DTM, '%Y-%m-%d')
+	                    OR
+	                    (DATE_FORMAT(A.BBS_STRT_DTM, '%Y-%m-%d')  <![CDATA[>=]]>   #{searchDtmStart} AND 	DATE_FORMAT(A.BBS_STRT_DTM, '%Y-%m-%d')  <![CDATA[<=]]>  #{searchDtmEnd})
+                    )
+					</if>
+				</when>
+				<when test='dateType == "endDtm"'>
+					<if test="searchDtmStart != null and searchDtmStart!=''">
+					AND 	DATE_FORMAT(A.BBS_END_DTM, '%Y-%m-%d') <![CDATA[>=]]> #{searchDtmStart}
+					</if>
+					<if test="searchDtmEnd != null and searchDtmEnd !=''">
+					AND 	DATE_FORMAT(A.BBS_END_DTM, '%Y-%m-%d') <![CDATA[<=]]> #{searchDtmEnd}
+					</if>
+				</when>
+				<otherwise>
+					<if test="searchDtmStart != null and searchDtmStart!=''">
+					AND 	DATE_FORMAT(A.SYS_UPD_DTM, '%Y-%m-%d') <![CDATA[>=]]> #{searchDtmStart}
+					</if>
+					<if test="searchDtmEnd != null and searchDtmEnd !=''">
+					AND 	DATE_FORMAT(A.SYS_UPD_DTM, '%Y-%m-%d') <![CDATA[<=]]> #{searchDtmEnd}
+					</if>
+				</otherwise>
+			</choose>
+		</if>
+		<if test='siteGubun == "FO"'>
+			AND	A.BBS_END_DTM >= date_format(NOW(), '%Y-%m-%d') 
+		</if>
+	</sql>
+
+	<!-- 게시판 구분 목록 -->
+	<select id="listBbsGb" resultType="biz.app.system.model.BbsGbVO">
+		<!--
+			Query Name : board.listBbsGb
+			Description : 게시판 글 목록
+		-->
+		SELECT	/* QUERYID(board.listBbsGb) */
+				  BG.BBS_ID				/* 게시판 아이디 */
+				, BG.BBS_GB_NO			/* 게시판 구분 번호 */
+				, BG.BBS_GB_NM			/* 게시판 구분 명 */
+				, BG.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, BG.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, BG.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, BG.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM	bbs_gb BG
+				INNER JOIN bbs_base BB ON (BB.BBS_ID = BG.BBS_ID AND BB.GB_USE_YN = 'Y') 
+		WHERE	1 = 1
+		<include refid="listBbsGbCondition" />
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<select id="listBoardReply" resultType="biz.app.system.model.BbsReplyVO">
+		<!--
+			Query Name : board.listBbsGb
+			Description : 게시글 답글 목록
+		-->
+		SELECT						/* QUERYID(board.listBoardReply) */
+				  LETT_NO			/* 글 번호 */
+				, RPL_NO			/* 답글 번호 */
+				, CONTENT			/* 내용 */
+				, UP_RPL_NO			/* 상위 답글 번호 */
+				, SORT_SEQ			/* 정렬 순서 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, SYS_DEL_YN		/* 시스템 삭제 여부 */
+				, SYS_DEL_RSN		/* 시스템 삭제 사유 */
+				, SYS_DELR_NO		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		/* 시스템 삭제 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	bbs_reply
+		WHERE	1 = 1
+		AND		LETT_NO		=	#{lettNo}
+		/* AND		SYS_DEL_YN	=	'${@framework.common.constants.CommonConstants@DEL_YN_N}' */
+	</select>
+
+	<!-- 게시판 구분 목록 : 조건절 -->
+	<sql id="listBbsGbCondition">
+		<if test='bbsId != null and bbsId != ""'>
+		AND		BG.BBS_ID = #{bbsId}
+		</if>
+		<if test='bbsGbNo != null and bbsGbNo != ""'>
+		AND		BG.BBS_GB_NO = #{bbsGbNo}
+		</if>
+	</sql>
+
+	<!-- FAQ 자주하는 질문  최신순 10개 -->
+	<select id="listBbsLetterTop" resultType="biz.app.system.model.BbsLetterVO">
+		<!--
+			Query Name : board.listBbsLetterTop
+			Description : FAQ 자주하는 질문 TOP 10
+		-->
+		SELECT	/* QUERYID(board.listBbsLetterTop) */
+				  BL.LETT_NO			/* 글 번호 */
+		  		, BL.BBS_ID				/* 게시판 아이디 */
+		  		, BL.BBS_GB_NO			/* 게시판 구분 코드 */
+		  		, BL.TTL				/* 제목 */
+		  		, BL.CONTENT			/* 내용 */
+		  		, BL.HITS				/* 조회수 */
+		  		, BL.FL_NO				/* 파일 번호 */
+		  		, BL.SCR_YN				/* 비밀 여부 */
+		  		, BL.OPEN_YN			/* 공개 여부 */
+		  		, BL.RCOM_YN			/* 공개 여부 */
+		  		, BL.SYS_DEL_YN			/* 시스템 삭제 여부 */
+		  		, BL.SYS_DELR_NO		/* 시스템 삭제자 번호 */
+		  		, BL.SYS_DEL_DTM		/* 시스템 삭제 일시 */
+		  		, BL.SYS_DEL_RSN		/* 시스템 삭제 사유 */
+		  		, BL.SYS_REGR_NO		/* 시스템 등록자 번호 */
+		  		, BL.SYS_REG_DTM		/* 시스템 등록 일시 */
+		  		, BL.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		  		, BL.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(BL.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(BL.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, BG.BBS_GB_NM			/* 게시판 구분 명 */
+				, (SELECT FIN.PAGE 
+		           FROM (
+		                  SELECT FLOOR(PNUM.RNUM/10)+1 AS PAGE
+		                       , PNUM.LETT_NO
+		                    FROM (
+		                          SELECT @rownum:=@rownum+1 AS RNUM
+		                               , IBL.LETT_NO
+		                            FROM bbs_letter IBL
+		                               , (SELECT @rownum:=-1) TMP
+		                           WHERE 1=1
+		                             AND BBS_ID = '${@framework.front.constants.FrontConstants@BBS_ID_FAQ}'
+		                             AND OPEN_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		                           ORDER BY LETT_NO DESC
+		                         ) PNUM
+		                 ) FIN
+		          WHERE FIN.LETT_NO = BL.LETT_NO ) AS FAQ_PAGE		/* 글 페이징 값 */
+		FROM	bbs_letter BL LEFT OUTER JOIN bbs_gb BG ON(BL.BBS_ID = BG.BBS_ID AND BL.BBS_GB_NO = BG.BBS_GB_NO)
+		WHERE	1 = 1
+		AND		BL.BBS_ID	= '${@framework.front.constants.FrontConstants@BBS_ID_FAQ}'
+		AND		BL.OPEN_YN	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test='rcomYn != null and rcomYn != ""'>
+		AND 	BL.RCOM_YN = #{rcomYn}
+		</if>
+		ORDER BY BL.HITS DESC limit 10
+	</select>
+
+	<select id="listBbsBase" resultType="biz.app.system.model.BbsBaseVO">
+		<!--
+			Query Name : board.listBbsBase
+			Description : 게시판기본항목
+		-->
+		SELECT
+			BBS_ID
+			,BBS_NM
+		FROM
+			bbs_base
+		WHERE
+		   1=1
+		AND
+			BBS_TP_CD = #{bbsTpCd}
+		<if test='stId != null and stId != ""'>
+			AND ST_ID = #{stId}
+		</if>
+		ORDER BY SYS_REG_DTM ASC
+	</select>
+
+	<!-- 게시판 댓글 목록 조회 -->
+	<select id="pageBbsReply" resultType="biz.app.system.model.BbsReplyVO">
+		SELECT
+			LETT_NO
+			,RPL_NO
+			,CONTENT
+			,UP_RPL_NO
+			,(SELECT COUNT(*) FROM bbs_reply BR WHERE BR.LETT_NO = #{lettNo} AND BR.UP_RPL_NO = 0) AS bbsReplyCnt
+			,SYS_REGR_NO
+			,SYS_REG_DTM
+		FROM
+			bbs_reply
+		WHERE
+		   1=1
+		AND
+			LETT_NO = #{lettNo}
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 게시판 댓글 목록 : 데이터 수 -->
+	<select id="pageBbsReplyCount" resultType="java.lang.Integer" >
+		SELECT
+			COUNT(*)
+		FROM	bbs_reply
+		WHERE
+			1=1
+		AND
+		LETT_NO = #{lettNo}
+	</select>
+
+	<select id="getBbsLetter" resultType="biz.app.system.model.BbsLetterVO">
+		<!--
+			Query Name : board.getBbsLetter
+			Description : 게시 글 목록
+		-->
+		SELECT	  LETT_NO			/* 글 번호 */
+				, BBS_ID			/* 게시판 아이디 */
+				, BBS_GB_NO			/* 게시판 구분 코드 */
+				, TTL				/* 제목 */
+				, CONTENT			/* 내용 */
+				, HITS				/* 조회수 */
+				, FL_NO				/* 파일 번호 */
+				, SCR_YN			/* 비밀 여부 */
+				, OPEN_YN			/* 공개 여부 */
+				, USR_DFN1_VAL			/* 사용자 정의1 값 */
+				, USR_DFN2_VAL			/* 사용자 정의2 값 */
+				, USR_DFN3_VAL			/* 사용자 정의3 값 */
+				, USR_DFN4_VAL			/* 사용자 정의4 값 */
+				, USR_DFN5_VAL			/* 사용자 정의5 값 */
+				, SYS_DEL_YN		/* 시스템 삭제 여부 */
+				, SYS_DELR_NO		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM		/* 시스템 삭제 일시 */
+				, SYS_DEL_RSN		/* 시스템 삭제 사유 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, RCOM_YN			/* 추천 여부 */
+				, IMG_PATH			/* 이미지 경로 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				
+				 <if test="bbsId == 'dwNotice'" >   
+		        , BBS_STAT_CD				/* 게시 상태코드 */
+		        , DATE_FORMAT(BBS_STRT_DTM, '%Y-%m-%d')  AS BBS_STRT_DTM 	/* 공지 시작날짜*/
+		        , DATE_FORMAT(BBS_END_DTM, '%Y-%m-%d')  AS BBS_END_DTM	/* 공지 종료날짜 */
+                , ALM_SND_YN				/* 알림발송여부 */
+                , (SELECT GROUP_CONCAT( POC_GB_CD SEPARATOR ',' ) AS POC_GB_CD FROM BBS_POC WHERE LETT_NO = A.LETT_NO AND POC_MENU_CD = '01') AS POC_GB_CD /* POC번호 문자열*/
+                , TOP_FIX_YN   /* 상단고정여부*/
+                , APP_LNK		/*앱링크*/
+                , WEB_LNK		/*웹링크*/
+                , ALM_SND_DTM 	/*알림 발송 날짜*/
+                </if>
+                 <if test="bbsId == 'bonotice'" >   
+		        , BBS_STAT_CD				/* 게시 상태코드 */
+		        , DATE_FORMAT(BBS_STRT_DTM, '%Y-%m-%d')  AS BBS_STRT_DTM 	/* 공지 시작날짜*/
+		        , DATE_FORMAT(BBS_END_DTM, '%Y-%m-%d')  AS BBS_END_DTM	/* 공지 종료날짜 */
+                , ALM_SND_YN				/* 알림발송여부 */
+                , (SELECT GROUP_CONCAT( POC_GB_CD SEPARATOR ',' ) AS POC_GB_CD FROM BBS_POC WHERE LETT_NO = A.LETT_NO AND POC_MENU_CD = '01') AS POC_GB_CD /* POC번호 문자열*/
+                , TOP_FIX_YN   /* 상단고정여부*/
+                , APP_LNK		/*앱링크*/
+                , WEB_LNK		/*웹링크*/
+                , ALM_SND_DTM 	/*알림 발송 날짜*/
+                </if>
+                 <if test="bbsId == 'csnotice'" >   
+		        , BBS_STAT_CD				/* 게시 상태코드 */
+		        , DATE_FORMAT(BBS_STRT_DTM, '%Y-%m-%d')  AS BBS_STRT_DTM 	/* 공지 시작날짜*/
+		        , DATE_FORMAT(BBS_END_DTM, '%Y-%m-%d')  AS BBS_END_DTM	/* 공지 종료날짜 */
+                , ALM_SND_YN				/* 알림발송여부 */
+                , (SELECT GROUP_CONCAT( POC_GB_CD SEPARATOR ',' ) AS POC_GB_CD FROM BBS_POC WHERE LETT_NO = A.LETT_NO AND POC_MENU_CD = '01') AS POC_GB_CD /* POC번호 문자열*/
+                , TOP_FIX_YN   /* 상단고정여부*/
+                , APP_LNK		/*앱링크*/
+                , WEB_LNK		/*웹링크*/
+                , ALM_SND_DTM 	/*알림 발송 날짜*/
+                </if>
+                
+		FROM	bbs_letter A
+		WHERE	LETT_NO = #{lettNo}
+		AND		BBS_ID = #{bbsId}
+		/* AND		SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}' */
+		<if test="openYn != null and openYn !=''">
+		AND		OPEN_YN = #{openYn}
+		</if>
+		<if test="scrYn != null and scrYn !=''">
+		AND		SCR_YN = #{scrYn}
+		</if>
+	</select>
+
+	<update id="updateBbsLetterHits" parameterType="biz.app.system.model.BbsLetterPO">
+
+		UPDATE
+			bbs_letter
+		SET
+			HITS = HITS +1
+			,SYS_UPDR_NO		= #{sysUpdrNo}
+			,SYS_UPD_DTM		= NOW()
+		WHERE
+			LETT_NO = #{lettNo}
+	</update>
+
+	<!-- 스토리 댓글 목록 조회 -->
+	<select id="pageStoryReply" resultType="biz.app.system.model.BbsReplyVO">
+		SELECT
+			DISTINCT *
+		FROM (
+			SELECT
+				 B.LETT_NO
+		        ,B.RPL_NO
+		        ,B.CONTENT
+		        ,B.UP_RPL_NO
+		        ,B.SYS_REG_DTM
+		        ,FN_GET_USER_ID(B.SYS_REGR_NO) AS SYS_REGR_ID
+		        ,B.SYS_REGR_NO
+				,CASE WHEN B.UP_RPL_NO = 0 THEN B.RPL_NO ELSE B.UP_RPL_NO END AS PARENT
+				,CASE WHEN B.UP_RPL_NO = 0 THEN 1 ELSE 2 END AS LEV
+			FROM (
+				SELECT
+					RPL_NO
+					,UP_RPL_NO
+				FROM
+					 bbs_reply
+				WHERE
+					LETT_NO = #{lettNo}
+				ORDER BY RPL_NO ASC
+			) A
+		 	JOIN bbs_reply B ON (B.RPL_NO = A.RPL_NO OR B.RPL_NO = A.UP_RPL_NO)
+		) B
+		WHERE
+			B.LETT_NO = #{lettNo}
+		ORDER BY
+			PARENT ASC, B.RPL_NO ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 스토리 댓글 목록 : 데이터 수 -->
+	<select id="pageStoryReplyCount" resultType="java.lang.Integer" >
+		SELECT
+			DISTINCT COUNT(*)
+		FROM (
+			SELECT
+				B.*
+				,CASE WHEN B.UP_RPL_NO = 0 THEN B.RPL_NO ELSE B.UP_RPL_NO END AS PARENT
+				,CASE WHEN B.UP_RPL_NO = 0 THEN 1 ELSE 2 END AS LEV
+			FROM (
+				SELECT
+					RPL_NO
+					,UP_RPL_NO
+				FROM
+					 bbs_reply
+				WHERE
+					LETT_NO = #{lettNo}
+				ORDER BY RPL_NO ASC
+			) A
+		 	JOIN bbs_reply B ON (B.RPL_NO = A.RPL_NO OR B.RPL_NO = A.UP_RPL_NO)
+		) B
+		WHERE
+			B.LETT_NO = #{lettNo}
+		ORDER BY
+			PARENT ASC, B.RPL_NO ASC
+	</select>
+
+	<!-- 게시판 이전글 -->
+	<select id="listBbsPrev" resultType="biz.app.system.model.BbsLetterVO">
+		SELECT
+			LETT_NO
+		   ,TTL
+		   ,HITS
+		   ,IMG_PATH
+		   ,SYS_REG_DTM
+	 	FROM
+	 		bbs_letter
+		WHERE LETT_NO &lt; #{lettNo}
+		AND BBS_ID = #{bbsId}
+		/* AND SYS_DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}' */
+		AND	OPEN_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		 
+		ORDER BY LETT_NO DESC
+		LIMIT 0,1
+	</select>
+
+	<!-- 게시판 다음글 -->
+	<select id="listBbsNext" resultType="biz.app.system.model.BbsLetterVO">
+		SELECT
+			LETT_NO
+		   ,TTL
+		   ,HITS
+		   ,IMG_PATH
+		   ,SYS_REG_DTM
+	 	FROM
+	 		bbs_letter
+		WHERE
+			LETT_NO &gt; #{lettNo}
+		AND
+			BBS_ID = #{bbsId}
+		/* AND SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DISP_YN_N}' */
+		AND
+			OPEN_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		 
+		ORDER BY LETT_NO ASC
+		LIMIT 0,1
+	</select>
+
+	<update id="updateBbsReply" parameterType="biz.app.system.model.BbsReplyPO">
+
+		UPDATE
+			bbs_reply
+		SET
+			CONTENT = #{content}
+			,SYS_UPDR_NO		= #{sysUpdrNo}
+			,SYS_UPD_DTM		= NOW()
+		WHERE
+			LETT_NO = #{lettNo}
+		AND
+			RPL_NO = #{rplNo}
+	</update>
+
+	<insert id="insertBbsReply" parameterType="biz.app.system.model.BbsReplyPO">
+		<!--
+			Query Name : board.insertBbsReply
+			Description : 답글 등록 저장
+		-->
+		INSERT INTO bbs_reply(	/* QUERYID(board.insertBbsReply) */
+			  LETT_NO			/* 글 번호 */
+			, RPL_NO			/* 답글 번호 */
+			, CONTENT			/* 내용 */
+			, UP_RPL_NO			/* 상위 답글 번호 */
+			, SORT_SEQ			/* 정렬 순서 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			/* , SYS_DEL_YN		 시스템 삭제 여부 */
+			)
+			VALUES(
+			 #{lettNo}
+			,(SELECT RPL_NO FROM(SELECT IFNULL(MAX(RPL_NO), 0) +1 AS RPL_NO FROM bbs_reply WHERE LETT_NO = #{lettNo}) tmp)
+			,#{content}
+			,0
+			,(SELECT SORT_SEQ FROM(SELECT IFNULL(MAX(SORT_SEQ), 0) +1 AS SORT_SEQ FROM bbs_reply WHERE LETT_NO = #{lettNo}) tmp1)
+			,#{sysRegrNo}
+			,NOW()
+			,#{sysUpdrNo}
+			,NOW()
+			/* ,'${@framework.common.constants.CommonConstants@DEL_YN_N}'	시스템 삭제 여부 */
+			)
+	</insert>
+
+	<!-- 2017.2.2, 답글을 삭제하도록 수정함. 
+	
+		update id="deleteBbsReply" parameterType="biz.app.system.model.BbsReplyPO">
+			Query Name : board.deleteBbsReply
+			Description : 답글 글 삭제
+
+		UPDATE	BBS_REPLY	SET
+				  SYS_DEL_YN  = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' /* 시스템 삭제자 여부 */
+				, SYS_DELR_NO = #{sysDelrNo}		/* 시스템 삭제자 번호 */
+				, SYS_DEL_DTM = NOW()				/* 시스템 삭제 일시 */
+		WHERE	LETT_NO = #{lettNo}
+		<if test="rplNo != null and rplNo !=''">
+		AND		RPL_NO = #{rplNo}
+		</if>
+	</update -->
+	
+	<delete id="deleteBbsReply" parameterType="biz.app.system.model.BbsReplyPO">
+		<!--
+			Query Name : board.deleteBbsReply
+			Description : 답글 글 삭제
+		-->
+		DELETE FROM bbs_reply
+		WHERE
+			LETT_NO = #{lettNo}
+		<if test="rplNo != null and rplNo !=''">
+			AND	RPL_NO = #{rplNo}
+		</if>
+	</delete>
+
+	<select id="getReplyCnt" resultType="Integer">
+		SELECT
+			COUNT(*) AS bbsReplyCnt
+		FROM
+			bbs_reply
+		WHERE
+			LETT_NO = #{lettNo} AND UP_RPL_NO = 0
+	</select>
+	
+	
+	<delete id="deleteBbsLetterGoods" parameterType="biz.app.system.model.BbsLetterPO">
+		<!--
+			Query Name : brand.deleteBbsLetterGoods
+			Description : 관련상품삭제 
+		-->
+		DELETE FROM bbs_letter_goods
+		 WHERE LETT_NO = #{lettNo }
+	</delete>
+	
+	<insert id="insertBbsLetterGoods" parameterType="biz.app.system.model.BbsLetterGoodsPO">
+		<!--
+			Query Name : board.insertBbsLetterGoods
+			Description : 관련상품 등록
+		-->
+		INSERT INTO bbs_letter_goods (	/* QUERYID(board.insertBbsLetterGoods) */
+			  LETT_NO			/* 글번호 */
+			, GOODS_ID			/* 상품아이디 */
+		 	, DISP_PRIOR_RANK	/* 전시우선순위 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{lettNo}			/* 글번호 */
+			, #{goodsId}			/* 상품아이디 */
+			, #{dispPriorRank}  /* 전시우선순위 */ 
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<resultMap id="BbsLetterGoodsTargetMap" type="biz.app.system.model.BbsLetterGoodsVO">
+		<id property="goodsId"				column="GOODS_ID"/>
+		<result property="goodsNm"			column="GOODS_NM"/>
+		<result property="goodsStatCd"		column="GOODS_STAT_CD"/>
+		<result property="mdlNm"			column="MDL_NM"/>
+		<result property="compNo"			column="COMP_NO"/>
+		<result property="mmft"				column="MMFT"/>
+		<result property="saleStrtDtm"		column="SALE_STRT_DTM"/>
+		<result property="saleEndDtm"		column="SALE_END_DTM"/>
+		<result property="showYn"			column="SHOW_YN"/>
+		<result property="goodsTpCd"		column="GOODS_TP_CD"/>
+		<result property="bigo"				column="BIGO"/>
+		<result property="bndNo"			column="BND_NO"/>
+		<result property="compNm"			column="COMP_NM"/>
+		<result property="bndNmKo"			column="BND_NM_KO"/>
+		<result property="saleAmt"			column="SALE_AMT"/>
+		<result property="lettNo"			column="LETT_NO"/>
+		<result property="dispPriorRank"	column="DISP_PRIOR_RANK"/>
+		
+	</resultMap>
+	
+	<select id="listBbsLetterGoods" resultMap="BbsLetterGoodsTargetMap">
+		<!--
+			Query Name : board.listBbsLetterGoods
+			Description : 게시판상품목록 그리드
+		-->
+		SELECT	/*SG.ST_ID
+				, S.ST_NM
+				,*/ A.GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, F.LETT_NO
+				, F.DISP_PRIOR_RANK
+		FROM goods_base A
+		INNER JOIN bbs_letter_goods F ON A.GOODS_ID = F.GOODS_ID
+		LEFT OUTER JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+		LEFT OUTER JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+		LEFT OUTER JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		/*LEFT JOIN st_goods_map SG ON (A.GOODS_ID = SG.GOODS_ID)
+		INNER JOIN st_std_info S ON SG.ST_ID = S.ST_ID */
+		WHERE	F.LETT_NO = #{lettNo}
+	</select>
+	
+	
+	
+	
+	
+	<!-- 게시글 전시 우선순위 목록 -->
+	<select id="pageBbsLetterDispList" resultType="biz.app.system.model.BbsLetterDispVO">
+		<!--
+			Query Name : board.pageBbsLetterDispList
+			Description : 게시글 전시 우선순위 
+		-->
+		SELECT	/* QUERYID(board.pageBbsLetterDispList) */
+				  A.LETT_NO			/* 글 번호 */
+				, A.BBS_ID			/* 게시판 아이디 */
+				, A.BBS_GB_NO		/* 게시판 구분 코드 */
+				, A.TTL				/* 제목 */
+				, A.HITS			/* 조회수 */
+				, A.SCR_YN			/* 비밀 여부 */
+				, A.OPEN_YN			/* 공개 여부 */
+				, B.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, B.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, B.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, B.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, B.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+		FROM	bbs_letter A
+		INNER JOIN  bbs_letter_disp B ON (A.BBS_ID = B.BBS_ID AND A.LETT_NO = B.LETT_NO)
+		WHERE	1 = 1
+		<include refid="pageBbsLetterDispListCondition" />
+		ORDER BY B.DISP_PRIOR_RANK ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 게시판 글 목록 : 데이터 수 -->
+	<select id="pageBbsLetterDispListCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : board.pageBbsLetterDispListCount
+			Description : 게시글 전시 우선순위 카운트조회
+		-->
+		SELECT	/* QUERYID(board.pageBbsLetterDispListCount) */
+				COUNT(*)
+		FROM	bbs_letter A
+		WHERE	1 = 1
+		<include refid="pageBbsLetterDispListCondition" />
+	</select>
+	<!-- 게시판 글 목록 : 조건절 -->
+	<sql id="pageBbsLetterDispListCondition">
+	
+		<if test='bbsId != null and bbsId != ""'>
+		AND		A.BBS_ID = #{bbsId}
+		</if>
+		<if test='lettNo != null and lettNo != ""'>
+		AND		A.LETT_NO = #{lettNo}
+		</if>
+	</sql>
+	
+	<insert id="insertBbsLetterDisp" parameterType="biz.app.system.model.BbsLetterDispPO">
+		<!--
+			Query Name : board.insertBbsLetterDisp
+			Description :게시글 전시 우선순위 등록
+		-->
+		INSERT INTO bbs_letter_disp (
+			  LETT_NO			/* 글 번호 */
+			, BBS_ID			/* 게시판 아이디 */
+			, DISP_PRIOR_RANK	/* 전시 우선 순위 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{lettNo}			/* 글 번호 */
+			, #{bbsId}			/* 게시판 아이디 */
+			, #{dispPriorRank}	/* 전시 우선 순위 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			 
+		)
+	</insert>
+	
+	<delete id="deleteBbsLetterDisp" parameterType="biz.app.system.model.BbsLetterDispPO">
+		<!--
+			Query Name : brand.deleteBbsLetterDisp
+			Description : 게시글 전시 우선순위 삭제
+		-->
+		DELETE FROM bbs_letter_disp
+		 WHERE BBS_ID = #{bbsId }
+		 <if test='lettNo != null and lettNo != ""'>
+	 	   AND LETT_NO = #{lettNo}
+		</if>
+	</delete>
+	
+	<select id="getBoardMainList" parameterType="java.lang.String" resultType="biz.app.system.model.BbsLetterVO">
+		<!--
+			Query Name : board.getBoardMain
+			Description : 메인 전시 게시판 목록
+		-->	
+		SELECT A.LETT_NO
+			  , A.TTL
+              , A.IMG_PATH
+              , A.USR_DFN1_VAL
+              , A.SYS_REG_DTM
+		  FROM bbs_letter  A
+	INNER JOIN bbs_base B ON (A.BBS_ID = B.BBS_ID) 
+		 WHERE A.BBS_ID = #{bbsId}
+	  ORDER BY A.LETT_NO DESC
+	  	 LIMIT 2
+	</select>
+	
+	<insert id="insertBbsLetterHist" parameterType="biz.app.system.model.BbsLetterPO">
+		<!--
+			Query Name : board.insertBbsLetterHist
+			Description : 게시글 이력 등록
+		-->
+		<selectKey keyProperty="bbsLettHistSeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_BBS_LETT_HIST_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO bbs_lett_hist (
+			  HIST_SEQ			/* 이력 seq*/
+			, LETT_NO			/* 글 번호 */
+			, HIST_GB			/* 이력구분 */
+			, SYS_REGR_NO		/* 등록자번호*/
+			, SYS_REG_DTM		/* 등록일자 */
+		) VALUES (
+			  #{bbsLettHistSeq}
+			, #{lettNo}
+			, #{histGb}
+			, #{sysRegrNo}
+			, NOW()
+		)
+			
+	</insert>
+	
+	<select id="getBbsLetterHist" parameterType="biz.app.system.model.BbsLetterSO" resultType="biz.app.system.model.BbsLetterHistVO">
+		<!--
+			Query Name : board.getBbsLetterHist
+			Description : 게시 글 등록 이력 조회
+		-->
+		SELECT 	  A.SYS_REGR_NO
+				, (SELECT USR_NM 
+				   FROM USER_BASE 
+				   WHERE USR_NO = A.SYS_REGR_NO) AS SYS_REGR_NM
+				, DATE_FORMAT(SYS_REG_DTM, '%Y-%m-%d %H:%i:%s') AS SYS_REG_DTM	   
+        FROM BBS_LETT_HIST A
+        WHERE A.LETT_NO = #{lettNo}
+        AND A.HIST_GB =  '${@framework.common.constants.CommonConstants@BBS_INSERT}'
+	</select>
+	
+	<insert id="insertLetterPoc" parameterType="biz.app.system.model.BbsPocVO">
+		<!--
+			Query Name : board.insertLetterPoc
+			Description : 공지사항 poc 등록
+		-->
+		INSERT INTO BBS_POC
+        (	  LETT_NO
+			, POC_GB_CD
+			, POC_MENU_CD
+            , SYS_REGR_NO
+            , SYS_REG_DTM
+		)
+        VALUES
+       	<foreach collection="list" item="item" separator=",">
+        (
+       		#{item.lettNo},
+       		#{item.pocGbCd},
+       		'01',
+       		#{item.sysRegrNo},
+       		NOW()
+        )
+       	</foreach>
+	</insert>
+	
+	<delete id="deleteLetterPoc" parameterType="biz.app.system.model.BbsPocVO">
+		<!--
+		Query Name : board.deleteLetterPoc
+		Description : 게시판 POC 글 삭제
+		-->
+		DELETE FROM BBS_POC
+		<where>
+			<foreach collection="list" item="item" open="" close="" separator="OR"> 
+				(
+					LETT_NO = #{item.lettNo}
+					AND POC_MENU_CD = '01'
+					<if test="item.pocGbCd != null and item.pocGbCd != ''">
+						AND POC_GB_CD = #{item.pocGbCd} 
+					</if>
+				) 
+			</foreach> 
+		</where>
+	</delete>
+	
+	<select id = "bbsGbList" resultType="biz.app.system.model.BbsLetterVO">
+		SELECT
+			BBS_ID
+			, BBS_GB_NO
+			, BBS_GB_NM
+		FROM	
+			BBS_GB
+		WHERE 
+			BBS_ID = #{bbsId}	
+	</select>
+	
+	<resultMap type="biz.app.system.model.BbsLetterVO" id="BbsPopupDetail">
+		<result property="filePath" column="PHY_PATH"/>
+		<result property="fileName" column="ORG_FL_NM"/>
+	</resultMap>
+	
+	<select id="getBbsPopupDetail" resultType="biz.app.system.model.BbsLetterVO" resultMap="BbsPopupDetail">
+		<!--
+			Query Name : board.getBbsPopupDetail
+			Description : 입점/제휴문의 팝업 
+		-->
+        SELECT      B.LETT_NO            /* 글 번호 */
+                , A.BBS_GB_NM        /* 게시판 구분 명*/
+                , A.BBS_ID            /* 게시판 아이디 */
+                , B.BBS_GB_NO            /* 게시판 구분 코드 */
+                , B.TTL                /* 제목 */
+                , B.CONTENT            /* 내용 */
+                , B.FL_NO                /* 파일 번호 */
+                , B.SYS_REGR_NO        /* 시스템 등록자 번호 */
+                , B.SYS_REG_DTM        /* 시스템 등록 일시 */
+                , B.SYS_UPDR_NO        /* 시스템 수정자 번호 */
+                , B.SYS_UPD_DTM        /* 시스템 수정 일시 */
+                , FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM    /* 시스템 등록자 */
+                , FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM    /* 시스템 수정자 */
+                , B.BBS_STAT_CD                /* 게시 상태코드 */
+                , DATE_FORMAT(B.BBS_STRT_DTM, '%Y-%m-%d')  AS BBS_STRT_DTM     /* 공지 시작날짜*/
+                , DATE_FORMAT(B.BBS_END_DTM, '%Y-%m-%d')  AS BBS_END_DTM    /* 공지 종료날짜 */
+                , AF.PHY_PATH
+                , AF.ORG_FL_NM
+                , AF.SEQ
+        FROM    bbs_letter B
+        INNER JOIN bbs_gb A ON (B.BBS_ID = A.BBS_ID)
+        INNER JOIN attach_file AF ON (AF.FL_NO = B.FL_NO)
+        WHERE    A.BBS_ID = #{bbsId}
+        AND A.BBS_GB_NM = #{bbsGbNm}
+        AND B.ttl = #{ttl}
+        ORDER BY AF.SEQ DESC
+        LIMIT 0,1;
+	</select>
+</mapper>

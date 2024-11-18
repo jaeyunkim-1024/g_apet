@@ -1,0 +1,1806 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="company">
+
+	<resultMap type="biz.app.company.model.CompanyBaseVO" id="CompanyBaseMap">
+		<id     property="compNo"			column="COMP_NO"/>			<!-- 업체 번호 -->
+		<result property="compNm"			column="COMP_NM"/>			<!-- 업체 명 -->
+		<result property="upCompNo"			column="UP_COMP_NO"/>		<!-- 상위 업체번호-->
+		<result property="upCompNm"			column="UP_COMP_NM"/>		<!-- 상위 업체 명 -->
+		<result property="bizNo"			column="BIZ_NO"/>			<!-- 사업자 번호 -->
+		<result property="compStatCd"		column="COMP_STAT_CD"/>		<!-- 업체 상태 코드 -->
+		<result property="ceoNm"			column="CEO_NM"/>			<!-- 대표자 명 -->
+		<result property="bizCdts"			column="BIZ_CDTS"/>			<!-- 업태  -->
+		<result property="bizTp"			column="BIZ_TP"/>			<!-- 종목 -->
+		<result property="compGbCd"			column="COMP_GB_CD"/>		<!-- 업체 구분 코드  -->
+		<result property="compTpCd"			column="COMP_TP_CD"/>		<!-- 업체 유형 코드  -->
+		<result property="fax"				column="FAX"/>				<!-- 팩스  -->
+		<result property="tel"				column="TEL"/>				<!-- 전화 -->
+		<result property="postNoOld"		column="POST_NO_OLD"/>		<!-- 우편 번호 구 -->
+		<result property="postNoNew"		column="POST_NO_NEW"/>		<!-- 우편 번호 신 -->
+		<result	property="roadAddr"			column="ROAD_ADDR"/>		<!-- 도로 주소 -->
+		<result property="roadDtlAddr"		column="ROAD_DTL_ADDR"/>	<!-- 도로 상세 주소 -->
+		<result property="prclAddr"			column="PRCL_ADDR"/>		<!-- 지번 주소 -->
+		<result property="prclDtlAddr"		column="PRCL_DTL_ADDR"/>	<!-- 지번 상세 주소 -->
+		<result property="cclTermCd"        column="CCL_TERM_CD"/>      <!-- 업체 정산 주기 -->
+		<result property="mdUsrNo"			column="MD_USR_NO"/>		<!-- MD 사용자번호 -->
+		<result property="mdUsrNm"			column="MD_USR_NM"/>		<!-- MD 사용자 명 -->
+
+		<result property="bankCd"			column="BANK_CD"/>			<!-- 은행 코드 -->
+		<result property="acctNo"			column="ACCT_NO"/>			<!-- 계좌 번호 -->
+		<result property="ooaNm"			column="OOA_NM"/>			<!-- 예금주 명 -->
+		<result property="bigo"				column="BIGO"/>				<!-- 비고 -->
+		<result property="sysRegrNo"		column="SYS_REGR_NO"/>		<!-- 시스템 등록자 번호 -->
+		<result property="sysRegDtm"		column="SYS_REG_DTM"/>		<!-- 시스템 등록 일시 -->
+		<result property="sysUpdrNo"		column="SYS_UPDR_NO"/>		<!-- 시스템 수정자 번호 -->
+		<result property="sysUpdDtm"		column="SYS_UPD_DTM"/>		<!-- 시스템 수정 일시 -->
+		<result property="sysRegrNm"		column="SYS_REGR_NM"/>		<!-- 시스템 등록자 -->
+		<result property="sysUpdrNm"		column="SYS_UPDR_NM"/>		<!-- 시스템 수정자 -->
+		<result property="cpLevel"		    column="CP_LEVEL"/>		    <!-- 레벨-->
+		<result property="bndNmKo"          column="BND_NM_KO"/>        <!-- 브랜드 한글, 업체검색 팝업창에서 브랜드검색할 때만 사용함 -->
+        <result property="bndNmEn"          column="BND_NM_EN"/>        <!-- 브랜드 영문, 업체검색 팝업창에서 브랜드검색할 때만 사용함 -->
+		<collection property="stStdList" column="COMP_NO" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="getStStdInfoById"/>
+	</resultMap>
+
+	<select id="getStStdInfoById" resultType="biz.app.st.model.StStdInfoVO">
+		<!--
+			Query Name	: company.getStStdInfoById
+			Description	: 사이트 정보 조회
+		-->
+		SELECT	/* QUERYID(company.getStStdInfoById) */
+			  M.ST_ID
+			, S.ST_NM
+			, S.USE_YN
+		FROM
+			ST_STD_INFO S
+			INNER JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID
+		WHERE
+			M.COMP_NO = #{COMP_NO}
+	</select>
+
+
+	<select id="pageCompany" resultMap="CompanyBaseMap">
+		<!--
+			Query Name	: company.pageUser
+			Description	: 공급 업체 페이지
+		-->
+		SELECT	/* QUERYID(company.pageCompany) */
+			  CB.COMP_NO			/* 업체 번호 */
+			, CB.COMP_NM			/* 업체 명 */
+			, CB.UP_COMP_NO			/* 상위 업체 번호 */
+			, (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = CB.UP_COMP_NO ) AS UP_COMP_NM		/* 상위 업체명 */
+			, CB.BIZ_NO				/* 사업자 번호 */
+			, CB.COMP_STAT_CD		/* 업체 상태 코드 */
+			, CB.CEO_NM				/* 대표자 명 */
+			, CB.BIZ_CDTS			/* 업태 */
+			, CB.BIZ_TP				/* 종목 */
+			, CB.COMP_GB_CD			/* 업체 구분 코드 */
+			, CB.COMP_TP_CD			/* 업체 유형 코드 */
+			, CB.FAX				/* 팩스 */
+			, CB.TEL				/* 전화 */
+			, CB.POST_NO_OLD		/* 우편 번호 구 */
+			, CB.POST_NO_NEW		/* 우편 번호 신 */
+			, CB.ROAD_ADDR			/* 도로 주소 */
+			, CB.ROAD_DTL_ADDR		/* 도로 상세 주소 */
+			, CB.PRCL_ADDR			/* 지번 주소 */
+			, CB.PRCL_DTL_ADDR		/* 지번 상세 주소 */
+			, CCL_TERM_CD           /* 업체 정산 주기 */
+			, MD_USR_NO				/* MD 사용자번호 */
+			, FN_GET_USER_NAME(MD_USR_NO) AS MD_USR_NM	/* MD 사용자명 */
+			-- , CB.BANK_CD			/* 은행 코드 */
+			-- , CB.ACCT_NO			/* 계좌 번호 */
+			-- , CB.OOA_NM				/* 예금주 명 */
+			, CB.BIGO				/* 비고 */
+			, CB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CB.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(CB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(CB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, CASE WHEN UP_COMP_NO = 0 THEN 0 ELSE 1 END AS CP_LEVEL	/* 레벨 */
+			, IFNULL(CB.CIS_REG_YN, 'N') AS CIS_REG_YN	/* CIS 등록 여부 */
+			, CB.BIZ_LIC_IMG_PATH 	/* 사업자 등록증 이미지 패스 */
+		FROM
+			COMPANY_BASE CB
+		WHERE	1 = 1
+		<if test='"Y".equals(adminYn)'>
+		    AND CB.UP_COMP_NO != 0
+		</if>
+        <if test='upCompNo != null and ! upCompNo.equals("")'>
+            AND CB.UP_COMP_NO = #{upCompNo}
+		</if>
+		<if test='stId != null and stId != ""'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+							 WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+		<if test='compNo != null and compNo != ""'>
+			AND CB.COMP_NO = #{compNo}
+		</if>
+		<if test='compNm != null and compNm != ""'>
+			AND CB.COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND CB.COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND CB.COMP_TP_CD = #{compTpCd}
+		</if>
+        <if test='compGbCd != null and compGbCd != ""'>
+			AND CB.COMP_GB_CD = #{compGbCd}
+		</if>
+		<if test='cisRegYn != null and cisRegYn != ""'>
+			AND CB.CIS_REG_YN = #{cisRegYn}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCompanyCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.pageCompanyCount
+			Description	: 공급 업체 검색 카운트
+		-->
+		SELECT	/* QUERYID(company.pageCompanyCount) */
+			COUNT(*)
+		FROM
+			COMPANY_BASE CB
+		WHERE	1 = 1
+        <if test='"Y".equals(adminYn)'>
+		    AND CB.UP_COMP_NO != 0
+		</if>
+        <if test='upCompNo != null and ! upCompNo.equals("")'>
+            AND CB.UP_COMP_NO = #{upCompNo}
+		</if>
+		<if test='stId != null and stId != ""'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+							 WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+		<if test='compNo != null and compNo != ""'>
+			AND CB.COMP_NO = #{compNo}
+		</if>
+		<if test='compNm != null and compNm != ""'>
+			AND CB.COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND CB.COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND CB.COMP_TP_CD = #{compTpCd}
+		</if>
+        <if test='compGbCd != null and compGbCd != ""'>
+			AND CB.COMP_GB_CD = #{compGbCd}
+		</if>
+		<if test='cisRegYn != null and cisRegYn != ""'>
+			AND CB.CIS_REG_YN = #{cisRegYn}
+		</if>
+	</select>
+
+
+	<select id="pageCompanyPopup" resultMap="CompanyBaseMap">
+		<!--
+			Query Name	: company.pageCompanyPopup
+			Description	: 업체 팝업
+		-->
+		SELECT	/* QUERYID(company.pageCompanyPopup) */
+			  CB.COMP_NO			/* 업체 번호 */
+			, CB.COMP_NM			/* 업체 명 */
+			, CB.UP_COMP_NO			/* 상위 업체 번호 */
+			, (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = #{upCompNo} ) AS UP_COMP_NM		/* 상위 업체명 */
+			, CB.BIZ_NO				/* 사업자 번호 */
+			, CB.COMP_STAT_CD		/* 업체 상태 코드 */
+			, CB.CEO_NM				/* 대표자 명 */
+			, CB.BIZ_CDTS			/* 업태 */
+			, CB.BIZ_TP				/* 종목 */
+			, CB.COMP_GB_CD			/* 업체 구분 코드 */
+			, CB.COMP_TP_CD			/* 업체 유형 코드 */
+			, CB.FAX				/* 팩스 */
+			, CB.TEL				/* 전화 */
+			, CB.POST_NO_OLD		/* 우편 번호 구 */
+			, CB.POST_NO_NEW		/* 우편 번호 신 */
+			, CB.ROAD_ADDR			/* 도로 주소 */
+			, CB.ROAD_DTL_ADDR		/* 도로 상세 주소 */
+			, CB.PRCL_ADDR			/* 지번 주소 */
+			, CB.PRCL_DTL_ADDR		/* 지번 상세 주소 */
+			-- , CB.BANK_CD			/* 은행 코드 */
+			-- , CB.ACCT_NO			/* 계좌 번호 */
+			-- , CB.OOA_NM				/* 예금주 명 */
+			, CB.BIGO				/* 비고 */
+			, CB.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CB.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CB.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CB.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(CB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(CB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, CASE WHEN UP_COMP_NO = 0 THEN 0 ELSE 1 END AS CP_LEVEL	/* 레벨 */
+			, IFNULL(CB.CIS_REG_YN, 'N') AS CIS_REG_YN /* CIS 등록 여부 */
+			<if test='bndNm != null and bndNm != ""'>
+			, CBM.BND_NM_KO			/* 브랜드 한글 */
+			, CBM.BND_NM_EN			/* 브랜드 영어 */
+			</if>
+		FROM
+			COMPANY_BASE CB
+		<if test='bndNm != null and bndNm != ""'>
+			JOIN (
+				SELECT BM.COMP_NO, B.BND_NM_KO, B.BND_NM_EN
+				FROM BRAND_BASE B JOIN COMPANY_BRAND BM ON B.BND_NO = BM.BND_NO
+				WHERE B.BND_NM_KO LIKE CONCAT('%', #{bndNm}, '%') OR B.BND_NM_EN LIKE CONCAT('%', #{bndNm}, '%')
+			) CBM ON (CB.COMP_NO = CBM.COMP_NO)
+		</if>
+		WHERE	1 = 1
+		<if test='stId != null and stId != ""'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+						WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+		<if test='stIds != null and stIds.size() > 0'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE <foreach collection="stIds" item="stIds" separator="," open="S.ST_ID IN (" close=")"> #{stIds} </foreach> ) SM
+						WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+<!-- 		<if test='compNo != null and ! compNo.equals("")'> -->
+<!-- 			AND CB.COMP_NO = #{compNo} -->
+<!-- 			<if test='upCompNo != null and ! upCompNo.equals("")'> -->
+<!-- 			OR CB.UP_COMP_NO = #{upCompNo} -->
+<!-- 			</if> -->
+<!-- 		</if> -->
+<!-- 		<if test='(compNo == null or compNo.equals("")) and (upCompNo != null and ! upCompNo.equals(""))'> -->
+<!-- 			AND CB.UP_COMP_NO = #{upCompNo} -->
+<!-- 		</if> -->
+		<!-- <if test='compNo != null and compNo != ""'>
+			AND CB.COMP_NO = #{compNo}
+		</if>
+		<if test='upCompNo != null and upCompNo != ""'>
+			AND CB.UP_COMP_NO = #{upCompNo}
+		</if> -->
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND CB.COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compStatCd == null or compStatCd == ""'>
+			<if test='excludeCompStatCd != null and excludeCompStatCd != ""'>
+				AND CB.COMP_STAT_CD NOT IN
+				<foreach collection="excludeCompStatCd.split(',')" item="compStatCd" index="index" open="(" close=")" separator=",">
+			       #{compStatCd}
+			     </foreach>
+			</if>
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND CB.COMP_TP_CD = #{compTpCd}
+        </if>
+		<if test='compTpCd == null or compTpCd == ""'>
+			<if test='excludeCompTpCd != null and excludeCompTpCd != ""'>
+				AND CB.COMP_TP_CD NOT IN
+				<foreach collection="excludeCompTpCd.split(',')" item="compTpCd" index="index" open="(" close=")" separator=",">
+			       #{compTpCd}
+			     </foreach>
+			</if>
+		</if>
+		<!-- <if test='compGbCd != null and compGbCd != ""'>
+			AND CB.COMP_GB_CD = #{compGbCd}
+		</if> -->
+		<if test='compNm != null and compNm != ""'>
+			AND CB.COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCompanyPopupCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.pageCompanyCount
+			Description	: 공급 업체 검색 카운트, 내 하위업체 포함 조회
+		-->
+		SELECT	/* QUERYID(company.pageCompanyPopupCount) */
+			COUNT(*)
+		FROM
+			COMPANY_BASE CB
+		<if test='bndNm != null and bndNm != ""'>
+			JOIN (
+				SELECT BM.COMP_NO, B.BND_NM_KO, B.BND_NM_EN
+				FROM BRAND_BASE B JOIN COMPANY_BRAND BM ON B.BND_NO = BM.BND_NO
+				WHERE B.BND_NM_KO LIKE CONCAT('%', #{bndNm}, '%') OR B.BND_NM_EN LIKE CONCAT('%', #{bndNm}, '%')
+			) CBM ON (CB.COMP_NO = CBM.COMP_NO)
+		</if>
+		WHERE
+			1 = 1
+        <if test='stId != null and stId != ""'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+						WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+		<if test='stIds != null and stIds.size() > 0'>
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.COMP_NO
+							 FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE <foreach collection="stIds" item="stIds" separator="," open="S.ST_ID IN (" close=")"> #{stIds} </foreach> ) SM
+						WHERE CB.COMP_NO = SM.COMP_NO)
+		</if>
+		<!-- <if test='compNo != null and ! compNo.equals("")'>
+			AND CB.COMP_NO = #{compNo}
+			<if test='upCompNo != null and ! upCompNo.equals("")'>
+			OR CB.UP_COMP_NO = #{upCompNo}
+			</if>
+		</if>
+		<if test='(compNo == null or compNo.equals("")) and (upCompNo != null and ! upCompNo.equals(""))'>
+			AND CB.UP_COMP_NO = #{upCompNo}
+		</if> -->
+		<!-- <if test='compNo != null and compNo != ""'>
+			AND CB.COMP_NO = #{compNo}
+		</if>
+		<if test='upCompNo != null and upCompNo != ""'>
+			AND CB.UP_COMP_NO = #{upCompNo}
+		</if> -->
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND CB.COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compStatCd == null or compStatCd == ""'>
+			<if test='excludeCompStatCd != null and excludeCompStatCd != ""'>
+				AND CB.COMP_STAT_CD NOT IN
+				<foreach collection="excludeCompStatCd.split(',')" item="compStatCd" index="index" open="(" close=")" separator=",">
+			       #{compStatCd}
+			     </foreach>
+			</if>
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND CB.COMP_TP_CD = #{compTpCd}
+        </if>
+		<if test='compTpCd == null or compTpCd == ""'>
+			<if test='excludeCompTpCd != null and excludeCompTpCd != ""'>
+				AND CB.COMP_TP_CD NOT IN
+				<foreach collection="excludeCompTpCd.split(',')" item="compTpCd" index="index" open="(" close=")" separator=",">
+			       #{compTpCd}
+			     </foreach>
+			</if>
+		</if>
+		<!-- <if test='compGbCd != null and compGbCd != ""'>
+			AND CB.COMP_GB_CD = #{compGbCd}
+		</if> -->
+		<if test='compNm != null and compNm != ""'>
+			AND CB.COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+	</select>
+
+
+	<select id="pageCompanyWms" resultType="biz.app.company.model.CompanyBaseVO">
+		<!--
+			Query Name	: company.pageCompanyWms
+			Description	: 공급 업체 페이지 (WMS)
+		-->
+		SELECT	/* QUERYID(company.pageCompanyWms) */
+			  COMP_NO				/* 업체 번호 */
+			, COMP_NM 				/* 업체 명 */
+			, CONCAT(COMP_NO,' - ',COMP_NM) AS COMP_NM2		/* 업체 명2 */
+			, BIZ_NO				/* 사업자 번호 */
+			, COMP_STAT_CD			/* 업체 상태 코드 */
+			, CEO_NM				/* 대표자 명 */
+			, BIZ_CDTS				/* 업태 */
+			, BIZ_TP				/* 종목 */
+			, COMP_GB_CD			/* 업체 구분 코드 */
+			, COMP_TP_CD			/* 업체 유형 코드 */
+			, FAX					/* 팩스 */
+			, TEL					/* 전화 */
+			, POST_NO_OLD			/* 우편 번호 구 */
+			, POST_NO_NEW			/* 우편 번호 신 */
+			, ROAD_ADDR				/* 도로 주소 */
+			, ROAD_DTL_ADDR			/* 도로 상세 주소 */
+			, PRCL_ADDR				/* 지번 주소 */
+			, PRCL_DTL_ADDR			/* 지번 상세 주소 */
+			-- , BANK_CD				/* 은행 코드 */
+			-- , ACCT_NO				/* 계좌 번호 */
+			-- , OOA_NM				/* 예금주 명 */
+			, BIGO					/* 비고 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM		/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM		/* 시스템 수정자 */
+		FROM
+			COMPANY_BASE T01
+		WHERE	1 = 1
+		<if test='compNo != null'>
+			AND COMP_NO LIKE CONCAT('%', #{compNo}, '%')
+		</if>
+		<if test='compNm != null and compNm != ""'>
+			AND COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compTpCd == null or compTpCd == ""'>
+			AND COMP_TP_CD IN ('30','40','50')
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND COMP_TP_CD = #{compTpCd}
+		</if>
+		<if test='compGbCd != null and compGbCd != ""'>
+			AND COMP_GB_CD = #{compGbCd}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCompanyWmsCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.pageCompanyWmsCount
+			Description	: 공급 업체 페이지 카운트
+		-->
+		SELECT	/* QUERYID(company.pageCompanyWmsCount) */
+			COUNT(*)
+		FROM
+			COMPANY_BASE
+		WHERE	1 = 1
+		<if test='compNo != null'>
+			AND COMP_NO LIKE CONCAT('%', #{compNo}, '%')
+		</if>
+		<if test='compNm != null and compNm != ""'>
+			AND COMP_NM LIKE CONCAT('%', #{compNm}, '%')
+		</if>
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND COMP_STAT_CD = #{compStatCd}
+		</if>
+		<if test='compTpCd == null or compTpCd == ""'>
+			AND COMP_TP_CD IN ('30','40','50')
+		</if>
+		<if test='compTpCd != null and compTpCd != ""'>
+			AND COMP_TP_CD = #{compTpCd}
+		</if>
+		<if test='compGbCd != null and compGbCd != ""'>
+			AND COMP_GB_CD = #{compGbCd}
+		</if>
+	</select>
+
+
+	<select id="getCompany" resultMap="CompanyBaseMap">
+		<!--
+			Query Name	: company.getCompany
+			Description	: 공급 업체 상세
+		-->
+		SELECT	/* QUERYID(company.getCompany) */
+			  A.COMP_NO				/* 업체 번호 */
+			, A.UP_COMP_NO			/* 상위 업체 번호 */
+			, FN_GET_COMPANY_NAME(A.UP_COMP_NO)  AS UP_COMP_NM		/* 상위 업체명 */
+			, A.COMP_NM				/* 업체 명 */
+			, A.BIZ_NO				/* 사업자 번호 */
+			, A.COMP_STAT_CD		/* 업체 상태 코드 */
+			, A.CEO_NM				/* 대표자 명 */
+			, A.BIZ_CDTS			/* 업태 */
+			, A.BIZ_TP				/* 종목 */
+			, A.COMP_GB_CD			/* 업체 구분 코드 */
+			, A.COMP_TP_CD			/* 업체 유형 코드 */
+			, A.FAX					/* 팩스 */
+			, A.TEL					/* 전화 */
+			, A.POST_NO_OLD			/* 우편 번호 구 */
+			, A.POST_NO_NEW			/* 우편 번호 신 */
+			, A.ROAD_ADDR			/* 도로 주소 */
+			, A.ROAD_DTL_ADDR		/* 도로 상세 주소 */
+			, A.PRCL_ADDR			/* 지번 주소 */
+			, A.PRCL_DTL_ADDR		/* 지번 상세 주소 */
+			, A.CCL_TERM_CD			/* 업체 정산 주기 */
+			, A.MD_USR_NO			/* MD 사용자번호 */
+			, FN_GET_USER_NAME(A.MD_USR_NO) AS MD_USR_NM		/* 담당 MD */
+			, A.BIGO				/* 비고 */
+			, A.DLGT_EMAIL      	/* 대표이메일 */
+			, A.API_KEY				/* API KEY */		
+			, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, IFNULL(A.CIS_REG_YN, 'N') AS CIS_REG_YN	/* CIS 등록 여부 */
+			, A.CIS_REG_NO			/* CIS에 등록된 업체 번호 */
+			, A.BIZ_LIC_IMG_PATH	/* 사업자 등록증 */
+			, A.INCM_READ_TM	/* 입고리드타임 */
+			, ORD_CLET_CHAR_ALM_CD 	/* 주문 수집 문자 알림 코드 */
+		FROM
+			COMPANY_BASE A
+		WHERE	1 = 1
+		<if test='compNo != null'>
+			AND	A.COMP_NO = #{compNo}
+		</if>
+		<if test='apiKey != null and apiKey != ""'>
+			AND	A.API_KEY = #{apiKey}
+		</if>
+		<if test='compStatCd != null and compStatCd != ""'>
+			AND A.COMP_STAT_CD = #{compStatCd}
+		</if>
+	</select>
+
+
+	<insert id="insertCompany" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+			Query Name	: company.insertCompany
+			Description	: 공급업체 등록
+		-->
+		<!-- <selectKey keyProperty="compNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_BASE_SEQ}') FROM DUAL
+		</selectKey> -->
+		INSERT INTO COMPANY_BASE (	/* QUERYID(company.insertCompany) */
+			  	COMP_NO
+				, UP_COMP_NO
+				, COMP_NM
+				, COMP_STAT_CD
+				, CEO_NM
+				, BIZ_NO
+				, BIZ_LIC_IMG_PATH
+				, BIZ_CDTS
+				, BIZ_TP
+				, DLGT_EMAIL
+				, TEL
+				, FAX
+				, POST_NO_OLD
+				, POST_NO_NEW
+				, ROAD_ADDR
+				, ROAD_DTL_ADDR
+				, PRCL_ADDR
+				, PRCL_DTL_ADDR
+				, COMP_GB_CD
+				, COMP_TP_CD
+				, CCL_TERM_CD
+				, MD_USR_NO
+				, BIGO
+				, CIS_REG_YN
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, CIS_REG_NO
+				, INCM_READ_TM
+				, ORD_CLET_CHAR_ALM_CD
+		) VALUES (
+				#{compNo}
+				, #{upCompNo}
+				, #{compNm}
+				, #{compStatCd}
+				, #{ceoNm}
+				, #{bizNo}
+				, #{bizLicImgPath}
+				, #{bizCdts}
+				, #{bizTp}
+				, #{dlgtEmail}
+				, #{tel}
+				, #{fax}
+				, #{postNoOld}
+				, #{postNoNew}
+				, #{roadAddr}
+				, #{roadDtlAddr}
+				, #{prclAddr}
+				, #{prclDtlAddr}
+				, #{compGbCd}
+				, #{compTpCd}
+				, #{cclTermCd}
+				, #{mdUsrNo}
+				, #{bigo}
+				, #{cisRegYn}
+				, #{sysRegrNo}
+				, NOW()
+				, #{sysUpdrNo}
+				, NOW()
+				, #{cisRegNo}
+				, #{incmReadTm}
+				, #{ordCletCharAlmCd}
+		)
+	</insert>
+
+
+	<update id="updateCompany" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+			Query Name	: company.updateCompany
+			Description	: 공급업체 수정
+		-->
+		UPDATE	/* QUERYID(company.updateCompany) */
+		COMPANY_BASE SET
+			  COMP_NM			= #{compNm}				/* 업체 명 */
+			, BIZ_NO			= #{bizNo}				/* 사업자 번호 */
+			, COMP_STAT_CD		= #{compStatCd}			/* 업체 상태 코드 */
+			, CEO_NM			= #{ceoNm}				/* 대표자 명 */
+			, BIZ_CDTS			= #{bizCdts}			/* 업태 */
+			, BIZ_TP			= #{bizTp}				/* 종목 */
+			<if test='compGbCd != null or compGbCd != ""'>
+			, COMP_GB_CD		= #{compGbCd}			/* 업체 구분 코드 */
+			</if>
+			<if test='compTpCd != null or compTpCd != ""'>
+			, COMP_TP_CD		= #{compTpCd}			/* 업체 유형 코드 */
+			</if>
+			, FAX				= #{fax}				/* 팩스 */
+			, TEL				= #{tel}				/* 전화 */
+			, POST_NO_OLD		= #{postNoOld}			/* 우편 번호 구 */
+			, POST_NO_NEW		= #{postNoNew}			/* 우편 번호 신 */
+			, ROAD_ADDR			= #{roadAddr}			/* 도로 주소 */
+			, ROAD_DTL_ADDR		= #{roadDtlAddr}		/* 도로 상세 주소 */
+			, PRCL_ADDR			= #{prclAddr}			/* 지번 주소 */
+			, PRCL_DTL_ADDR		= #{prclDtlAddr}		/* 지번 상세 주소 */
+			<if test='cclTermCd != null or cclTermCd != ""'>
+			, CCL_TERM_CD		= #{cclTermCd}			/* 업체 정산 주기 */
+			</if>
+			, MD_USR_NO			= #{mdUsrNo}			/* MD 사용자번호 */
+			, BIGO				= #{bigo}				/* 비고 */
+			, DLGT_EMAIL		= #{dlgtEmail}			/* 대표이메일 */
+			<if test='apiKey != null or apiKey != ""'>
+			, API_KEY			= #{apiKey}				/* API KEY */
+			</if>
+			, SYS_UPDR_NO		= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+			, BIZ_LIC_IMG_PATH 	= #{bizLicImgPath}		/* 사업자 등록증*/
+			, INCM_READ_TM 	= #{incmReadTm}				/* 입고리드타임*/
+			, ORD_CLET_CHAR_ALM_CD = #{ordCletCharAlmCd}   /* 주문 수집 문자 알림 코드 */
+		WHERE
+			COMP_NO				= #{compNo}
+	</update>
+	
+
+	<insert id="insertStStdCompanyMap" parameterType="biz.app.st.model.StStdInfoPO">
+		<!--
+			Query Name	: company.insertStStdCompanyMap
+			Description	: 사이트와 공급업체 매핑 등록
+		-->
+		INSERT INTO ST_COMP_MAP (	/* QUERYID(company.insertStStdCompanyMap) */
+			  ST_ID				/* 사이트 아이디 */
+			, COMP_NO			/* 업체 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{compNo}			/* 업체 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<delete id="deleteStStdCompanyMap">
+		<!--
+			Query Name	: company.deleteStStdCompanyMap
+			Description	: 공급업체에 매핑된 사이트 정보를 모두 삭제
+		-->
+		DELETE	/* QUERYID(company.deleteStStdCompanyMap) */
+		FROM ST_COMP_MAP
+		<choose>
+			<when test='compNo != null and compNo != ""'>
+			WHERE COMP_NO = #{compNo}
+			</when>
+			<otherwise>
+			WHERE 1 = 2
+			</otherwise>
+		</choose>
+	</delete>
+
+
+	<select id="listCompanyCcl" resultType="biz.app.company.model.CompanyCclVO">
+		<!--
+			Query Name	: company.listCompanyCcl
+			Description	: 공급 업체 페이지
+		-->
+		SELECT	/* QUERYID(company.listCompanyCcl) */
+			  CCL.COMP_CCL_NO		/* 업체 정산 번호 */
+			, CCL.COMP_NO			/* 업체 번호 */
+			, CCL.ST_ID				/* 사이트 아이디 */
+			, SI.ST_NM				/* 사이트 아이디 */
+			, CCL.CCL_STRT_DTM		/* 정산 시작 일자 */
+			, CCL.CCL_END_DTM		/* 정산 종료 일자 */
+			, CCL.CMS_RATE			/* 수수료 율 */
+			, CASE WHEN NOW() BETWEEN CCL.CCL_STRT_DTM AND CCL.CCL_END_DTM	THEN 'Y' ELSE 'N' END USE_YN   
+			, CCL.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CCL.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CCL.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CCL.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(CCL.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(CCL.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			COMPANY_CCL CCL
+			JOIN ST_STD_INFO SI ON (CCL.ST_ID = SI.ST_ID)
+		WHERE
+			CCL.COMP_NO			= #{compNo}
+		ORDER BY CCL.COMP_CCL_NO DESC;
+	</select>
+
+
+	<insert id="insertCompanyCcl" parameterType="biz.app.company.model.CompanyCclPO">
+		<!--
+			Query Name	: company.insertCompanyCcl
+			Description	: 공급업체 정산 수수료 등록
+		-->
+		<selectKey keyProperty="compCclNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_CCL_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMPANY_CCL (	/* QUERYID(company.insertCompanyCcl) */
+			  COMP_CCL_NO		/* 업체 정산 번호 */
+			, COMP_NO			/* 업체 번호 */
+			, ST_ID				/* 사이트 ID */
+			, CCL_STRT_DTM		/* 정산 시작 일자 */
+			, CCL_END_DTM		/* 정산 종료 일자 */
+			, CMS_RATE			/* 수수료 율 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		)
+		SELECT
+			  #{compCclNo}			/* 업체 정산 번호 */
+			, CCL.COMP_NO			/* 업체 번호 */
+			, CCL.ST_ID				/* 사이트 ID */
+			, CCL.CCL_STRT_DTM		/* 정산 시작 일자 */
+			, CCL.CCL_END_DTM		/* 정산 종료 일자 */
+			, CCL.CMS_RATE			/* 수수료 율 */
+			, CCL.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CCL.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CCL.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CCL.SYS_UPD_DTM		/* 시스템 수정 일시 */		    
+		FROM (    
+			SELECT
+				  MAX(COMP_NO) AS COMP_NO		/* 업체 번호 */
+				, #{stId} AS ST_ID				/* 사이트 ID */
+				, IF(MAX(CCL_END_DTM) IS NULL, NOW(), DATE_ADD(MAX(CCL_END_DTM), INTERVAL 1 SECOND)) AS CCL_STRT_DTM
+				, STR_TO_DATE('${@framework.common.constants.CommonConstants@COMMON_END_DATE}', '%Y-%m-%d %H:%i:%s') AS CCL_END_DTM		/* 정산 종료 일자 */
+				, #{cmsRate} AS CMS_RATE		/* 수수료 율 */
+				, #{sysRegrNo} AS SYS_REGR_NO	/* 시스템 등록자 번호 */
+				, NOW() AS SYS_REG_DTM			/* 시스템 등록 일시 */
+				, #{sysUpdrNo} AS SYS_UPDR_NO	/* 시스템 수정자 번호 */
+				, NOW() AS SYS_UPD_DTM			/* 시스템 수정 일시 */
+			FROM	
+				COMPANY_CCL
+			WHERE
+				COMP_NO IN (
+					SELECT #{compNo} 
+					UNION 
+					SELECT C.COMP_NO 
+						FROM COMPANY_BASE C 
+						WHERE C.UP_COMP_NO = #{compNo} AND C.COMP_STAT_CD IN ('${@framework.common.constants.CommonConstants@COMP_STAT_10}','${@framework.common.constants.CommonConstants@COMP_STAT_20}','${@framework.common.constants.CommonConstants@COMP_STAT_30}')
+				)
+				AND ST_ID =  #{stId}
+			GROUP BY COMP_NO
+		) CCL   
+	</insert>
+	
+	
+	<insert id="insertNewCompanyCcl" parameterType="biz.app.company.model.CompanyCclPO">
+		<!--
+			Query Name	: company.insertNewCompanyCcl
+			Description	: 신규 공급업체 등록 시 정산정보 등록
+		-->
+		<selectKey keyProperty="compCclNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_CCL_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMPANY_CCL (	/* QUERYID(company.insertNewCompanyCcl) */
+			  COMP_CCL_NO		/* 업체 정산 번호 */
+			, COMP_NO			/* 업체 번호 */
+			, ST_ID				/* 사이트 ID */
+			, CCL_STRT_DTM		/* 정산 시작 일자 */
+			, CCL_END_DTM		/* 정산 종료 일자 */
+			, CMS_RATE			/* 수수료 율 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		)
+		SELECT
+			  #{compCclNo}		/* 업체 정산 번호 */
+			, #{compNo}			/* 업체 번호 */
+			, #{stId}			/* 사이트 아이디 */
+			, IF(MAX(CCL_END_DTM) IS NULL, NOW(), DATE_ADD(MAX(CCL_END_DTM), INTERVAL 1 SECOND))
+			, STR_TO_DATE('${@framework.common.constants.CommonConstants@COMMON_END_DATE}', '%Y-%m-%d %H:%i:%s')		/* 정산 종료 일자 */
+			, #{cmsRate}		/* 수수료 율 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		FROM
+			COMPANY_CCL
+		WHERE
+			COMP_NO = #{compNo}
+			AND ST_ID =  #{stId}
+		LIMIT 1
+	</insert>	
+
+
+	<select id="existsCompanyCcl"  resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.existsCompanyCcl
+			Description	: 업체 존재 여부 
+		--> 
+		SELECT	/* QUERYID(company.existsCompanyCcl) */
+			COUNT(*)
+		FROM
+			COMPANY_CCL  
+		WHERE
+			COMP_NO = #{compNo}
+			AND ST_ID =  #{stId}
+			AND (NOW() BETWEEN CCL_STRT_DTM AND CCL_END_DTM)
+  	</select>
+  	
+  	
+	<update id="updateCompanyCcl" parameterType="biz.app.company.model.CompanyCclPO">
+		<!--
+			Query Name	: company.updateCompanyCcl
+			Description	: 공급업체 정산 수정
+		-->
+		UPDATE	/* QUERYID(company.updateCompanyCcl) */
+		COMPANY_CCL SET
+			  CCL_END_DTM	= NOW()
+			, SYS_UPDR_NO	= #{sysUpdrNo}
+			, SYS_UPD_DTM	= NOW()
+		WHERE
+			ST_ID = #{stId}
+			AND COMP_NO IN (SELECT #{compNo} UNION SELECT C.COMP_NO FROM COMPANY_BASE C WHERE C.UP_COMP_NO = #{compNo})
+			AND (NOW() BETWEEN CCL_STRT_DTM AND CCL_END_DTM)
+	</update>
+
+
+	<select id="listCompDlvrcPlc" resultType="biz.app.delivery.model.DeliveryChargePolicyVO" >
+		<!--
+			Query Name	: company.listCompDlvrcPlc
+			Description	: 공급업체 배송정책 조회 [상품 등록/수정시 사용]
+		-->
+		SELECT	/* QUERYID(company.listCompDlvrcPlc) */
+			  DLVRC_PLC_NO
+			, PLC_NM
+			, DLVR_AMT
+			, DLVRC_CDT_CD
+			, DLVRC_CDT_STD_CD
+			, DLVRC_PAY_MTD_CD
+			, COMP_DLVR_PSB_AREA_CD
+			, AREA_GB_CD
+			, BUY_QTY
+			, BUY_PRC
+		FROM
+			DELIVERY_CHARGE_POLICY
+		WHERE	1 = 1
+			AND COMP_NO = #{compNo }
+			AND DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		ORDER BY DLVRC_PLC_NO DESC 
+	</select>
+
+
+	<select id="getCompCcl" resultType="biz.app.company.model.CompanyCclVO" >
+		<!--
+			Query Name	: company.getCompCcl
+			Description	: 공급업체 수수료 정책 조회
+		-->
+		SELECT	/* QUERYID(company.getCompCcl) */
+			  COMP_CCL_NO
+			, CCL_STRT_DTM
+			, CCL_END_DTM
+			, CMS_RATE
+		FROM
+			COMPANY_CCL
+		WHERE	1 = 1
+			AND COMP_NO = #{compNo }
+		<if test='stId != null and stId != ""'>
+			AND ST_ID = #{stId}
+		</if>
+			AND NOW() BETWEEN CCL_STRT_DTM AND CCL_END_DTM
+	</select>
+
+
+	<delete id="deleteCompDispMap">
+		<!--
+			Query Name	: company.deleteCompDispMap
+			Description	: 공급업체에 매핑된 전시 카테고리를 모두 삭제
+		-->
+		DELETE	/* QUERYID(company.deleteCompDispMap) */
+		FROM COMPANY_DISP_MAP
+		WHERE COMP_NO = #{compNo}
+	</delete>
+
+
+	<insert id="insertCompDispMap" parameterType="biz.app.display.model.DisplayCategoryPO">
+		<!--
+			Query Name	: company.insertCompDispMap
+			Description	: 전시 카테고리와 공급업체 매핑 등록
+		-->
+		INSERT INTO COMPANY_DISP_MAP (	/* QUERYID(company.insertCompDispMap) */
+			  DISP_CLSF_NO		/* 전시 분류 번호 */
+			, COMP_NO			/* 업체 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfNo}		/* 전시 분류 번호 */
+			, #{compNo}			/* 업체 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<select id="pageCompDispMap" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name	: company.pageCompDispMap
+			Description	: 업체 전시 매핑 페이지
+		-->
+		SELECT	/* QUERYID(company.pageCompDispMap) */
+			  CDM.COMP_NO			/* 업체 번호 */
+			, CDM.DISP_CLSF_NO		/* 전시 분류 번호 */
+			, DC.DISP_CLSF_NM		/* 기획전 노출명 */
+			, ST.ST_ID				/* 사이트 ID */
+			, ST.ST_NM				/* 사이트 명 */
+			, FN_GET_DISP_CLSF_PATH(CDM.DISP_CLSF_NO,  '${@framework.common.constants.CommonConstants@DISP_CLSF_10}') AS CTG_PATH	/* 전시 경로 */
+			, CDM.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CDM.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CDM.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CDM.SYS_UPD_DTM		/* 시스템 수정 일시 */
+		FROM
+			COMPANY_DISP_MAP CDM
+			INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = CDM.DISP_CLSF_NO
+			INNER JOIN (SELECT S.ST_ID, S.ST_NM FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE M.COMP_NO = #{compNo} AND S.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') ST ON ST.ST_ID = DC.ST_ID
+		WHERE	1 = 1
+		<if test='compNo != null and ! compNo.equals("")'>
+			AND CDM.COMP_NO = #{compNo}
+		</if>
+		<if test='delYn != null and ! delYn.equals("")'>
+		 	AND DC.DEL_YN = #{delYn}
+		</if>
+		<if test='useYn != null and ! useYn.equals("")'>
+			AND ST.USE_YN = #{useYn}
+		</if>
+	</select>
+
+	<select id="pageCompDispMapCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.pageCompDispMapCount
+			Description	: 업체 전시 매핑 페이지
+		-->
+		SELECT	/* QUERYID(company.pageCompDispMapCount) */
+			COUNT(*)
+		FROM
+			COMPANY_DISP_MAP CDM
+			INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = CDM.DISP_CLSF_NO
+			INNER JOIN (SELECT S.ST_ID, S.ST_NM FROM ST_STD_INFO S JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID WHERE M.COMP_NO = #{compNo} AND S.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}') ST ON ST.ST_ID = DC.ST_ID
+		WHERE	1 = 1
+		<if test='compNo != null and ! compNo.equals("")'>
+			AND CDM.COMP_NO = #{compNo}
+		</if>
+		<if test='delYn != null and ! delYn.equals("")'>
+		 	AND DC.DEL_YN = #{delYn}
+		</if>
+		<if test='useYn != null and ! useYn.equals("")'>
+			AND ST.USE_YN = #{useYn}
+		</if>	
+	</select>
+
+
+	<select id="pageCompDispInterface" resultType="biz.app.display.model.interfaces.DisplayCategoryVO">
+		<!--
+			Query Name	: company.pageCompDispInterface
+			Description	: 업체 전시 매핑 페이지 (API용)
+		-->
+		SELECT	/* QUERYID(company.pageCompDispInterface) */
+			  CDM.COMP_NO			/* 업체 번호 */
+			, CDM.DISP_CLSF_NO		/* 전시 분류 번호 3단계 */
+			, DC.DISP_CLSF_NM		/* 기획전 노출명 3단계 */
+			, ST.ST_ID				/* 사이트 ID */
+			, ST.ST_NM				/* 사이트 명 */
+			, FN_GET_DISP_CLSF_PATH(CDM.DISP_CLSF_NO, '${@framework.common.constants.CommonConstants@DISP_CLSF_10}') AS CTG_PATH	/* 전시 경로 */
+			, CDM.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CDM.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CDM.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CDM.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, DC.LEAF_YN
+			, DC.DISP_LVL
+			, DC2.DISP_CLSF_NO AS DISP_CLSF_NO2
+			, DC2.DISP_CLSF_NM AS DISP_CLSF_NM2
+			, DC2.LEAF_YN AS LEAF_YN2
+			, DC2.DISP_LVL AS DISP_LVL2
+			, DC3.DISP_CLSF_NO AS DISP_CLSF_NO1
+			, DC3.DISP_CLSF_NM AS DISP_CLSF_NM1
+			, DC3.LEAF_YN AS LEAF_YN1
+			, DC3.DISP_LVL AS DISP_LVL1
+		FROM
+			COMPANY_DISP_MAP CDM
+			INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = CDM.DISP_CLSF_NO
+			INNER JOIN ST_STD_INFO ST ON ST.ST_ID = DC.ST_ID
+			LEFT OUTER JOIN DISPLAY_CATEGORY DC2 ON DC.UP_DISP_CLSF_NO = DC2.DISP_CLSF_NO
+        	LEFT OUTER JOIN DISPLAY_CATEGORY DC3 ON DC2.UP_DISP_CLSF_NO = DC3.DISP_CLSF_NO
+		WHERE	1 = 1
+		<if test='compNo != null and ! compNo.equals("")'>
+			AND CDM.COMP_NO = #{compNo}
+		</if>
+		<if test='stId != null and ! stId.equals("")'>
+			AND ST.ST_ID = #{stId}
+		</if>
+		<if test='delYn != null and ! delYn.equals("")'>
+		 	AND DC.DEL_YN = #{delYn}
+		</if>
+		<if test='useYn != null and ! useYn.equals("")'>
+			AND ST.USE_YN = #{useYn}
+		</if>
+	</select>
+
+	<select id="pageCompDispInterfaceCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: company.pageCompDispInterfaceCount
+			Description	: 업체 전시 매핑 페이지
+		-->
+		SELECT	/* QUERYID(company.pageCompDispInterfaceCount) */
+			COUNT(*)
+		FROM
+			COMPANY_DISP_MAP CDM
+			INNER JOIN DISPLAY_CATEGORY DC ON DC.DISP_CLSF_NO = CDM.DISP_CLSF_NO
+			INNER JOIN ST_STD_INFO ST ON ST.ST_ID = DC.ST_ID
+			LEFT OUTER JOIN DISPLAY_CATEGORY DC2 ON DC.UP_DISP_CLSF_NO = DC2.DISP_CLSF_NO
+        	LEFT OUTER JOIN DISPLAY_CATEGORY DC3 ON DC2.UP_DISP_CLSF_NO = DC3.DISP_CLSF_NO
+		WHERE	1 = 1
+		<if test='compNo != null and ! compNo.equals("")'>
+			AND CDM.COMP_NO = #{compNo}
+		</if>
+		<if test='stId != null and ! stId.equals("")'>
+			AND ST.ST_ID = #{stId}
+		</if>
+		<if test='delYn != null and ! delYn.equals("")'>
+		 	AND DC.DEL_YN = #{delYn}
+		</if>
+		<if test='useYn != null and ! useYn.equals("")'>
+			AND ST.USE_YN = #{useYn}
+		</if>
+	</select>
+	
+	
+	<select id="pageCompBrandMap" resultType="biz.app.brand.model.CompanyBrandVO">
+		<!--
+			Query Name	: company.pageCompBrandMap
+			Description	: 업체 브랜드 매핑 페이지
+		-->
+		SELECT	/* QUERYID(company.pageCompBrandMap) */
+			  C.COMP_NO
+			, CBR.BND_NO
+			, BND_NM_KO
+			, BND_NM_EN
+			, USE_YN
+			, CBR.DLGT_BND_YN
+		FROM
+			COMPANY_BRAND CBR
+			INNER JOIN COMPANY_BASE C
+			INNER JOIN BRAND_BASE B
+		WHERE	1=1
+			AND CBR.COMP_NO = C.COMP_NO
+		<if test='compNo != null'>
+			AND C.COMP_NO = #{compNo}
+		</if>
+			AND CBR.BND_NO = B.BND_NO
+	</select>
+
+	<select id="pageCompBrandMapCount" resultType="Integer">
+		<!--
+			Query Name	: company.pageCompBrandMap
+			Description	: 업체 브랜드 매핑 목록 카운트
+		-->
+		SELECT	/* QUERYID(company.pageCompBrandMapCount) */
+			COUNT(*)
+		FROM
+			COMPANY_BRAND CBR
+			INNER JOIN COMPANY_BASE C
+		WHERE	1=1
+			AND CBR.COMP_NO = C.COMP_NO
+		<if test='compNo != null'>
+			AND C.COMP_NO = #{compNo}
+		</if>
+	</select>
+
+
+	<insert id="insertCompanyBrand" parameterType="biz.app.brand.model.CompanyBrandPO">
+		<!--
+			Query Name	: company.insertCompanyBrand
+			Description	: 업체 브랜드 매핑 등록
+		-->
+		INSERT INTO COMPANY_BRAND (	/* QUERYID(company.insertCompanyBrand) */
+			  COMP_NO
+			, BND_NO
+			, DLGT_BND_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			 #{compNo}			/* 업체번호 */
+			, #{bndNo}			/* 브랜드 번호 */
+			, #{dlgtBndYn}				/* 대표 브랜드 여부 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+
+	<delete id ="deleteCompanyBrand" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+			Query Name	: company.deleteCompanyBrand
+			Description	: 업체 브랜드 매핑 삭제
+		-->
+		DELETE	/* QUERYID(company.deleteCompanyBrand) */
+		FROM COMPANY_BRAND
+		WHERE COMP_NO = #{compNo}
+	</delete>
+
+
+	<select id="getUpperCompStIdList" resultType="biz.app.st.model.StStdInfoVO">
+		<!--
+			Query Name	: company.getUpperCompStIdList
+			Description	: 상위 업체에 해당하는 사이트 목록 조회
+		-->
+		SELECT	/* QUERYID(company.getUpperCompStIdList) */
+			  M.ST_ID
+			, S.ST_NM
+		FROM
+			ST_STD_INFO S 
+			INNER JOIN ST_COMP_MAP M ON S.ST_ID = M.ST_ID
+		WHERE
+			M.COMP_NO = #{upCompNo}
+	</select>
+
+
+	<select id="listCompanyCategory" resultType="biz.app.display.model.DisplayCategoryVO">
+		<!--
+			Query Name	: company.listCompanyCategory
+			Description	: 업체 카테고리 목록 조회
+		-->
+		SELECT	/* QUERYID(company.listCompanyCategory) */
+			  DISP_CLSF_NO
+			, DISP_CLSF_NM
+			, COUNT(*) GOODS_CNT
+		FROM
+			(SELECT
+				  GB.GOODS_ID
+				, GB.GOODS_NM
+				, DG.DISP_CLSF_NO
+				, DC.DISP_CLSF_NM
+				, DC.DISP_LVL
+			FROM
+				GOODS_BASE GB,
+				DISPLAY_GOODS DG,
+				DISPLAY_CATEGORY DC
+			WHERE
+				GB.COMP_NO = #{compNo}
+				AND GB.GOODS_ID = DG.GOODS_ID
+				AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+				AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+				AND GB.SHOW_YN = 'Y'
+				AND DG.DISP_CLSF_NO = DC.DISP_CLSF_NO
+				AND DC.LEAF_YN = 'Y'
+				AND DC.ST_ID = #{stId}
+			) x
+		GROUP BY DISP_CLSF_NO, DISP_CLSF_NM
+	</select>
+
+
+	<select id="getFlagApiPermitIp" parameterType="biz.app.company.model.ApiPermitIpSO" resultType="string">
+		<!--
+			Query Name	: company.getFlagApiPermitIp
+			Description	: 업체 API 접근 IP 여부 조회
+		-->
+		SELECT	/* QUERYID(company.getFlagApiPermitIp) */
+			CASE
+				WHEN COUNT(IP_SEQ) > 0 THEN 'Y'
+				ELSE 'N'
+			END PERMIT_YN
+		FROM
+			API_PERMIT_IP
+		WHERE
+			COMP_NO = #{compNo}
+			AND (PMT_IP = '*' OR PMT_IP = #{pmtIp})
+	</select>
+
+
+	<update id="companyCmsRateChg" parameterType="biz.app.goods.model.StGoodsMapPO">
+		<!--
+			Query Name	: company.companyCmsRateChg
+			Description	: 업체 수수료율 일괄 변경 
+		-->
+		UPDATE	/* QUERYID(company.companyCmsRateChg) */
+			ST_GOODS_MAP SGM, GOODS_PRICE GP, GOODS_BASE GB
+		SET
+			  SGM.CMS_RATE = #{cmsRate} 
+			, SGM.SPL_AMT = CAST(FN_SPLIT(FN_GET_GOODS_PRICE(SGM.GOODS_ID, #{stId}, '00'), '|', 1) AS UNSIGNED) - (FLOOR(CAST(FN_SPLIT(FN_GET_GOODS_PRICE(SGM.GOODS_ID, #{stId}, '00'), '|', 1) AS UNSIGNED) * (#{cmsRate} / 100) / 10) * 10)
+			, SGM.SYS_UPDR_NO = #{sysUpdrNo}
+			, SGM.SYS_UPD_DTM = NOW()
+		WHERE  
+			SGM.ST_ID = #{stId}
+			AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM 
+			AND GP.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND GP.GOODS_ID = SGM.GOODS_ID
+			AND GB.GOODS_ID = SGM.GOODS_ID
+			AND GB.COMP_NO IN (SELECT ${compNo} UNION SELECT CB.COMP_NO FROM COMPANY_BASE CB WHERE CB.UP_COMP_NO = ${compNo})
+			AND GB.GOODS_STAT_CD IN (
+				 '${@framework.common.constants.CommonConstants@GOODS_STAT_10}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_20}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_30}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+			)
+	</update> 
+
+	
+	<update id="goodsCmsRateChg" parameterType="biz.app.goods.model.StGoodsMapPO">
+		<!--
+			Query Name	: company.goodsCmsRateChg
+			Description	: 상품 수수료율 일괄 변경 
+		-->
+    	UPDATE	/* QUERYID(company.goodsCmsRateChg) */
+			ST_GOODS_MAP SGM, GOODS_PRICE GP, (SELECT G.GOODS_ID, G.GOODS_STAT_CD FROM GOODS_BASE G WHERE <foreach collection="goodsIds" item="goodsId" separator="," open="G.GOODS_ID IN (" close=")"> #{goodsId} </foreach>) GB
+		SET
+			  SGM.CMS_RATE = #{cmsRate} 
+			, SGM.SPL_AMT = CAST(FN_SPLIT(FN_GET_GOODS_PRICE(SGM.GOODS_ID, #{stId}, '00'), '|', 1) AS UNSIGNED) - (FLOOR(CAST(FN_SPLIT(FN_GET_GOODS_PRICE(SGM.GOODS_ID, #{stId}, '00'), '|', 1) AS UNSIGNED) * (#{cmsRate} / 100) / 10) * 10)
+			, SGM.SYS_UPDR_NO = #{sysUpdrNo}
+			, SGM.SYS_UPD_DTM = NOW()
+		WHERE
+			SGM.ST_ID = #{stId}
+			AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM 
+			AND GP.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND GP.GOODS_ID = SGM.GOODS_ID
+			AND GB.GOODS_ID = SGM.GOODS_ID
+			AND GB.GOODS_STAT_CD IN (
+				 '${@framework.common.constants.CommonConstants@GOODS_STAT_10}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_20}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_30}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+				,'${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+			)
+	</update>
+
+	
+	<select id="companyApiPermitIpList" resultType="biz.app.company.model.CompanyBaseVO" >
+		<!--
+			Query Name	: company.companyApiPermitIpList
+			Description	: 업체별 API 허용 IP
+		-->
+		SELECT	/* QUERYID(company.companyApiPermitIpList) */ 	
+			  API.IP_SEQ		/* IP 일련 번호 */
+			, API.DEL_YN		/* 삭제 여부 */
+			, API.COMP_NO		/* 업체 번호 */
+			, API.PMT_IP		/* 허용 IP */
+			, CB.COMP_NM		/* 업체 명 */
+		FROM
+			API_PERMIT_IP API
+			INNER JOIN COMPANY_BASE CB ON (API.COMP_NO = CB.COMP_NO)
+		WHERE	1=1        
+			AND API.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test='compNo != null and compNo != ""'>
+			AND API.COMP_NO = #{compNo}
+		</if>
+		ORDER BY API.IP_SEQ DESC  
+	</select>
+	
+	
+	<insert id="insertApiPermitIp" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+			Query Name	: company.insertApiPermitIp
+			Description	: API 허용 IP 등록
+		-->
+		<selectKey keyProperty="ipSeq" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_API_PERMIT_IP}') FROM DUAL
+		</selectKey>
+		INSERT INTO API_PERMIT_IP (	/* QUERYID(company.insertApiPermitIp) */ 
+			  IP_SEQ			/* IP일련 번호 */
+			, DEL_YN			/* 삭제 여부 */
+			, COMP_NO			/* 업체 번호 */
+			, PMT_IP			/* 허용 IP */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{ipSeq}			/* IP일련 번호 */
+			, '${@framework.common.constants.CommonConstants@COMM_YN_N}'	/* 삭제 여부 */
+			, #{compNo}			/* 업체 번호 */
+			, #{pmtIp}			/* 허용 IP */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	
+	<update id="deleteApiPermitIp" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+			Query Name	: company.deleteApiPermitIp
+			Description	: API 허용 IP 삭제
+		-->
+		UPDATE	/* QUERYID(company.deleteApiPermitIp) */ 
+		API_PERMIT_IP SET
+			  DEL_YN			= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/* 삭제 여부 */
+			, SYS_UPDR_NO		= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+		WHERE
+			IP_SEQ				= #{ipSeq}
+	</update>
+	
+	<select id="companyChrgList" resultType="biz.app.company.model.CompanyChrgVO">
+		<!--
+		   Query Name	: company.companyChrgList 
+		   Description	: 업체 담당자 리스트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		SELECT	COMP_PIC_NO
+				, COMP_NO
+				, PIC_TP_CD
+				, PIC_DPM
+				, PIC_NM
+				, PIC_TELNO
+				, PIC_MOBILE
+				, PIC_EMAIL
+				, PIC_MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, DEL_DTM
+		FROM	COMPANY_CHRG
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<select id="pageCompanyChrg" resultType="biz.app.company.model.CompanyChrgVO">
+		<!--
+		   Query Name	: company.pageCompanyChrg 
+		   Description	: 업체 담당자 페이지 리스트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		SELECT	COMP_PIC_NO
+				, COMP_NO
+				, PIC_TP_CD
+				, PIC_DPM
+				, PIC_NM
+				, PIC_TELNO
+				, PIC_MOBILE
+				, PIC_EMAIL
+				, PIC_MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, DEL_DTM
+		FROM	COMPANY_CHRG
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageCompanyChrgCount" resultType="java.lang.Integer">
+		<!--
+		   Query Name	: company.pageCompanyChrgCount
+		   Description	: 업체 담당자 페이지 카운트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		SELECT	COUNT(*)
+		FROM	COMPANY_CHRG
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<insert id="insertCompanyChrg" parameterType="biz.app.company.model.CompanyChrgPO">
+		<!--
+		   Query Name	: company.insertCompanyChrg 
+		   Description	: 업체 담당자 등록
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		<selectKey keyProperty="compPicNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_CHRG_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMPANY_CHRG (
+			COMP_PIC_NO
+			, COMP_NO
+			, PIC_TP_CD
+			, PIC_DPM
+			, PIC_NM
+			, PIC_TELNO
+			, PIC_MOBILE
+			, PIC_EMAIL
+			, PIC_MEMO
+			, PIC_ALM_RCV_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{compPicNo}
+			, #{compNo}
+			, #{picTpCd}
+			, #{picDpm}
+			, #{picNm}
+			, #{picTelno}
+			, #{picMobile}
+			, #{picEmail}
+			, #{picMemo}
+			, #{picAlmRcvYn}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+		
+	<update id="updateCompanyChrg" parameterType="biz.app.company.model.CompanyChrgPO">
+		<!--
+		   Query Name	: company.updateCompanyChrg 
+		   Description	: 업체 담당자 수정
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		UPDATE COMPANY_CHRG SET
+			DEL_DTM = NOW()
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</update>
+	
+	<delete id="deleteCompanyChrg" parameterType="biz.app.company.model.CompAcctPO">
+		<!--
+		   Query Name	: company.deleteCompanyChrg
+		   Description	: 업체 담당자 삭제
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		DELETE FROM COMPANY_CHRG WHERE COMP_NO = #{compNo}
+	</delete>
+	
+	<select id="compAcctList" resultType="biz.app.company.model.CompAcctVO">
+		<!--
+		   Query Name	: company.compAcctList 
+		   Description	: 업체 계좌 리스트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		SELECT	COMP_ACCT_ISU_NO
+				, COMP_NO
+				, ACCT_NO
+				, BANK_GB_CD
+				, ACCT_OOA
+				, ACCT_IMG_PATH
+				, ACCT_MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM	COMP_ACCT
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<select id="pageCompAcct" resultType="biz.app.company.model.CompAcctVO">
+		<!--
+		   Query Name	: company.pageCompAcct 
+		   Description	: 업체 계좌 페이지 리스트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		SELECT	COMP_ACCT_ISU_NO
+				, COMP_NO
+				, ACCT_NO
+				, BANK_GB_CD
+				, ACCT_OOA
+				, ACCT_IMG_PATH
+				, ACCT_MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM	COMP_ACCT
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageCompAcctCount" resultType="int">
+		<!--
+		   Query Name	: company.pageCompAcctCount 
+		   Description	: 업체 계좌 페이지 카운트
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->	
+		SELECT	COUNT(*)
+		FROM	COMP_ACCT
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<insert id="insertCompAcct" parameterType="biz.app.company.model.CompAcctPO">
+		<!--
+		   Query Name	: company.insertCompAcct 
+		   Description	: 업체 계좌 등록
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		<selectKey keyProperty="compAcctIsuNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@COMP_ACCT_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMP_ACCT (
+			COMP_ACCT_ISU_NO
+			, COMP_NO
+			, ACCT_NO
+			, BANK_GB_CD
+			, ACCT_OOA
+			, ACCT_IMG_PATH
+			, ACCT_MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{compAcctIsuNo}
+			, #{compNo}
+			, #{acctNo}
+			, #{bankGbCd}
+			, #{acctOoa}
+			, #{acctImgPath}
+			, #{acctMemo}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<insert id="insertCompAcctHist" parameterType="biz.app.company.model.CompAcctPO">
+		<!--
+			Query Name	: company.insertCompAcctHist 
+			Description	: 업체 계좌 히스토리
+			Writer		: 조은지
+			Date 		: 2021. 3. 10.
+		-->
+		<selectKey keyProperty="compAcctIsuNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@COMP_ACCT_SEQ_HIST}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMP_ACCT_HIST(
+			COMP_ACCT_ISU_HIST_NO
+			, COMP_ACCT_ISU_NO
+			, COMP_NO
+			, ACCT_NO
+			, BANK_GB_CD
+			, ACCT_OOA
+			, ACCT_IMG_PATH
+			, ACCT_MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{compAcctIsuHistNo}
+			, #{compAcctIsuNo}
+			, #{compNo}
+			, #{acctNo}
+			, #{bankGbCd}
+			, #{acctOoa}
+			, #{acctImgPath}
+			, #{acctMemo}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	<!-- 삭제
+	<update id="updateCompAcct" parameterType="biz.app.company.model.CompAcctPO">
+		
+		   Query Name	: company.updateCompAcct 
+		   Description	: 업체 계좌 수정
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		
+		UPDATE COMP_ACCT SET
+			DEL_DTM = NOW()
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</update> -->
+		
+	<insert id="insertCompanyBaseHist" parameterType="biz.app.company.model.CompanyBasePO">
+		<!--
+		   Query Name	: company.insertCompanyBaseHist 
+		   Description	: 업체 이력 등록
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		<selectKey keyProperty="compDftHistNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_BASE_HIST_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMPANY_BASE_HIST (
+				COMP_DFT_HIST_NO
+				, COMP_NO
+				, COMP_NM
+				, COMP_STAT_CD
+				, CEO_NM
+				, BIZ_NO
+				, BIZ_LIC_IMG_PATH
+				, BIZ_CDTS
+				, BIZ_TP
+				, DLGT_EMAIL
+				, TEL
+				, FAX
+				, POST_NO_OLD
+				, POST_NO_NEW
+				, ROAD_ADDR
+				, ROAD_DTL_ADDR
+				, PRCL_ADDR
+				, PRCL_DTL_ADDR
+				, COMP_GB_CD
+				, COMP_TP_CD
+				, COMP_DISP_TP_CD
+				, CCL_TERM_CD
+				, MD_USR_NO
+				, BIGO
+				, API_KEY
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, CIS_REG_YN
+				, CIS_REG_NO
+				, INCM_READ_TM
+				, ORD_CLET_CHAR_ALM_CD
+		)
+		SELECT #{compDftHistNo}
+				, COMP_NO
+				, COMP_NM
+				, COMP_STAT_CD
+				, CEO_NM
+				, BIZ_NO
+				, BIZ_LIC_IMG_PATH
+				, BIZ_CDTS
+				, BIZ_TP
+				, DLGT_EMAIL
+				, TEL
+				, FAX
+				, POST_NO_OLD
+				, POST_NO_NEW
+				, ROAD_ADDR
+				, ROAD_DTL_ADDR
+				, PRCL_ADDR
+				, PRCL_DTL_ADDR
+				, COMP_GB_CD
+				, COMP_TP_CD
+				, COMP_DISP_TP_CD
+				, CCL_TERM_CD
+				, MD_USR_NO
+				, BIGO
+				, API_KEY
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, CIS_REG_YN
+				, CIS_REG_NO
+				, INCM_READ_TM
+				, ORD_CLET_CHAR_ALM_CD
+		FROM	COMPANY_BASE
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</insert>
+	
+	<delete id="deleteCompAcct" parameterType="biz.app.company.model.CompAcctPO">
+		<!--
+		   Query Name	: company.deleteCompAcct
+		   Description	: 업체 계좌 삭제
+		   Writer		: 조은지
+		   Date 		: 2021. 2. 4.
+		-->
+		DELETE FROM COMP_ACCT WHERE COMP_NO = #{compNo}
+	</delete>
+	
+	<select id="listCompAcct" resultType="biz.app.company.model.CompAcctVO">
+		<!--
+			Query Name	: company.listCompAcct 
+			Description	: 업체 계좌 리스트
+			Writer		: 조은지
+			Date 		: 2021. 3. 11.
+		-->
+		SELECT	COMP_ACCT_ISU_NO
+				, COMP_NO
+				, ACCT_NO
+				, BANK_GB_CD
+				, ACCT_OOA
+				, ACCT_IMG_PATH
+				, ACCT_MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM	COMP_ACCT
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<select id="listCompanyChrg" resultType="biz.app.company.model.CompanyChrgVO">
+		<!--
+			Query Name	: company.listCompanyChrg 
+			Description	: 업체 담당자 리스트
+			Writer		: 조은지
+			Date 		: 2021. 3. 11.
+		-->
+		SELECT	COMP_PIC_NO
+				, COMP_NO
+				, PIC_TP_CD
+				, PIC_DPM
+				, PIC_NM
+				, PIC_TELNO
+				, PIC_MOBILE
+				, PIC_EMAIL
+				, PIC_MEMO
+				, PIC_ALM_RCV_YN
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM	COMPANY_CHRG
+		WHERE 1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<select id="listCompAcctHist" resultType="String">
+		SELECT	ACCT_NO
+		FROM	COMP_ACCT_HIST
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</select>
+	
+	<select id="listBrandBase" resultType="biz.app.brand.model.BrandBaseVO">
+		SELECT	BND_NO
+		FROM	BRAND_BASE A
+		WHERE	1=1
+			AND USE_YN = 'Y'
+			AND EXISTS (SELECT 1
+							FROM
+								(SELECT M.BND_NO
+								FROM ST_STD_INFO S JOIN ST_BND_MAP M ON S.ST_ID = M.ST_ID WHERE S.ST_ID = #{stId}) SM
+							WHERE A.BND_NO = SM.BND_NO)
+	</select>
+	
+	<update id="updateCompanyBrand" parameterType="biz.app.brand.model.CompanyBrandPO">
+		UPDATE COMPANY_BRAND SET
+			DLGT_BND_YN = #{dlgtBndYn}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+			AND BND_NO = #{bndNo}
+	</update>
+	
+	<select id="compNmDupCheck" resultType="int">
+		SELECT	COUNT(*)
+		FROM	COMPANY_BASE
+		WHERE	1=1
+			AND COMP_NM = #{compNm}
+	</select>
+	
+	<update id="deleteCompanyBaseImg" parameterType="biz.app.company.model.CompanyBasePO">
+		UPDATE COMPANY_BASE SET
+			BIZ_LIC_IMG_PATH = NULL
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE	1=1
+			AND COMP_NO = #{compNo}
+	</update>
+	
+	<update id="deleteCompAcctImg" parameterType="biz.app.company.model.CompAcctPO">
+		UPDATE COMP_ACCT SET
+			ACCT_IMG_PATH = NULL
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE	1=1
+			AND COMP_ACCT_ISU_NO = #{compAcctIsuNo}
+	</update>
+</mapper>

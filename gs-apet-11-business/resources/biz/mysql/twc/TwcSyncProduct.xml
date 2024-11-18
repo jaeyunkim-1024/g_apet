@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	valfac
+	일자 : 2021. 03. 31
+	작성자 : TWC PRODUCT, TWC PRODUCT_NUTRITION
+-->
+
+<mapper namespace="twcSyncProduct">
+	<select id="listTwcProduct" resultType="biz.twc.model.TwcProductVO">
+		select a.ID
+			, IFNULL( a.`name`, '' ) AS `name`
+			, IFNULL( a.brand_name, '' ) AS brand_name
+			, IFNULL( a.product_code, '' ) AS product_code
+			, IFNULL( a.petsbe_id, '' ) AS petsbe_id
+			, IFNULL((SELECT name from common_code where id = a.app_name), '') as app_name
+			, IFNULL( a.`type`, '' ) AS `type`
+			, IFNULL( a.scent, '' ) AS scent
+			, IFNULL( a.life_stage, '' ) AS life_stage
+			, IFNULL( a.recommend_age, '' ) AS recommend_age
+			, IFNULL( a.breed_size, '' ) AS breed_size
+			, IFNULL( a.manufacturer, '' ) AS manufacturer
+			, IFNULL( a.importer, '' ) AS importer
+			, IFNULL( a.country_of_origin, '' ) AS country_of_origin
+			, IFNULL( a.expiry_text, '' ) AS expiry_text
+			, IFNULL( a.expiry_desc, '' ) AS expiry_desc
+			, IFNULL( a.product_dimensions, '' ) AS product_dimensions
+			, IFNULL( a.capacity_weight, '' ) AS capacity_weight
+			, IFNULL( a.`size`, '' ) AS `size`
+			, IFNULL( a.calorie, '' ) AS calorie
+			, IFNULL( a.packaging_type, '' ) AS packaging_type
+			, IFNULL( a.inner_packing, '' ) AS inner_packing
+			, IFNULL((SELECT name from common_code where id = a.hair_type), '') as hair_type
+			, IFNULL( a.color, '' ) AS color
+			, IFNULL( a.quantity, '' ) AS quantity
+			, IFNULL( a.main_nutrition, '' ) AS main_nutrition
+			, IFNULL( a.pet_inducer, '' ) AS pet_inducer
+			, IFNULL((SELECT name from common_code where id = a.feed_grade), '') as feed_grade
+			, IFNULL((SELECT name from common_code where id = a.grain_free), '') as grain_free
+			, IFNULL((SELECT name from common_code where id = a.aafco), '') as aafco
+			, IFNULL( a.existence, '' ) AS existence
+			, IFNULL((SELECT name from common_code where id = a.repackaging), '') as repackaging
+			, IFNULL( a.comment_operator, '' ) AS comment_operator
+			, IFNULL( a.comment_gsn, '' ) AS comment_gsn
+			, IFNULL( a.comment_md, '' ) AS comment_md
+			, IFNULL( a.feeding_guideline, '' ) AS feeding_guideline
+			, IFNULL( a.storage_instructions, '' ) AS storage_instructions
+			, IFNULL( a.feature, '' ) AS feature
+			, IFNULL( a.create_date, '' ) AS create_date
+			, IFNULL( a.create_by, '' ) AS create_by
+			, IFNULL( a.modify_date, '' ) AS modify_date
+			, IFNULL( a.status, '' ) AS status
+			, IFNULL( a.caution_additive, '' ) AS caution_additive
+			, description_id
+			, IFNULL( a.code, '' ) AS code
+			, IFNULL((SELECT name from common_code where id = a.suggest_age), '') as suggest_age
+			, IFNULL( a.modify_by, '' ) AS modify_by
+			, (select description from product_description b where b.id = a.description_id limit 1) as description
+			, category
+			, g.material
+			, i.tags
+		from product a
+		inner join lateral (
+			select group_concat(distinct e.name order by e.id SEPARATOR " > ") as category
+			from product_category e
+			where e.id in (select product_category_id from product_category_mapping d where d.product_id = a.id)
+		) e on (true)
+		left outer join lateral (
+			select group_concat(distinct g.name order by m.id) as material
+			from (
+			select m.id, product_ingredient_id
+			from product_ingredient_mapping m where product_id =a.id
+			) m
+			join product_ingredient g
+			on (m.product_ingredient_id = g.id)
+		) g on (true)
+		left outer join lateral (
+			select  group_concat(distinct i.name) as tags
+			from service_tags i
+			where i.id in (select service_tags_id from product_tag_mapping where product_id = a.id)
+		) i on (true)
+	</select>
+
+	<select id="listTwcProductNutrition" resultType="biz.twc.model.TwcProductNutritionVO">
+		SELECT id
+			,  IFNULL(crude_protein, '') AS crude_protein
+			,  IFNULL(crude_fat, '') AS crude_fat
+			,  IFNULL(crude_fiber, '') AS crude_fiber
+			,  IFNULL(ash, '') AS ash
+			,  IFNULL(calcium, '') AS calcium
+			,  IFNULL(phosphorus, '') AS phosphorus
+			,  IFNULL(omega3, '') AS omega3
+			,  IFNULL(omega6, '') AS omega6
+			,  IFNULL(moisture, '') AS moisture
+			,  IFNULL(other, '') AS other
+			,  IFNULL(dry_matter_crude_protein, '') AS dry_matter_crude_protein
+			,  IFNULL(dry_matter_crude_fat, '') AS dry_matter_crude_fat
+			,  IFNULL(dry_matter_crude_fiber, '') AS dry_matter_crude_fiber
+			,  IFNULL(dry_matter_ash, '') AS dry_matter_ash
+			,  IFNULL(dry_matter_calcium, '') AS dry_matter_calcium
+			,  IFNULL(dry_matter_phosphorus, '') AS dry_matter_phosphorus
+			,  IFNULL(dry_matter_omega3, '') AS dry_matter_omega3
+			,  IFNULL(dry_matter_omega6, '') AS dry_matter_omega6
+			,  IFNULL(carbohydrate, '') AS carbohydrate
+			,  product_id
+		FROM twc_gs_aboutpet_service.product_nutrition
+	</select>
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명 상품 일괄 등록 관리
+	작성자  	valueFactory
+	작성일자  	2021.01.11
+-->
+
+<mapper namespace="goodsBulk" >
+
+	<select id="pageGoodsBulkPriceCount" resultType="java.lang.Integer">
+		SELECT COUNT(1)
+		FROM (
+		SELECT *
+		FROM GOODS_BASE A
+		WHERE 1 = 1
+		<include refid="goods.whereGoodsBase" />
+		) A
+		JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+		<include refid="goods.joinGoodsBase" />
+	</select>
+
+	<select id="pageGoodsBulkPrice" resultType="biz.app.goods.model.GoodsBulkPriceVO">
+		<!-- Query Name : goods.pageGoodsBulkPrice Description : 상품 가격 리스트 조회 -->
+		SELECT /*QUERYID(goods.pageGoodsBulkPrice) */
+		A.GOODS_ID /* 상품 아이디 */
+		, A.GOODS_NM /* 상품 명 */
+		, A.GOODS_STAT_CD /* 상품 상태 코드 */
+		, A.MDL_NM /* 모델 명 */
+		, A.COMP_NO /* 업체 번호 */
+		, A.COMP_GOODS_ID /* 업체 상품 ID */
+		, B.COMP_NM
+		, B.COMP_TP_CD /* 업체 유형 */
+		, A.BND_NO /* 브랜드 번호 */
+		, C.BND_NM_KO
+		, A.MMFT /* 제조사 */
+		, A.SHOW_YN /* 노출 여부 */
+		, A.GOODS_TP_CD /* 상품 유형 코드 */
+		, A.GOODS_CSTRT_TP_CD /* 상품 구성 유형 코드 */
+		, A.BIGO /* 비고 */
+		, A.SYS_REGR_NO /* 시스템 등록자 번호 */
+		, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM
+		, A.SYS_REG_DTM /* 시스템 등록 일시 */
+		, A.SYS_UPDR_NO /* 시스템 수정자 번호 */
+		, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM
+		, A.SYS_UPD_DTM /* 시스템 수정 일시 */
+		, IFNULL(D.SALE_AMT,0) AS SALE_AMT /* 판매가 */
+		<if test="endSaleYn ==@framework.common.constants.CommonConstants@COMM_YN_Y" >
+			, D.MAX_SALE_END_DTM
+		</if>
+		, D.GOODS_AMT_TP_CD /* 상품 금액 유형 코드 */
+		, D.SALE_STRT_DTM /* 판매 시작 일시 */
+		, D.SALE_END_DTM /* 판매 종료 일시 */
+		, D.ORG_SALE_AMT
+		, D.SALE_AMT
+		, D.SPL_AMT
+		, D.CMS_RATE
+		, GI.IMG_SEQ
+		, GI.IMG_PATH
+		, GI.RVS_IMG_PATH
+		, (SELECT group_concat(GOODS_ICON_CD separator ', ') FROM GOODS_ICON WHERE GOODS_ID = A.GOODS_ID GROUP BY GOODS_ID) AS ICONS
+		FROM (
+		SELECT *
+		FROM GOODS_BASE A
+		WHERE 1 = 1
+		<include refid="goods.whereGoodsBase" />
+		) A
+		JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+		<include refid="goods.joinGoodsBase" />
+		ORDER BY
+		<if test="goodsOrderingTpCd != null and goodsOrderingTpCd.equals('20')">
+			BGT.TOTAL_SCR DESC,
+		</if>
+		A.GOODS_ID DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!--<update id="updateGoodsBatch" parameterType="biz.app.goods.model.GoodsBasePO">-->
+	<update id="updateGoodsBatch" parameterType="hashmap">
+		<selectKey keyProperty="goodsCstrtTpCd,cisNo" resultType="hashmap" order="AFTER">
+			SELECT GOODS_CSTRT_TP_CD AS goodsCstrtTpCd, CIS_NO AS cisNo FROM GOODS_BASE WHERE GOODS_ID = #{po.goodsId }
+		</selectKey>
+		<!-- Query Name : goodsBulk.updateGoodsBatch Description : 상품 수정 [배치] -->
+		UPDATE GOODS_BASE SET
+			SYS_UPDR_NO = #{po.sysUpdrNo } /* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		<if test="po.goodsStatCd != null and po.goodsStatCd != ''">
+			, GOODS_STAT_CD = #{po.goodsStatCd } /* 상품 상태 코드 */
+		</if>
+		<if test="po.showYn != null and po.showYn != ''">
+			, SHOW_YN = #{po.showYn } /* 노출 여부 */
+		</if>
+		<if test="po.webMobileGbCd != null and po.webMobileGbCd != ''">
+			, WEB_MOBILE_GB_CD = #{po.webMobileGbCd} /* 웹 모바일 구분 */
+		</if>
+		<if test="po.bigo != null and po.bigo != ''">
+			, BIGO = #{po.bigo } /* 비고 */
+		</if>
+		WHERE GOODS_ID = #{po.goodsId }
+		<if test="goodsUpdateGb eq @framework.admin.constants.AdminConstants@GOODS_BULK_UPDATE_APPR">
+			AND GOODS_STAT_CD IN ( '${@framework.common.constants.CommonConstants@GOODS_STAT_10}'
+				, '${@framework.common.constants.CommonConstants@GOODS_STAT_20}'
+			)
+		</if>
+		<if test="goodsUpdateGb eq @framework.admin.constants.AdminConstants@GOODS_BULK_UPDATE_STAT">
+			AND GOODS_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@GOODS_STAT_10}'
+				, '${@framework.common.constants.CommonConstants@GOODS_STAT_20}'
+				, '${@framework.common.constants.CommonConstants@GOODS_STAT_30}'
+			    <choose>
+				    <when test="po.goodsStatCd eq @framework.common.constants.CommonConstants@GOODS_STAT_40">
+					    , '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					    , '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+				    </when>
+			        <otherwise>
+				        , '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+				        , '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+				        , '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+			        </otherwise>
+			    </choose>
+		    )
+		</if>
+	</update>
+
+	<insert id="callGoodsBestProc" statementType="CALLABLE">
+		{ CALL aboutpet.SP_SET_BEST_GOODS_TOTAL(#{argBaseDt},1,?) }
+	</insert >
+
+	<insert id="callGoodsStatProc" statementType="CALLABLE">
+		{ CALL aboutpet.SP_SET_GOODS_STAT(?) }
+	</insert >
+
+	<insert id="callGoodsDispAllCtgProc" statementType="CALLABLE">
+		{ CALL aboutpet.SP_BAT_DISPLAY_GOODS_ALL_CTG() }
+	</insert >
+</mapper>

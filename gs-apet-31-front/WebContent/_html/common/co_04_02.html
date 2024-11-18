@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set19","tit":"<b class=e>d</b>타이틀"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		
+		<!-- <include class="lnb" data-include-html="../inc/lnb.html"></include> -->
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					
+					<!-- 공통 검색  -->
+					<div class="search-wrap">
+						<div class="block-wrap">
+							<!-- 인기 검색어 -->
+							<div class="search-list" style="margin-top:0;">
+								<div class="swiper-container">
+									<p class="tit">인기 검색어</p>
+									<div class="swiper-wrapper">
+										<div class="swiper-slide">
+											<ul class="item">
+												<li>
+													<a href="javascript:;">
+														<span class="num">1</span>
+														<p class="txt">
+															검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking"></span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">2</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking down">2</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">3</span>
+														<p class="txt">
+															검색어
+															<span>지금바로 다시보기!</span>
+														</p>
+														<span class="ranking up">1</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">4</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking up">2</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">5</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking down">3</span>
+													</a>
+												</li>
+											</ul>
+										</div>
+										<div class="swiper-slide">
+											<ul class="item">
+												<li>
+													<span class="num">6</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking"></span>
+												</li>
+												<li>
+													<span class="num">7</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking down">2</span>
+												</li>
+												<li>
+													<span class="num">8</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking up">1</span>
+												</li>
+												<li>
+													<span class="num">9</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking up">2</span>
+												</li>
+												<li>
+													<span class="num">10</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking down">3</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+									<div class="swiper-pagination"></div>
+								</div>
+								<!-- 하단 배너  -->
+								<div class="b-banner">
+									<a href="javascript:;">
+										<img src="../../_images/_temp/temp_banner01.png" alt="" >
+									</a>
+								</div>
+								<!-- 하단 배너  -->
+							</div>
+							<!-- // 인기 검색어 -->
+						</div>
+
+						
+
+						
+					</div>
+
+					
+					<!-- // 공통 검색  -->
+					
+					
+				</div>
+			</div>
+		</main>
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+			
+
+			(function(){
+				setTimeout(function(){
+					var check = ($('link[href *= "style.mo.css"]').length) ? true : false;
+					console.log(check);
+					if(check) {
+						var swiper = new Swiper('.recommendation-tag .swiper-container', {
+							slidesPerView: '1.1',
+							centeredSlides: false,
+							spaceBetween: 0,
+							pagination: {
+								el: '.swiper-pagination',
+								clickable: true,
+							},
+						});
+
+						var swiper2 = new Swiper('.search-list .swiper-container', {
+							slidesPerView: '1',
+							centeredSlides: false,
+							spaceBetween: 0,
+							pagination: {
+								el: '.search-list .swiper-pagination',
+								clickable: true,
+							},
+						});
+					}
+
+				},50)
+			})();
+		</script>
+	</div>
+</body>
+</html>

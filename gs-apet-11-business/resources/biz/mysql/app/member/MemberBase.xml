@@ -1,0 +1,1733 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 기본
+	작성자  		snw
+	작성일자  	2017.02.01
+-->
+
+<mapper namespace="memberBase">
+	<resultMap type="biz.app.member.model.MemberBaseVO" id="memberBaseVoMap" >
+		<result property="mbrNm" column="MBR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="loginId" column="LOGIN_ID" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="birth" column="BIRTH" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="mobile" column="MOBILE" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="email" column="EMAIL" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="roadDtlAddr" column="ROAD_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="prclDtlAddr" column="PRCL_DTL_ADDR" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="updrIp" column="UPDR_IP" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+	</resultMap>
+
+
+	<select id="listMemberBaseNo" resultType="Long">
+		<!--
+			Query Name : memberBase.listMemberBaseNo
+			Description : 회원번호 목록 조회
+		-->
+		SELECT	/* QUERYID(memberBase.listMemberBaseNo) */
+					  A.MBR_NO				/* 회원 번호 */
+		FROM		member_base A
+		WHERE	1=1
+		<if test="stId != null and stId != ''" >
+		AND 		A.ST_ID = #{stId}
+		</if>
+		<if test='mbrNm != null and mbrNm != ""'>
+		AND		A.MBR_NM = #{mbrNm}
+		</if>
+		<if test='loginId != null and loginId != ""'>
+		AND		A.LOGIN_ID = #{loginId}
+		</if>
+		<if test='tel != null and tel != ""'>
+		AND		A.TEL = #{tel}
+		</if>
+		<if test='mobile != null and mobile != ""'>
+		AND		A.MOBILE = #{mobile}
+		</if>
+	</select>
+	
+	<update id="updateMemberBaseSavedMoney">
+		<!--
+			Query Name : memberBase.updateMemberBaseSavedMoney
+			Description : 회원 기본 잔여 적립금 수정
+		-->
+		UPDATE	member_base
+		SET		SVMN_RMN_AMT	= SVMN_RMN_AMT + #{svmnRmnAmt}
+					, SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+		WHERE	MBR_NO	= #{mbrNo}
+	</update>
+
+	<select id="getMemberBaseCnt" resultType="Integer">
+		<!--
+			Query Name : memberBase.getMemberBaseCnt
+			Description : 사이트별 회원 수 조회
+		-->
+		SELECT	IFNULL(COUNT(MBR_NO), 0) AS MEMBER_CNT
+		FROM		member_base
+		WHERE	ST_ID = #{stId}
+		<!-- <if test="ctfCd != null and ctfCd != ''">
+		AND		CTF_CD = #{ctfCd}
+		</if> -->
+		<if test="loginId != null and loginId != ''">
+		AND		LOGIN_ID = #{loginId}
+		</if>
+		<if test="email != null and email != ''">
+		AND		EMAIL = #{email}
+		</if>
+		<if test="mobile != null and mobile != ''">
+		AND		MOBILE = #{mobile}
+		</if>
+		<if test="mbrNo != null and mbrNo != ''">
+		AND		MBR_NO != #{mbrNo}
+		</if>
+		<if test="nickNm != null and nickNm != ''">
+		AND		NICK_NM = #{nickNm}
+		</if>
+		AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>
+
+	<select id="getMemberBaseCheckStr" resultType="String">
+		<!--
+			Query Name : memberBase.getMemberBaseCheckStr
+			Description : 중복체크 
+		-->
+		SELECT GROUP_CONCAT(MBR_NO)
+		FROM		member_base
+		WHERE	ST_ID = #{stId}
+		<if test="loginId != null and loginId != ''">
+		AND		LOGIN_ID = #{loginId}
+		</if>
+		<if test="email != null and email != ''">
+		AND		EMAIL = #{email}
+		</if>
+		<if test="mobile != null and mobile != ''">
+		AND		MOBILE = #{mobile}
+		</if>
+		<if test="nickNm != null and nickNm != ''">
+		AND		NICK_NM = #{nickNm}
+		</if>
+		AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>
+
+	<insert id="insertMemberBase">
+		<!--
+			Query Name : memberBase.insertMemberBase
+			Description : 회원 등록
+		-->
+		INSERT INTO member_base
+			(
+				MBR_NO					/* 회원번호 */
+				,ST_ID					/* 사이트ID */
+				<!-- ,POLICY_NO				/* 처리 방침 번호 */ -->
+                ,LOGIN_ID				/* 로그인 아이디 */
+                ,MBR_NM					/* 회원 명*/
+                ,NICK_NM				/* 닉네임 */
+                ,RCOM_CD				/* 내 추천인 코드*/
+                ,PET_LOG_URL			/* 펫로그URL */
+                ,MBR_GB_CD				/* 회원 구분코드 */
+                ,MBR_STAT_CD			/* 회원 상태코드 */
+                ,MBR_GRD_CD				/* 회원 등급코드 */
+                ,BIRTH					/* 생년월일 */
+                ,GD_GB_CD 				/* 성별 구분코드*/
+                ,NTN_GB_CD				/* 국적 구분코드 */
+                ,JOIN_DTM				/* 가입 일시 */
+                ,MOD_DTM				/* 회원정보 변경일시 */
+                ,JOIN_PATH_CD			/* 가입경로코드 */
+                ,JOIN_ENV_CD			/* 가입환경 */
+                ,CTF_YN					/* 인증여부 */
+                ,CI_CTF_VAL					/* CI 인증값 */
+                ,DI_CTF_VAL					/* DI 인증값 */
+                ,GSPT_USE_YN				/* GS 연계 사용 여부 */
+                ,GSPT_STATE_CD				/* GS 연계 사용 상태 코드  */
+                ,INFO_RCV_YN			/* 알림수신여부*/
+                ,MKNG_RCV_YN			/* 마케팅 수신 여부*/
+                ,PST_INFO_AGR_YN		/* 위치정보동의여부*/
+                ,TEL					/* 전화 */
+                ,MOBILE					/* 휴대폰 */
+                ,MOBILE_CD				/* 통신사코드 */
+                ,EMAIL					/* 이메일 */
+                ,RCOM_LOGIN_ID			/* 추천인 아이디 */
+                ,PRFL_IMG				/* 프로필 이미지 */
+                ,SYS_REGR_NO			/* 시스템 등록자 번호 */
+                ,SYS_REG_DTM			/* 시스템 등록날짜 */
+                ,SYS_UPDR_NO			/* 시스템 수정자 번호 */
+                ,SYS_UPD_DTM			/* 시스템 수정 날짜 */
+                ,UPDR_IP				/* 수정자 IP*/
+			)
+			VALUES
+			(
+				#{mbrNo}					/* 회원번호 */
+				,'1'						/* 사이트ID */
+				<!-- ,#{policyNo}				/* 처리 방침 번호 */ -->
+                ,#{loginId}					/* 로그인 아이디 */
+                ,#{mbrNm}					/* 회원 명*/
+                ,#{nickNm}					/* 닉네임 */
+                ,FN_RCOM_URL_RANDOM()		/* 내 추천인 코드*/
+                ,#{petLogUrl}				/* 펫로그URL */
+                ,#{mbrGbCd}					/* 회원 구분코드 */
+                ,#{mbrStatCd}				/* 회원 상태코드 */
+                ,#{mbrGrdCd}				/* 회원 등급코드 */
+                ,#{birth}					/* 생년월일 */
+                ,#{gdGbCd}					/* 성별 구분코드*/
+                ,#{ntnGbCd}					/* 국적 구분코드 */
+                ,NOW()					/* 가입 일시 */
+                ,NOW()					/* 회원정보 변경일시 */
+                ,#{joinPathCd}			/* 가입경로코드 */
+                ,#{joinEnvCd}			/* 가입환경 */
+                ,#{ctfYn}				/* 인증여부 */
+                ,#{ciCtfVal}					/* CI 인증값 */
+                ,#{diCtfVal}					/* DI 인증값 */
+				,#{gsptUseYn}				/* GS 연계 사용 여부 */
+				,#{gsptStateCd}				/* GS 연계 사용 상태 코드  */
+                ,#{infoRcvYn}				/* 알림수신여부*/
+                ,#{mkngRcvYn}				/* 마케팅 수신 여부*/
+                ,#{pstInfoAgrYn}			/* 위치정보동의여부*/
+                ,#{tel}						/* 전화 */
+                ,#{mobile}					/* 휴대폰 */
+                ,#{mobileCd}				/* 통신사코드 */
+                ,#{email}					/* 이메일 */
+                ,#{rcomLoginId}			/* 추천인 아이디 */
+                ,#{prflImg}				/* 프로필 이미지 */
+                ,#{sysRegrNo}			/* 시스템 등록자 번호 */
+                ,NOW()					/* 시스템 등록날짜 */
+                ,#{sysUpdrNo}			/* 시스템 수정자 번호 */
+                ,NOW()					/* 시스템 수정 날짜 */
+                ,#{updrIp}				/* 수정자 IP*/
+			)
+	</insert>
+	
+	<insert id="insertMemberGrade">
+		INSERT INTO member_grade_history 
+				(
+					MBR_NO
+				  , HIST_STRT_DTM
+				  , MBR_GRD_CD
+				  , SYS_REG_DTM
+				  , SYS_REGR_NO
+				)
+		     VALUES 
+				(
+					#{mbrNo}
+				  , sysdate()
+				  , #{mbrGrdCd}
+				  , SYSDATE()
+				  , #{sysRegrNo}
+				)
+	</insert>
+
+	<update id="updateMemberBasePassword">
+		<!--
+			Query Name : memberBase.updateMemberBasePassword
+			Description : 회원 비밀번호 수정
+		-->
+		UPDATE	member_base
+		SET		PSWD = #{pswd}
+					,PSWD_INIT_YN = #{pswdInitYn}
+					,LOGIN_FAIL_CNT = 0
+					,PSWD_CHG_SCD_DTM = DATE_ADD(NOW() , INTERVAL 90 DAY)		/* 비밀번호 변경 예정일시 */
+					,PSWD_CHG_DTM = NOW()
+		WHERE	MBR_NO = #{mbrNo}
+		<if test="stId != null and stId != ''" >
+		  AND ST_ID = #{stId}
+		</if>
+	</update>
+
+	<update id="updateMemberBase">
+		<!--
+			Query Name : memberBase.updateMemberBase
+			Description : 회원정보 수정
+		-->
+		UPDATE	member_base
+		SET		  SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+				<if test="tel != null and tel != ''">
+				, TEL			= #{tel}					/* 전화 */
+				</if>
+				<if test="mobile != null and mobile != ''">
+				, MOBILE		= #{mobile}				/* 휴대폰 */
+				</if>
+				<if test="email != null and email != ''">
+				, EMAIL			= #{email}				/* 이메일 */
+				</if>
+				<if test=" mbrGrdCd != null and mbrGrdCd != '' ">
+				, MBR_GRD_CD = #{mbrGrdCd}
+				</if>
+				<if test="mbrStatCd != null and mbrStatCd != ''">
+				, MBR_STAT_CD	= #{mbrStatCd}			/* 회원 상태 코드 */
+				</if>
+		  		<if test="dormantRlsYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)">
+				, DORMANT_RLS_DTM = NOW()
+				</if>
+				<if test="joinEnvCd != null and joinEnvCd != ''">
+				, JOIN_ENV_CD	= #{joinEnvCd}			/* 가입 환경코드 */
+				</if>
+				
+				<if test="ntnGbCd != null and ntnGbCd != ''">
+				, NTN_GB_CD		= #{ntnGbCd}				/* 국가 */
+				</if>
+				<if test="ciCtfVal != null and ciCtfVal != ''">
+				, CI_CTF_VAL		= #{ciCtfVal}				/* ci값 */
+				</if>
+				<if test="diCtfVal != null and diCtfVal != ''">
+				, DI_CTF_VAL		= #{diCtfVal}				/* di값 */
+				</if>
+				<if test="mobileCd != null and mobileCd != ''">
+				, MOBILE_CD		= #{mobileCd}				/* 통신사코드 */
+				</if>
+				<if test="ctfYn != null and ctfYn != ''">
+				, CTF_YN		= #{ctfYn}				/* 인증여부 */
+				</if>
+				<if test="mbrNm != null and mbrNm != ''">
+				, MBR_NM		= #{mbrNm}				/* 이름 */
+				</if>
+				<if test="gdGbCd != null and gdGbCd != ''">
+				, GD_GB_CD		= #{gdGbCd}				/* 성별 */
+				</if>
+				<if test="birth != null and birth != ''">
+				, BIRTH			= #{birth}				/* 생년월일 */
+				</if>
+				<if test="gsptNo != null and gsptNo != '' ">
+				, GSPT_NO			= #{gsptNo}					/* GS 연계 번호 */
+				, GSPT_START_DTM	= NOW()
+				</if>
+				<if test="gsptUseYn != null and gsptUseYn != '' ">
+				, GSPT_USE_YN			= #{gsptUseYn}
+				</if>
+				<if test="gsptStateCd != null and gsptStateCd != '' ">
+				, GSPT_STATE_CD			= #{gsptStateCd}				
+				</if>
+				<if test="gsptStopDtm != null ">
+				, GSPT_STOP_DTM			= NOW()
+				</if>
+				<if test="deviceToken != null and deviceToken != '' and deviceToken != 'nullToken'">
+				, DEVICE_TOKEN			= #{deviceToken}					
+				</if>
+				<if test="deviceToken != null and deviceToken == 'nullToken' ">
+				, DEVICE_TOKEN			= null				
+				</if>
+				<if test="infoRcvYn != null and infoRcvYn != '' ">
+				, INFO_RCV_YN			= #{infoRcvYn}					
+				</if>
+				<if test="mkngRcvYn != null and mkngRcvYn != '' ">
+				, MKNG_RCV_YN			= #{mkngRcvYn}					
+				</if>
+				<if test="dffcMbrYn != null and dffcMbrYn != '' ">
+				, DFFC_MBR_YN			= #{dffcMbrYn}					
+				</if>
+				<!-- <if test="pswdChgScdDtm != null and pswdChgScdDtm != ''">
+				, PSWD_CHG_SCD_DTM			=  DATE_ADD(NOW() , INTERVAL 90 DAY)			
+				</if> -->
+				<if test="petLogItrdc != null and petLogItrdc != ''">
+				, PET_LOG_ITRDC			= #{petLogItrdc}			
+				</if>
+				
+				<if test="nickNm != null and nickNm != ''">
+				, NICK_NM			= #{nickNm}			
+				</if>
+				<if test="rcomUrl != null and rcomUrl != ''">
+				, RCOM_URL			= #{rcomUrl}			
+				</if>
+				<if test="petLogUrl != null and petLogUrl != ''">
+				, PET_LOG_URL			= #{petLogUrl}			
+				</if>
+				<if test="mbrGbCd != null and mbrGbCd != ''">
+				, MBR_GB_CD			= #{mbrGbCd}			
+				</if>
+				<if test="joinDtm != null ">
+				, JOIN_DTM			= #{joinDtm}		
+				</if>
+				, MOD_DTM = NOW()
+				<if test="joinPathCd != null and joinPathCd != ''">
+				, JOIN_PATH_CD			= #{joinPathCd}			
+				</if>
+				<if test="joinEnvCd != null and joinEnvCd != ''">
+				, JOIN_ENV_CD			= #{joinEnvCd}			
+				</if>
+				<if test="pswdInitYn != null and pswdInitYn != ''">
+				, PSWD_INIT_YN			= #{pswdInitYn}
+				</if>			
+				<if test="pswdChgDtm != null">
+				,PSWD_CHG_DTM			= #{pswdChgDtm}			
+				</if>
+				<if test="loginFailCnt != null and loginFailCnt != ''">
+				, LOGIN_FAIL_CNT		= #{loginFailCnt}
+				</if>			
+				<if test="lastLoginDtm != null">
+				, LAST_LOGIN_DTM			= #{lastLoginDtm}			
+				</if>
+				<if test="rcomLoginId != null and rcomLoginId != ''">
+				, RCOM_LOGIN_ID			= #{rcomLoginId}			
+				</if>
+				<if test="prflImg != null and prflImg != ''">
+				, PRFL_IMG			= #{prflImg}			
+				</if>
+				<if test="sysRegrNo != null and sysRegrNo != ''">
+				, SYS_REGR_NO			= #{sysRegrNo}			
+				</if>
+				<if test="sysRegDtm != null ">
+				, SYS_REG_DTM			= #{sysRegDtm}			
+				</if>
+				<if test="updrIp != null and updrIp != ''">
+				, UPDR_IP			= #{updrIp}			
+				</if>
+				<if test="petSchlYn != null and petSchlYn != ''">
+				, PET_SCHL_YN			= #{petSchlYn}	/* 펫스쿨 여부 */
+				</if>
+				<if test="dffcMbrYn != null and dffcMbrYn != ''">
+				, DFFC_MBR_YN			= #{dffcMbrYn}	/* 강성 회원 여부 */
+				</if>
+				<if test="almRcvYn != null and almRcvYn != ''">
+				, ALM_RCV_YN			= #{almRcvYn}	/* 알림 수신 여부 */
+				</if>
+				<if test="buyCntAdd != null and buyCntAdd != ''">
+				, BUY_CNT = IFNULL(BUY_CNT,0) + 1		/* 구매 횟수 증가 */
+				</if>
+				<if test="buyCnt != null and buyCnt != ''">
+				, BUY_CNT = #{buyCnt}		/* 구매 횟수 */
+				</if>
+				<if test='removeBillYn eq "Y"'>
+					, SIMP_SCR_NO = NULL
+					, BILL_INPUT_FAIL_CNT = 0
+				</if>
+		WHERE	MBR_NO			= #{mbrNo}
+				<if test="stId != null and stId != ''" >
+				AND ST_ID = #{stId}
+				</if>
+	</update>
+
+	<select id="getMemberBase" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name : memberBase.getMemberBase
+			Description : 회원 상세 조회
+		-->
+		SELECT	/* QUERYID(memberBase.getMemberBase) */
+			A.MBR_NO
+		,   A.ST_ID
+		,   A.POLICY_NO
+		,   A.LOGIN_ID
+		,   A.MBR_NM
+		,   A.NICK_NM
+		,   A.PET_LOG_URL
+		,   A.RCOM_URL
+		,   A.RCOM_CD
+		,   A.MBR_GB_CD
+		,   A.MBR_STAT_CD
+		,   A.MBR_GRD_CD
+		,   A.BIRTH
+		,   A.GD_GB_CD
+		,   A.NTN_GB_CD
+		,   A.JOIN_DTM
+		,   A.MOD_DTM
+		,   A.JOIN_PATH_CD
+		,   A.JOIN_ENV_CD
+		,   A.CTF_YN
+		,   A.CI_CTF_VAL
+		,   A.DI_CTF_VAL
+		,   A.GSPT_NO
+		,   A.GSPT_USE_YN
+		,   A.GSPT_STATE_CD
+		,   A.GSPT_START_DTM
+		,   A.GSPT_STOP_DTM
+		,   A.DEVICE_TOKEN
+		,   A.DEVICE_TP_CD
+		,   A.ALM_RCV_YN
+		,   A.INFO_RCV_YN
+		,   A.MKNG_RCV_YN
+		, 	A.PST_INFO_AGR_YN
+		,   A.DFFC_MBR_YN
+		,   A.PET_SCHL_YN
+		,   A.PSWD
+		,   A.PSWD_INIT_YN
+		,   A.PSWD_CHG_DTM
+		,   A.LOGIN_FAIL_CNT
+		,   A.LAST_LOGIN_DTM
+		,   A.PSWD_CHG_SCD_DTM
+		,   A.TEL
+		,   A.MOBILE
+		,   A.MOBILE_CD
+		,   A.EMAIL
+		,   A.RCOM_LOGIN_ID
+		,   A.MBR_LEV_RSN_CD
+		,   A.MBR_LEV_CONTENT
+		,   A.MBR_LEV_DTM
+		,   A.RE_JOIN_PSB_DT
+		,   A.DORMANT_APL_DTM
+		,   A.DORMANT_RLS_DTM
+		,   A.PET_LOG_ITRDC
+		,   A.PRFL_IMG
+		,   A.MBR_STOP_DTM
+		,   A.DLGT_PET_GB_CD
+		,   A.UPDR_IP
+		,   A.BUY_CNT
+		,   A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+		,   A.SYS_REG_DTM			/* 시스템 등록 일시 */
+		,   A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+		,   A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+		,	A.MIG_MEMNO			/* 마이그 회원 번호 */
+		, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@MBR_GRD_CD}' AND DTL_CD = A.MBR_GRD_CD) AS MBR_GRD_NM
+		, ( SELECT CONCAT(ROAD_ADDR,' ',ROAD_DTL_ADDR) FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1) AS MBR_DFT_DLVR_ROAD_ADDRESS
+		, ( SELECT CONCAT(PRCL_ADDR,' ',PRCL_DTL_ADDR) FROM MEMBER_ADDRESS MA WHERE MA.MBR_NO = A.MBR_NO ORDER BY MA.DFT_YN DESC LIMIT 0,1) AS MBR_DFT_DLVR_PRCL_ADDRESS
+		, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+		, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		,(	SELECT  COUNT(MC.MBR_CP_NO)
+			FROM    COUPON_BASE CB ,MEMBER_COUPON MC
+			WHERE   CB.CP_NO = MC.CP_NO
+			AND     MC.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND     CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+			AND		MC.MBR_NO = A.MBR_NO
+			<!--   AND     ((CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_10}' AND (DATE_ADD(MC.SYS_REG_DTM, INTERVAL CB.VLD_PRD_DAY DAY) &gt;= SYSDATE))
+	                  OR (CB.VLD_PRD_CD = '${@framework.common.constants.CommonConstants@VLD_PRD_20}' AND SYSDATE BETWEEN CB.VLD_PRD_STRT_DTM AND CB.VLD_PRD_END_DTM)) -->
+			AND NOW() BETWEEN MC.USE_STRT_DTM AND MC.USE_END_DTM
+			AND NOW() BETWEEN CB.APL_STRT_DTM AND CB.APL_END_DTM
+		) AS CP_CNT											/* 사용가능 쿠폰 수 */
+		,A.DLGT_PET_GB_CD AS PET_GB_CD 				/* 대표 펫 구분코드 */
+		<if test="pswd!=null and pswd == 'pswd'"> /* 로그인 시 태그 정보 조회하기 위해 */
+			 , (SELECT COUNT(MT.TAG_NO) FROM MBR_TAG_MAP MT WHERE A.MBR_NO = MT.MBR_NO GROUP BY MT.MBR_NO) as TAGS
+			 , (SELECT BIZ_NO FROM MEMBER_BIZ_INFO WHERE MBR_NO = A.MBR_NO ) AS BIZ_NO /* 로그인 시 회사정보유무로 펫로그회원 여부 체크*/
+			 , ( SELECT GROUP_CONCAT( PET_NO SEPARATOR ',' )  FROM PET_BASE WHERE MBR_NO = A.MBR_NO ) AS PET_NOS  /* 로그인 시 펫 리스트 조회*/
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+			,	( SELECT GROUP_CONCAT(MTM.TAG_NO) FROM MBR_TAG_MAP MTM WHERE MTM.MBR_NO = #{mbrNo} ) AS TAGS
+		</if>
+		FROM	MEMBER_BASE A
+		WHERE	1=1
+		<!-- <choose>
+			<when test="ctfYn != null and ctfYn != ''">
+				AND A.CTF_YN = #{ctfYn}
+			</when>
+		    <otherwise>
+				AND A.CTF_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			</otherwise>
+		</choose>  210203 쿼리 수정 -->
+		<if test="ctfYn != null and ctfYn != ''">
+			AND A.CTF_YN = #{ctfYn}
+		</if>
+		<if test="stId != null and stId != 0" >
+			AND A.ST_ID = #{stId}
+		</if>
+		<if test="mbrNo != null">
+			AND		A.MBR_NO = #{mbrNo}
+		</if>
+		<if test='mbrNm != null and mbrNm != ""'>
+			AND		A.MBR_NM = #{mbrNm}
+		</if>
+		<if test='loginId != null and loginId != ""'>
+			AND		A.LOGIN_ID = #{loginId}
+		</if>
+		<if test='email != null and email != ""'>
+			AND		A.EMAIL = #{email}
+		</if>
+		<if test='mobile != null and mobile != ""'>
+			AND		A.MOBILE = #{mobile}
+		</if>
+		<if test='ciCtfVal != null and ciCtfVal != ""'>
+			AND		A.CI_CTF_VAL = #{ciCtfVal}
+		</if>
+		<if test='mbrGbCd != null and mbrGbCd != ""'>
+			AND		A.MBR_GB_CD = #{mbrGbCd}
+		</if>
+		<if test="pswd!=null and pswd == 'pswd'">
+			AND A.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		</if>
+	</select>
+
+	<select id="getMemberSaveMoneyRate" resultType="Double">
+		<!--
+			Query Name : memberBase.getMemberSaveMoneyRate
+			Description : 회원 적립율 조회
+		-->
+		SELECT 	FN_GET_MEMBER_SAVE_RATE(#{mbrNo})
+		FROM		DUAL
+	</select>
+
+	<update id="updateMemberRcvYn">
+		<!--
+			Query Name : memberBase.updateMemberRcvYn
+			Description : 광고 수신 동의 변경
+			Writter : 김재윤
+		-->
+		<selectKey keyProperty="sysUpdDtm" resultType="java.sql.Timestamp" order="AFTER">
+			SELECT NOW() FROM DUAL
+		</selectKey>
+		UPDATE	member_base
+		SET		SYS_UPDR_NO = #{sysUpdrNo}
+			,	SYS_UPD_DTM = NOW()
+			<if test="infoRcvYn != null and infoRcvYn != '' ">
+			,	INFO_RCV_YN = #{infoRcvYn}
+			,	ALM_RCV_UPD_DTM = NOW()
+			</if>
+			<if test="mkngRcvYn != null and mkngRcvYn != '' ">
+			,	MKNG_RCV_YN = #{mkngRcvYn}
+			,	MKNG_RCV_UPD_DTM = NOW()
+			</if>
+		WHERE	MBR_NO			= #{mbrNo}
+	</update>
+
+	<update id="updateMemberBaseLastLoginDtm">
+		<!--
+			Query Name : memberBase.update0MemberBaseLastLoginDtm
+			Description : 회원 최종 로그인 일시 업데이트
+		-->
+		UPDATE	member_base
+		SET		LAST_LOGIN_DTM = now()
+				, DORMANT_APL_DTM = DATE_ADD(NOW(), INTERVAL 1 YEAR)
+				,LOGIN_FAIL_CNT = 0
+		<if test="deviceToken != null and deviceToken != ''">
+				,DEVICE_TOKEN = #{deviceToken}
+				,DEVICE_TP_CD =	#{deviceTpCd}
+		</if>
+		WHERE	MBR_NO = #{mbrNo}
+		<if test="stId != null and stId != ''" >
+		AND 	ST_ID = #{stId}
+		</if>
+	</update> 
+
+	<insert id="insertMemberBaseHistory">
+		INSERT /* QUERYID(MemberBase.insertMemberBaseHistory) */ 
+		  INTO member_base_history (
+									   MBR_NO
+									,	UPDR_IP
+								   ,	HIST_STRT_DTM
+								   ,   ST_ID
+								   ,   POLICY_NO
+								   ,   LOGIN_ID
+								   ,   MBR_NM
+								   ,   NICK_NM
+								   ,   PET_LOG_URL
+								   ,   PET_LOG_SRT_URL
+								   ,   RCOM_CD
+								   ,   RCOM_URL
+								   ,   MBR_GB_CD
+								   ,   MBR_STAT_CD
+								   ,   MBR_GRD_CD
+								   ,   BIRTH
+								   ,   GD_GB_CD
+								   ,   NTN_GB_CD
+								   ,   JOIN_DTM
+								   ,   MOD_DTM
+								   ,   JOIN_PATH_CD
+								   ,   JOIN_ENV_CD
+								   ,   CTF_YN
+								   ,   CI_CTF_VAL
+								   ,   DI_CTF_VAL
+								   ,   GSPT_NO
+								   ,   GSPT_USE_YN
+								   ,   GSPT_STATE_CD
+								   ,   GSPT_START_DTM
+								   ,   GSPT_STOP_DTM
+								   ,   DEVICE_TOKEN
+								   ,   DEVICE_TP_CD
+								   ,   INFO_RCV_YN
+								   ,   MKNG_RCV_YN
+								   ,   PST_INFO_AGR_YN
+								   ,   ALM_RCV_YN
+								   ,   DFFC_MBR_YN
+								   ,   PET_SCHL_YN
+								   <!-- , EMAIL_RCV_YN
+								   , EMAIL_RCV_DT
+								   , SMS_RCV_YN -->
+								  <!--  , SMS_RCV_DT -->
+								   , PSWD
+								   , PSWD_INIT_YN
+								   , PSWD_CHG_DTM
+								   , LOGIN_FAIL_CNT
+								   , LAST_LOGIN_DTM
+								   , PSWD_CHG_SCD_DTM
+								   <!-- , TEL -->
+								   , MOBILE
+								   , MOBILE_CD
+								   , EMAIL
+								   , RCOM_LOGIN_ID
+								   , MBR_LEV_RSN_CD
+								   , MBR_LEV_CONTENT
+								   , MBR_LEV_DTM
+								   , RE_JOIN_PSB_DT
+								   , DORMANT_APL_DTM
+								   , MBR_STOP_DTM
+								   , DLGT_PET_GB_CD
+								   , PET_LOG_ITRDC
+								   , PRFL_IMG
+								   , DORMANT_RLS_DTM
+								   , BUY_CNT
+								   , SYS_REGR_NO
+								   , SYS_REG_DTM
+								   , SYS_UPDR_NO
+								   , SYS_UPD_DTM
+								   , SIMP_SCR_NO
+								   , BILL_INPUT_FAIL_CNT
+								   , mig_memNo		
+								   , ALM_RCV_UPD_DTM 
+								   , MKNG_RCV_UPD_DTM	
+						 )                                                                                                                      
+						 SELECT
+									MBR_NO
+							   , #{updrIp}	    /* 수정자 IP            */
+							   ,		NOW()
+							   ,   ST_ID
+							   ,   POLICY_NO
+							   ,   LOGIN_ID
+							   ,   MBR_NM
+							   ,   NICK_NM
+							   ,   PET_LOG_URL
+							   ,   PET_LOG_SRT_URL
+							   ,   RCOM_CD
+							   ,   RCOM_URL
+							   ,   MBR_GB_CD
+							   ,   MBR_STAT_CD
+							   ,   MBR_GRD_CD
+							   ,   BIRTH
+							   ,   GD_GB_CD
+							   ,   NTN_GB_CD
+							   ,   JOIN_DTM
+							   ,   MOD_DTM
+							   ,   JOIN_PATH_CD
+							   ,   JOIN_ENV_CD
+							   ,   CTF_YN
+							   ,   CI_CTF_VAL
+							   ,   DI_CTF_VAL
+							   ,   GSPT_NO
+							   ,   GSPT_USE_YN
+							   ,   GSPT_STATE_CD
+							   ,   GSPT_START_DTM
+							   ,   GSPT_STOP_DTM
+							   ,   DEVICE_TOKEN
+							   ,   DEVICE_TP_CD
+							   ,   INFO_RCV_YN
+							   ,   MKNG_RCV_YN
+							   ,   PST_INFO_AGR_YN
+							   ,   ALM_RCV_YN
+							   ,   DFFC_MBR_YN
+							   ,   PET_SCHL_YN
+							  , PSWD
+							  , PSWD_INIT_YN
+							  , PSWD_CHG_DTM
+							  , LOGIN_FAIL_CNT
+							  , LAST_LOGIN_DTM
+							  , PSWD_CHG_SCD_DTM
+							  <!-- , TEL -->
+							  , MOBILE
+							  , MOBILE_CD
+							  , EMAIL
+							  , RCOM_LOGIN_ID
+							  , MBR_LEV_RSN_CD
+							  , MBR_LEV_CONTENT
+							  , MBR_LEV_DTM
+							  , RE_JOIN_PSB_DT
+							  , DORMANT_APL_DTM
+							  , MBR_STOP_DTM
+							  , DLGT_PET_GB_CD
+							  , PET_LOG_ITRDC
+							  , PRFL_IMG
+							  , DORMANT_RLS_DTM
+							  , BUY_CNT
+							  , SYS_UPDR_NO AS 'SYS_REGR_NO'
+							  , SYS_UPD_DTM AS 'SYS_REG_DTM'
+							  , SYS_UPDR_NO
+							  , SYS_UPD_DTM
+							  , SIMP_SCR_NO
+							  , BILL_INPUT_FAIL_CNT
+							  , mig_memNo
+							  , ALM_RCV_UPD_DTM 
+							  , MKNG_RCV_UPD_DTM	
+					 FROM member_base
+					 WHERE MBR_NO =  #{mbrNo}
+	</insert>
+	
+	<select id="getLeaveMemberBase" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name : memberBase.getLeaveMemberBase
+			Description : 탈퇴 회원 상세 조회
+		-->
+		SELECT	/* QUERYID(memberBase.getLeaveMemberBase) */
+				  A.MBR_NO				/* 회원 번호 */
+				, A.ST_ID				/* 사이트 아이디 */
+				, S.ST_NM				/* 사이트 명 */
+				, A.MBR_STAT_CD			/* 회원 상태 코드 */
+				, A.LOGIN_ID			/* 로그인 아이디 */
+				, A.MBR_LEV_DTM			/* 회원 탈퇴 일시 */
+				, A.RE_JOIN_PSB_DT		/* 재 가입 가능 일자 */
+				, A.DORMANT_APL_DTM     /* 휴면 적용 일시 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, A.LAST_LOGIN_DTM      /* 최종 로그인 일시 */
+		FROM	member_base A INNER JOIN st_std_info S ON A.ST_ID = S.ST_ID
+		WHERE	1=1
+		<if test="stId != null and stId != ''" >
+		AND 	A.ST_ID = #{stId}
+		</if>
+		<if test='mbrNo != null'>
+		AND		A.MBR_NO = #{mbrNo}
+		</if>
+		<!-- <if test="ctfCd != null and ctfCd != ''">
+		AND		A.CTF_CD = #{ctfCd}
+		</if> -->
+	</select>
+
+	<select id="listMemberMdnChangeHistory" resultMap="memberBaseVoMap">
+		<!--
+			Query Name : memberBase.listMemberMdnChangeHistory
+			Description : 회원 MDN 변경 이력 조회
+		-->
+		SELECT	/* QUERYID(memberBase.listMemberMdnChangeHistory) */
+				MBR_NO
+			,	MBR_NM
+			,   ROW_NUMBER() OVER(ORDER BY MAX(HIST_STRT_DTM)) AS HIST_NO
+			,	MAX(HIST_STRT_DTM) 	AS HIST_STRT_DTM
+			,  	MOBILE
+			,	MOBILE_CD
+		FROM MEMBER_BASE_HISTORY
+		WHERE MBR_NO = #{mbrNo}
+		GROUP BY MOBILE,MOBILE_CD
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="listMemberMdnChangeHistoryCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : memberBase.listMemberMdnChangeHistoryCount
+			Description : 회원 MDN 변경 이력 조회 Count
+		-->
+		SELECT /* QUERYID(memberBase.listMemberMdnChangeHistoryCount) */
+		       COUNT(*)
+		FROM (
+			SELECT COUNT(*) AS CNT
+			FROM member_base_history
+			WHERE MBR_NO = #{mbrNo}
+			GROUP BY MOBILE,MOBILE_CD
+		) SUB
+	</select>
+
+	<select id="listRecommandedList" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT
+		  		MBR_NO
+		     , 	MBR_NM
+		     , 	MBR_GB_CD
+		     , 	MBR_STAT_CD
+		     , 	JOIN_DTM
+			 , 	LOGIN_ID
+		     , 	SYS_REG_DTM
+		FROM MEMBER_BASE MB
+		WHERE MB.RCOM_LOGIN_ID = #{mbrNo}
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="listRecommandedListCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM MEMBER_BASE MB
+		WHERE MB.RCOM_LOGIN_ID = #{mbrNo}
+	</select>
+
+	<select id="listRecommandingList" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT
+				MB.MBR_NO
+		     , 	MB.MBR_NM
+		     , 	MB.MBR_GB_CD
+		     , 	MB.MBR_STAT_CD
+		     , 	MB.JOIN_DTM
+			 ,	(SELECT S1.MBR_NM FROM MEMBER_BASE S1 WHERE S1.MBR_NO = MB.RCOM_LOGIN_ID) AS RCOM_MBR_NM
+			 ,	(SELECT S2.LOGIN_ID FROM MEMBER_BASE S2 WHERE S2.MBR_NO = MB.RCOM_LOGIN_ID ) AS RCOM_LOGIN_ID
+		     , 	MB.SYS_REG_DTM
+		FROM MEMBER_BASE MB
+		WHERE MB.MBR_NO = #{mbrNo}
+		AND MB.RCOM_LOGIN_ID IS NOT NULL AND MB.RCOM_LOGIN_ID != ''
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="listRecommandingListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM MEMBER_BASE MB
+		WHERE MB.MBR_NO = #{mbrNo}
+		AND MB.RCOM_LOGIN_ID IS NOT NULL AND MB.RCOM_LOGIN_ID != ''
+	</select>
+	
+	
+	<select id="getExistingMemberCheck" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name : member.getExistingMemberCheck
+			Description : 회원가입 시 기존 회원체크
+			Writer : 이지희
+			Date : 2021.01.15 
+ 		-->
+		SELECT 	/* QUERYID(member.getExistingMemberCheck) */
+				MBR_NO 
+				, LOGIN_ID
+				, CI_CTF_VAL
+        		, (SELECT SNS_LNK_CD FROM SNS_MEMBER_INFO WHERE MBR_NO = M.MBR_NO ORDER BY SNS_LNK_CD ASC LIMIT 1) AS JOIN_PATH 
+		FROM 	MEMBER_BASE M
+		WHERE 	( 	
+					<choose>
+						<when test="(ciCtfVal == null or ciCtfVal == '') and (mobile == null or mobile == '' or mbrNm == null or mbrNm == '') and (email == null or email == '')">
+							1 = 2
+						</when>
+						<otherwise>
+							1 = 2
+							<if test="ciCtfVal != null and ciCtfVal != ''">
+								OR CI_CTF_VAL = #{ciCtfVal}
+							</if>
+							<if test="email != null and email != ''" >
+								OR	EMAIL = #{email}
+							</if>
+							<if test="mobile != null and mobile != '' and mbrNm != null and mbrNm != ''">
+								OR 	(MOBILE = #{mobile} AND MBR_NM = #{mbrNm} )
+							</if>
+						</otherwise>
+					</choose>
+		        )
+		AND     MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'   /*탈퇴 회원 제외*/
+		ORDER BY mbr_no DESC		        
+		LIMIT 1
+	</select>
+	
+	<select id="getMbrNoFromMemberInfo" resultType="java.lang.Long" >
+		<!--
+			Query Name : memberBase.getMbrNoFromMemberInfo
+			Description : 회원가입 시 핸드폰 번호 or 로그인아디 일치하는 기존회원번호 리턴
+			Writer : 이지희
+			Date : 2021.01.19
+ 		-->
+		SELECT	MBR_NO
+		FROM	member_base
+		WHERE	1 =1
+		<if test="mobile != null and mobile != ''">
+		AND		MOBILE = #{mobile}
+		</if>
+		<if test="rcomLoginId != null and rcomLoginId != ''">
+		AND 	LOGIN_ID = #{rcomLoginId}	
+		</if>
+		 AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>
+
+	<select id="getRcomURLFromMemberInfo" resultType="java.lang.String" >
+		<!--
+			Query Name : memberBase.getRcomURLFromMemberInfo
+			Description : 회원가입 시 추천인 아디에 해당하는 추천인 코드 조회
+			Writer : 이지희
+			Date : 2021.02.18
+ 		-->
+		SELECT	RCOM_CD
+		FROM	member_base
+		WHERE	1 =1
+		<if test="rcomLoginId != null and rcomLoginId != ''">
+		AND 	RCOM_CD = #{rcomLoginId}	
+		</if>
+		AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		LIMIT 	1
+	</select>
+	
+	<select id="getRecommanderInfo" resultType="java.lang.Long" >
+		<!--
+			Query Name : memberBase.getRecommanderInfo
+			Description : 추천인 정보 조회
+			Writer : kek01
+			Date : 2021.04.13
+ 		-->
+		SELECT MB2.MBR_NO  /*추천인 고객정보*/
+		FROM MEMBER_BASE MB2
+		WHERE MB2.RCOM_CD = (
+		 						SELECT MB.RCOM_LOGIN_ID 	/*추천인 아이디*/
+								FROM MEMBER_BASE MB
+								WHERE MB.MBR_NO = #{mbrNo} /*피추천인 고객번호*/ AND IFNULL(MB.RCOM_LOGIN_ID,'') <![CDATA[<>]]> ''
+		                     )
+		AND MB2.MBR_STAT_CD IN ('${@framework.common.constants.CommonConstants@MBR_STAT_10}','${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_40}') /*10:정상, 30:휴면, 40:중복*/
+		ORDER BY MB2.MBR_STAT_CD
+		LIMIT 1
+	</select>
+	
+	<insert id="insertTermsRcvHistory" >
+		<!--
+			Query Name : memberBase.insertTermsRcvHistory
+			Description : 회원가입 시 약관 이력 등록
+			Writer : 이지희
+			Date : 2021.01.19
+ 		-->
+		INSERT INTO 	TERMS_RCV_HISTORY
+		VALUES 
+		<foreach collection="list" item="item" separator=",">
+		( 
+			#{item.termsAgreeHistNo}
+			,#{item.mbrNo}
+			,#{item.menuCd}
+			,#{item.termsNo}
+			,null
+			,null
+			,null
+			,#{item.rcvYn}
+			,NOW()
+			,#{item.sysRegrNo}
+			,NOW()					
+		)
+		</foreach>
+	</insert>
+
+	<insert id="insertSnsMemberInfo" >
+		<!--
+			Query Name : memberBase.insertSnsMemberInfo
+			Description : sns 로그인 정보 등록
+			Writer : 이지희
+			Date : 2021.01.20
+ 		-->
+		INSERT INTO 	SNS_MEMBER_INFO
+		VALUES 
+		( 
+			  #{snsUuid}
+			, #{snsLnkCd}
+			, #{snsJoinYn}
+			, #{mbrNo}
+			, #{email}
+			, NULL
+			, #{snsStatCd}
+			, #{mbrNo}
+			, NOW()					
+		)
+	</insert>
+
+	<insert id="insertMbrTagMap" >
+		<!--
+			Query Name : memberBase.insertMbrTagMap
+			Description : 회원가입 시 태그 맵핑
+			Writer : 이지희
+			Date : 2021.01.27
+ 		-->
+		INSERT INTO MBR_TAG_MAP(
+		    	TAG_NO
+		    ,	MBR_NO
+		    ,	SYS_REGR_NO
+		    ,	SYS_REG_DTM
+		    ,	SYS_UPDR_NO
+		    ,	SYS_UPD_DTM
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		( 
+			  #{item.tagNo}
+		    , #{item.mbrNo}
+		    , #{item.sysRegrNo}
+		    , NOW()
+		    , #{item.sysUpdrNo}
+		    , NOW()
+		)  
+		</foreach>
+	</insert>
+	<delete id="deleteMbrTagMap" parameterType="java.lang.Long">
+		<!--
+			Query Name : memberBase.deleteMbrTagMap
+			Description : 회원정보 수정 시 회원 태그 삭제
+			Writer : 이지희
+			Date : 2021.01.27
+		 -->
+		DELETE FROM MBR_TAG_MAP
+		WHERE MBR_NO = #{mbrNo}
+	</delete>
+	
+	<insert id="insertMemberPswdHist" >
+		<!--
+			Query Name : memberBase.insertMemberPswdHist
+			Description : 회원 비밀번호 이력 저장
+			Writer : 이지희
+			Date : 2021.01.28
+ 		-->
+		INSERT INTO 	MEMBER_PSWD_HIST
+		VALUES 
+		( 
+			  #{mbrNo}
+			, NOW()
+			, #{pswd}
+			, #{sysRegrNo}
+			, NOW()					
+		)
+	</insert>
+	
+	<insert id="insertCertifiedLog" useGeneratedKeys="true" keyProperty="ctfLogNo">
+		<!--
+			Query Name : memberBase.insertCertifiedLog
+			Description : 회원 인증 이력 저장
+			Writer : 이지희
+			Date : 2021.02.03.
+ 		-->
+		INSERT INTO 	MEMBER_CERTIFIED_LOG
+		VALUES 
+		( 
+			  #{ctfLogNo}
+			, #{mbrNo}
+			, #{ctfMtdCd}
+			, #{ctfTpCd}
+			, #{ciCtfVal}
+			, #{diCtfVal}
+			, #{ctfKey}
+			, #{ctfRstCd}
+			, #{sysRegrNo}
+			, NOW()					
+		)
+	</insert>
+
+	<update id="updateCertifiedLogMbrNo" >
+		<!--
+			Query Name : memberBase.updateCertifiedLogMbrNo
+			Description : 회원 인증 이력 회원번호 저장
+			Writer : 이지희
+			Date : 2021.02.03.
+ 		-->
+		UPDATE	MEMBER_CERTIFIED_LOG
+		SET		MBR_NO	= #{mbrNo}
+				, CTF_TP_CD = #{ctfTpCd}
+				, SYS_REGR_NO	= #{sysRegrNo}	/* 시스템 수정자 번호 */
+				, SYS_REG_DTM	= NOW()			/* 시스템 수정 일시 */
+		WHERE	CTF_LOG_NO	= #{ctfLogNo}
+	</update>
+	
+	<delete id="deleteCertifiedLogNotMem">
+		<!--
+			Query Name : memberBase.deleteCertifiedLogNotMem
+			Description : 회원 인증 이력 삭제
+			Writer : 이지희
+			Date : 2021.02.08.
+ 		-->
+		DELETE FROM MEMBER_CERTIFIED_LOG
+		WHERE CTF_LOG_NO	= #{ctfLogNo}
+	</delete>
+	
+	<insert id="insertInactiveMember">
+		<!--
+			Query Name : memberBase.insertInactiveMember
+			Description : 휴면 회원 분리 보관 저장
+			Writer : 이지희
+			Date : 2021.02.04.
+ 		-->
+		INSERT INTO MEMBER_BASE_INACTIVE(
+									   MBR_NO
+								   ,   ST_ID
+								   ,   POLICY_NO
+								   ,   LOGIN_ID
+								   ,   MBR_NM
+								   ,   NICK_NM
+                                   ,   PET_LOG_URL
+                                   ,   RCOM_URL
+								   ,   MBR_GB_CD
+								   ,   MBR_STAT_CD
+								   ,   MBR_GRD_CD
+								   ,   BIRTH
+								   ,   GD_GB_CD
+								   ,   NTN_GB_CD
+								   ,   JOIN_DTM
+								   ,   MOD_DTM
+								   ,   JOIN_PATH_CD
+								   ,   JOIN_ENV_CD
+								   ,   CTF_YN
+								   ,   CI_CTF_VAL
+								   ,   DI_CTF_VAL
+								   ,   GSPT_NO
+								   ,   GSPT_USE_YN
+								   ,   GSPT_STATE_CD
+								   ,   GSPT_START_DTM
+								   ,   GSPT_STOP_DTM
+                                   ,   DEVICE_TOKEN
+                                   ,   INFO_RCV_YN
+                                   ,   MKNG_RCV_YN
+                                   ,   DFFC_MBR_YN
+                                   ,   PET_SCHL_YN
+								   , PSWD
+								   , PSWD_INIT_YN
+								   , PSWD_CHG_DTM
+								   , LOGIN_FAIL_CNT
+								   , LAST_LOGIN_DTM
+								   , PSWD_CHG_SCD_DTM
+								   , TEL
+								   , MOBILE
+								   , MOBILE_CD
+								   , EMAIL
+								   , RCOM_LOGIN_ID
+								   , MBR_LEV_RSN_CD
+								   , MBR_LEV_CONTENT
+								   , MBR_LEV_DTM
+								   , RE_JOIN_PSB_DT
+								   , DORMANT_APL_DTM
+                                   , DORMANT_RLS_DTM
+                                   , PET_LOG_ITRDC
+                                   , PRFL_IMG
+								   , MBR_STOP_DTM
+								   , SYS_REGR_NO
+								   , SYS_REG_DTM
+								   , SYS_UPDR_NO
+								   , SYS_UPD_DTM
+                                   , UPDR_IP
+						 )                                                                                                                      
+						 SELECT
+							   MBR_NO,   ST_ID,   POLICY_NO,   LOGIN_ID,   MBR_NM,   NICK_NM,   PET_LOG_URL,   RCOM_URL,   MBR_GB_CD
+							   ,   MBR_STAT_CD,   MBR_GRD_CD,   BIRTH,   GD_GB_CD,   NTN_GB_CD,   JOIN_DTM,   MOD_DTM,   JOIN_PATH_CD
+							   ,   JOIN_ENV_CD,   CTF_YN,   CI_CTF_VAL,   DI_CTF_VAL,   GSPT_NO,   GSPT_USE_YN,   GSPT_STATE_CD
+							   ,   GSPT_START_DTM,   GSPT_STOP_DTM,   DEVICE_TOKEN,   INFO_RCV_YN,   MKNG_RCV_YN,   DFFC_MBR_YN
+							   ,   PET_SCHL_YN, PSWD, PSWD_INIT_YN, PSWD_CHG_DTM, LOGIN_FAIL_CNT, LAST_LOGIN_DTM, PSWD_CHG_SCD_DTM
+							   , TEL, MOBILE, MOBILE_CD, EMAIL, RCOM_LOGIN_ID, MBR_LEV_RSN_CD, MBR_LEV_CONTENT, MBR_LEV_DTM, RE_JOIN_PSB_DT
+							   , DORMANT_APL_DTM, DORMANT_RLS_DTM, PET_LOG_ITRDC, PRFL_IMG, MBR_STOP_DTM, SYS_REGR_NO, SYS_REG_DTM, SYS_UPDR_NO, SYS_UPD_DTM, UPDR_IP
+					 FROM member_base
+					 WHERE MBR_NO = #{mbrNo}
+	</insert>
+	
+	<select id="listBeforePswd" resultType="java.lang.String">
+		<!--
+			Query Name : memberBase.listBeforePswd
+			Description : 비번 변경 시 그 전 비번과 비교 위해 조회
+			Writer : 이지희
+			Date : 2021.02.08.
+ 		-->
+		SELECT PSWD 
+		FROM MEMBER_PSWD_HIST  
+		WHERE MBR_NO= ${mbrNo}
+		ORDER BY SYS_REG_DTM DESC 
+		LIMIT 2
+	
+	</select>
+	
+	<update id="updateMemberBaseGspt">
+		<!--
+			Query Name : memberBase.updateMemberBaseGspt
+			Description : 회원 GSR연동 정보 업데이트
+			Writer : 이지희
+			Date : 2021.02.09.
+		-->
+		UPDATE 	member_base
+		SET 	 GSPT_NO = #{gsptNo}
+				,GSPT_USE_YN = #{gsptUseYn}
+		        ,GSPT_STATE_CD = #{gsptStateCd}
+		  		<if test="mbrGbCd != null and mbrGbCd != ''">
+					,MBR_GB_CD = #{mbrGbCd}
+				</if>
+				<if test="ctfYn != null and ctfYn != ''">
+					,CTF_YN = #{ctfYn}
+				</if>
+				<choose>
+					<when test="gsptNo != null and gsptNo != ''">
+						,GSPT_START_DTM = NOW()
+					</when>
+					<otherwise>
+						,GSPT_START_DTM = NULL
+					</otherwise>
+				</choose>
+		WHERE	MBR_NO = #{mbrNo}        
+	</update>
+
+	<select id="validateCheckMemberInfoWhenUpdate" resultType="java.util.Map">
+		<!--
+			Query Name : memberBase.validateCheckMemberInfoWhenUpdate
+			Description : 회원 정보 수정 시 - 중복 정보 확인
+			Writer : 김재윤
+			Date : 2021.02.22.
+		-->
+		SELECT
+		    	(
+		    	    SELECT COUNT(*)
+		    	    FROM MEMBER_BASE
+		    	    WHERE MBR_NO != #{mbrNo}
+		    	    <if test="ciCtfVal != null and ciCtfVal != ''">
+						AND CI_CTF_VAL != #{ciCtfVal}
+					</if>
+		    	    AND MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}' )
+		    	    AND TRIM(NICK_NM) = TRIM(#{nickNm}) ) AS NICK_NM_CNT
+			 ,	(
+			 		SELECT COUNT(*)
+					FROM MEMBER_BASE
+					WHERE MBR_NO != #{mbrNo}
+					<if test="ciCtfVal != null and ciCtfVal != ''">
+						AND CI_CTF_VAL != #{ciCtfVal}
+					</if>
+					AND MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}' )
+					AND EMAIL = #{email} ) AS EMAIL_CNT
+			<choose>
+			<when test="mobile  != null and mobile != ''">		
+			 ,	(
+			 		SELECT COUNT(*)
+					FROM MEMBER_BASE
+					WHERE MBR_NO != #{mbrNo}
+					<if test="ciCtfVal != null and ciCtfVal != ''">
+						AND CI_CTF_VAL != #{ciCtfVal}
+					</if>
+					AND MBR_STAT_CD NOT IN ( '${@framework.common.constants.CommonConstants@MBR_STAT_50}' )
+					AND MOBILE = #{mobile} ) AS MOBILE_CNT
+			</when>
+			<otherwise>
+				,0 AS MOBILE_CNT
+			</otherwise>
+			</choose>					
+		FROM DUAL
+	</select>
+	
+	<delete id="deleteSnsMemberInfo" parameterType="biz.app.login.model.SnsMemberInfoPO">
+		<!--
+			Query Name : memberBase.updateSnsMemberInfo
+			Description : sns 연동 해제
+			Writter : 김재윤
+		-->
+		  DELETE FROM SNS_MEMBER_INFO
+		  WHERE MBR_NO = #{mbrNo}
+		  <if test="snsLnkCd != null and snsLnkCd != ''">
+			  AND SNS_LNK_CD = #{snsLnkCd}
+		  </if>
+		  <if test="snsUuid != null and snsUuid != ''">
+			  AND SNS_UUID = #{snsUuid}
+		  </if>
+	</delete>
+
+	<insert id="upSertSnsMemberInfo" parameterType="biz.app.login.model.SnsMemberInfoPO">
+		INSERT INTO 	SNS_MEMBER_INFO
+		(
+				SNS_UUID
+			,	MBR_NO
+			,	EMAIL
+			,	TOKEN
+			,	SNS_LNK_CD
+			,	SNS_STAT_CD
+			,	SNS_JOIN_YN
+			,	SYS_REGR_NO
+			,	SYS_REG_DTM
+		)
+		VALUES
+		(
+				#{snsUuid}
+			, 	#{mbrNo}
+			, 	#{email}
+			, 	#{token}
+			, 	#{snsLnkCd}
+			, 	#{snsStatCd}
+			, 	#{snsJoinYn}
+			, 	#{mbrNo}
+			, 	NOW()
+		) ON DUPLICATE KEY UPDATE
+				MBR_NO = #{mbrNo}
+			,	EMAIL = #{email}
+			,	TOKEN = #{token}
+			,	SNS_LNK_CD = #{snsLnkCd}
+			,	SNS_STAT_CD = #{snsStatCd}
+			,	SNS_JOIN_YN = #{snsJoinYn}
+			,	SYS_REGR_NO = #{mbrNo}
+			,	SYS_REG_DTM = NOW()
+	</insert>
+	
+	
+	<select id="selectPetsbeMig"  resultType="biz.app.member.model.MemberBaseVO" > 
+		select mbr_no, login_id, mbr_nm, nick_nm, birth, tel, mobile, email from member_base_enc where mbr_no <![CDATA[ < ]]> 15026  order by mbr_no asc 
+	</select>
+	
+	<update id="updatePetsbeMig" parameterType="java.util.List"> 
+		<foreach collection="list" item="list" index="index"  separator=";" open="" close=""  > 
+		update member_base_enc
+		set 	 nick_nm = #{list.nickNm}
+		where mbr_no = #{list.mbrNo} 
+		</foreach>
+	</update>
+	
+	<update id="updateInfoRcvYn" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET
+			INFO_RCV_YN = #{infoRcvYn}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+			, UPDR_IP = #{updrIp}
+			, ALM_RCV_UPD_DTM = NOW()
+		WHERE	1=1
+			AND MBR_NO = #{mbrNo}
+	</update>
+	
+	<select id="isPswdForUpdate" resultType="java.lang.String"> 
+		<!--
+			Query Name : memberBase.selectPswdForUpdate
+			Description : 내정보 관리 > 비밀번호 존재 유무 확인
+			Writer : 이지희
+			Date : 2021.03.10.
+		-->
+		SELECT PSWD FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="getMemberBaseNickNmInJoin" resultType="java.lang.String">
+		SELECT GROUP_CONCAT(NICK_NM) AS NICK_NM
+		FROM MEMBER_BASE
+		WHERE MBR_NO != #{mbrNo} AND NICK_NM IS NOT NULL AND NICK_NM != ''
+		AND MBR_STAT_CD IN (    '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+							,   '${@framework.common.constants.CommonConstants@MBR_STAT_30}'
+							,   '${@framework.common.constants.CommonConstants@MBR_STAT_60}'
+							,   '${@framework.common.constants.CommonConstants@MBR_STAT_80}'
+			)
+	</select>
+
+	<update id="updateRcomUrl" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE
+		SET RCOM_URL = #{rcomUrl}
+		WHERE MBR_NO = #{mbrNo}
+	</update>
+	
+	<update id="updateMemberBaseTermsYn" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET 
+			<if test="mkngRcvYn != null and mkngRcvYn != ''">
+				MKNG_RCV_YN = #{mkngRcvYn}
+			</if> 
+			<if test="pstInfoAgrYn != null and pstInfoAgrYn != ''">
+				PST_INFO_AGR_YN = #{pstInfoAgrYn}
+			</if>
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+			, UPDR_IP = #{updrIp}
+			, MKNG_RCV_UPD_DTM = NOW()
+		WHERE	1=1
+			AND MBR_NO = #{mbrNo}
+	</update>
+	
+	<insert id="insertMemberMarketingAgreeHist" parameterType="biz.app.member.model.MemberBasePO">
+		<selectKey keyProperty="chgHistNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_MARKETING_AGREE_HISTORY_SEQ}') FROM DUAL
+	    </selectKey>
+		INSERT INTO MEMBER_MARKETING_AGREE_HIST
+		(
+			CHG_HIST_NO
+			, MBR_NO
+			, CHG_ACTR_CD
+			, MKNG_RCV_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		)
+		VALUES
+		(
+			#{chgHistNo}
+			, #{mbrNo}
+			, '${@framework.common.constants.CommonConstants@CHG_ACTR_MBR}'
+			, #{mkngRcvYn}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<select id="getMemberDeviceToken" resultType="String"> 
+		<!--
+			Query Name	: memberBase.getMemberDeviceToken
+			Description	: 로그인시 디바이스 토큰 조회
+			Writer		: 이지희
+			Date 		: 2021. 3. 31.
+		-->
+		SELECT 	DEVICE_TOKEN
+		FROM 	MEMBER_BASE
+		WHERE	MBR_NO=#{mbrNo}
+	</select>
+	
+	<select id="getTagCntMember" resultType="Integer">
+		SELECT COUNT(MT.TAG_NO) 
+		FROM MBR_TAG_MAP MT 
+		WHERE MBR_NO = #{mbrNo} 
+		GROUP BY MT.MBR_NO
+	</select>
+
+	<select id="getMemberBaseGsrRequiredParam" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT 	MBR_NO
+			 ,	MBR_NM
+			 ,	BIRTH
+			 ,	GD_GB_CD
+		FROM MEMBER_BASE
+		WHERE MBR_NO = #{mbrNo}
+	</select>
+
+	<select id="getSaveGsrMemberBaseInfoByGsptNo" resultType="biz.app.member.model.MemberBasePO">
+		SELECT 	MBR_NO
+			 ,	MBR_NM
+			 ,	BIRTH
+			 ,	GD_GB_CD
+			 , 	CI_CTF_VAL
+			 ,	MOBILE_CD
+			 ,	MOBILE
+		FROM MEMBER_BASE
+		WHERE GSPT_NO = #{gsptNo}
+		AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+	</select>
+
+	<select id="checkIsAlreadyCertification" resultType="biz.app.member.model.MemberBaseVO">
+		SELECT MBR_NO,LOGIN_ID,MBR_NM
+		FROM MEMBER_BASE
+		WHERE MBR_NO != #{mbrNo}
+		AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		AND CI_CTF_VAL = #{ciCtfVal} 
+		ORDER BY MBR_NO DESC
+		LIMIT 0 , 1
+	</select>
+	
+	<select id="getMemberBizInfo" resultType="biz.app.member.model.MemberBizInfoVO">
+		SELECT	MBR_NO
+				, BIZ_NO
+				, BIZ_ID
+				, BIZ_NM
+				, POST_NO_OLD
+				, POST_NO_NEW
+				, ROAD_ADDR
+				, ROAD_DTL_ADDR
+				, PRCL_ADDR
+				, PRCL_DTL_ADDR
+				, EMAIL
+				, PTN_DATE
+				, STAT_CD
+				, CEO_NM
+				, BIZ_LIC_NO
+				, BIZ_LIC_IMG_PATH
+				, BIZ_CDTS
+				, BIZ_TP
+				, DLGT_NO
+				, REL_POST_NO_OLD
+				, REL_POST_NO_NEW
+				, REL_ROAD_ADDR
+				, REL_ROAD_DTL_ADDR
+				, REL_PRCL_ADDR
+				, REL_PRCL_DTL_ADDR
+				, RE_POST_NO_OLD
+				, RE_POST_NO_NEW
+				, RE_ROAD_ADDR
+				, RE_ROAD_DTL_ADDR
+				, RE_PRCL_ADDR
+				, RE_PRCL_DTL_ADDR
+				, CHRG_PART
+				, CHRG_NM
+				, CHRG_TEL
+				, CHRG_MOBILE
+				, CHRG_EMAIL
+				, BANK_CD
+				, ACCT_NO
+				, OOA_NM
+				, MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM	MEMBER_BIZ_INFO
+		WHERE	MBR_NO = #{mbrNo}
+	</select>
+
+	<update id="emailUpdate" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET
+			EMAIL = #{email}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE	MBR_NO = #{mbrNo}
+	</update>
+
+	<update id="updateMemberBizInfo">
+		<!--
+			Query Name : memberBase.updateMemberBase
+			Description : 회원정보 수정
+		-->
+		UPDATE	member_base
+		SET		  SYS_UPDR_NO	= #{sysUpdrNo}
+				, SYS_UPD_DTM	= NOW()
+				, BIZ_NM			= #{bizNm}
+				, POST_NO_OLD			= #{postNoOld}
+				, POST_NO_NEW			= #{postNoNew}
+				, ROAD_ADDR			= #{roadAddr}
+				, ROAD_DTL_ADDR			= #{roadDtlAddr}
+				, PRCL_ADDR			= #{prclAddr}
+				, PRCL_DTL_ADDR			= #{prclDtlAddr}
+				, EMAIL			= #{email}
+				, PTN_DATE			= #{ptnDate}
+				, STAT_CD			= #{statCd}
+				, CEO_NM			= #{ceoNm}
+				, BIZ_LIC_NO			= #{bizLicNo}
+				, BIZ_LIC_IMG_PATH			= #{bizLicImgPath}
+				, BIZ_CDTS			= #{bizCdts}
+				, BIZ_TP			= #{bizTp}
+				, DLGT_NO			= #{dlgtNo}
+				, REL_POST_NO_OLD			= #{relPostNoOld}
+				, REL_POST_NO_NEW			= #{relPostNoNew}
+				, REL_ROAD_ADDR			= #{relRoadAddr}
+				, REL_ROAD_DTL_ADDR			= #{relRoadDtlAddr}
+				, REL_PRCL_ADDR			= #{relPrclAddr}
+				, REL_PRCL_DTL_ADDR			= #{relPrclDtlAddr}
+				, RE_POST_NO_OLD			= #{rePostNoOld}
+				, RE_POST_NO_NEW			= #{rePostNoNew}
+				, RE_ROAD_ADDR			= #{reRoadAddr}
+				, RE_ROAD_DTL_ADDR			= #{reRoadDtlAddr}
+				, RE_PRCL_ADDR			= #{rePrclAddr}
+				, RE_PRCL_DTL_ADDR			= #{rePrclDtlAddr}
+				, CHRG_PART			= #{chrgPart}
+				, CHRG_NM			= #{chrgNm}
+				, CHRG_TEL			= #{chrgTel}
+				, CHRG_MOBILE			= #{chrgMobile}
+				, CHRG_EMAIL			= #{chrgEmail}
+				, BANK_CD			= #{bankCd}
+				, ACCT_NO			= #{acctNo}
+				, OOA_NM			= #{ooaNm}
+				, MEMO			= #{memo}
+				, SYS_REGR_NO			= #{sysRegrNo}
+				, SYS_REG_DTM			= #{sysRegDtm}
+		WHERE	MBR_NO			= #{mbrNo}
+	</update>
+
+	<select id="checkInterlock" resultType="java.util.HashMap">
+		<!--
+            Query Name : memberBase.checkInterlock
+            Description : 회원 연동 여부
+        -->
+		SELECT /* QUERYID(memberBase.getMemberInterlockInfo) */
+					  MB.MBR_NO AS mbrNo
+					, SNS_UUID AS snsUuid
+					, INTLK_NO AS intlkNo
+					, STATUS AS status
+					, INTLK_ID as intlkId
+		FROM MEMBER_BASE MB
+		INNER JOIN
+			(
+				SELECT * FROM SNS_MEMBER_INFO
+				WHERE 1=1
+			<if test=" snsLnkCd != null and snsLnkCd != '' ">
+				AND SNS_LNK_CD = #{snsLnkCd}
+			</if>
+			<if test=" snsUuid != null and snsUuid != '' ">
+				AND SNS_UUID = #{snsUuid}
+			</if>
+			) SMI ON MB.MBR_NO = SMI.MBR_NO
+		LEFT OUTER JOIN
+			(
+				SELECT * FROM MEMBER_PRTN_INTLK
+				WHERE 1=1
+				<if test=" interlockMemberIdNo != null and interlockMemberIdNo != '' ">
+					AND INTLK_ID = #{interlockMemberIdNo}  -- Npay회원 번호
+				</if>
+				<if test=" ciCtfVal != null and ciCtfVal != '' ">
+					AND CI_CTF_VAL = #{ciCtfVal}  -- Npay회원 번호
+				</if>
+			) MPI ON MB.MBR_NO = MPI.MBR_NO
+		WHERE 1=1
+		<if test=" affiliateMemberIdNo != null and affiliateMemberIdNo != '' ">
+			AND MB.MBR_NO = #{affiliateMemberIdNo}
+		</if>
+		<if test=" ciCtfVal != null and ciCtfVal != '' ">
+			AND MB.CI_CTF_VAL = #{ciCtfVal}
+		</if>
+	</select>
+
+	<insert id="insertMemberPrtnIntlk" parameterType="framework.common.model.NaverApiVO">
+		<!--
+            Query Name : memberBase.insertMemberPrtnIntlk
+            Description : 회원 연동 저장
+        -->
+		INSERT INTO /* QUERYID(memberBase.insertMemberPrtnIntlk) */
+		    MEMBER_PRTN_INTLK (
+				PET_PRTN_CD, MBR_NO, STATUS, INTLK_ID, CI_CTF_VAL, SYS_REGR_NO, SYS_REG_DTM, SYS_UPDR_NO, SYS_UPD_DTM
+		) VALUES (
+				   #{petPrtnCd}
+				 , #{mbrNo}
+				 , #{status}
+				 , #{interlockMemberIdNo}
+				 , #{ciCtfVal}
+				 , #{mbrNo}
+				 , NOW()
+				 , #{mbrNo}
+				 , NOW()
+		)
+	</insert>
+
+	<update id="updateMemberPrtnIntlk" parameterType="framework.common.model.NaverApiVO">
+		/*
+			QUERYID(memberBase.updateMemberPrtnIntlk)
+			Description : 회원 연동 저장
+		   */
+		UPDATE MEMBER_PRTN_INTLK
+			SET PET_PRTN_CD = #{petPrtnCd}
+				,  MBR_NO = #{mbrNo}
+				,  STATUS = #{status}
+				,  INTLK_ID = #{interlockMemberIdNo}
+			    ,  CI_CTF_VAL = #{ciCtfVal}
+				,  SYS_UPDR_NO = #{mbrNo}
+				,  SYS_UPD_DTM = NOW()
+		WHERE INTLK_NO = #{intlkNo}
+	</update>
+
+	<delete id="deleteMemberPrtnIntlk" parameterType="framework.common.model.NaverApiVO">
+		<!--
+			Query Name : memberBase.deleteMemberPrtnIntlk
+			Description : 회원 연동 삭제
+		 -->
+		DELETE FROM MEMBER_PRTN_INTLK
+		WHERE INTLK_NO = #{intlkNo}
+	</delete>
+
+	<delete id="deleteInterlockSnsMemberInfo" parameterType="framework.common.model.NaverApiVO">
+		<!--
+			Query Name : memberBase.deleteInterlockSnsMemberInfo
+			Description : 회원 연동 삭제
+		 -->
+		DELETE FROM SNS_MEMBER_INFO
+		WHERE SNS_UUID = #{snsUuid}
+	    AND MBR_NO = #{mbrNo}
+	</delete>
+
+	<select id="listPetBaseByPartnerByMap" resultType="java.util.LinkedHashMap">
+		<!--
+            Query Name : memberBase.listPetBaseByPartner
+            Description : 반려 동물 조회
+        -->
+		SELECT
+				  PET_NO as petNo /*펫 번호*/
+				, PET_GB_CD as petGbCd /*펫 구분 코드*/
+				, FN_GET_CODE_NAME('PET_GB', A.PET_GB_CD, 'N') AS petGbCdNm /*펫 구분 명*/
+				, PET_NM as petNm /*펫 이름*/
+		FROM PET_BASE_PARTNER A
+		WHERE 1 = 1
+		<if test="mbrNo != null and mbrNo != 0">
+			AND MBR_NO = #{mbrNo}
+		</if>
+		ORDER BY SYS_REG_DTM DESC
+	</select>
+
+	<insert id="insertPetBasePartner" parameterType="biz.app.member.model.MemberPetVO" useGeneratedKeys="true" keyProperty="petNo">
+		<!--
+           Query Name   : memberBase.insertPetBasePartner
+        -->
+		INSERT INTO PET_BASE_PARTNER (
+				PARTNER_CD, MBR_NO, IMG_PATH, PET_GB_CD, PET_KIND_NM,
+				PET_NM, PET_GD_GB_CD, BIRTH, WEIGHT, ALLERGY_YN,
+				FIXING_YN, WRY_DA_YN, SYS_REGR_NO, SYS_REG_DTM, SYS_UPDR_NO, SYS_UPD_DTM
+		)
+		VALUES (
+						  #{partnerCd}
+						, #{mbrNo}
+						, #{imageUrl}
+						, #{type}
+						, #{breedName}
+						, #{name}
+						, #{gender}
+						, #{birthday}
+						, #{weight}
+						, #{allergyYn}
+						, #{fixingYn}
+						, #{wryDaYn}
+						, #{mbrNo}
+						, now()
+						, #{mbrNo}
+						, now()
+		)
+		<selectKey keyProperty="petNo" resultType="java.lang.Long" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<insert id="insertPetDaPartner" parameterType="biz.app.member.model.MemberPetSubVO">
+		<!--
+           Query Name   : memberBase.insertPetDaPartner
+        -->
+		INSERT INTO PET_DA_PARTNER (
+				  PET_NO, DA_GB_CD, DA_CD, DA_CD_NM, SYS_REGR_NO, SYS_REG_DTM, SYS_UPDR_NO, SYS_UPD_DTM
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			  #{item.petNo}
+			, #{item.daGbCd}
+			, #{item.daCd}
+			, #{item.daCdNm}
+			, #{item.sysRegrNo}
+			, NOW()
+			, #{item.sysRegrNo}
+			, NOW()
+			)
+		</foreach>
+	</insert>
+
+    <select id="getMemberPetHasCnt" resultType="java.lang.Integer">
+        <!--
+            Query Name : memberBase.getMemberPetHasCnt
+        -->
+		SELECT COUNT(*) FROM PET_BASE WHERE MBR_NO = #{mbrNo}
+    </select>
+
+</mapper>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<style>/* 아코디언 UI */
+
+	</style>
+	<div class="option-detail">
+		<div class="top-chk">
+			<label class="checkbox"><input type="checkbox"><span class="txt">품절 제외</span></label>
+		</div>
+		<div class="option-item">
+			<!-- 옵션 선택  -->
+			<ul class="uiAccd" data-accd="tog">
+				<li class="open">
+					<div class="hBox"><span class="tit">옵션을 선택해 주세요</span> <button type="button" class="btnTog">버튼</button></div>
+					<div class="cBox">
+						<p class="txt">HOTHALO 스몰브리드 연어&흰살생선 300g 10개 묶음 (+10,000)</p>
+						<p class="price">40,000원</p>
+					</div>
+					<div class="cBox disabled">
+						<p class="txt">HOTHALO 스몰브리드 연어&흰살생선 300g 10개 묶음 (+10,000)</p>
+						<button class="btn round">입고알림</button>
+					</div>
+					<div class="cBox">
+						<p class="txt">HOTHALO 스몰브리드 연어&흰살생선 300g 10개 묶음 (+10,000)</p>
+						<p class="price">40,000원</p>
+					</div>
+				</li>
+			</ul>
+			<!-- // 옵션 선택  -->
+			<!-- 수량 선택  -->
+			<div class="untcart">
+				<button type="button" class="bt del">삭제</button>
+				<p class="tit">HOTHALO 스몰브리드 연어&흰살생선 300g 10개 묶음 (+10,000)</p>
+				<div class="box">
+					<div class="amount">
+						<div class="uispiner">
+							<input type="text" value="1" class="amt" disabled="">
+							<button type="button" class="bt minus">수량더하기</button>
+							<button type="button" class="bt plus">수량빼기</button>
+						</div>
+						<div class="prcs">
+							<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="untcart">
+				<button type="button" class="bt del">삭제</button>
+				<p class="tit">HOTHALO 스몰브리드 연어&흰살생선 300g 10개 묶음 (+10,000)</p>
+				<div class="box">
+					<div class="amount">
+						<div class="uispiner">
+							<input type="text" value="1" class="amt" disabled="">
+							<button type="button" class="bt minus">수량더하기</button>
+							<button type="button" class="bt plus">수량빼기</button>
+						</div>
+						<div class="prcs">
+							<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- // 수량 선택  -->
+			<!-- 옵션 선택  -->
+			<ul class="uiAccd" data-accd="tog">
+				<li class="open">
+					<div class="hBox"><span class="tit disabled">옵션을 선택해 주세요</span> <button type="button" class="btnTog">버튼</button></div>
+				</li>
+			</ul>
+			<!-- // 옵션 선택  -->
+		</div>
+		<!-- 토탈 합계 -->
+		<div class="quantity-area">
+			<div class="total">총 수량 <strong>0개</strong></div>
+			<div class="quantity">
+				<strong class="total-txt">합계</strong>
+				<span class="price">
+					<em class="p">32,500원</em>
+				</span>
+			</div>
+		</div>	
+		<!-- // 토탈 합계 -->
+	</div>
+
+</body>
+</html>

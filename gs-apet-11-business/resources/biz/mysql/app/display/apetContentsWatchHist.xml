@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="apetContentsWatchHist">
+	<select id="getContentWatchHist" resultType="biz.app.pettv.model.ApetContentsWatchHistVO">
+	SELECT
+		AC.VD_ID
+		, AAF.FL_NO
+		, AAF.SEQ
+		, AAF.CONTS_TP_CD
+		, AAF.PHY_PATH
+		, AAF.ORG_FL_NM
+		, AAF.FL_SZ
+		, AAF.VD_LNTH AS TOTAL_LNTH
+        , ACWH.VD_LNTH AS HIST_LNTH
+		, AAF.OUTSIDE_VD_ID
+		, AC.TTL
+		, AC.VD_GB_CD
+		, AC.SRIS_NO
+		, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+		, ACWH.SYS_UPD_DTM
+	FROM APET_ATTACH_FILE AAF 
+	INNER JOIN APET_CONTENTS AC ON(AAF.FL_NO = AC.FL_NO)
+	INNER JOIN APET_CONTENTS_WATCH_HIST ACWH ON(ACWH.VD_ID = AC.VD_ID)
+	INNER JOIN MEMBER_BASE MB ON(MB.MBR_NO = ACWH.MBR_NO)
+	JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO AND SRIS.DISP_YN = 'Y')
+	JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SRIS.SRIS_NO = SESN.SRIS_NO AND SESN.DISP_YN = 'Y')
+	WHERE 1 = 1
+	AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+	AND AC.DISP_YN = 'Y'
+	<if test="mbrNo != null and mbrNo != null">
+	AND	MB.MBR_NO = #{mbrNo}
+	</if>
+	ORDER BY SYS_UPD_DTM DESC
+	</select>
+	
+</mapper>

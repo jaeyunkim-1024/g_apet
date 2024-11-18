@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.pc.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<!-- 팝업윈도우 A .popLayer.win-->
+	<article class="popLayer win a popDeliMod">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">배송지입력</h1>
+					<!-- <button type="button" class="btnPopClose" onclick="window.self.close();">닫기</button> -->
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="uidelivsets">
+						<ul class="list">
+							<li class="name">
+								<div class="hdt">배송지 명칭</div>
+								<div class="cdt">
+									<div class="input del"><input type="text" placeholder="배송지 명칭을 입력하세요" title="배송지"></div>
+								</div>
+							</li>
+							<li class="user">
+								<div class="hdt">받는 사람</div>
+								<div class="cdt">
+									<div class="input del"><input type="text" placeholder="이름을 입력하세요" title="배송지"></div>
+								</div>
+							</li>
+							<li class="phone">
+								<div class="hdt">휴대폰번호</div>
+								<div class="cdt">
+									<div class="input del"><input type="text" placeholder="'–' 빼고 숫자만 입력해주세요" title="배송지"></div>
+								</div>
+							</li>
+							<li class="adrs">
+								<div class="hdt">주소</div>
+								<div class="cdt">
+									<div class="uiadrset">
+										<div class="adrbox a1">
+											<div class="adr">주소를 검색해주세요.</div>
+											<a href="javascript:;" class="btAdr">주소검색</a>
+										</div>
+										<div class="adrbox a1">
+											<div class="adr on">[06141] 서울특별시 강남구 논현로 508 (역삼동, GS강남타워)</div>
+											<a href="javascript:;" class="btAdr">주소검색</a>
+										</div>
+										<div class="adrbox a2">
+											<span class="input"><input type="text" placeholder="상세주소를 입력하세요."></span>
+										</div>
+									</div>
+								</div>
+							</li>
+							<li class="dreq">
+								<div class="hdt">배송 요청사항</div>
+								<div class="cdt">
+									<div class="uiadrreq">
+										<div class="pwf">
+											<em class="t">문앞</em> <em class="p">공동현관 비밀번호 입력</em>
+											<div class="txt">벨 누르지말고 문 앞에 놔주세요~~~~</div>
+											<div class="btt"><a href="javascript:;" class="btn sm btMod">변경</a></div>
+										</div>
+										<div class="pss">
+											<a href="javascript:;" class="btn btPdPl ">상품 수령 장소를 선택해주세요.</a>
+										</div>
+									</div>
+									<div class="saves">
+										<div class="pp"><label class="checkbox"><input type="checkbox"><span class="txt"><em class="tt">기본 배송지로 등록</em></span></label></div>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="btnList bot">
+						<button type="button" class="btn lg d">취소</button>
+						<button type="button" class="btn lg a">등록</button>
+					</div>
+				</main>
+			</div>
+			
+		</div>
+	</article>
+</body>
+</html>

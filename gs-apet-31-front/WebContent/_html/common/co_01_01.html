@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Layout</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+    <link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+    <link rel="stylesheet" href="../../_css/style.mo.css">
+
+    <script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../../_script/jquery/jquery-ui.min.js"></script>
+    <script src="../../_script/swiper.min.js"></script>
+    <script src="../../_script/ui.js"></script>
+    <script src="../../_script/ui.mo.js"></script>
+    <script src="../../_html/guide/html.js"></script>
+    <!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+
+<body class="body">
+    <div class="wrap" id="wrap">
+
+        <!-- 헤더 MO-->
+        <include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set9","tit":"<b class=e>회원가입</b>"}'></include>
+
+        <!-- GNB -->
+        <include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+        <!-- 바디 - 여기위로 템플릿 -->
+        <main class="container page login srch agree" id="container">
+
+            <div class="inr">
+                <!-- 본문 -->
+                <div class="contents" id="contents">
+                    <!-- PC 타이틀 모바일에서 제거  -->
+                    <div class="pc-tit">
+                        <h2>회원가입</h2>
+                    </div>
+                    <!-- // PC 타이틀 모바일에서 제거  -->
+                    <div class="fake-wrap pt20">
+                        <div class="result mb10"><span class="blue">서비스이용 약관에 동의</span>해주세요.</div>
+                        <div class="chk-wrap">
+                            <dl>
+                                <dt class="allchk">
+									<label class="checkbox">
+										<input type="checkbox">
+										<span class="txt">약관 전체동의</span>
+									</label>
+								</dt>
+                                <dd>
+                                    <ul>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 서비스 이용약관 동의</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기" onclick="popServiceList()"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 개인정보처리방침 동의</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기" onClick="popInfoList()"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 만 14세 이상입니다.</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 제3자 정보제공 동의(네이버)</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 제3자 정보제공 동의(GS리테일)</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[선택] 문자(SMS) 마케팅 수신 동의</span>
+											</label>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[선택] 이메일 마케팅 수신 동의</span>
+											</label>
+                                        </li>
+                                    </ul>
+									<div class="warn-sp">
+										<p class="wmb-10">약관 전체동의는 필수 및 선택 정보에 대한 동의도 포함되어 있으며, 개별적으로 동의를 선택하실 수 있습니다.</p>
+                                        <p>* 필수항목에 대해서는 동의 거부시 회원가입이 어려우며, 선택항목에 대해서는 동의 거부 시에도 서비스 이용이 가능합니다.</p>
+
+									</div>
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt>네이버 서비스 이용약관</dt>
+                                <dd>
+                                    <ul>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 제3자 정보제공 동의(어바웃펫)</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt>GS포인트 이용약관</dt>
+                                <dd>
+                                    <ul>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 서비스 이용약관 동의</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 개인정보처리방침 동의</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                        <li>
+                                            <label class="checkbox">
+												<input type="checkbox">
+												<span class="txt">[필수] 제3자 정보제공 동의(어바웃펫)</span>
+											</label>
+                                            <a href="javascript:;" title="내용보기"></a>
+                                        </li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="pbt fixed">
+                            <!-- 버튼 활성화시 -->
+                            <div class="bts">
+                                <button type="button" class="btn xl a">가입하기</button>
+                            </div>
+
+                            <!-- 버튼 비활성화시 -->
+                            <div class="bts" style="display:none;">
+                                <button type="button" class="btn xl gray a" disabeld>가입하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="layers">
+            <article class="popLayer a" id="popServiceList">
+                <div class="pbd width562">
+                    <div class="phd">
+                        <div class="in">
+                            <h1 class="tit">이용약관</h1>
+                            <button type="button" class="btnPopClose">닫기</button>
+                        </div>
+                    </div>
+                    <div class="pct">
+                        <main class="poptents">
+                            <dl>
+                                <dt>제1조 (목적)</dt>
+                                <dd>본 약관은 주식회사 GS리테일이 제공하는 GS리테일(GS&POINT) 멤버십 서비스 및 팝카드 서비스를 회원들이 이용함에 있어 회사와 회원 간의 권리 의무 및 기타 필요한 사항 등을 규정하는데 그 목적이 있습니다. GS리테일의 사업 분야인 GS25, GS THE FRESH, 랄라블라 및 GS Fresh Mall, 달리살다 등(이하 "GS리테일")이 운영하는 아래 인터넷 웹사이트(이하 "사이트")
+                                    및 어플리케이션(이하 "앱")에서 제공하는 서비스도 포함합니다.</dd>
+                            </dl>
+                            <dl>
+                                <dt>제2조 (정의)</dt>
+                                <dd>
+                                    <ul>
+                                        <li>①"회원"이란 GS리테일에서 제공하는 서비스 이용을 위해 본 약관에 동의하고 GS리테일이 정한 방법과 절차에 따라 개인정보를 제공함으로서 서비스 이용 권한을 부여받은 자를 말합니다. 회원으로 가입하지 않은 "비회원" 혹은 본인인증이 완료되지 않은 "미인증 회원"은 회사가 제공하는 일부 서비스만 이용할 수 있습니다.</li>
+                                        <li>②"회원등급"이란 회사의 재화를 구매한 결과를 바탕으로 회사가 정한 기준에 따라 회사가 회원에게 부여하는 등급을 말합니다.</li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt>제3조 (기타등등)</dt>
+                                <dd>
+                                    <ul>
+                                        <li>①"회원"이란 GS리테일에서 제공하는 서비스 이용을 위해 본 약관에 동의하고 GS리테일이 정한 방법과 절차에 따라 개인정보를 제공함으로서 서비스 이용 권한을 부여받은 자를 말합니다. 회원으로 가입하지 않은 "비회원" 혹은 본인인증이 완료되지 않은 "미인증 회원"은 회사가 제공하는 일부 서비스만 이용할 수 있습니다.</li>
+                                        <li>②"회원등급"이란 회사의 재화를 구매한 결과를 바탕으로 회사가 정한 기준에 따라 회사가 회원에게 부여하는 등급을 말합니다.</li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                        </main>
+                    </div>
+                </div>
+            </article>
+
+            <article class="popLayer a" id="popInfoList">
+                <div class="pbd width562">
+                    <div class="phd">
+                        <div class="in">
+                            <h1 class="tit">개인정보처리방침</h1>
+                            <button type="button" class="btnPopClose">닫기</button>
+                        </div>
+                    </div>
+                    <div class="pct">
+                        <main class="poptents">
+                            <dl>
+                                <dt>1. 수집하는 개인정보 항목</dt>
+                                <dd>
+                                    <p>회사는 회원님의 개인정보 수집 시 개인의 식별을 위해 필요한 최소의 정보만을 수집하고 있습니다.</p>
+                                    <ul>
+                                        <li class="mt20">가. 수집 항목 :</li>
+                                        <li>1) 필수 입력사항 : 이름, 생년월일, 성별, 휴대전화번호, 웹 아이디, 웹 비밀번호, 이메일</li>
+                                        <li class="idx10">*어플리케이션의 푸시 수신 동의 및 철회는 각 어플리케이션에서 처리가 가능합니다.</li>
+                                        <li class="idx10">- 본인확인기관 인증 또는 아이핀으로 인증을 완료한 경우, 본인확인기관에서 제공하는 본인인증결과값(CI)을 수집함</li>
+
+                                        <li class="mt20">2) 선택 입력사항 : 주소(자택), 직장명/주소/부서명(POP카드 회원가입 시 미수집), 생일, 광고성 정보 수신 동의 여부(이메일/우편/SMS/전화, 단 POP카드는 이메일/SMS 동의여부 확인), 현금영수증번호(GS THE FRESH 결제 입력시) 등</li>
+
+                                        <li class="mt20">3) 서비스별 모바일 앱(APP) 이용 시 자동 수집사항 : 단말기 모델명/OS정보/사용 앱 버전/통신사(GS THE FRESH), Push Token/OS정보(랄라블라), User-Agent/Log-in</li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                        </main>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <!-- 바디 - 여기 밑으로 템플릿 -->
+
+        <!-- 하단메뉴 -->
+        <!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+        <!-- 푸터 -->
+        <!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+        <script>
+            //이용약관 레이어
+            var popServiceList = function() {
+                // 레이어팝업 열기 콜백
+                ui.popLayer.open('popServiceList', {
+                    ocb: function() {
+                        console.log("popServiceList 열림");
+                    },
+                    ccb: function() {
+                        console.log("popServiceList 닫힘");
+                    }
+                });
+            }
+
+            //개인정보처리방침 레이어
+            var popInfoList = function() {
+                // 레이어팝업 열기 콜백
+                ui.popLayer.open('popInfoList', {
+                    ocb: function() {
+                        console.log("popInfoList 열림");
+                    },
+                    ccb: function() {
+                        console.log("popInfoList 닫힘");
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+
+</html>

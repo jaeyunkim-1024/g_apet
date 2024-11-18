@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="orderMemoHist">
+
+	<insert id="insertOrderMemoHist" parameterType="biz.app.order.model.OrderMemoHistPO">
+		<!--
+			Query Name : orderMemoHist.insertOrderMemoHist
+			Description : 주문 메모 변경 이력 등록
+		-->
+		INSERT INTO ORDER_MEMO_HIST 
+		(
+			ORD_NO			/* 주문 번호 */
+			, MEMO_SEQ			/* 메모 순번 */
+			, HIST_STRT_DTM		/* 이력 시작 일시 */
+			, MEMO_CONTENT		/* 메모 내용 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) 
+		SELECT
+					ORD_NO			/* 주문 번호 */
+					, MEMO_SEQ 	/* 메모 순번 */
+					, NOW()				/* 시스템 등록 일시 */
+					, MEMO_CONTENT	/* 메모 내용 */
+					, #{sysRegrNo}
+					, NOW()
+		FROM		ORDER_MEMO
+		WHERE	ORD_NO = #{ordNo}
+		AND		MEMO_SEQ = #{memoSeq}
+	</insert>
+			
+</mapper>

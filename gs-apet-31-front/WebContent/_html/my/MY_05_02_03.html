@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			setTimeout(function(){
+				/* pc일 경우 스와이퍼처리 */
+				var check = ($("link[href *= 'style.pc.css']").length > 0)?true:false;
+				if(check){
+					// Swiper 상품
+					var swiperFit = new Swiper('.scroll-x .swiper-container', {
+						slidesPerView: 3,
+						spaceBetween: 18, 
+						navigation: {
+							nextEl: '.scroll-x .swiper-button-next',
+							prevEl: '.scroll-x .swiper-button-prev',
+						}
+					});
+				};
+			},1000);
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set21","tit":""}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop my" id="container">
+			<div class="inr">			
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- <div class="pc-tit">
+						<h2></h2>
+					</div> -->
+					<div class="exchange-area pc-reposition success2">
+						<div class="complete t2 pd i2"><!-- i1 : 취소 //i2 : 반품  //i3 : 교환 // -->
+							<span>주문 취소</span>가 완료되었습니다.
+						</div>
+					</div>
+					
+					<div class="exchange-area pc-reposition">
+						<div class="item-box pc-reposition">
+							<p class="tit">예상 환불 금액</p>
+							<div class="price-area">
+								<!-- <div class="gray-box">
+									<div class="list">
+										<ul>
+											<li>
+												<p class="txt1">환불 금액</p>
+												<p class="txt2">50,000원</p>
+											</li>
+											<li>
+												<p class="txt1">환불 포인트</p>
+												<p class="txt2">2,500P</p>
+											</li>
+										</ul>
+									</div>
+								</div> -->
+								<!--  APET-1258 210803 lju02 -->
+								<ul class="addPoint delivery">
+									<li class="ttl"><span>환불 금액</span>	<span class="savePoint">60,000원</span></li>
+									<li><span>신용카드 환불</span>			<span class="savePoint">57,500원</span></li>
+									<li><span>GS&POINT 환불</span>			<span class="savePoint">2,000P</span></li>
+									<li><span>우주코인 환불</span>				<span class="savePoint">500C</span></li><!-- 21.08.10 APET-1258 lcm01 -->
+								</ul>
+								<!--  //APET-1258 210803 lju02 -->
+							</div>
+						</div>
+						<div class="item-box  pc-reposition">
+							<p class="tit">수거지</p>
+							<div class="sub-tit">
+								우리집
+							</div>
+							<p class="txt-t1 pc-resize-tit">[01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우</p>
+							<p class="txt-t2 pc-resize-tit">박이슬 / 010-1234-1234</p>
+						</div>
+						<div class="item-box pc-reposition">
+							<p class="tit pc-m0">환불계좌</p>
+							<p class="order-text"><strong> 홍길동</strong>국민은행(1234567890)</p>
+							<div class="info-txt pc-reposition">
+								<ul>
+									<li>반품은 상품 수거 후 상품 이상 유무를 확인한 뒤 주문 시 결제 수 단으로 환불됩니다.</li>
+									<li>가상계좌 결제의 경우 입력하신 환불 계좌로 환불 됩니다.</li>
+									<li>판매자 과실 사유로 인한 교환/반품은 비용 발생 없이 처리됩니다. </li>
+									<li>판매자 과실 사유로 인한 교환/반품 신청 후 상품에 이상이 없을 경우 반송 처리 될 수 있으며, 배송비를 입금해주셔야 합니다.</li>
+									<li>사은품이 있을 경우 같이 반송해야하며 사은품 누락 시 교환/반품이 불가할 수 있습니다.</li>
+								</ul>
+							</div>
+						</div>
+						<div class="btnSet space pc-reposition">
+							<a href="javascript:;" class="btn lg d">취소/반품/교환 목록</a><!-- 03.08 수정 -->
+							<a href="javascript:;" class="btn lg b">계속 쇼핑하기</a>
+						</div>
+					</div>
+					
+					<div class="exchange-area pc-reposition pc-padding-top50">
+						<div class="cart-add pc-reposition">
+							<p class="tit">
+								상품을 다시 장바구니에 <br>
+								담으시겠어요?
+							</p>
+							<div class="scroll-x">
+								<div class="scroll swiper-container">
+									<ul class="scroll-list swiper-wrapper">
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+										<li class="swiper-slide">
+											<div class="cart">
+												<div class="pic">
+													<img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img">
+												</div>
+												<div class="name">
+													<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+													<div class="stt">2개 / 옵션명</div>
+													<div class="price">
+														<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+													</div>
+													<a href="javascript:;" class="btn sm icon2">담기</a>
+												</div>
+											</div>
+										</li>
+									</ul>
+									<div class="swiper-pagination"></div>
+								</div>
+								<div class="remote-area">
+									<button class="swiper-button-next" type="button"></button>
+									<button class="swiper-button-prev" type="button"></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+
+		</script>
+	</div>
+</body>
+</html>

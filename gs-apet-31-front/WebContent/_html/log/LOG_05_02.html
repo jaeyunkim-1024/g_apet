@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		var swiperBox = new Array();
+		$(function(){
+			/* 스와이퍼 */
+			$(".swiper-container.logMain").each(function(i,n){
+				swiperBox.push(new Swiper(".swiper-container.logMain", {
+					spaceBetween:0,
+					navigation: {
+					nextEl: '.swiper-container.logMain .swiper-button-next',
+					prevEl: '.swiper-container.logMain .swiper-button-prev',
+					},
+					pagination: {
+						el: '.swiper-container.logMain .swiper-pagination',
+						type: 'fraction',
+					}
+				}));
+			});
+			/* content 글 open close */
+			$(".iconOm_arr").click(function(){
+				$(this).parents(".lcbConTxt").toggleClass("active")
+			});
+			/* 댓글 오픈 */
+			ui.commentBox.open(".commentBoxAp.logpet");
+			/* // 2021.03.11 : 만들기영역 swiper 추가 */
+			var tagSwiper = new Swiper('.tag .swiper-container', {
+                slidesPerView: "auto",
+				watchOverflow:true,
+				freeMode: true,
+			});
+			/* 2021.03.11 : 만들기영역 swiper 추가 */
+			/* window scroll 이동 */
+			move_scroll(1)
+		});
+			function move_scroll(n){
+				var $box = $(".logContentBox");
+				var arr = new Array();
+				$box.each(function(i,n){
+					arr[i] = $(n).offset().top;
+				});
+				$("body,html").animate({"scrollTop":(arr[n] - 5)},300);
+				console.log(arr[n])
+			}
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set6","tit":"<b class=e>#강아지</b>"}' data-btn-rname="팔로우" ></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page logmain" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log main" id="contents">
+					<!-- 로그 리스트뷰 탑 -->
+					<section class="log_listviewTop">
+						<h1><a href="javascript:;">#멍스타그램</a></h1>
+						<div class="logView_rightBt p2">
+							<button class="btn a r0">팔로우</button>
+						</div>
+					</section>
+					<!-- // 로그 리스트뷰 탑 -->
+					<!-- // progress -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- 펫로그 메인 콘턴츠 area -->
+					<section class="logContentBox">
+						<!-- user content -->
+						<div class="lcbConTxt">
+							<!-- userInfo -->
+							<div class="userInfo mt14">
+								<div class="pic"><img src="../../_images/_temp/temp_logDogImg01.png" alt="dog"></div>
+								<div class="con">
+									<div class="txt">
+										<span class="nickname">샤니사랑</span>
+										<span class="dotIcon2x2 onWeb_ib"></span>
+										<span class="location">강남파이낸스센터</span>
+										<span class="dotIcon2x2"></span>
+										<span class="time">2시간전</span>
+									</div>
+								</div>
+								<!-- select box -->
+								<div class="menu dopMenuIcon" onclick="ui.popSel.open(this)">
+									<div class="popSelect r">
+										<input type="text" class="popSelInput">
+										<div class="popSelInnerWrap" style="height: 0px;">
+											<ul>
+												<li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- // select box -->
+							</div>
+							<!-- // userInfo -->
+							<!-- content txt -->
+						</div>
+						<!-- // user content -->
+						<!-- picture -->
+						<div class="lcbPicture">
+							<!-- div class="log_f_c_pop">90%일치</div -->
+							<button class="logBtnBasic28 icon_sound"></button>
+							<img src="../../_images/_temp/temp_logsImg01.png" alt="img01" class="tempImgSize" />
+						</div>
+						<!-- // picture -->
+						<!-- both -->
+						<div class="lcbWebRconBox">
+							<!-- menu bar -->
+							<div class="lcbmenuBar">
+								<div class="inner">
+									<ul class="bar-btn-area">
+										<li>
+											<button class="logBtnBasic btn-like">299</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-comment" onClick="ui.commentBox.open('.pop1')">13</button>
+										</li>
+										<li>
+											<button class="logBtnBasic btn-share"><span>공유</span></button>
+										</li>
+										<li class="ml20">
+											<button class="logBtnBasic btn-bookmark" onClick="ui.commentBox.open('.type01')"><span>북마크</span></button>
+										</li>
+									</ul>
+									<div class="log_connectTingWrap" onClick="ui.commentBox.open('.type01')"><!-- 2021.02.02 : onClick 이벤트 추가  -->
+										<buttron class="tvConnectedTing">연관상품</buttron>
+										<button class="btn_connectTing">
+											<span>4</span>
+											<img src="../../_images/tv/@temp01.jpg" alt="">
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- // menu bar -->
+							<!-- span class="iconOm_arr"></span -->
+							<div class="contxtWrap">
+								<div class="lcbConTxt_content">
+									오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+									앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+									로그 많이 올릴게여! 히히
+								</div>
+								<!-- more btn -->
+								<button class="btn_logMain_more">더보기</button>
+								<!-- // more btn -->
+							</div>
+							<!-- // content txt -->
+						</div>
+						<!-- // both -->
+					</section>
+					<!-- // 펫로그 메인 콘턴츠 area -->
+					<!-- both popup -->
+					<div class="commentBoxAp logpet" data-autoCloseUp="true" data-close="true" data-min="75px" data-max="180px" data-autoOpen="true" data-priceh="75px"><!-- data-priceh : 오픈 시 올라가는 높이 -->
+						<div class="head bnone">
+							<div class="con">
+								<div class="tit pic">
+									<span class="picWrap"><img src="../../_images/_temp/temp_logDogImg03.png" alt="dog"></span>오늘 하루는 어땠어요?
+								</div>
+							</div>
+						</div>
+						<div class="con">
+							<div class="box full">
+								<!-- content -->
+								<div class="filter-area t1">
+									<div class="filter-item">
+										<div class="tag">
+											<!-- 2021.03.11 : swiper 수정 -->
+											<!-- Slides -->
+											<div class="swiper-container">
+												<div class="swiper-wrapper">
+													<div class="swiper-slide"><button class="active none_click"> <span class="iconWrap20 iconPlus"></span> 만들기</button></div>
+													<div class="swiper-slide"><button>#힐링데이</button></div>
+													<div class="swiper-slide"><button>#산책</button></div>
+													<div class="swiper-slide"><button>#여행은즐거워</button></div>
+													<div class="swiper-slide"><button>#힐링데이</button></div>
+													<div class="swiper-slide"><button>#산책</button></div>
+													<div class="swiper-slide"><button>#여행은즐거워</button></div>
+													<div class="swiper-slide"><button>#힐링데이</button></div>
+													<div class="swiper-slide"><button>#산책</button></div>
+													<div class="swiper-slide"><button>#여행은즐거워</button></div>
+													<div class="swiper-slide"><button>#힐링데이</button></div>
+													<div class="swiper-slide"><button>#산책</button></div>
+													<div class="swiper-slide"><button>#여행은즐거워</button></div>
+													<div class="swiper-slide"><button>#힐링데이</button></div>
+													<div class="swiper-slide"><button>#산책</button></div>
+													<div class="swiper-slide"><button>#여행은즐거워</button></div>
+												</div>
+											</div>
+											<!-- // Slides -->
+											<!-- // 2021.03.11 : swiper 수정 -->
+										</div>
+									</div>
+								</div>
+								<!-- // content -->
+							</div>
+						</div>
+					</div>
+					<!-- // both popup -->
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+        <include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"hide","talk_mo":"hide","foot_pc":"","talk_pc":"","zindex":10}'></include>
+	</div>
+</body>
+</html>

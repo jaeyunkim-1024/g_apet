@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userBatch">
+
+	 <select id="listUserStatForUnUsed" resultType="biz.app.system.model.UserBaseVO">
+	 	<!--
+			Query Name	: userBatch.listUserStatForUnUsed
+			Description	: 로그인한지 30일 경과한 사용자 리스트
+			Writer		: 조은지
+			Date 		: 2021. 5. 3.
+		-->
+	 	SELECT	USR_NO
+	 	FROM	USER_BASE
+	 	WHERE	<![CDATA[ DATE_ADD(LAST_LOGIN_DTM, INTERVAL #{validDayForBatch} DAY) < NOW() ]]>
+	 		AND	LOGIN_ID != 'admin'
+	 </select>
+	 
+	 <update id="updateUserStatForUnUsed" parameterType="biz.app.system.model.UserBasePO">
+	 	<!--
+			Query Name	: userBatch.updateUserStatForUnUsed
+			Description	: 로그인한지 30일 경과한 사용자 상태 업데이트
+			Writer		: 조은지
+			Date 		: 2021. 5. 3.
+		-->
+		UPDATE USER_BASE SET
+			USR_STAT_CD = '${@framework.common.constants.CommonConstants@USR_STAT_40}'
+			, SYS_UPDR_NO = ${@framework.common.constants.CommonConstants@COMMON_BATCH_USR_NO}
+			, SYS_UPD_DTM = NOW()
+		WHERE USR_NO IN
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.usrNo}
+		</foreach>
+	 </update>
+</mapper>

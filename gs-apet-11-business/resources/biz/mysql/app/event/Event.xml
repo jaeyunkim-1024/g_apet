@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	이벤트
+	작성자  	phy
+	작성일자  	2016.03.08
+-->
+
+<mapper namespace="event">
+
+	<!-- ///////////////////////////////////////////////////////////////////
+	- Front
+	////////////////////////////////////////////////////////////////////// -->
+
+	<!-- 이벤트 리스트 -->
+	<select id="pageEvent" resultType="biz.app.event.model.EventBaseVO">
+		SELECT	EVENT_NO		/* 이벤트 번호 */
+				,EVENT_GB_CD	/* 이벤트 구분 코드 */
+				,TTL			/* 제목 */
+				,CONTENT		/* 내용 */
+				,DLGT_IMG_PATH	/* 대표 이미지 경로 */
+				,APL_STRT_DTM	/* 전시 시작 일시 */
+				,APL_END_DTM	/* 전시 종료 일시 */
+				,SYS_REGR_NO	/* 시스템 등록자 번호 */
+				,SYS_REG_DTM	/* 시스템 등록 일시 */
+				,SYS_UPDR_NO	/* 시스템 수정자 번호 */
+				,SYS_UPD_DTM	/* 시스템 수정 일시 */
+		FROM	EVENT_BASE
+		WHERE	1=1
+		<include refid="pageEventCondition" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 이벤트 목록 : 데이터 수-->
+	<select id="pageEventCount" resultType="Integer">
+		SELECT  COUNT(*)
+		FROM	EVENT_BASE
+		WHERE   1=1
+		<include refid="pageEventCondition" />
+	</select>
+
+	<!-- 이벤트 목록 : 조건절 -->
+	<sql id="pageEventCondition">
+ 		AND NOW() <![CDATA[ >= ]]> DISP_STRT_DTM
+ 		AND EVENT_GB_CD <![CDATA[ <> ]]> '${@framework.common.constants.CommonConstants@EVENT_GB_40}'
+ 		<if test='stId != null and stId != ""'>
+ 		AND EVENT_NO IN (
+ 			SELECT APL_NO AS EVENT_NO
+			FROM ST_PRMT_MAP
+			WHERE
+				ST_ID = #{stId}
+				AND PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}'
+ 		)
+ 		</if>
+ 		<if test='eventGbCd != null and eventGbCd != ""'>
+		AND		EVENT_GB_CD = #{eventGbCd}
+		</if>
+		<if test="sysRegDtm != null">
+		AND		SYS_REG_DTM &gt; DATE_ADD(now(), INTERVAL -7 DAY)
+		</if>
+	</sql>
+
+	<!-- 기획전 리스트 -->
+	<select id="pageExhibition" resultType="biz.app.display.model.DisplayCategoryVO">
+		SELECT /* QUERYID(event.pageExhibition) */
+    		A.DISP_CLSF_NO
+    		, A.UP_DISP_CLSF_NO
+    		, A.DISP_CLSF_CD
+    		, A.DISP_CLSF_NM
+    		, A.DISP_STRTDT
+    		, A.DISP_ENDDT
+    		, A.DISP_CLSF_TITLE_IMG_PATH
+    		, B.BNR_IMG_NM
+			, B.BNR_IMG_PATH
+			, B.BNR_MOBILE_IMG_NM
+			, B.BNR_MOBILE_IMG_PATH
+			, B.DFT_BNR_YN
+    	FROM DISPLAY_CATEGORY A
+    	LEFT OUTER JOIN DISPLAY_BANNER B
+				ON A.DISP_CLSF_NO = B.DISP_CLSF_NO
+    	WHERE 1=1
+			<include refid="pageExhibitionCondition" />
+    		<include refid="bizCommon.sortSql" />
+    		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 기획전 리스트 : 데이터 수-->
+	<select id="pageExhibitionCount" resultType="Integer">
+		SELECT  COUNT(*)
+		FROM DISPLAY_CATEGORY A
+    	LEFT OUTER JOIN DISPLAY_BANNER B
+				ON A.DISP_CLSF_NO = B.DISP_CLSF_NO
+		WHERE   1=1
+		<include refid="pageExhibitionCondition" />
+	</select>
+
+	<!-- 기획전 목록 : 조건절 -->
+	<sql id="pageExhibitionCondition">
+		<if test='dispClsfNo !=  null'>
+		AND A.UP_DISP_CLSF_NO IN
+	           ( SELECT DISP_CLSF_NO
+	                FROM DISPLAY_CATEGORY DC
+	               WHERE 1=1
+	                     AND DC.ST_ID = #{stId}
+	                     AND DC.UP_DISP_CLSF_NO = #{dispClsfNo}
+	                     AND DC.DISP_YN = 'Y'
+	                     AND DC.DEL_YN = 'N'
+	           )
+		</if>
+		<if test='stId != null and stId != ""'>
+		AND A.ST_ID = #{stId}
+		</if>
+    	AND DATE_FORMAT(NOW(),'%Y%m%d') BETWEEN  DATE_FORMAT(A.DISP_STRTDT,'%Y%m%d') AND DATE_FORMAT(A.DISP_ENDDT,'%Y%m%d')
+    	AND A.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+    	AND A.DISP_YN ='${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+	</sql>
+
+	<select id="getExhibitionDealGoodsOrg" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : Event.getExhibitionDealGoods
+			Description : 기획전 상품 목록 조회 (딜 상품  조회 hjko)
+		-->
+          SELECT /* QUERYID(Event.getExhibitionDealGoods) */
+          		RESULT.GOODS_ID,
+		    	RESULT.GOODS_NM,
+		    	CSTRT_GOODS_ID,
+		    	GOODS.BND_NO,
+			  	GOODS.SALE_STRT_DTM,
+			  	GOODS.PR_WDS_SHOW_YN,
+			  	GOODS.PR_WDS,
+			  	GOODS.SALE_END_DTM,
+			  	GOODS.GOODS_STAT_CD,
+			  	GOODS.PPLRT_RANK,
+			  	BRAND.BND_NM_KO,
+			  	(SELECT FN_GET_GOODS_SALE_AMT(RESULT.CSTRT_GOODS_ID)) AS SALE_AMT,
+			  	0 AS DC_AMT,
+			  	0 AS CP_NO,
+			  	0 AS CP_AMT,
+		    	CASE WHEN GOODS.FREE_DLVR_YN = 'Y'   THEN   'Y'
+					          WHEN (SELECT DLVRC_STD_CD  FROM DELIVERY_CHARGE_POLICY  WHERE DLVRC_PLC_NO = GOODS.DLVRC_PLC_NO) = '10'  THEN  'Y'
+				          ELSE  'N'
+				       END  AS FREE_DLVR_YN,
+				 '03' AS GOODS_TP_CD,
+				IMG_SEQ,
+				IMG_PATH,
+				RVS_IMG_PATH,
+		     	(SELECT COUNT(1)   FROM GOODS_COMMENT COMMENT  WHERE COMMENT.GOODS_ID = RESULT.CSTRT_GOODS_ID)  AS COMMENT_CNT,
+				'N' AS COUPON_YN,
+				'N' AS SOLDOUT_YN,
+				IF( DATE_FORMAT(NOW(), '%Y%M%D') BETWEEN DATE_FORMAT( GOODS.SALE_STRT_DTM,'%Y%M%D')  AND DATE_FORMAT(  DATE_ADD( GOODS.SALE_STRT_DTM, INTERVAL 30 DAY), '%Y%M%D') > 0, 'Y', 'N') AS NEW_YN,
+				'N' AS FREEBIE_YN ,
+		    	IFNULL(RESULT.DISP_PRIOR_RANK, 0) DISP_PRIOR_RANK
+		    <if test='mbrNo != null'>
+			, IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS MI WHERE GOODS.GOODS_ID = MI.GOODS_ID AND MI.MBR_NO = #{mbrNo}) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS INTEREST_YN
+			</if>
+			FROM
+			(
+			    SELECT
+			      	MRESULT.GOODS_ID AS GOODS_ID,
+			      	GOODS.GOODS_NM AS GOODS_NM,
+			      	CSTRT_GOODS_ID,
+			      	DISP_PRIOR_RANK
+			    FROM
+			    (
+				      SELECT TARGET.GOODS_ID, CSTRT_GOODS_ID, DG.DISP_PRIOR_RANK FROM
+				      (
+				        	SELECT S2.GOODS_ID, S2.CSTRT_GOODS_ID, FIND_IN_SET(S2.DISP_PRIOR_RANK,
+				        		(SELECT GROUP_CONCAT(DISP_PRIOR_RANK ORDER BY DISP_PRIOR_RANK ASC) FROM GOODS_CSTRT_INFO S1
+				        		WHERE S1.GOODS_ID=S2.GOODS_ID)
+				        		) AS RANK
+				        	FROM goods_cstrt_info S2 WHERE GOODS_CSTRT_GB_CD='10' ORDER BY GOODS_ID, DISP_PRIOR_RANK ASC
+				      ) TARGET , DISPLAY_GOODS DG
+				      WHERE TARGET.GOODS_ID=DG.GOODS_ID
+				      <if test='dispClsfNo !=  null'>
+			   		  AND DG.DISP_CLSF_NO = #{dispClsfNo}
+					</if>
+				      AND RANK=1
+			    ) MRESULT, GOODS_BASE GOODS
+		   		WHERE MRESULT.GOODS_ID = GOODS.GOODS_ID
+			) RESULT, GOODS_BASE GOODS, BRAND_BASE BRAND, GOODS_IMG IMG
+			WHERE BRAND.BND_NO = GOODS.BND_NO
+			AND RESULT.CSTRT_GOODS_ID = GOODS.GOODS_ID
+			AND IMG.GOODS_ID= RESULT.CSTRT_GOODS_ID
+			AND IMG.DLGT_YN='Y'
+			AND GOODS.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			AND GOODS.SHOW_YN = '${@framework.common.constants.CommonConstants@SHOW_YN_Y}'
+			AND now() BETWEEN GOODS.SALE_STRT_DTM AND GOODS.SALE_END_DTM
+		<if test="webMobileGbCds != null">
+			<foreach collection="webMobileGbCds" item="code" separator="," open="AND goods.WEB_MOBILE_GB_CD IN (" close=")">
+				#{code}
+			</foreach>
+		</if>
+    </select>
+
+	<select id="getExhibitionDealGoods" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : Event.getExhibitionDealGoods
+			Description : 기획전 상품 목록 조회 (딜 상품  조회 hjko)
+		-->
+          SELECT /* QUERYID(Event.getExhibitionDealGoods) */
+          		RESULT.GOODS_ID,
+		    	RESULT.GOODS_NM,
+		    	CSTRT_GOODS_ID,
+		    	GOODS.BND_NO,
+			  	GOODS.SALE_STRT_DTM,
+			  	GOODS.PR_WDS_SHOW_YN,
+			  	GOODS.PR_WDS,
+			  	GOODS.SALE_END_DTM,
+			  	GOODS.GOODS_STAT_CD,
+			  	GOODS.PPLRT_RANK,
+			  	BRAND.BND_NM_KO,
+			  	(SELECT FN_GET_GOODS_SALE_AMT(RESULT.CSTRT_GOODS_ID)) AS SALE_AMT,
+			  	0 AS DC_AMT,
+			  	0 AS CP_NO,
+			  	0 AS CP_AMT,
+		    	CASE WHEN GOODS.FREE_DLVR_YN = 'Y'   THEN   'Y'
+					          WHEN (SELECT DLVRC_STD_CD  FROM DELIVERY_CHARGE_POLICY  WHERE DLVRC_PLC_NO = GOODS.DLVRC_PLC_NO) = '10'  THEN  'Y'
+				          ELSE  'N'
+				       END  AS FREE_DLVR_YN,
+				 '03' AS GOODS_TP_CD,
+				IMG_SEQ,
+				IMG_PATH,
+				RVS_IMG_PATH,
+		     	(SELECT COUNT(1)   FROM GOODS_COMMENT COMMENT  WHERE COMMENT.GOODS_ID = RESULT.CSTRT_GOODS_ID)  AS COMMENT_CNT,
+				'N' AS COUPON_YN,
+				'N' AS SOLDOUT_YN,
+				IF( DATE_FORMAT(NOW(), '%Y%M%D') BETWEEN DATE_FORMAT( GOODS.SALE_STRT_DTM,'%Y%M%D')  AND DATE_FORMAT(  DATE_ADD( GOODS.SALE_STRT_DTM, INTERVAL 30 DAY), '%Y%M%D') > 0, 'Y', 'N') AS NEW_YN,
+				'N' AS FREEBIE_YN ,
+		    	RESULT.DISP_PRIOR_RANK
+		    <if test='mbrNo != null'>
+			, IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS MI WHERE GOODS.GOODS_ID = MI.GOODS_ID AND MI.MBR_NO = #{mbrNo}) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS INTEREST_YN
+			</if>
+			FROM
+			(
+			    SELECT
+			      	MRESULT.GOODS_ID AS GOODS_ID,
+			      	GOODS.GOODS_NM AS GOODS_NM,
+			      	CSTRT_GOODS_ID,
+			      	DISP_PRIOR_RANK
+			    FROM
+			    (
+				      SELECT
+				      	TARGET.GOODS_ID,
+				      	MIN(CSTRT_GOODS_ID) AS CSTRT_GOODS_ID
+				      FROM
+				      (
+				        	SELECT S2.GOODS_ID, S2.CSTRT_GOODS_ID, FIND_IN_SET(S2.DISP_PRIOR_RANK,
+				        		(SELECT GROUP_CONCAT(DISP_PRIOR_RANK ORDER BY DISP_PRIOR_RANK ASC) FROM GOODS_CSTRT_INFO S1
+				        		WHERE S1.GOODS_ID=S2.GOODS_ID)
+				        		) AS RANK
+				        	FROM goods_cstrt_info S2 WHERE GOODS_CSTRT_GB_CD='10' ORDER BY GOODS_ID, DISP_PRIOR_RANK ASC
+				      ) TARGET
+				      WHERE  RANK=1
+				      GROUP BY TARGET.GOODS_ID
+			    ) MRESULT, GOODS_BASE GOODS, DISPLAY_GOODS DG
+		   		WHERE 1=1
+		   			  AND MRESULT.GOODS_ID = GOODS.GOODS_ID
+		   		 	  AND DG.GOODS_ID = MRESULT.GOODS_ID
+		   		<if test='dispClsfNo !=  null'>
+			   		  AND DG.DISP_CLSF_NO = #{dispClsfNo}
+				</if>
+			) RESULT, GOODS_BASE GOODS, BRAND_BASE BRAND, GOODS_IMG IMG
+			WHERE BRAND.BND_NO = GOODS.BND_NO
+			AND RESULT.CSTRT_GOODS_ID = GOODS.GOODS_ID
+			AND IMG.GOODS_ID= RESULT.CSTRT_GOODS_ID
+			AND IMG.DLGT_YN='Y'
+			AND GOODS.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			AND GOODS.SHOW_YN = '${@framework.common.constants.CommonConstants@SHOW_YN_Y}'
+			AND now() BETWEEN GOODS.SALE_STRT_DTM AND GOODS.SALE_END_DTM
+		<if test="webMobileGbCds != null">
+			<foreach collection="webMobileGbCds" item="code" separator="," open="AND goods.WEB_MOBILE_GB_CD IN (" close=")">
+				#{code}
+			</foreach>
+		</if>
+    </select>
+	<select id="getExhibitionGoods" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : Event.getExhibitionGoods
+			Description : 기획전 상품 목록 조회
+		-->
+		SELECT /* QUERYID(Event.getExhibitionGoods) */
+			goods.GOODS_ID
+			, goods.GOODS_NM
+			, goods.BND_NO
+			, goods.SALE_STRT_DTM
+			, goods.PR_WDS_SHOW_YN
+			, goods.PR_WDS
+			, goods.SALE_END_DTM
+			, goods.GOODS_STAT_CD
+			, goods.PPLRT_RANK
+			, brand.BND_NM_KO
+			, IF(price.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20}', IFNULL(price.SALE_ORG_AMT,0), IFNULL(price.SALE_AMT,0)) AS SALE_AMT
+       		, IF(price.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20}', IFNULL(price.SALE_AMT,0), IFNULL(price.DC_AMT,0)) AS DC_AMT
+       		, price.CP_NO /*쿠폰번호 */
+       		 ,goods.GOODS_TP_CD
+       		, IFNULL(price.CP_AMT, 0) AS CP_AMT  /* 쿠폰 금액 */
+       		, CASE WHEN goods.FREE_DLVR_YN = 'Y' then 'Y'
+                 WHEN (SELECT DLVRC_STD_CD FROM DELIVERY_CHARGE_POLICY WHERE DLVRC_PLC_NO = goods.DLVRC_PLC_NO) = '10' THEN 'Y'
+       		       ELSE 'N'
+       		  END AS FREE_DLVR_YN		/* 무료 배송 여부 : 상품의 무료배송여부가 'Y' 또는 배송비정책의 배송비기준코드가 10일 경우 무료 배송 */
+			, img.IMG_SEQ
+			, img.IMG_PATH
+			, img.RVS_IMG_PATH
+			, (select count(1) from goods_comment comment where goods_id = dg.GOODS_ID) as COMMENT_CNT
+			, IF(price.CP_NO IS NOT NULL and price.CP_NO > 0, 'Y', 'N') AS coupon_yn
+			, IF(goods.GOODS_STAT_CD !=  '${@framework.common.constants.CommonConstants@GOODS_STAT_40}', 'Y', 'N') AS soldOut_yn
+			, IF(DATE_FORMAT(now(),'%Y%m%d') BETWEEN DATE_FORMAT(goods.SALE_STRT_DTM,'%Y%m%d') AND DATE_FORMAT(DATE_ADD(goods.SALE_STRT_DTM, INTERVAL 30 day), '%Y%m%d') > 0,'Y','N') AS new_yn
+			, IF(
+					(
+					SELECT COUNT(D.GOODS_ID)
+					FROM  promotion_base A
+					INNER JOIN promotion_freebie B
+					ON    A.PRMT_NO = B.PRMT_NO
+					INNER JOIN promotion_target C
+					ON    A.PRMT_NO = C.PRMT_NO
+					INNER JOIN goods_base D
+					ON    B.GOODS_ID = D.GOODS_ID
+					WHERE 1 = 1
+					AND   A.PRMT_KIND_CD = '${@framework.common.constants.CommonConstants@PRMT_KIND_20}'
+					AND   A.PRMT_STAT_CD = '${@framework.common.constants.CommonConstants@PRMT_STAT_20}'
+					AND   now() between A.APL_STRT_DTM AND A.APL_END_DTM
+					AND   D.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					AND   now() between D.SALE_STRT_DTM AND D.SALE_END_DTM
+					AND   C.GOODS_ID = dg.GOODS_ID
+					) > 0,'Y','N'
+			) AS freebie_yn,
+			IFNULL(DG.DISP_PRIOR_RANK, 0) DISP_PRIOR_RANK
+			<if test='mbrNo != null'>
+			, IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS MI WHERE GOODS.GOODS_ID = MI.GOODS_ID AND MI.MBR_NO = #{mbrNo}) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS INTEREST_YN
+			</if>
+		FROM  display_goods dg
+		LEFT OUTER JOIN goods_base goods 	ON dg.GOODS_ID = goods.GOODS_ID
+		LEFT OUTER JOIN (
+			SELECT
+				GOODS_ID
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) SALE_AMT
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) DC_AMT
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 4) AS UNSIGNED) CP_NO
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 5) AS UNSIGNED) CP_AMT
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 6) AS UNSIGNED) GOODS_AMT_TP_CD
+				, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) SALE_ORG_AMT
+			  FROM ( SELECT GOODS_ID, FN_GET_GOODS_PRICE(gb.GOODS_ID, #{stId}, #{webMobileGbCd}) GOODS_PRICE_INFO
+			           FROM goods_base gb ) price_str
+		) price ON dg.GOODS_ID = price.GOODS_ID
+		LEFT OUTER JOIN brand_base brand  ON goods.BND_NO = brand.BND_NO
+		LEFT OUTER JOIN goods_img img ON dg.GOODS_ID = img.GOODS_ID AND img.DLGT_YN = 'Y'
+		WHERE goods.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+		AND goods.SHOW_YN = '${@framework.common.constants.CommonConstants@SHOW_YN_Y}'
+		AND now() BETWEEN goods.SALE_STRT_DTM AND goods.SALE_END_DTM
+		<if test="webMobileGbCds != null">
+			<foreach collection="webMobileGbCds" item="code" separator="," open="AND goods.WEB_MOBILE_GB_CD IN (" close=")">
+				#{code}
+			</foreach>
+		</if>
+		<if test='dispClsfNo !=  null'>
+		AND dg.DISP_CLSF_NO = #{dispClsfNo}
+		</if>
+		<if test='upDispClsfNo !=  null'>
+		AND dg.DISP_CLSF_NO IN
+	           ( SELECT DISP_CLSF_NO
+	                FROM DISPLAY_CATEGORY DC
+	               WHERE 1=1
+	                     AND DC.ST_ID = 2
+	                     AND DC.UP_DISP_CLSF_NO = #{upDispClsfNo}
+	                     AND DC.DISP_YN = 'Y'
+	                     AND DC.DEL_YN = 'N'
+	           )
+		</if>
+		<if test='rows !=  null'>
+		LIMIT 0, #{rows}
+		</if>
+	</select>
+
+	<insert id="insertEventBase" parameterType="biz.app.event.model.EventBasePO" >
+		<selectKey keyProperty="eventNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_EVENT_BASE_SEQ}') FROM DUAL
+		</selectKey>
+		<!--
+			Query Name : event.updateGoodsBase
+			Description : 이벤트 등록
+			Writter : 김재윤
+		-->
+		INSERT INTO EVENT_BASE (
+			  EVENT_NO			/* 이벤트 번호 */
+			, SEO_INFO_NO		/* SEO 정보 번호 */
+			, TTL				/* 제목 */
+			, EVENT_SUB_NM		/* 이벤트 서브명 */
+			, EVENT_TP_CD		/* 이벤트 유형 코드 */
+			, EVENT_GB_CD		/* 이벤트 구분 코드 */
+			, EVENT_GB2_CD		/* 이벤트 구분2 코드 */
+			, EVENT_BNFTS		/* 이벤트 혜택 */
+			, EVENT_STAT_CD		/*  이벤트 상태 */
+			, EVENT_DSCRT		/* 이벤트 설명(=참고 사항) */
+			, DLGT_IMG_PATH		/* 대표 이미지 경로 */
+			, CONTENT			/* 내용 */
+			, APL_STRT_DTM		/* 이벤트 시작 일시 */
+			, APL_END_DTM		/* 이벤트 종료 일시 */
+			, APLY_USE_YN		/* 댓글 사용 여부 */
+			, WIN_DT			/* 당첨자 발표일 */
+			, CP_NO				/* 쿠폰 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{eventNo}			/* 이벤트 번호 */
+			, #{seoInfoNo}			/* SEO 정보 번호 */
+			, #{ttl}				/* 제목 */
+			, #{eventSubNm}			/* 이벤트 서브명 */
+			, #{eventTpCd}			/* 이벤트 유형 코드 */
+			, #{eventGbCd}			/* 이벤트 구분 코드 */
+			, #{eventGb2Cd}			/* 이벤트 구분2 코드 */
+			, #{eventBnfts}			/* 이벤트 혜택 */
+			, #{eventStatCd}		/* 이벤트 상태 */
+			, #{eventDscrt}			/* 이벤트 설명(=참고 사항) */
+			, #{dlgtImgPath}		/* 대표 이미지 경로 */
+			, #{content}			/* 내용 */
+			, #{aplStrtDtm}			/* 이벤트 시작 일시 */
+			, #{aplEndDtm}			/* 이벤트 종료 일시 */
+		    , #{aplyUseYn}			/* 댓글 사용 여부 */
+			, #{winDt}				/* 당첨자 발표일 */
+		    , #{cpNo}				/* 쿠폰 번호 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<insert id="insertEventEntry" parameterType="biz.app.event.model.EventBasePO">
+		<!--
+			Query Name : event.insertEventEntry
+			Description : 응모 이벤트 정보 등록
+			Writter : 김재윤
+		 -->
+		INSERT INTO EVENT_ENTRY(
+				EVENT_NO /* 이벤트 번호 */
+			, 	PC_IMG_PATH /* PC 이미지 경로 */
+			, 	MO_IMG_PATH /* MO 이미지 경로 */
+			, 	LOGIN_RQID_YN /* 로그인 여부 */
+			, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+			, 	SYS_REG_DTM /* 시스템 등록 일시*/
+			, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+		)
+		VALUES(
+				#{eventNo} /* 이벤트 번호 */
+			, 	#{pcImgPath} /* PC 이미지 경로 */
+			, 	#{moImgPath} /* MO 이미지 경로 */
+			, 	#{loginRqidYn} /* 로그인 여부 */
+			, 	#{sysRegrNo} /* 시스템 등록자 번호 */
+			, 	NOW() /* 시스템 등록 일시 */
+			, 	#{sysUpdrNo} /* 시스템 수정자 번호 */
+			, 	NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateEventEntry" parameterType="biz.app.event.model.EventBasePO">
+		<!--
+			Query Name : event.updateEventEntry
+			Description : 응모형 이벤트 수정
+			Writter : 김재윤
+		-->
+		UPDATE EVENT_ENTRY SET
+				PC_IMG_PATH = #{pcImgPath} /* PC 이미지 경로 */
+			, 	MO_IMG_PATH = #{moImgPath} /* MO 이미지 경로 */
+			, 	LOGIN_RQID_YN = #{loginRqidYn} /* 로그인 여부 */
+			, 	SYS_UPDR_NO = #{sysUpdrNo} /* 시스템 수정자 번호 */
+			, 	SYS_UPD_DTM = NOW() /* 시스템 수정 일시 */
+		WHERE EVENT_NO = #{eventNo}
+	</update>
+
+
+	<insert id="insertEventCollectItem"	parameterType="biz.app.event.model.EventCollectItemPO">
+		<selectKey keyProperty="itemNo" resultType="java.lang.Long"	order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_EVENT_COLLECT_ITEM_SEQ}')	FROM DUAL
+		</selectKey>
+		<!--
+			Query Name : event.insertEventCollectItem
+			Description : 이벤트 수집 항목 등록
+			Writter : 김재윤
+		-->
+		INSERT INTO EVENT_COLLECT_ITEM (
+		ITEM_NO /* 항목 번호 */
+		, 	EVENT_NO /* 이벤트 번호 */
+		, 	COLLECT_ITEM_CD /* 수집 항목 코드 */
+		, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+		, 	SYS_REG_DTM /* 시스템 등록 일시*/
+		, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+		, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+		)
+		VALUES (
+		#{itemNo} /* 항목 번호 */
+		, 	#{eventNo} /* 이벤트 번호 */
+		, 	#{collectItemCd} /* 수집 항목 코드 */
+		, 	#{sysRegrNo} /* 시스템 등록자 번호 */
+		, 	NOW() /* 시스템 등록 일시 */
+		, 	#{sysUpdrNo} /* 시스템 수정자 번호 */
+		, 	NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteEventCollectItem" parameterType="biz.app.event.model.EventCollectItemPO">
+		<!--
+			Query Name : event.deleteEventCollectItem
+			Description : 이벤트 수집 항목 삭제
+			Writter : 김재윤
+		-->
+		DELETE FROM EVENT_COLLECT_ITEM
+		WHERE EVENT_NO = #{eventNo}
+	</delete>
+
+	<insert id="insertEventQuestion" parameterType="biz.app.event.model.EventQuestionPO">
+		<selectKey keyProperty="qstNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_QUESTION_INFO}') FROM DUAL
+		</selectKey>
+		<!--
+			Query Name : event.insertEventQuestion
+			Description : 질문정보 등록
+			Writter : 김재윤
+		-->
+		INSERT INTO QUESTION_INFO(
+				QST_NO /* 문항 번호 */
+			, 	EVENT_NO /* 이벤트 번호 */
+			, 	QST_NM /* 문항 명 */
+			, 	QST_TP_CD /* 문항 타입 코드 */
+			, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+			, 	SYS_REG_DTM /* 시스템 등록 일시 */
+			, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+			)
+			VALUES(
+					#{qstNo} /* 문항 번호 */
+				, 	#{eventNo} /* 이벤트 번호 */
+				, 	#{qstNm} /* 문항 명 */
+				, 	#{qstTpCd} /* 문항 타입 코드 */
+				, 	#{sysRegrNo} /* 시스템 등록자 번호 */
+				, 	NOW() /* 시스템 등록 일시 */
+				, 	#{sysUpdrNo} /* 시스템 수정자 번호 */
+				, 	NOW() /* 시스템 수정 일시 */
+			)
+	</insert>
+
+	<delete id="deleteEventQuestion" parameterType="biz.app.event.model.EventQuestionPO">
+		<!--
+			Query Name : event.deleteEventQuestion
+			Description : 질문 정보 DELETE
+			Writter : 김재윤
+		-->
+		DELETE FROM QUESTION_INFO
+		WHERE EVENT_NO = #{eventNo}
+	</delete>
+
+	<insert id="insertEventAnswer" parameterType="biz.app.event.model.EventAnswerPO">
+		<selectKey keyProperty="rplNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_ANSWER_INFO}') FROM DUAL
+		</selectKey>
+		<!--
+			Query Name : event.insertAnswerInfo
+			Description : 답변 정보 등록
+			Writter : 김재윤
+		-->
+		INSERT INTO ANSWER_INFO(
+			RPL_NO /* 답변 번호 */
+			, 	QST_NO /* 문항 번호 */
+			, 	EVENT_NO /* 이벤트 번호 */
+			, 	RPL_CONTENT /* 답변 내용 */
+			, 	RGHTANS_YN /* 정답 여부 */
+			, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+			, 	SYS_REG_DTM /* 시스템 등록 일시 */
+			, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+		)
+		VALUES (
+				#{rplNo} /* 답변 번호 */
+			, 	#{qstNo} /* 문항 번호 */
+			, 	#{eventNo} /* 이벤트 번호 */
+			, 	#{rplContent} /* 답변 내용 */
+			, 	#{rghtansYn} /* 정답 여부 */
+			, 	#{sysRegrNo} /* 시스템 등록자 번호 */
+			, 	NOW() /* 시스템 등록 일시 */
+			,	#{sysUpdrNo} /* 시스템 수정자 번호 */
+			,	NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteEventAnswer" parameterType="biz.app.event.model.EventAnswerPO">
+		<!--
+			Query Name : event.deleteEventAnswer
+			Description : 답변 정보 DELETE
+			Writter : 김재윤
+		-->
+		DELETE FROM ANSWER_INFO
+		WHERE EVENT_NO = #{eventNo}
+	</delete>
+
+	<insert id="insertEventAddField" parameterType="biz.app.event.model.EventAddFieldPO">
+		<!--
+			Query Name : event.insertEventAddField
+			Description : 이벤트 추가 필드 등록
+			Writter : 김재윤
+		-->
+		<selectKey keyProperty="fldNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_EVENT_ADD_FIELD_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO EVENT_ADD_FIELD(
+			FLD_NO /* 필드 번호 */
+			, 	EVENT_NO /* 이벤트 번호 */
+			, 	FLD_GRP /* 필드 그룹 */
+			,	FLD_DSCRT /* 안내 문구 */
+			, 	FLD_TP_CD /* 필드 타입 코드 */
+			, 	FLD_NM /* 필드 명 */
+			, 	FLD_VAL /* 필드 값*/
+			, 	IMG_DSCRT /* 이미지 설명*/
+			, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+			, 	SYS_REG_DTM /* 시스템 등록 일시 */
+			, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+			, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+		)
+		VALUES(
+			#{fldNo} /* 필드 번호 */
+			, 	#{eventNo} /* 이벤트 번호 */
+			, 	#{fldGrp} /* 필드 그룹 */
+			,   #{fldDscrt} /* 안내 문구 */
+			, 	#{fldTpCd} /* 필드 타입 코드 */
+			, 	#{fldNm} /* 필드 명 */
+			, 	#{fldVal} /* 필드 값*/
+			, 	#{imgDscrt} /* 이미지 설명*/
+			, 	#{sysRegrNo} /* 시스템 등록자 번호 */
+			, 	NOW() /* 시스템 등록 일시 */
+			, 	#{sysUpdrNo} /* 시스템 수정자 번호 */
+			, 	NOW() /* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteEventAddField" parameterType="biz.app.event.model.EventAddFieldPO">
+		<!--
+			Query Name : event.deleteEventAddField
+			Description : 추가 필드 정보 삭제
+			Writter : 김재윤
+		-->
+		DELETE FROM EVENT_ADD_FIELD
+		WHERE EVENT_NO = #{eventNo}
+	</delete>
+
+
+	<update id="updateEventBase" parameterType="biz.app.event.model.EventBasePO" >
+		<!--
+			Query Name : event.updateEventBase
+			Description : 이벤트 수정
+			Writter : 김재윤
+		-->
+		UPDATE	EVENT_BASE SET
+					TTL				= #{ttl}				/* 제목 */
+		        ,	SEO_INFO_NO		= #{seoInfoNo}			/* SEO 정보 번호 */
+				,	EVENT_TP_CD		= #{eventTpCd}			/* 이벤트 유형 코드 */
+				, 	EVENT_GB_CD		= #{eventGbCd}			/* 이벤트 구분 코드 */
+				, 	EVENT_GB2_CD	= #{eventGb2Cd}			/* 이벤트 구분2 코드 */
+				, 	EVENT_STAT_CD 	= #{eventStatCd} 		/* 이벤트 상태 코드 */
+				, 	EVENT_DSCRT 	= #{eventDscrt}			/* 이벤트 참고 설명 */
+		        ,	APL_STRT_DTM	= #{aplStrtDtm}			/* 이벤트 시작 일시 */
+		        ,	APL_END_DTM		= #{aplEndDtm}			/* 이벤트 종료 일시 */
+				, 	DLGT_IMG_PATH   = #{dlgtImgPath}        /* 대표 이미지 경로 */
+				, 	EVENT_SUB_NM 	= #{eventSubNm} 		/* 이벤트 서브명 */
+				, 	EVENT_BNFTS 	= #{eventBnfts} 		/* 이벤트 혜택 */
+		        ,	APLY_USE_YN		= #{aplyUseYn}			/* 댓글 사용 여부 */
+		        ,	CP_NO			= #{cpNo}				/* 쿠폰 번호 */
+		        ,   WIN_DT			= #{winDt}				/* 당첨자 발표일 */
+				,	SYS_UPDR_NO		= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, 	SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				, 	CONTENT			= #{content}			/* 내용 */
+		WHERE	1 = 1
+		AND		EVENT_NO			= #{eventNo}
+	</update>
+
+	<insert id="insertStStdEventMap" parameterType="biz.app.st.model.StStdInfoPO">
+		<!--
+			Query Name : company.insertStStdEventMap
+			Description : 사이트와 이벤트 매핑 등록
+		-->
+		INSERT INTO ST_PRMT_MAP (
+			  ST_ID				/* 사이트 아이디 */
+			, APL_NO			/* 이벤트 번호 */
+			, PRMT_APL_GB_CD	/* 프로모션/쿠폰/이벤트 구본 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{eventNo}		/* 이벤트 번호 */
+			, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}' /* 프로모션/쿠폰/이벤트 구본 코드 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteStStdEventMap" parameterType="biz.app.event.model.EventBasePO">
+		<!--
+			Query Name : delete.deleteStStdEventMap
+			Description : 이벤트에 매핑된 사이트 정보를 모두 삭제
+		-->
+		DELETE FROM ST_PRMT_MAP
+		<choose>
+			<when test="eventNo != null and eventNo != ''">
+				WHERE APL_NO = #{eventNo}
+					AND PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}'
+			</when>
+			<otherwise>
+				WHERE 1 = 2
+			</otherwise>
+		</choose>
+	</delete>
+
+	<select id="getEventBase" resultType="biz.app.event.model.EventBaseVO" >
+		<!--
+			Query Name : event.getEventBase
+			Description : 이벤트 정보 조회
+		-->
+		SELECT	/* QUERYID(event.getEventBase) */
+				  E.EVENT_NO			/* 이벤트 번호 */
+				, E.SEO_INFO_NO		/* SEO 정보 번호 */
+				, E.TTL				/* 제목 */
+				, E.EVENT_SUB_NM		/* 이벤트 서브명 */
+				, E.EVENT_TP_CD		/* 이벤트 유형 코드 */
+				, E.EVENT_GB_CD		/* 이벤트 구분 코드 */
+				, E.EVENT_GB2_CD		/* 이벤트 구분2 코드 */
+				, E.EVENT_BNFTS		/* 이벤트 혜택 */
+				, E.EVENT_STAT_CD		/*  이벤트 상태 */
+				, E.EVENT_DSCRT		/* 이벤트 설명(=참고 사항) */
+				, E.DLGT_IMG_PATH		/* 대표 이미지 경로 */
+				, E.CONTENT			/* 내용 */
+				, E.APL_STRT_DTM		/* 이벤트 시작 일시 */
+				, E.APL_END_DTM		/* 이벤트 종료 일시 */
+				, DATE_FORMAT(E.WIN_DT, '%Y-%m-%d') AS WIN_DT		/* 당첨 일자 */
+		     	, E.APLY_USE_YN		/* 댓글 사용 여부 */
+		     	, E.CP_NO			/* 쿠폰 번호 */
+		    	, E.SEO_INFO_NO		/* SEO NO 번호 */
+				, E.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, E.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, E.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, E.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(E.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(E.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}' AS PRMT_APL_GB_CD
+				, IF(NOW() >= E.APL_END_DTM, '${@framework.common.constants.CommonConstants@COMM_YN_Y}', '${@framework.common.constants.CommonConstants@COMM_YN_N}') END_YN
+				, EE.PC_IMG_PATH /* PC 이미지 경로 */
+				, EE.MO_IMG_PATH /* MO 이미지 경로 */
+				, EE.LOGIN_RQID_YN /* 로그인 여부 */
+				, E.CP_NO 		/* 쿠폰 번호 */
+				, (SELECT CB.CP_NM FROM COUPON_BASE CB WHERE CB.CP_NO = E.CP_NO) AS CP_NM	/* 쿠폰 이름 */
+		FROM	EVENT_BASE E
+		LEFT JOIN EVENT_ENTRY EE ON E.EVENT_NO = EE.EVENT_NO
+		WHERE	1 = 1
+		AND		E.EVENT_NO		= #{eventNo}
+	</select>
+
+	<update id="updateEventDlgtImgPath">
+		UPDATE EVENT_BASE SET DLGT_IMG_PATH = #{dlgtImgPath} WHERE EVENT_NO = #{eventNo}
+	</update>
+
+	<!-- 이벤트 목록 리스트 -->
+	<select id="pageEventBase" resultType="biz.app.event.model.EventBaseVO">
+		SELECT	/* QUERYID(event.pageEventBase) */
+				  E.EVENT_NO		/* 이벤트 번호 */
+				, TTL				/* 제목 */
+				, EVENT_TP_CD		/* 이벤트 유형 코드 */
+				, EVENT_GB_CD		/* 이벤트 구분 코드 */
+				, EVENT_GB2_CD		/* 이벤트 구분2(타입) 코드 */
+				, EVENT_STAT_CD		/* 이벤트 상태 코드 */
+				, DLGT_IMG_PATH		/* 대표 이미지 경로 */
+				, CONTENT			/* 내용 */
+		     	, APL_STRT_DTM		/* 이벤트 시작 기간 */
+		     	, APL_END_DTM		/* 이벤트 종료 기간 */
+		     	, (SELECT COUNT(*) FROM EVENT_ENTRY_INFO EEI WHERE EEI.EVENT_NO = E.EVENT_NO) AS ENTRY_CNT	/* 참여자 수 */
+		     	,  ( SELECT IF(COUNT(*)>0,'${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}')
+					FROM EVENT_BASE E
+					WHERE EXISTS( SELECT 1 FROM EVENT_WIN_LIST EWL WHERE EWL.EVENT_NO = E.EVENT_NO ) ) AS WIN_RST_YN /*당첨자 발표*/
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}' AS PRMT_APL_GB_CD
+		FROM	EVENT_BASE E
+		WHERE	1 = 1
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.APL_NO AS EVENT_NO
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}') SM
+						WHERE E.EVENT_NO = SM.EVENT_NO)
+		</if>
+		<include refid="pageEventBaseCondition" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 이벤트 목록 : 데이터 수-->
+	<select id="pageEventBaseCount" resultType="Integer">
+		SELECT  COUNT(*)
+		FROM	EVENT_BASE E
+		WHERE   1=1
+		<if test="stId != null and stId != ''">
+			AND EXISTS (SELECT 1
+						FROM
+							(SELECT M.APL_NO AS EVENT_NO
+							FROM ST_STD_INFO S JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID
+							WHERE S.ST_ID = #{stId} AND M.PRMT_APL_GB_CD = '${@framework.common.constants.CommonConstants@PRMT_APL_GB_30}') SM
+						WHERE E.EVENT_NO = SM.EVENT_NO)
+		</if>
+		<include refid="pageEventBaseCondition" />
+	</select>
+
+	<!-- 이벤트 목록 : 조건절 -->
+	<sql id="pageEventBaseCondition">
+		<if test='ttl != null and ttl != ""'>
+			AND		TTL LIKE CONCAT( '%', #{ttl}, '%' )
+		</if>
+		<if test='eventGbCd != null and eventGbCd != ""'>
+			AND		EVENT_GB_CD = #{eventGbCd}
+		</if>
+		<if test='eventGb2Cd != null and eventGb2Cd != ""'>
+			AND		EVENT_GB2_CD = #{eventGb2Cd}
+		</if>
+		<if test='eventStatCd != null and eventStatCd != ""'>
+			AND		EVENT_STAT_CD = #{eventStatCd}
+		</if>
+		<!-- 등록 시작일, 등록 종료일 -->
+		<if test="strtDate != null and endDate != null">
+			AND SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+		</if>
+	</sql>
+
+	<!-- 결제 혜택 무이자 최근 등록 1건 조회 -->
+	<select id="getEventPayment" resultType="biz.app.event.model.EventBaseVO">
+		SELECT  EB.TTL
+				,EB.CONTENT
+		  FROM EVENT_BASE EB
+		 WHERE EB.EVENT_GB_CD = '${@framework.common.constants.CommonConstants@EVENT_GB_40}'
+		       AND NOW() BETWEEN APL_STRT_DTM AND APL_END_DTM
+		ORDER BY SYS_REG_DTM DESC LIMIT 0, 1
+	</select>
+
+
+	<select id="listEventAddField" resultType="biz.app.event.model.EventAddFieldVO">
+		<!--
+			Query Name : event.listEventAddField
+			Description : 이벤트 추가 필드 조회
+			Writter : 김재윤
+		-->
+		SELECT /* QUERYID(event.listEventAddField) */
+		FLD_NO /* 필드 번호 */
+		, 	EVENT_NO /* 이벤트 번호 */
+		, 	FLD_GRP /* 필드 그룹 */
+		, 	FLD_TP_CD /* 필드 타입 코드 */
+		, 	FLD_NM /* 필드 명 */
+		,	FLD_DSCRT	/* 필드 안내 문구 */
+		, 	GROUP_CONCAT(FLD_VAL) AS FLD_VAL  /* 필드 값*/
+		,   FLD_DSCRT
+		, 	IMG_DSCRT /* 이미지 설명*/
+		, 	SYS_REGR_NO /* 시스템 등록자 번호 */
+		, 	SYS_REG_DTM /* 시스템 등록 일시 */
+		, 	SYS_UPDR_NO /* 시스템 수정자 번호 */
+		, 	SYS_UPD_DTM /* 시스템 수정 일시 */
+		FROM EVENT_ADD_FIELD
+		WHERE EVENT_NO = #{eventNo}
+		GROUP BY FLD_GRP
+	</select>
+
+	<select id="listQuestionAndAnswerInfo" resultType="biz.app.event.model.EventQuestionVO">
+		<!--
+			Query Name : event.listQuestionAndAnswerInfo
+			Description : 이벤트 퀴즈 조회
+			Writter : 김재윤
+		-->
+		SELECT /* QUERYID(event.listQuestionAndAnswerInfo) */
+			QI.QST_NO /* 문항 번호 */
+		, 	QI.EVENT_NO /* 이벤트 번호 */
+		, 	QI.QST_NM /* 문항 명 */
+		, 	QI.QST_TP_CD /* 문항 타입 코드 */
+		, 	AI.RPL_NOS /* 답변 번호 */
+		, 	AI.RPL_CONTENT /* 답변 내용 */
+		, 	AI.RGHTANS_YN /* 정답 여부 */
+		, 	QI.SYS_REGR_NO /* 시스템 등록자 번호 */
+		, 	QI.SYS_REG_DTM /* 시스템 등록 일시 */
+		, 	QI.SYS_UPDR_NO /* 시스템 수정자 번호 */
+		, 	QI.SYS_UPD_DTM /* 시스템 수정 일시 */
+		FROM QUESTION_INFO QI
+		INNER JOIN (SELECT QST_NO,GROUP_CONCAT(RPL_NO) RPL_NOS,GROUP_CONCAT(RPL_CONTENT) RPL_CONTENT,GROUP_CONCAT(RGHTANS_YN) RGHTANS_YN FROM ANSWER_INFO WHERE EVENT_NO = #{eventNo} GROUP BY QST_NO) AI
+		ON QI.QST_NO = AI.QST_NO
+		WHERE QI.EVENT_NO = #{eventNo}
+	</select>
+
+
+	<select id="pageEventJoinMember" resultType="biz.app.event.model.EventEntryWinInfoVO">
+		<!--
+			Query Name : event.pageEventJoinMember
+			Description : 이벤트 참여자 목록 조회
+			Writter : 김재윤
+		-->
+		SELECT	/* QUERYID(event.pageEventJoinMember) */
+				EEI.PATI_NO
+		    ,	EEI.MBR_NO
+		    ,	MB.LOGIN_ID
+			,	EEI.PATIR_NM
+			,	EEI.CTT
+			,	EEI.EMAIL
+			,	EEI.ADDR
+			,	EEI.SNS
+			,	EEI.CP_NO
+		    ,	EEI.ENRY_APLY
+			,	EEI.SYS_UPD_DTM
+		FROM EVENT_ENTRY_INFO EEI
+		INNER JOIN MEMBER_BASE MB ON EEI.MBR_NO = MB.MBR_NO
+		WHERE 1=1
+		<include refid="pageEventJoinMemberWhere"/>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageEventJoinMemberCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM EVENT_ENTRY_INFO EEI
+		INNER JOIN MEMBER_BASE MB ON EEI.MBR_NO = MB.MBR_NO
+		WHERE 1=1
+		<include refid="pageEventJoinMemberWhere"/>
+	</select>
+	<sql id="pageEventJoinMemberWhere">
+		AND EEI.EVENT_NO = #{eventNo}
+		<if test="patirNm != null and patirNm != ''">
+			AND EEI.PATIR_NM = #{patirNm}
+		</if>
+		<if test="ctt != null and ctt != ''">
+			AND EEI.CTT = #{ctt}
+		</if>
+	</sql>
+
+	<select id="pageEventWinnerMember" resultType="biz.app.event.model.EventEntryWinInfoVO">
+		<!--
+			Query Name : event.pageEventWinnerMember
+			Description : 이벤트 당첨자 목록 조회
+			Writter : 김재윤
+		-->
+		SELECT	/* QUERYID(event.pageEventWinnerMember) */
+		    EEI.MBR_NO
+		,	EEI.PATI_NO
+		,	EWL.WIN_NO
+		,	EEI.PATIR_NM
+		,	EEI.CTT
+		,	EEI.EMAIL
+		,	EEI.ADDR
+		,	EEI.SNS
+		,	EEI.CP_NO
+		,	EEI.ISU_SRL_NO
+		,	EWL.REWARD_NM
+		FROM EVENT_WIN_LIST EWL
+		INNER JOIN EVENT_ENTRY_INFO EEI ON EWL.PATI_NO = EEI.PATI_NO
+		WHERE 1=1
+		<include refid="pageEventWinnerMemberWhere"/>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageEventWinnerMemberCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM EVENT_WIN_LIST EWL
+		INNER JOIN EVENT_ENTRY_INFO EEI ON EWL.PATI_NO = EEI.PATI_NO
+		WHERE 1=1
+		<include refid="pageEventWinnerMemberWhere"/>
+	</select>
+	<sql id="pageEventWinnerMemberWhere">
+		AND EWL.EVENT_NO = #{eventNo}
+	</sql>
+
+	<select id="getEventWinInfo" resultType="biz.app.event.model.EventBaseVO">
+		<!--
+			Query Name : event.getEventWinInfo
+			Description : 이벤트 당첨 정보 조회
+			Writter : 김재윤
+		-->
+			SELECT	/* QUERYID(event.getEventWinInfo) */
+					EVENT_NO
+				,	WIN_TTL
+				,	CONTENT
+				,	NOT_OPEN_YN
+			FROM EVENT_WIN_INFO
+			WHERE EVENT_NO = #{eventNo}
+	</select>
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	TWC 성분 정보
+	작성자  	valueFactory
+	작성일자  	2020.01.15
+-->
+<mapper namespace="TwcProductNutrition">
+
+	<select id="getTwcProductNutrition" resultType="biz.app.goods.model.TwcProductNutritionVO" >
+		<!--
+			Query Name : TwcProductNutrition.getTwcProductNutrition
+			Description : TWC 성분 영양 정보
+		-->
+		/* QUERYID(TwcProductNutrition.getTwcProductNutrition) */
+		
+		SELECT
+			TPN.ID
+			, TPN.CRUDE_PROTEIN
+			, TPN.CRUDE_FAT
+			, TPN.CRUDE_FIBER
+			, TPN.ASH
+			, TPN.CALCIUM
+			, TPN.PHOSPHORUS
+			, TPN.OMEGA3
+			, TPN.OMEGA6
+			, TPN.MOISTURE
+			, TPN.OTHER
+			, TPN.DRY_MATTER_CRUDE_PROTEIN
+			, TPN.DRY_MATTER_CRUDE_FAT
+			, TPN.DRY_MATTER_CRUDE_FIBER
+			, TPN.DRY_MATTER_ASH
+			, TPN.DRY_MATTER_CALCIUM
+			, TPN.DRY_MATTER_PHOSPHORUS
+			, TPN.DRY_MATTER_OMEGA3
+			, TPN.DRY_MATTER_OMEGA6
+			, TPN.CARBOHYDRATE
+			, TPN.PRODUCT_ID
+		FROM TWC_PRODUCT_NUTRITION TPN	
+		WHERE 1 = 1
+		AND TPN.PRODUCT_ID = #{productId}
+	</select>
+
+	<insert id="replaceTwcProductNutrition">
+		REPLACE INTO TWC_PRODUCT_NUTRITION (
+		ID
+		, CRUDE_PROTEIN
+		, CRUDE_FAT
+		, CRUDE_FIBER
+		, ASH
+		, CALCIUM
+		, PHOSPHORUS
+		, OMEGA3
+		, OMEGA6
+		, MOISTURE
+		, OTHER
+		, DRY_MATTER_CRUDE_PROTEIN
+		, DRY_MATTER_CRUDE_FAT
+		, DRY_MATTER_CRUDE_FIBER
+		, DRY_MATTER_ASH
+		, DRY_MATTER_CALCIUM
+		, DRY_MATTER_PHOSPHORUS
+		, DRY_MATTER_OMEGA3
+		, DRY_MATTER_OMEGA6
+		, CARBOHYDRATE
+		, PRODUCT_ID
+		) VALUES
+		<if test="nutrition != null">
+			( #{nutrition.id}
+			, #{nutrition.crudeProtein}
+			, #{nutrition.crudeFat}
+			, #{nutrition.crudeFiber}
+			, #{nutrition.ash}
+			, #{nutrition.calcium}
+			, #{nutrition.phosphorus}
+			, #{nutrition.omega3}
+			, #{nutrition.omega6}
+			, #{nutrition.moisture}
+			, #{nutrition.other}
+			, #{nutrition.dryMatterCrudeProtein}
+			, #{nutrition.dryMatterCrudeFat}
+			, #{nutrition.dryMatterCrudeFiber}
+			, #{nutrition.dryMatterAsh}
+			, #{nutrition.dryMatterCalcium}
+			, #{nutrition.dryMatterPhosphorus}
+			, #{nutrition.dryMatterOmega3}
+			, #{nutrition.dryMatterOmega6}
+			, #{nutrition.carbohydrate}
+			, #{nutrition.productId})
+		</if>
+		<if test="list != null">
+		<foreach collection="list" item="nutrition" open=" (" separator="),(" close=")">
+			#{nutrition.id}
+			, #{nutrition.crudeProtein}
+			, #{nutrition.crudeFat}
+			, #{nutrition.crudeFiber}
+			, #{nutrition.ash}
+			, #{nutrition.calcium}
+			, #{nutrition.phosphorus}
+			, #{nutrition.omega3}
+			, #{nutrition.omega6}
+			, #{nutrition.moisture}
+			, #{nutrition.other}
+			, #{nutrition.dryMatterCrudeProtein}
+			, #{nutrition.dryMatterCrudeFat}
+			, #{nutrition.dryMatterCrudeFiber}
+			, #{nutrition.dryMatterAsh}
+			, #{nutrition.dryMatterCalcium}
+			, #{nutrition.dryMatterPhosphorus}
+			, #{nutrition.dryMatterOmega3}
+			, #{nutrition.dryMatterOmega6}
+			, #{nutrition.carbohydrate}
+			, #{nutrition.productId}
+		</foreach>
+		</if>
+	</insert>
+</mapper>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="eventPopup">
+
+	<select id="pageEventPopupList" resultType="biz.app.display.model.EventPopupVO">
+		<!--
+			Query Name : eventPopup.pageEventPopupList
+			Description : 이벤트팝업 리스트
+		-->
+		SELECT T3.*,  @ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+		FROM(
+			SELECT	T2.* /* QUERYID(eventPopup.pageEventPopupList) */
+			FROM (
+					SELECT
+						  T1.EVTPOP_NO			/* 이벤트 팝업 번호 */
+						, T1.EVTPOP_GB_CD		/* 이벤트팝업 구분 코드(게시구분) */
+						, T1.EVTPOP_LOC_CD		/* 이벤트팝업 게시위치 코드 */
+						, T1.EVTPOP_TTL			/* 제목 */
+						, T1.EVTPOP_IMG_PATH	/* 이미지 경로 */
+						, T1.EVTPOP_LINK_URL	/* 연결화면 경로 */
+						, T1.DISPLAY_STRT_DTM	/* 게시 시작 일시 */
+						, T1.DISPLAY_END_DTM	/* 게시 종료 일시 */
+						, T1.EVTPOP_STAT_CD		/* 이벤트 상태 코드(게시여부) */
+						, T1.EVTPOP_SORT_SEQ	/* 정렬 순서 */		
+						, CASE WHEN NOW() &gt; T1.DISPLAY_END_DTM THEN 'CLOSE'
+							   WHEN NOW() &lt; T1.DISPLAY_STRT_DTM THEN 'STANDBY'
+							   ELSE 'OPEN'
+						  END AS PROGRESS_STAT_CD		
+						, T1.SYS_REGR_NO		/* 시스템 등록자 번호 */
+						, T1.SYS_REG_DTM		/* 시스템 등록 일시 */
+						, T1.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+						, T1.SYS_UPD_DTM		/* 시스템 수정 일시 */
+						, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */		
+						<if test='excelYn == "Y"'>
+						, FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVTPOP_GB}',T1.EVTPOP_GB_CD,'')	AS EVTPOP_GB_NM
+						, FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVTPOP_LOC}',T1.EVTPOP_LOC_CD,'')	AS EVTPOP_LOC_NM
+						, FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@EVTPOP_STAT}',T1.EVTPOP_STAT_CD,'')	AS EVTPOP_STAT_NM	
+						, CASE WHEN NOW() &gt; T1.DISPLAY_END_DTM THEN '마감'
+							   WHEN NOW() &lt; T1.DISPLAY_STRT_DTM THEN '대기'
+							   ELSE '진행중'
+						  END AS PROGRESS_STAT_NM
+						, CONCAT(DATE_FORMAT(T1.DISPLAY_STRT_DTM, '%Y-%m-%d'), ' ~ ', DATE_FORMAT(T1.DISPLAY_END_DTM, '%Y-%m-%d')) AS STRT_END_DTM   
+						</if>
+					FROM	EVTPOP_BASE T1
+				 ) T2	
+			WHERE	1 = 1
+			<include refid="pageEventPopupCondition" />
+			ORDER BY T2.EVTPOP_SORT_SEQ, T2.DISPLAY_STRT_DTM, T2.DISPLAY_END_DTM
+			) T3, (SELECT @ROWNUM:=0) TMP	
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageEventPopupListCount" resultType="Integer">
+		<!--
+			Query Name : eventPopup.pageEventPopupListCount
+			Description : 팝업 목록 : 데이터 수
+		-->
+		SELECT  COUNT(*)	/* QUERYID(eventPopup.pageEventPopupListCount) */
+		FROM	(
+					SELECT
+						  T1.EVTPOP_NO			/* 이벤트 팝업 번호 */
+						, T1.EVTPOP_GB_CD		/* 이벤트팝업 구분 코드(게시구분) */
+						, T1.EVTPOP_LOC_CD		/* 이벤트팝업 게시위치 코드 */
+						, T1.EVTPOP_TTL			/* 제목 */
+						, T1.EVTPOP_IMG_PATH	/* 이미지 경로 */
+						, T1.EVTPOP_LINK_URL	/* 연결화면 경로 */
+						, T1.DISPLAY_STRT_DTM	/* 게시 시작 일시 */
+						, T1.DISPLAY_END_DTM	/* 게시 종료 일시 */
+						, T1.EVTPOP_STAT_CD		/* 이벤트 상태 코드(게시여부) */
+						, T1.EVTPOP_SORT_SEQ	/* 정렬 순서 */		
+						, CASE WHEN NOW() &gt; T1.DISPLAY_END_DTM THEN 'CLOSE'
+							   WHEN NOW() &lt; T1.DISPLAY_STRT_DTM THEN 'STANDBY'
+							   ELSE 'OPEN'
+						  END AS PROGRESS_STAT_CD		
+						, T1.SYS_REGR_NO		/* 시스템 등록자 번호 */
+						, T1.SYS_REG_DTM		/* 시스템 등록 일시 */
+						, T1.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+						, T1.SYS_UPD_DTM		/* 시스템 수정 일시 */
+						, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */				
+					FROM	EVTPOP_BASE T1
+				 ) T2
+		WHERE   1=1
+		<include refid="pageEventPopupCondition" />
+	</select>
+
+	<sql id="pageEventPopupCondition">
+		<!--
+			Query Name : eventPopup.pageEventPopupCondition
+			Description : 팝업 목록 : 조건절
+		-->
+		<if test='evtpopTtl != null and evtpopTtl != ""'>
+			AND		T2.EVTPOP_TTL LIKE CONCAT('%', #{evtpopTtl}, '%' )	/* 팝업 명 */
+		</if>
+ 
+		<if test='evtpopStatCd != null and evtpopStatCd != ""'>
+			AND		T2.EVTPOP_STAT_CD = #{evtpopStatCd}					/* 이벤트 상태 코드(게시여부) */
+		</if>
+		<if test='progressStatCd != null and progressStatCd != ""'>
+			AND		T2.PROGRESS_STAT_CD = #{progressStatCd}				/* 이벤트 진행 여부 */
+		</if>
+		<if test='evtpopGbCd != null and evtpopGbCd != ""'>
+			AND		T2.EVTPOP_GB_CD = #{evtpopGbCd}						/* 이벤트 팝업 구분코드(게시구분) */
+		</if>
+		<if test='evtpopLocCd != null and evtpopLocCd != ""'>
+			AND		T2.EVTPOP_LOC_CD = #{evtpopLocCd}					/* 이벤트팝업 개시위치 코드 */
+		</if>
+		<if test="displayStrtDtm != null and displayEndDtm != null"> 	
+			AND ( 		(DATE_ADD(#{displayEndDtm }, INTERVAL 1 DAY) &gt;= T2.DISPLAY_END_DTM 
+							AND T2.DISPLAY_END_DTM BETWEEN #{displayStrtDtm} AND DATE_ADD(#{displayEndDtm }, INTERVAL 1 DAY)) 
+					 OR (DATE_ADD(#{displayEndDtm }, INTERVAL 1 DAY) &lt;= T2.DISPLAY_END_DTM 
+					 		AND T2.DISPLAY_STRT_DTM &lt;= DATE_ADD(#{displayEndDtm }, INTERVAL 1 DAY)) 
+				)		
+		</if>
+        
+	</sql>
+
+
+	<insert id="insertEventPopup" parameterType="biz.app.display.model.EventPopupPO" >
+		<!--
+			Query Name : eventPopup.insertEventPopup
+			Description : 이벤트팝업 등록
+		-->		
+		INSERT INTO EVTPOP_BASE (
+			  EVTPOP_NO				/* 이벤트 팝업 번호 */
+			, FL_NO					/* 파일 번호 */
+			, EVTPOP_GB_CD     		/* 이벤트팝업 구분 코드 */
+			, EVTPOP_LOC_CD			/* 이벤트팝업 게시위치 코드 */
+			, EVTPOP_TTL			/* 제목 */
+			, EVTPOP_IMG_PATH		/* 이미지 경로 */
+			, EVTPOP_LINK_URL		/* 연결화면 경로 */
+			, DISPLAY_STRT_DTM		/* 게시 시작 일시 */
+			, DISPLAY_END_DTM		/* 게시 종료 일시 */
+			, EVTPOP_STAT_CD		/* 이벤트 상태 코드 */
+			, EVTPOP_SORT_SEQ		/* 정렬 순서 */			
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{evtpopNo}			
+			, #{flNo}			
+			, #{evtpopGbCd}         
+			, #{evtpopLocCd}			
+			, #{evtpopTtl}				
+			, #{evtpopImgPath}				
+			, #{evtpopLinkUrl}				
+			, #{displayStrtDtm}			
+			, #{displayEndDtm}				
+			, #{evtpopStatCd}		
+			, #{evtpopSortSeq}			
+			, #{sysRegrNo}			
+			, NOW()					
+			, #{sysUpdrNo}			
+			, NOW()					
+		)
+	</insert>
+
+
+	<update id="updateEventPopup" parameterType="biz.app.display.model.EventPopupPO" >
+		<!--
+			Query Name : eventPopup.updateEventPopup
+			Description : 이벤트팝업 수정
+		-->
+		UPDATE	EVTPOP_BASE 
+		SET
+			  FL_NO					= #{flNo}				/* 파일 번호 */
+			, EVTPOP_GB_CD     		= #{evtpopGbCd}   		/* 이벤트팝업 구분 코드 */
+			, EVTPOP_LOC_CD			= #{evtpopLocCd}		/* 이벤트팝업 게시위치 코드 */
+			, EVTPOP_TTL			= #{evtpopTtl}			/* 제목 */
+			, EVTPOP_IMG_PATH		= #{evtpopImgPath}		/* 이미지 경로 */
+			, EVTPOP_LINK_URL		= #{evtpopLinkUrl}		/* 연결화면 경로 */
+			, DISPLAY_STRT_DTM		= #{displayStrtDtm}		/* 게시 시작 일시 */
+			, DISPLAY_END_DTM		= #{displayEndDtm}		/* 게시 종료 일시 */
+			, EVTPOP_STAT_CD		= #{evtpopStatCd}		/* 이벤트 상태 코드 */
+			, EVTPOP_SORT_SEQ		= #{evtpopSortSeq}		/* 정렬 순서 */			
+			, SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			=  NOW()				/* 시스템 수정 일시 */				 
+		WHERE	EVTPOP_NO			= #{evtpopNo}
+	</update>
+
+
+	<select id="getEventPopupDetail" resultType="biz.app.display.model.EventPopupVO" >
+		<!--
+			Query Name : eventPopup.getEventPopupDetail
+			Description : 이벤트 팝업 조회
+		-->
+		SELECT
+			  T1.EVTPOP_NO			/* 이벤트 팝업 번호 */
+			, T1.EVTPOP_GB_CD		/* 이벤트팝업 구분 코드(게시구분) */
+			, T1.EVTPOP_LOC_CD		/* 이벤트팝업 게시위치 코드 */
+			, T1.EVTPOP_TTL			/* 제목 */
+			, T1.EVTPOP_IMG_PATH	/* 이미지 경로 */
+			, T1.EVTPOP_LINK_URL	/* 연결화면 경로 */
+			, T1.DISPLAY_STRT_DTM	/* 게시 시작 일시 */
+			, T1.DISPLAY_END_DTM	/* 게시 종료 일시 */
+			, T1.EVTPOP_STAT_CD		/* 이벤트 상태 코드(게시여부) */
+			, T1.EVTPOP_SORT_SEQ	/* 정렬 순서 */		
+			, CASE WHEN NOW() &gt; T1.DISPLAY_END_DTM THEN 'CLOSE'
+				   WHEN NOW() &lt; T1.DISPLAY_STRT_DTM THEN 'STANDBY'
+				   ELSE 'OPEN'
+			  END AS PROGRESS_STAT_CD		
+			, T1.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, T1.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, T1.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, T1.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */		
+			, T1.FL_NO
+			, T2.ORG_FL_NM AS ORG_FILE_NM		
+		FROM	EVTPOP_BASE T1
+			LEFT OUTER JOIN ATTACH_FILE T2 ON (T1.FL_NO = T2.FL_NO)
+		WHERE T1.EVTPOP_NO = #{evtpopNo} 
+	</select>
+
+	
+	<delete id="deleteEventPopup" parameterType="biz.app.display.model.PopupTargetPO" >
+		<!--
+			Query Name : eventPopup.getEventPopupDetail
+			Description : 이벤트 팝업 삭제
+		-->
+		DELETE 
+		FROM EVTPOP_BASE
+		WHERE EVTPOP_NO = #{evtpopNo}
+	</delete>
+
+</mapper>

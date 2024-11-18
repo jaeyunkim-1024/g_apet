@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc		http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+						http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/aop		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+						http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+						http://www.springframework.org/schema/task		http://www.springframework.org/schema/task/spring-task-4.2.xsd ">
+
+	<context:component-scan base-package="batch" />
+
+	<!-- Scheduler -->
+	<task:scheduler id="jobScheduler" pool-size="30" />
+
+	<task:scheduled-tasks scheduler="jobScheduler">
+		<!-- 로컬 실행 방지를 위해서 주석 처리함. DEV/STG/PRD 에서는 실행해야함. 2021.03.17 by kek01 -->
+		<!-- CIS 배송 지시 --><!-- 배치실행후 3분마다 실행 -->
+		<!-- <task:scheduled ref="cisDeliveryCommandExecute" method="cronCisDeliveryCommand" cron="0 0/3 * * * *" /> -->
+		<!-- CIS 배송 상태 변경 --><!-- 배치실행후 5분마다 실행 -->
+		<!-- <task:scheduled ref="cisDeliveryStateChangeExecute" method="cronCisDeliveryStateChange" cron="0 0/5 * * * *" /> -->
+		<!-- CIS 회수 지시 --><!-- 배치실행후 7분마다 실행 -->
+		<!-- <task:scheduled ref="cisReturnCommandExecute" method="cronCisReturnCommand" cron="0 0/7 * * * *" /> -->
+		<!-- CIS 회수 상태 변경 --><!-- 배치실행후 8분마다 실행 -->
+		<!-- <task:scheduled ref="cisReturnStateChangeExecute" method="cronCisReturnStateChange" cron="0 0/8 * * * *" /> -->
+		<!-- 주문 구매확정 처리 --><!-- 배치실행후 60분마다 실행 -->
+		<!-- <task:scheduled ref="orderPurchaseConfirmExcute" method="cronOrderPurchaseConfirm" cron="0 0 0/1 * * *" /> -->
+		<!-- 주문 가상계좌 미입금시 주문취소 처리 --><!-- 배치실행후 10분마다 실행 -->
+		<!-- <task:scheduled ref="orderExcute" method="cronCancelOrderUnpaid" cron="0 0/10 * * * *" /> -->
+		<!-- 카드사 할부정보 저장 --><!-- 새벽 00:05 실행 -->
+		<!-- <task:scheduled ref="cardcInstmntInfoExcute" method="cronCardcInstmntInfo" cron="0 5 0 * * *" /> -->
+		<!-- 권역 조회 --><!-- 21:05, 21:15 실행 -->
+		<!-- <task:scheduled ref="cisDlvrAreaSearchExcute" method="cronCisDlvrAreaSearch" cron="0 5,15 21 * * *" /> -->
+
+		<!-- SMS 발송 결과 이력 저장 --><!-- 배치실행후 60분마다 실행 -->
+		<task:scheduled ref="noticeLogExecute" method="regLogSms" cron="0 0 0/1 * * *" />
+		<!-- 알림톡 발송 결과 이력 저장 --><!-- 배치실행후 60분마다 실행 -->
+		<task:scheduled ref="noticeLogExecute" method="regLogKko" cron="0 0 0/1 * * *" />
+		<!-- PUSH 발송 결과 이력 저장 --><!-- 배치실행후 60분마다 실행 -->
+		<task:scheduled ref="noticeLogExecute" method="regLogPush" cron="0 0 0/1 * * *" />
+
+		<!-- 		<task:scheduled ref="memberExecute" method="cronMemberMarketingInfoUpdate" cron="0 0 7 * * *" /> -->
+		<!-- 		<task:scheduled ref="orderExcute" method="cronRentalStatus" cron="0 0 0/1 * * *" /> -->
+		<!-- 		<task:scheduled ref="orderExcute" method="cronOrderStatus" cron="0 10 9-21 * * *" /> -->
+		<!-- 		<task:scheduled ref="orderExcute" method="cronOrderErpDelivery" cron="0 30 0/1 * * *" /> -->
+		<!-- 		<task:scheduled ref="customerBehaviorCollectionExcute" method="cronMagicmallWebLogData" cron="0 0 0/1 * * *" /> -->
+		<!-- 		<task:scheduled ref="pointExecute" method="cronErpPointSync" cron="0 30 19 * * *" /> -->
+		<!-- 080 수신거부 이력 동기화 --><!-- 배치실행후 10분마다 실행 -->
+		<task:scheduled ref="memberExecute" method="syncUnsubscribes" cron="0 0/10 * * * ?" />
+
+		<!-- 회원 생일축하 쿠폰 발급 배치 --><!-- 매일 자정 -->
+		<task:scheduled ref="memberExecute" method="memberBirthdayCoupon" cron="0 0 0 * * *" />
+
+		<!-- Goods Flow 배치 (배송추척등록요청) --><!-- 배치실행후 10분마다 실행 -->
+		<task:scheduled ref="goodsFlowDeliveryExecute" method="cronOrdRequestTrace" cron="0 0/1 * * * ?" />
+		<!-- Goods Flow 배치 (배송 결과 수신 및 응답처리) --><!-- 배치실행후 10분마다 실행 -->
+		<task:scheduled ref="goodsFlowDeliveryExecute" method="cronOrdReceiveTrace" cron="0 0/1 * * * ?" />
+
+		<!-- 회원 휴면 사전 알람 배치 --><!-- 매일 아침 10시 -->
+		<task:scheduled ref="memberExecute" method="memberDomantAlarm" cron="0 0 10 * * *" />
+
+		<!-- 회원 휴면 배치 --><!-- 매일 새벽 3시 -->
+		<task:scheduled ref="memberExecute" method="memberDomant" cron="0 0 3 * * *" />
+
+		<!-- 회원 탈퇴 배치 --><!-- 매일 새벽 3시 -->
+		<!-- 		<task:scheduled ref="memberExecute" method="memberLeave" cron="0 0 3 * * *" /> -->
+
+		<!-- 회원 쿠폰 배치 --><!-- 오후 7시 시 -->
+		<task:scheduled ref="memberCouponExecute" method="memberCouponExpire" cron="0 0 19 * * *" />
+
+		<!-- 사용자 상태변경 배치 --><!-- 매일 새벽 3시 -->
+		<task:scheduled ref="userExecute" method="changeUserStatForUnUsed" cron="0 0 3 * * *" />
+
+		<!-- 반려동물 나이 계산 배치 --><!-- 매일 새벽 2시 -->
+		<task:scheduled ref="petExecute" method="petAgeCalculate" cron="0 10 0 1 * *" />
+
+		<!-- 상품 베스트 배치 --><!-- 매일 새벽 1시 -->
+		<task:scheduled ref="goodsBastExecute" method="cronGoodsBest" cron="0 0 1 * * *" />
+
+		<!-- 상품 재입고 알림 Push 발송 배치 --><!-- 매일 8 ~ 20 시 매 1시간 -->
+		<task:scheduled ref="goodsIoAlarmExecute" method="cronSendIoAlarm" cron="0 0 8-20 * * *" />
+
+		<!-- 상품 가격 변동 CIS 전송 배치 --><!-- 1분 주기 -->
+		<task:scheduled ref="goodsPriceExecute" method="cronSkuInfoUpdate" cron="0 0/1 * * * *" />
+
+		<!-- 상품 상태값 변경 배치 --><!-- 1분 -->
+		<task:scheduled ref="goodsStatusExecute" method="cronGoodsSaleEnd" cron="0 0/1 * * * *" />
+
+		<!-- 상품 CIS 연동 재고 배치 --><!-- 20분 간격 -->
+		<task:scheduled ref="goodsStkQtyExecute" method="cronGoodsStockQty" cron="0 0/20 * * * ?" />
+
+		<!-- 상품 TWC 연동 배치 --><!-- 매일 새벽 4시 -->
+		<task:scheduled ref="goodsTwcSyncExecute" method="cronTwcProductSync" cron="0 0 4 * * ?" />
+
+		<!-- 회원 등급 배치 --><!-- 매월 1일 00시 -->
+		<task:scheduled ref="memberExecute" method="memberGrade" cron="0 0 0 1 * *" />
+
+		<!-- 상품 카테고리 랭킹 집계 배치 --><!-- 5분 간격 , 새벽 2 ~3시 DB 백업으로 중지 - 프로시저 내 alter 사용 -->
+		<task:scheduled ref="goodsDispExecute" method="cronGoodsDispRank" cron="0 0/5 3-23 * * ?" />
+		<task:scheduled ref="goodsDispExecute" method="cronGoodsDispRank" cron="0 0/5 0-1 * * ?" />
+		
+		<!-- 주문 가상계좌 1시간 경과 후 미입금 시 안내 알림톡 발송 --><!-- 배치실행후 10분마다 실행 -->
+		<task:scheduled ref="orderExcute" method="ndpstMsgSendKko" cron="0 0/10 * * * ?" />
+		
+		<!-- 위탁업체 배송안내 알림톡 발송 --><!-- 배치실행후 60분마다 실행 -->
+		<task:scheduled ref="deliverySendNoticeExecute" method="cronSendConsignDlvrIng" cron="0 0 0/1 * * *" />
+		<!-- 위탁업체 배송완료 알림톡 발송 --><!-- 배치실행후 60분마다 실행 -->
+		<task:scheduled ref="deliverySendNoticeExecute" method="cronSendConsignDlvrFinal" cron="0 0 0/1 * * *" />
+		
+		<!-- 위탁업체 주문건 수집문자 알림 -->
+		<task:scheduled ref="companyOrderNoticeExcute" method="cronCompanyOrderSendMsg" cron="0 0 9,12,15 * * *" />
+
+	</task:scheduled-tasks>
+
+</beans>

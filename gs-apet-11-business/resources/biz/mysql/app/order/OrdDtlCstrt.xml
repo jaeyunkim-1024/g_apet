@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2021. 02. 02.
+	작성자 : KEK01
+-->
+
+<mapper namespace="ordDtlCstrt">
+	
+	<select id="listOrdDtlCstrt" resultType="biz.app.order.model.OrdDtlCstrtVO" >
+		<!--
+			Query Name : ordDtlCstrt.listOrdDtlCstrt
+			Description : 주문 상세 구성 리스트
+		-->
+		SELECT	/* QUERYID(ordDtlCstrt.listOrdDtlCstrt) */
+				ODC.ORD_DTL_CSTRT_NO
+				, ODC.ORD_NO
+				, ODC.ORD_DTL_SEQ
+				, ODC.ORD_CSTRT_SEQ
+				, ODC.CSTRT_GOODS_ID
+				, ODC.SKU_CD
+				, ODC.CSTRT_GOODS_GB_CD
+				, CASE WHEN ODC.CSTRT_GOODS_GB_CD = '${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_20}'
+					   THEN '${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_10}'
+					   ELSE ODC.CSTRT_GOODS_GB_CD
+				   END AS SHOW_CSTRT_GB_CD
+				, ODC.CSTRT_QTY
+				, ODC.ORG_SALE_AMT
+				, ODC.SALE_AMT
+				, ODC.CIS_ORD_NO
+				, ODC.CIS_ORD_DTL_SEQ
+				, ODC.CIS_STAT_CD
+				, GB.GOODS_NM
+				, IT.ITEM_NO
+		  FROM ORD_DTL_CSTRT  ODC
+	INNER JOIN GOODS_BASE GB
+			ON GB.GOODS_ID = ODC.CSTRT_GOODS_ID
+	INNER JOIN ITEM IT
+			ON IT.GOODS_ID = GB.GOODS_ID
+		 WHERE ODC.ORD_NO = #{ordNo}
+		   AND ODC.ORD_DTL_SEQ = #{ordDtlSeq}
+	</select>
+	
+	<update id="updateOrdDtlCstrt" parameterType="biz.app.order.model.OrdDtlCstrtPO">
+		<!--
+			Query Name : ordDtlCstrt.updateOrdDtlCstrt
+			Description : 주문 상세 구성 수정
+		-->
+		UPDATE  /*QUERYID(ordDtlCstrt.updateOrdDtlCstrt) */
+			    ORD_DTL_CSTRT
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+				
+				<if test="cisOrdNo != null and cisOrdNo != ''">
+				, CIS_ORD_NO = #{cisOrdNo}				/* CIS 주문 번호 */
+				</if>
+				<if test="cisOrdDtlSeq != null and cisOrdDtlSeq != ''">
+				, CIS_ORD_DTL_SEQ = #{cisOrdDtlSeq}		/* CIS 주문 상세 순번 */
+				</if>
+				<if test="cisStatCd != null and cisStatCd != ''">
+				, CIS_STAT_CD = #{cisStatCd}			/* CIS 상태 코드 */
+				</if>
+		WHERE	ORD_NO = #{ordNo}
+		  AND	ORD_DTL_SEQ = #{ordDtlSeq}
+		  AND	ORD_CSTRT_SEQ = #{ordCstrtSeq}
+
+	</update>
+	
+	<select id="listOrdDtlCstrtForSendCis" resultMap="listordDtlCstrtForSendCisMap">
+		<!--
+			Query Name : ordDtlCstrt.listOrdDtlCstrtForSendCis
+			Description : CIS 배송지시 대상 조회 (주문배송, 클레임교환배송 대상)
+			Date : 2020. 2. 2  KEK01
+		-->
+		SELECT /* QUERYID(ordDtlCstrt.listOrdDtlCstrtForSendCis) */ 
+				X.*
+		  FROM (
+				SELECT  
+				       Z.*
+						,IF (Z.COMP_GB_CD = '${@framework.common.constants.CommonConstants@COMP_GB_10}' 
+						     and Z.DLVT_TP_CD in ('${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_20}','${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_21}')  /*자사이면서 새벽,당일배송 일때*/
+						    ,FN_SPLIT(DLV_AREA_INFO, '||', 1)
+						    ,NULL
+						) AS DLV_GRP_CD
+						,IF (Z.COMP_GB_CD = '${@framework.common.constants.CommonConstants@COMP_GB_10}' 
+						     and Z.DLVT_TP_CD in ('${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_20}','${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_21}')  /*자사이면서 새벽,당일배송 일때*/
+						    ,(SELECT DLVR_CNTR_CD FROM DLVR_AREA_POST_MAP DAPM WHERE DLVR_AREA_NO = FN_SPLIT(DLV_AREA_INFO, '||', 2) AND POST_NO = Z.RECV_ZIPCODE )
+						    ,NULL
+						) AS DAWN_MALL_ID
+						,IF(Z.CLM_DLVR_YN = 'Y' 
+						    ,IF(Z.SWAP_YN = 'Y', 'Y', IF(Z.CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_360}', 'Y', 'N'))
+						    ,'Y'
+						) AS BATCH_EXE_YN
+						, SUM(IF(ORD_DLVRC_ROW_NUM = 1, DLV_AMT_PER, 0)) OVER (PARTITION BY Z.ORD_NO) AS DLV_AMT  /* 주문번호별 배송비 합계 - 주문번호 1건의 모든 배송번호 별로 1번씩 SUM*/
+				  FROM (
+				  		   /* 주문 배송 대상 */
+						   SELECT
+						          CASE 
+						          WHEN OB.ORD_NM IS NULL OR OB.ORD_NM = '' 
+						          THEN  OD2.ADRS_NM 
+						          ELSE OB.ORD_NM
+						           END 									AS ORDR_NM				/*주문자 이름*/
+								, OB.ORDR_TEL							AS ORDR_TEL_NO			/*주문자 전화번호*/
+								, OB.ORDR_MOBILE						AS ORDR_CEL_NO			/*주문자 휴대전화*/
+								, OB.ORDR_EMAIL							AS ORDR_EMAIL			/*주문자 이메일*/
+								, OD2.ADRS_NM							AS RECV_NM				/*수령자 이름*/
+								, OD2.TEL								AS RECV_TEL_NO			/*수령자 전화번호*/
+								, OD2.MOBILE							AS RECV_CEL_NO			/*수령자 휴대전화*/
+								, OD2.POST_NO_NEW						AS RECV_ZIPCODE			/*수령자 우편번호*/
+								, OD2.ROAD_ADDR							AS RECV_ADDR			/*수령자 주소*/
+								, OD2.ROAD_DTL_ADDR						AS RECV_ADDR_DTL		/*수령자 주소 상세*/
+								, (	SELECT	IFNULL(SUM(APL_AMT), 0) 
+									FROM	APL_BNFT AB
+									WHERE	AB.ORD_NO = ODC.ORD_NO
+									AND		AB.ORD_DTL_SEQ = ODC.ORD_DTL_SEQ
+									AND		AB.APL_BNFT_GB_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_GB_10}'  /*프로모션*/
+									AND     AB.APL_BNFT_TP_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_TP_110}' /*가격할인*/ 
+								  )                                     AS DC_AMT						/*할인금액*/						
+								, FN_GET_ORDER_DTL_CP_DC_AMT(ODC.ORD_NO, ODC.ORD_DTL_SEQ)	AS CPN_AMT	/*쿠폰금액*/ 
+								, IFNULL(DC.REAL_DLVR_AMT,0) + IFNULL(DC.ADD_DLVR_AMT,0)    AS DLV_AMT_PER	/*배송비 - 주문상세별*/
+								, ROW_NUMBER() OVER (PARTITION BY OD.ORD_NO, OD.DLVRC_NO)   AS ORD_DLVRC_ROW_NUM  /*주문번호별 배송비번호의 SEQ*/
+								, OD2.PBL_GATE_PSWD 					AS GATE_NO				/*공동현관 출입번호*/
+								, DATE_FORMAT(OB.ORD_ACPT_DTM,'%Y%m%d') AS ORDR_DD				/*주문일자*/
+								, DATE_FORMAT(OB.ORD_ACPT_DTM,'%H%i%s') AS ORDR_TM				/*주문시간*/
+								, IF (OD2.DLVR_DEMAND_YN = 'Y' 
+						 		      ,CONCAT(FN_GET_CODE_NAME('GOODS_RCV_PST',OD2.GOODS_RCV_PST_CD,'')
+						 		              , IF(IFNULL(OD2.GOODS_RCV_PST_ETC,'') = '', '', CONCAT('(',OD2.GOODS_RCV_PST_ETC,')'))
+						 		              , ' / '
+						 		              , FN_GET_CODE_NAME('PBL_GATE_ENT_MTD',OD2.PBL_GATE_ENT_MTD_CD,'')
+						 		              , ' / '
+						 		              , OD2.DLVR_DEMAND 
+						 		              , IF(IFNULL(OD2.DLVR_MEMO,'') = '', '', CONCAT(' / ',OD2.DLVR_MEMO))
+						 		              )
+						 		      ,'')								AS RMK_TXT  			/*비고 - 주문메모*/
+						 		, ODC.CSTRT_GOODS_ID 					AS SKU_CD				/*단품코드*/
+						 		, OD.GOODS_NM							AS SKU_NM				/*단품명*/
+						 		, ''									AS OPT_TXT				/*옵션 내용*/
+						 		, ODC.SALE_AMT							AS PRICE				/*가격*/
+						 		, ODC.CSTRT_QTY * OD.RMN_ORD_QTY		AS EA					/*수량*/
+						 		, ODC.CSTRT_GOODS_GB_CD 				AS CSTRT_GB_CD			/*구성 구분 코드*/
+						 		, '${@framework.common.constants.CommonConstants@CIS_API_UNIT_NM_EA}'				AS UNIT_NM				/*단위*/	
+								, #{cisApiOwnrCd}				AS OWNR_CD				/*화주코드*/	
+								, #{cisApiWareCd}				AS WARE_CD				/*물류센터코드*/	
+								, '${@framework.common.constants.CommonConstants@CIS_API_DREL_TP_CD_SO1}'			AS DREL_TP_CD			/*출고 유형 코드*/	
+						 		, '${@framework.common.constants.CommonConstants@CIS_API_ARRV_CD_AP}'				AS ARRV_CD				/*도착지 코드*/
+						 		, IF (CB.COMP_GB_CD = '${@framework.common.constants.CommonConstants@COMP_GB_10}'	/*자사상품일때*/
+						 		      , OB.DLVR_PRCS_TP_CD				/*배송처리유형코드값으로*/
+						 		      , '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}'			/*외부업체상품일때는 무조건 택배 배송*/	
+						 		     )									AS DLVT_TP_CD			/*배송유형코드*/
+						 		, ( SELECT CONCAT(DAI.DLVR_AREA_CD,'||',IFNULL(DAI.DLVR_AREA_NO,'')) 
+                                    FROM DLVR_AREA_POST_MAP DAPM 
+										JOIN DLVR_AREA_INFO DAI ON (DAI.DLVR_AREA_NO = DAPM.DLVR_AREA_NO)
+									WHERE 1=1
+										AND DAPM.POST_NO = OD2.POST_NO_NEW
+										AND DAI.DLVR_PRCS_TP_CD = OB.DLVR_PRCS_TP_CD
+                                    LIMIT 1 )  AS DLV_AREA_INFO				/*배송 권역 정보*/	
+						 		, DATE_FORMAT(now(),'%Y%m%d')			AS DLV_REQ_DD			/*배송 요청일자*/
+						 		, ODC.ORD_NO							AS SHOP_ORDR_NO			/*상점 주문번호*/
+								, CONCAT(ODC.ORD_DTL_SEQ,'_',ODC.ORD_CSTRT_SEQ) AS SHOP_SORT_NO	/*상점 주문순번*/
+								, 'N'									AS EXCHG_YN				/*교환주문여부*/
+								, ''									AS ORG_SHOP_ORDR_NO 	/*원 상점 주문 번호 - 교환배송일때*/
+								, ''									AS ORG_SHOP_SORT_NO		/*원 상점 주문 순번 - 교환배송일때*/
+								/*필요에 의해 추가된 컬럼*/
+								, ODC.ORD_NO			AS ORD_NO
+								, ODC.ORD_DTL_SEQ		AS ORD_DTL_SEQ
+								, ODC.ORD_CSTRT_SEQ		AS ORD_CSTRT_SEQ
+								, ODC.ORD_DTL_CSTRT_NO  AS ORD_DTL_CSTRT_NO
+								, OB.DLVR_PRCS_TP_CD	AS DLVR_PRCS_TP_CD
+								, OD2.ORD_DLVRA_NO		AS ORD_DLVRA_NO
+								, OD.DLVRC_NO			AS DLVRC_NO
+								, CB.COMP_GB_CD         AS COMP_GB_CD
+								, CB.COMP_NO			AS COMP_NO
+								, 'N' 					AS CLM_DLVR_YN
+								, ''					AS CLM_DTL_STAT_CD
+								, ''					AS SWAP_YN
+						  FROM ORDER_BASE OB
+						       INNER JOIN ORDER_DETAIL OD	 ON OB.ORD_NO = OD.ORD_NO
+						                                    AND OB.ORD_ACPT_DTM IS NOT NULL /*주문접수일자*/
+						                                 	AND OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'	/*주문완료*/
+						                                 	AND 5 <![CDATA[<=]]> TIMESTAMPDIFF(MINUTE, OB.ORD_CPLT_DTM, NOW())  /* 주문완료일시 5분 경과 건 */
+						                                 	AND OD.RMN_ORD_QTY &gt; 0		/*주문취소 제외*/
+						                                 	AND OD.GOODS_NM IS NOT NULL		/*주문상세의 상품명 필수*/
+						                                 	AND OB.DATA_STAT_CD IN ('00','01') /*데이타 상태 코드 02:삭제 제외*/
+						       INNER JOIN COMPANY_BASE CB    ON OD.COMP_NO = CB.COMP_NO
+						       INNER JOIN ORD_DTL_CSTRT ODC  ON OD.ORD_NO = ODC.ORD_NO
+						                                    AND OD.ORD_DTL_SEQ = ODC.ORD_DTL_SEQ
+						       INNER JOIN ORDER_DLVRA  OD2   ON OD.ORD_DLVRA_NO = OD2.ORD_DLVRA_NO
+						       INNER JOIN DELIVERY_CHARGE DC ON OD.DLVRC_NO = DC.DLVRC_NO
+						       
+					     UNION 
+				  		
+				  		/* 클레임 교환배송 대상 */
+						SELECT  
+								  CASE 
+						          WHEN OB.ORD_NM IS NULL OR OB.ORD_NM = '' 
+						          THEN  OD2.ADRS_NM 
+						          ELSE OB.ORD_NM
+						           END 									AS ORDR_NM				/*주문자 이름*/
+								, OB.ORDR_TEL							AS ORDR_TEL_NO			/*주문자 전화번호*/
+								, OB.ORDR_MOBILE						AS ORDR_CEL_NO			/*주문자 휴대전화*/
+								, OB.ORDR_EMAIL							AS ORDR_EMAIL			/*주문자 이메일*/
+								, OD2.ADRS_NM							AS RECV_NM				/*수령자 이름*/
+								, OD2.TEL								AS RECV_TEL_NO			/*수령자 전화번호*/
+								, OD2.MOBILE							AS RECV_CEL_NO			/*수령자 휴대전화*/
+								, OD2.POST_NO_NEW						AS RECV_ZIPCODE			/*수령자 우편번호*/
+								, OD2.ROAD_ADDR							AS RECV_ADDR			/*수령자 주소*/
+								, OD2.ROAD_DTL_ADDR						AS RECV_ADDR_DTL		/*수령자 주소 상세*/
+								, 0										AS DC_AMT				/*할인금액*/
+								, 0										AS CPN_AMT				/*쿠폰금액*/
+								, 0										AS DLV_AMT_PER		    /*배송비 - 교환배송시 0원으로 설정-협의완료*/
+								, ROW_NUMBER() OVER (PARTITION BY CD.CLM_NO, CD.DLVRC_NO)    AS ORD_DLVRC_ROW_NUM /*클레임번호별 배송비번호의 SEQ*/
+								, OD2.PBL_GATE_PSWD 					AS GATE_NO				/*공동현관 출입번호*/
+								, DATE_FORMAT(CB.ACPT_DTM,'%Y%m%d') 	AS ORDR_DD				/*주문일자 - 클레임접수일자*/
+								, DATE_FORMAT(CB.ACPT_DTM,'%H%i%s') 	AS ORDR_TM				/*주문시간 - 클레임접수일자 시각*/
+								, IF (OD2.DLVR_DEMAND_YN = 'Y' 
+						 		      ,CONCAT(FN_GET_CODE_NAME('GOODS_RCV_PST',OD2.GOODS_RCV_PST_CD,'')
+						 		              , IF(IFNULL(OD2.GOODS_RCV_PST_ETC,'') = '', '', CONCAT('(',OD2.GOODS_RCV_PST_ETC,')'))
+						 		              , ' / '
+						 		              , FN_GET_CODE_NAME('PBL_GATE_ENT_MTD',OD2.PBL_GATE_ENT_MTD_CD,'')
+						 		              , ' / '
+						 		              , OD2.DLVR_DEMAND 
+						 		              , IF(IFNULL(OD2.DLVR_MEMO,'') = '', '', CONCAT(' / ',OD2.DLVR_MEMO))
+						 		              )
+						 		      ,'')								AS RMK_TXT  			/*비고 - 주문메모*/
+						 		, ODC.CSTRT_GOODS_ID 					AS SKU_CD				/*단품코드*/
+						 		, CD.GOODS_NM							AS SKU_NM				/*단품명*/
+						 		, ''									AS OPT_TXT				/*옵션 내용*/
+						 		, CDC.SALE_AMT							AS PRICE				/*가격*/
+						 		, IFNULL(CDC.CSTRT_QTY,0) * IFNULL(CD.CLM_QTY,0)    AS EA		/*수량*/
+						 		, ODC.CSTRT_GOODS_GB_CD 				AS CSTRT_GB_CD			/*구성 구분 코드*/
+						 		, '${@framework.common.constants.CommonConstants@CIS_API_UNIT_NM_EA}'				AS UNIT_NM				/*단위*/
+								, #{cisApiOwnrCd}				AS OWNR_CD				/*화주코드*/	
+								, #{cisApiWareCd}				AS WARE_CD				/*물류센터코드*/	
+								, '${@framework.common.constants.CommonConstants@CIS_API_DREL_TP_CD_SO1}'			AS DREL_TP_CD			/*출고 유형 코드*/
+						 		, '${@framework.common.constants.CommonConstants@CIS_API_ARRV_CD_AP}'				AS ARRV_CD				/*도착지 코드*/
+						 		, IF (CB2.COMP_GB_CD = '${@framework.common.constants.CommonConstants@COMP_GB_10}'	/*자사상품일때*/
+						 		      , CB.DLVR_PRCS_TP_CD				/*배송처리유형코드값으로*/
+						 		      , '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}'			/*외부업체상품일때는 무조건 택배 배송*/	
+						 		     )									AS DLVT_TP_CD					/*배송유형코드*/
+						 		, ( SELECT CONCAT(DAI.DLVR_AREA_CD,'||',IFNULL(DAI.DLVR_AREA_NO,'')) 
+                                    FROM DLVR_AREA_POST_MAP DAPM 
+										JOIN DLVR_AREA_INFO DAI ON (DAI.DLVR_AREA_NO = DAPM.DLVR_AREA_NO)
+									WHERE 1=1
+										AND DAPM.POST_NO = OD2.POST_NO_NEW
+										AND DAI.DLVR_PRCS_TP_CD = OB.DLVR_PRCS_TP_CD
+                                    LIMIT 1 )  AS DLV_AREA_INFO				/*배송 권역 정보*/				 		    
+						 		, DATE_FORMAT(now(),'%Y%m%d')			AS DLV_REQ_DD					/*배송 요청일자*/
+						 		, CDC.CLM_NO 							AS SHOP_ORDR_NO					/*상점 주문번호*/
+								, CONCAT(CDC.CLM_DTL_SEQ,'_',CDC.CLM_CSTRT_SEQ) AS SHOP_SORT_NO			/*상점 주문순번*/
+								, 'Y'									AS EXCHG_YN						/*교환주문여부*/
+								, ODC.ORD_NO							AS ORG_SHOP_ORDR_NO				/*원 상점 주문 번호 - 교환배송일때*/
+								, CONCAT(ODC.ORD_DTL_SEQ,'_',ODC.ORD_CSTRT_SEQ) AS ORG_SHOP_SORT_NO		/*원 상점 주문 순번 - 교환배송일때*/
+								/*필요에 의해 추가된 컬럼*/
+								, CDC.CLM_NO			AS ORD_NO 
+								, CDC.CLM_DTL_SEQ		AS ORD_DTL_SEQ
+								, CDC.CLM_CSTRT_SEQ		AS ORD_CSTRT_SEQ
+								, CDC.CLM_DTL_CSTRT_NO  AS ORD_DTL_CSTRT_NO
+								, OB.DLVR_PRCS_TP_CD	AS DLVR_PRCS_TP_CD
+								, OD2.ORD_DLVRA_NO		AS ORD_DLVRA_NO
+								, CD.DLVRC_NO			AS DLVRC_NO
+								, CB2.COMP_GB_CD        AS COMP_GB_CD
+								, CB2.COMP_NO			AS COMP_NO
+								, 'Y' 					AS CLM_DLVR_YN
+								, (SELECT T1.CLM_DTL_STAT_CD FROM CLAIM_DETAIL T1 WHERE T1.CLM_NO = CD.CLM_NO AND T1.ORD_NO = OD3.ORD_NO AND T1.ORD_DTL_SEQ = OD3.ORD_DTL_SEQ AND T1.CLM_DTL_TP_CD='30' limit 1) AS CLM_DTL_STAT_CD  
+								<!-- , CB.SWAP_YN			AS SWAP_YN --><!-- 2021.04.27 kek01 아래처럼 변경됨 -->
+								, IF(
+									IF (CB2.COMP_GB_CD = '10', CB.DLVR_PRCS_TP_CD, '10') = '10',	/*자사상품일때 배송처리유형코드값으로, 외부업체상품일때는 무조건 택배 배송*/
+						 		     'N',         /* 택배배송이면 SWAP_YN = N 으로 */
+								     CB.SWAP_YN   /* 그외이면 SWAP_YN 값으로 */
+								    ) AS SWAP_YN
+						  FROM CLAIM_BASE CB 
+						       INNER JOIN CLAIM_DETAIL CD    ON CB.CLM_NO = CD.CLM_NO 
+						                                    AND CD.CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_410}'	/*교환배송접수*/
+						       								AND CB.CLM_STAT_CD != '${@framework.common.constants.CommonConstants@CLM_STAT_40}'		/*취소 제외*/
+						       INNER JOIN ORDER_BASE OB      ON CD.ORD_NO = OB.ORD_NO
+						       INNER JOIN ORDER_DETAIL OD3   ON OD3.ORD_NO = CD.ORD_NO
+						                                    AND OD3.ORD_DTL_SEQ = CD.ORD_DTL_SEQ
+						       INNER JOIN COMPANY_BASE CB2   ON CD.COMP_NO = CB2.COMP_NO
+						       INNER JOIN CLM_DTL_CSTRT CDC  ON CD.CLM_NO = CDC.CLM_NO
+						                                    AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ
+						       INNER JOIN ORD_DTL_CSTRT ODC  ON CDC.ORD_DTL_CSTRT_NO = ODC.ORD_DTL_CSTRT_NO
+						       INNER JOIN ORDER_DLVRA  OD2   ON CD.DLVRA_NO = OD2.ORD_DLVRA_NO 
+						       INNER JOIN DELIVERY_CHARGE DC ON CD.DLVRC_NO = DC.DLVRC_NO
+					 ) Z
+				) X 
+		 WHERE X.BATCH_EXE_YN = 'Y'
+		 ORDER BY X.ORD_NO, X.ORD_DTL_SEQ, X.ORD_CSTRT_SEQ
+	</select>
+	
+	<resultMap type="biz.app.order.model.interfaces.CisOrderDeliveryCmdVO" id="listordDtlCstrtForSendCisMap">
+		<!-- 필요에 의해 추가된 컬럼 -->
+		<result property="ordNo"			column="ORD_NO"				/>	<!-- 주문 번호 -->
+		<result property="ordDtlSeq"		column="ORD_DTL_SEQ"		/>	<!-- 주문 상세 순번 -->
+		<result property="ordCstrtSeq"		column="ORD_CSTRT_SEQ"		/>	<!-- 주문 구성 순번 -->
+		<result property="ordDtlCstrtNo"	column="ORD_DTL_CSTRT_NO"	/>	<!-- 주문 상세 구성 번호 -->
+		<result property="dlvrPrcsTpCd"		column="DLVR_PRCS_TP_CD"	/>  <!-- 배송 처리 유형 코드(자사상품일때 유효값) -->
+		<result property="ordDlvraNo"		column="ORD_DLVRA_NO"		/>	<!-- 주문 배송지 번호 -->
+		<result property="compGbCd"		    column="COMP_GB_CD"		    />	<!-- 업체 구분 코드 -->
+		<result property="clmDlvrYn"		column="CLM_DLVR_YN"		/>	<!-- 클레임 배송 여부 -->
+		
+		<!-- 인터페이스 컬럼 -->
+		<collection property="orderInsertPO" ofType="biz.interfaces.cis.model.request.order.OrderInsertPO">
+			<result property="ordrNm"		column="ORDR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+			<result property="ordrTelNo"	column="ORDR_TEL_NO" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+			<result property="ordrCelNo"	column="ORDR_CEL_NO" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+			<result property="ordrEmail"	column="ORDR_EMAIL" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+			<result property="recvNm"		column="RECV_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler"	/>
+			<result property="recvTelNo"	column="RECV_TEL_NO" typeHandler="biz.common.typehandler.CryptoTypeHandler"	/>
+			<result property="recvCelNo"	column="RECV_CEL_NO" typeHandler="biz.common.typehandler.CryptoTypeHandler"	/>
+			<result property="recvZipcode"	column="RECV_ZIPCODE"	/>
+			<result property="recvAddr"		column="RECV_ADDR"		/>
+			<result property="recvAddrDtl"	column="RECV_ADDR_DTL" typeHandler="biz.common.typehandler.CryptoTypeHandler"	/>
+			<result property="dcAmt"		column="DC_AMT"			/>
+			<result property="cpnAmt"		column="CPN_AMT"		/>
+			<result property="dlvAmt"		column="DLV_AMT"		/>
+			<result property="gateNo"		column="GATE_NO"		/>
+			<result property="ordrDd"		column="ORDR_DD"		/>
+			<result property="ordrTm"		column="ORDR_TM"		/>
+			<result property="rmkTxt"		column="RMK_TXT"		/>
+			<collection property="itemList" ofType="biz.interfaces.cis.model.request.order.OrderInsertItemPO">
+				<result property="skuCd"        	column="SKU_CD"          />
+				<result property="skuNm"			column="SKU_NM"		     />
+				<result property="optTxt"			column="OPT_TXT"		 />
+				<result property="unitNm"			column="UNIT_NM"		 />
+				<result property="price"			column="PRICE"		     />
+				<result property="ea"				column="EA"			     />
+				<result property="cstrtGbCd"		column="CSTRT_GB_CD"	 />
+				<result property="ownrCd"			column="OWNR_CD"		 />
+				<result property="wareCd"			column="WARE_CD"		 />
+				<result property="drelTpCd"			column="DREL_TP_CD"		 />
+				<result property="dlvtTpCd"			column="DLVT_TP_CD"		 />
+				<result property="arrvCd"			column="ARRV_CD"		 />
+				<result property="dlvGrpCd"			column="DLV_GRP_CD"		 />
+				<result property="dawnMallId"		column="DAWN_MALL_ID"	 />
+				<result property="dlvReqDd"			column="DLV_REQ_DD"		 />
+				<result property="shopOrdrNo"		column="SHOP_ORDR_NO"	 />
+				<result property="shopSortNo"		column="SHOP_SORT_NO"	 />
+				<result property="exchgYn"			column="EXCHG_YN"		 />
+				<result property="orgShopOrdrNo"	column="ORG_SHOP_ORDR_NO" />
+				<result property="orgShopSortNo"	column="ORG_SHOP_SORT_NO" />
+				<result property="rmkTxt"			column="RMK_TXT"		 />
+				<result property="dlvrcNo"			column="DLVRC_NO"	     /> <!-- 필요에 의해 추가 : 배송비 번호 -->
+				<result property="compGbCd"			column="COMP_GB_CD"	     /> <!-- 필요에 의해 추가 : 업체 구분 코드 -->
+				<result property="compNo"			column="COMP_NO"	     /> <!-- 필요에 의해 추가 : 업체 번호 -->
+				<result property="ordDtlCstrtNo"	column="ORD_DTL_CSTRT_NO"	/>	<!-- 필요에 의해 추가 : 주문 상세 구성 번호 -->
+			</collection>
+		</collection>
+	</resultMap>
+
+	<select id="listOrdDtlCstrtForChkCisDlvrStateChg" resultType="biz.app.order.model.interfaces.CisOrderDeliveryStateChgVO">
+		<!--
+			Query Name : ordDtlCstrt.listOrdDtlCstrtForChkCisDlvrStateChg
+			Description : CIS 배송상태 변경 대상 주문상세내역 조회 (주문배송 + 클레임교환배송 대상) / 주문 상세 구성 상품 Base로 전송
+			Date : 2020. 2. 17  KEK01
+		-->
+		SELECT /* QUERYID(ordDtlCstrt.listOrdDtlCstrtForChkCisDlvrStateChg) */
+		       Z.*
+		  FROM (
+				   SELECT 
+				          OD.ORD_DTL_STAT_CD										AS ORD_DTL_STAT_CD
+				        , OD.ORD_DLVRA_NO  											AS ORD_DLVRA_NO
+				        , ODC.ORD_DTL_CSTRT_NO                                      AS ORD_DTL_CSTRT_NO
+				        , ODC.ORD_NO                                                AS ORD_NO
+				        , ODC.ORD_DTL_SEQ                                           AS ORD_DTL_SEQ
+				        , ODC.ORD_CSTRT_SEQ                                         AS ORD_CSTRT_SEQ
+				        , ODC.CSTRT_GOODS_ID                                        AS CSTRT_GOODS_ID
+				        , ODC.CSTRT_QTY * OD.RMN_ORD_QTY                            AS CSTRT_QTY
+						, OB.DLVR_PRCS_TP_CD                                        AS DLVR_PRCS_TP_CD
+						, CB.COMP_GB_CD                                             AS COMP_GB_CD
+						, 'N'                                                       AS CLM_DLVR_YN
+				        , (SELECT GROUP_CONCAT(ODCDM.DLVR_NO) 
+				             FROM ORD_DTL_CSTRT_DLVR_MAP ODCDM 
+				            WHERE ODCDM.ORD_DTL_CSTRT_NO = ODC.ORD_DTL_CSTRT_NO )   AS DLVR_NOS 
+						, IF (OB.DLVR_PRCS_TP_CD IN ('20','21'), 
+						     'Y',
+						     IF (OB.DLVR_PRCS_TP_CD = '10' AND OD.ORD_DTL_STAT_CD IN ('130','140'), 'Y', 'N')) AS BATCH_EXE_YN 
+						, null	AS CLM_ORD_NO
+						, null  AS CLM_ORD_DTL_SEQ						     
+				  FROM ORDER_BASE OB
+				       INNER JOIN ORDER_DETAIL OD	 ON OB.ORD_NO = OD.ORD_NO
+				                                 	AND OD.ORD_DTL_STAT_CD in ('130','140','150')	/*배송지시, 상품준비중, 배송중*/
+				                                 	AND OD.RMN_ORD_QTY <![CDATA[ > ]]> 0			/*주문 취소건 제외*/
+				       INNER JOIN COMPANY_BASE CB    ON OD.COMP_NO = CB.COMP_NO
+				                                    AND CB.COMP_GB_CD = '10'						/*자사(10) 주문건만*/
+				       INNER JOIN ORD_DTL_CSTRT ODC  ON OD.ORD_NO = ODC.ORD_NO
+				                                    AND OD.ORD_DTL_SEQ = ODC.ORD_DTL_SEQ
+			     UNION 
+				   SELECT 
+				          CD.CLM_DTL_STAT_CD										AS ORD_DTL_STAT_CD
+				        , CD.DLVRA_NO  												AS ORD_DLVRA_NO
+				        , CDC.CLM_DTL_CSTRT_NO                                      AS ORD_DTL_CSTRT_NO
+				        , CDC.CLM_NO                                                AS ORD_NO
+				        , CDC.CLM_DTL_SEQ                                           AS ORD_DTL_SEQ
+				        , CDC.CLM_CSTRT_SEQ                                         AS ORD_CSTRT_SEQ
+				        , CDC.CSTRT_GOODS_ID                                        AS CSTRT_GOODS_ID
+				        , CDC.CSTRT_QTY * CD.CLM_QTY                                AS CSTRT_QTY
+						, CB.DLVR_PRCS_TP_CD                                        AS DLVR_PRCS_TP_CD
+						, CB2.COMP_GB_CD                                            AS COMP_GB_CD
+						, 'Y'                                                       AS CLM_DLVR_YN
+				        , (SELECT GROUP_CONCAT(CDCDM.DLVR_NO) 
+				             FROM CLM_DTL_CSTRT_DLVR_MAP CDCDM 
+				            WHERE CDCDM.CLM_DTL_CSTRT_NO = CDC.CLM_DTL_CSTRT_NO )   AS DLVR_NOS 
+						, IF (CB.DLVR_PRCS_TP_CD IN ('20','21'), 
+						     'Y',
+						     IF (CB.DLVR_PRCS_TP_CD = '10' AND CD.CLM_DTL_STAT_CD IN ('420','430'), 'Y', 'N')) AS BATCH_EXE_YN 
+						, CD.ORD_NO			AS CLM_ORD_NO
+						, CD.ORD_DTL_SEQ	AS CLM_ORD_DTL_SEQ
+				  FROM CLAIM_BASE CB 
+				       INNER JOIN CLAIM_DETAIL CD    ON CB.CLM_NO = CD.CLM_NO 
+				                                    AND CD.CLM_DTL_STAT_CD in ('420','430','440')	/*교환배송지시, 상품준비중, 배송중*/
+				                                    AND CB.CLM_STAT_CD != '40'						/*클레임취소제외*/
+				       INNER JOIN ORDER_BASE OB      ON CD.ORD_NO = OB.ORD_NO
+				       INNER JOIN COMPANY_BASE CB2   ON CD.COMP_NO = CB2.COMP_NO
+				                                    AND CB2.COMP_GB_CD = '10'						/*자사(10) 주문건만*/
+				       INNER JOIN CLM_DTL_CSTRT CDC  ON CD.CLM_NO = CDC.CLM_NO
+				                                    AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ
+			 ) Z
+ 		WHERE Z.BATCH_EXE_YN = 'Y'
+ 		  AND Z.DLVR_NOS IS NOT NULL
+		ORDER BY Z.ORD_NO, Z.ORD_DTL_SEQ, Z.ORD_CSTRT_SEQ
+	</select>
+	
+	<select id="listOrdDtlCstrtForOrder" parameterType="biz.app.order.model.OrdDtlCstrtPO" resultType="biz.app.order.model.OrdDtlCstrtVO">
+		SELECT
+			CS.SUB_GOODS_ID AS CSTRT_GOODS_ID,
+			(SELECT SKU_CD FROM ITEM WHERE GOODS_ID = CS.SUB_GOODS_ID) AS SKU_CD,
+			'${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_20}' AS CSTRT_GOODS_GB_CD,
+			CS.CSTRT_QTY,
+			GP.ORG_SALE_AMT,
+			GP.SALE_AMT
+		FROM
+			GOODS_CSTRT_SET CS
+		INNER JOIN GOODS_BASE SGB ON SGB.GOODS_ID = CS.GOODS_ID
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = CS.SUB_GOODS_ID
+		INNER JOIN GOODS_PRICE GP ON GB.GOODS_ID = GP.GOODS_ID
+		WHERE 
+			CS.GOODS_ID = #{cstrtGoodsId, jdbcType=VARCHAR} 
+			AND SGB.GOODS_CSTRT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_SET}'
+			AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+			AND GP.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		UNION ALL
+		SELECT
+			GB.GOODS_ID AS CSTRT_GOODS_ID,
+			(SELECT SKU_CD FROM ITEM WHERE GOODS_ID = GB.GOODS_ID) AS SKU_CD,
+			'${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_10}' AS CSTRT_GOODS_GB_CD,
+			1 CSTRT_QTY,
+			GP.ORG_SALE_AMT,
+			GP.SALE_AMT
+		FROM GOODS_BASE GB 
+		INNER JOIN GOODS_PRICE GP ON GB.GOODS_ID = GP.GOODS_ID
+		WHERE 
+			GB.GOODS_ID = #{cstrtGoodsId, jdbcType=VARCHAR}
+			AND GOODS_CSTRT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM}'
+			AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM
+			AND GP.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+	</select>
+	
+	<insert id="insertOrdDtlCstrt" parameterType="biz.app.order.model.OrdDtlCstrtVO" >
+		INSERT INTO ORD_DTL_CSTRT	/* QUERYID(ordDtlCstrt.insertOrdDtlCstrt) */
+		(
+			ORD_DTL_CSTRT_NO
+			, ORD_NO
+			, ORD_DTL_SEQ
+			, ORD_CSTRT_SEQ
+			, CSTRT_GOODS_ID
+			, SKU_CD
+			, CSTRT_GOODS_GB_CD
+			, CSTRT_QTY
+			, ORG_SALE_AMT
+			, SALE_AMT
+			, CIS_ORD_NO
+			, CIS_ORD_DTL_SEQ
+			, CIS_STAT_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{ordDtlCstrtNo}
+			, #{ordNo}
+			, #{ordDtlSeq}
+			, #{ordCstrtSeq}
+			, #{cstrtGoodsId}
+			, #{skuCd}
+			, #{cstrtGoodsGbCd}
+			, #{cstrtQty}
+			, #{orgSaleAmt}
+			, #{saleAmt}
+			, #{cisOrdNo}
+			, #{cisOrdDtlSeq}
+			, #{cisStatCd}
+			, #{sysRegrNo }
+			, NOW()
+			, #{sysUpdrNo }
+			, NOW()
+		)
+	</insert>
+
+	
+</mapper>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업윈도우 A .popLayer.win-->
+		<article class="popLayer win a popWin1">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit newDn">주소검색</h1>
+						<button type="button" class="btnPopClose" onclick="window.self.close();">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						<!-- 주소 검색 -->
+						<div class="address-search">
+							<div class="input del t2 drop" data-txt="검색">
+								<input type="text" placeholder="도로명, 지번, 건물명을 입력해주세요" value="">
+								<div class="drop-list" style="display:none;">
+									<ul>
+										<li><a href="javascript:;">서울특별시 강남구 <span>역삼</span> 동</a></li>
+										<li><a href="javascript:;">서울특별시 강남구 <span>역삼</span> 동</a></li>
+										<li><a href="javascript:;">서울특별시 강남구 <span>역삼</span> 동</a></li>
+									</ul>
+								</div>
+							</div>
+							<!-- <p class="validation-check">error message</p> -->
+							<div class="address-list">
+								<p class="nodata">검색된 결과가 없습니다.<br>입력하신 주소를 다시 한번 확인해주세요.</p>
+								<ul>
+									<li>
+										<strong class="postal-code">07280</strong>
+										<p class="t1"><span class="i1">도로명</span> 서울특별시 영등포구 선유로 75 </p>
+										<p class="t2"><span class="i2">지번</span> 서울 특별시 영등포구 문래동6가 10 GS강서타워</p>
+									</li>
+									<li>
+										<strong class="postal-code">07280</strong>
+										<p class="t1"><span class="i1">도로명</span> 서울특별시 영등포구 선유로 75 역삼 덕양빌라트 2호 20-30 (GS강서타워)</p>
+										<p class="t2"><span class="i2">지번</span> 서울 특별시 영등포구 문래동6가 10 GS강서타워</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<p class="tip-text">아래와 같이 검색하면 더욱 정확한 결과가 검색 됩니다.</p>
+						<div class="hint-list">
+							<ul>
+								<li>
+									<p class="t1">도로명 + 건물번호</p>
+									<p class="t2">예) 영동대로 513</p>
+								</li>
+								<li>
+									<p class="t1">지역명(동/리) + 번지</p>
+									<p class="t2">예) 삼성동 25</p>
+								</li>
+								<li>
+									<p class="t1">지역명(동/리) + 건물명(아파트명)</p>
+									<p class="t2">예) 삼성동 코엑스</p>
+								</li>
+							</ul>
+						</div>
+						<!-- // 주소 검색 -->
+						<!-- paging -->
+						<div class="paginate" id="pageApi">
+							<button class="p">이전</button>
+							<span class="curr">1</span>
+							<span class="max">/ 20</span>
+							<button class="n">다음</button>
+						</div>
+						<!-- // paging -->
+					</main>
+				</div>
+				
+				<!-- 하단 고정 버튼 있을때 쓰세요
+					<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl d" onclick="ui.popLayer.close('popWin1');">취소</button>
+						<button type="button" class="btn xl a">등록</button>
+					</div>
+				</div>
+				-->
+				
+			</div>
+		</article>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<!-- 팝업 A .popLayer-->
+	<article class="popLayer a popDeliReq" id="popDeliReq">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">배송 요청사항</h1>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="uiDeliReq">
+						<ul class="delist">
+							<li>
+								<div class="hdt">상품 수령위치</div>
+								<div class="cdt">
+									<ul class="rlist">
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_a"><span class="txt"><em class="tt">문 앞</em></span></label>
+										</li>
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_a"><span class="txt"><em class="tt">경비실</em></span></label>
+										</li>
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_a"><span class="txt"><em class="tt">택배함</em></span></label>
+										</li>
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_a" id="rdo_dereq_msg"><span class="txt"><em class="tt">기타 (직접 입력)</em></span></label>
+										</li>
+									</ul>
+									<div class="etmsg" id="rdo_dereq_msg_box">
+										<span class="input"><input type="text" placeholder="메시지를 입력해 주세요." title="기타메시지"></span>
+										<div class="validation-check" style="display:none;">상품 수령위치를 입력해주세요.</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="hdt">공동현관 출입방법</div>
+								<div class="cdt">
+									<ul class="rlist">
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_b" id="rdo_dereq_pwd"><span class="txt"><em class="tt">공동현관 비밀번호</em></span></label>
+
+										</li>
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_b"><span class="txt"><em class="tt">경비실 호출</em></span></label>
+										</li>
+										<li>
+											<label class="radio"><input type="radio" name="rd_dereq_b"><span class="txt"><em class="tt">필요없음</em></span></label>
+										</li>
+									</ul>
+									<div class="etmsg" id="rdo_dereq_pwd_box">
+										<span class="input"><input type="text" placeholder="예) 1234 호출번호" title="공동현관 비밀번호"></span>
+										<div class="validation-check" style="display:none;">공동현관 비밀번호를 입력해주세요.</div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="hdt">택배배송 요청사항</div>
+								<div class="cdt">
+									<div class="textarea msgreq">
+										<textarea cols="30" rows="3" placeholder="택배기사님께 요청하실 사항이 있으실 경우 작성해 주세요.(최소 5자이상 ~ 최대 100자 이내 입력)"></textarea>
+									</div>
+								</div>
+							</li>
+						</ul>
+	
+						<div class="btnSet bot">
+							<button type="button" class="btn lg c">취소</button>
+							<button type="button" class="btn lg a">저장</button>
+						</div>
+					</div>
+				</main>
+			</div>
+			
+		</div>
+	</article>
+	<script>
+		ui.popLayer.open("popDeliReq");
+
+		$(document).on("change","[name='rd_dereq_a']",function(e){
+			if( $("#rdo_dereq_msg").prop("checked") ) {
+				$("#rdo_dereq_msg_box").show();
+			}else{
+				$("#rdo_dereq_msg_box").hide();
+			}
+		});
+		$(document).on("change","[name='rd_dereq_b']",function(e){
+			if( $("#rdo_dereq_pwd").prop("checked") ) {
+				$("#rdo_dereq_pwd_box").show();
+			}else{
+				$("#rdo_dereq_pwd_box").hide();
+			}
+		});
+
+	</script>
+</body>
+</html>

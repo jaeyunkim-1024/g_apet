@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<title>veci</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="stylesheet" type="text/css" href="css/design.css">
+	<script type="text/javascript"  src="js/jquery-1.11.3.min.js" ></script>
+	<script type="text/javascript"  src="js/jquery-ui.min.js" ></script>
+	<script type="text/javascript"  src="js/design-ui.js" ></script>
+	
+</head>
+<body>
+	<a href="#test1" class="eLayer">레이어 열기1</a>
+	<a href="#test2" class="eLayer">레이어 열기2</a>
+	
+	<div id="test1" class="mPop typeLayer layer">
+		<div class="popArea">
+			<p class="popTitle">완료확인</p>
+			<div class="popContent">
+				<p class="alertText">입력하신 데이터가 모두<br />완료되었습니다.</p>
+				<div class="mSubmit typeSubmit">
+					<button type="button" class="button normal"><span>확인하기</span></button>
+					<button type="button" class="button cancle"><span>취소하기</span></button>
+				</div>
+			</div>
+			<div class="closeBtn"><button type="button" >닫기</button></div>
+		</div>
+	</div>
+	<div id="test2" class="mPop typeLayer gError layer">
+		<div class="popArea">
+			<p class="popTitle">오류메세지</p>
+			<div class="popContent">
+				<p class="alertText">잘못 입력 또는 선택하셨습니다.<br />다시한번 확인 또는 입력해주세요.</p>
+				<div class="mSubmit typeSubmit">
+					<button type="button" class="button normal"><span>확인하기</span></button>
+					<button type="button" class="button cancle"><span>취소하기</span></button>
+				</div>
+			</div>
+			<div class="closeBtn"><button type="button" >닫기</button></div>
+		</div>
+	</div>
+</body>
+</html>

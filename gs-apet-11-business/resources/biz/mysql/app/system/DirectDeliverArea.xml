@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="directDeliverArea">
+
+	<select id="listDirectDeliverArea" resultType="biz.app.system.model.DeliverAreaSetVO">
+		<!--
+			Query Name : directDeliverArea.listDirectDeliverAreaGrid
+			Description : 직배송지역 리스트
+		-->
+		SELECT	/* QUERYID(directDeliverArea.listDirectDeliverAreaGrid) */
+				  A.AREA_ID					/* 아이디 */
+				, A.AREA_NAME				/* 지역명 */
+				, A.OUTGO_STORAGE_ID		/* 출고창고아이디 */
+				, A.AS_STORAGE_ID1			/* AS창고1 */
+				, A.AS_STORAGE_ID2			/* AS창고2 */
+				, A.AREA_CD					/* 지역코드 */
+				, (SELECT WHS_NM FROM WMS_WAREHOUSE WHERE WHS_NO = A.OUTGO_STORAGE_ID) AS OUTGO_STORAGE_NM	/* 출고창고명 */
+				, (SELECT WHS_NM FROM WMS_WAREHOUSE WHERE WHS_NO = A.AS_STORAGE_ID1) AS AS_STORAGE_NM1		/* AS창고1명 */
+				, (SELECT WHS_NM FROM WMS_WAREHOUSE WHERE WHS_NO = A.AS_STORAGE_ID2) AS AS_STORAGE_NM2		/* AS창고2명 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	DELIVER_AREA_SET A
+		WHERE	1 = 1
+		<if test="areaId != null">
+			AND		A.AREA_ID	= #{areaId}
+		</if>
+		<if test="areaCd != null and areaCd != ''">
+			AND		A.AREA_CD	= #{areaCd}
+		</if>
+	</select>
+
+	<delete id="deleteDirectDeliverArea" parameterType="biz.app.system.model.DeliverAreaSetPO">
+		<!--
+			Query Name : directDeliverArea.deleteDirectDeliverArea
+			Description : 직배송지역 삭제
+		-->
+		DELETE	FROM	DELIVER_AREA_SET
+		WHERE	AREA_ID	= #{areaId}
+	</delete>
+
+	<select id="listWareHouse" resultType="biz.app.system.model.DeliverAreaSetVO">
+		<!--
+			Query Name : directDeliverArea.listWareHouseGrid
+			Description : 창고 리스트
+		-->
+		SELECT	/* QUERYID(directDeliverArea.listWareHouseGrid) */
+				  WHS_NO			/* 창고 번호 */
+				, WHS_CD			/* 창고 코드 */
+				, WHS_NM			/* 창고 명 */
+				, WHS_TP			/* 창고 유형 */
+				, RLTN_WHS			/* 관계 창고 */
+				, TEL				/* 전화 */
+				, STAT_CD			/* 상태 코드 */
+				, ADDR				/* 주소 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, AREA_GB_CD		/* 지역구분 */
+				, MANAGER_NM		/* 책임자 */
+				, MANAGER_TEL		/* 책임자연락처 */
+				, MANAGER_EMAIL		/* 책임자e-mail */
+				, WMS_GET_COMM_CODE('COMM_CODE', 'WMS_WAREHOUSE_TYPE', WHS_TP) AS WHS_TP_NM	/* 창고 유형명 */
+				, WMS_GET_MASTER_INFO('WAREHOUSE_NM', RLTN_WHS) AS RLTN_WHS_NM				/* 관계 창고명 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	WMS_WAREHOUSE
+		WHERE	1 = 1
+		AND		STAT_CD != 'D'
+		<if test="areaId != null">
+			AND		WHS_NO	 = #{whsNo}
+		</if>
+	</select>
+
+	<select id="listWareHouseGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : directDeliverArea.listWareHouseGridCount
+			Description : 창고 리스트 카운트
+		-->
+		SELECT	/* QUERYID(directDeliverArea.listWareHouseGridCount) */
+				COUNT(*)
+		FROM	WMS_WAREHOUSE
+		WHERE	1 = 1
+		AND		STAT_CD != 'D'
+		<if test="areaId != null">
+			AND		WHS_NO	 = #{whsNo}
+		</if>
+	</select>
+
+	<insert id="insertDirectDeliverArea" parameterType="biz.app.system.model.DeliverAreaSetPO">
+		<!--
+			Query Name : directDeliverArea.insertDirectDeliverArea
+			Description : 직배송지역 등록
+		-->
+		<selectKey keyProperty="areaId" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DIRECT_DELIVER_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO DELIVER_AREA_SET (
+			  AREA_ID				/* 아이디 */
+			, AREA_NAME				/* 지역명 */
+			, OUTGO_STORAGE_ID		/* 출고창고아이디 */
+			, AS_STORAGE_ID1		/* AS창고1 */
+			, AS_STORAGE_ID2		/* AS창고2 */
+			, AREA_CD				/* 지역코드 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{areaId}				/* 아이디 */
+			, #{areaName}			/* 지역명 */
+			, #{outgoStorageId}		/* 출고창고아이디 */
+			, #{asStorageId1}		/* AS창고1 */
+			, #{asStorageId2}		/* AS창고2 */
+			, #{areaCd}				/* 지역코드 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDirectDeliverArea" parameterType="biz.app.system.model.DeliverAreaSetPO">
+		<!--
+			Query Name : directDeliverArea.updateDirectDeliverArea
+			Description : 직배송지역 수정
+		-->
+		UPDATE	DELIVER_AREA_SET SET
+				  AREA_ID				= #{areaId}				/* 아이디 */
+				, AREA_NAME				= #{areaName}			/* 지역명 */
+				, OUTGO_STORAGE_ID		= #{outgoStorageId}		/* 출고창고아이디 */
+				, AS_STORAGE_ID1		= #{asStorageId1}		/* AS창고1 */
+				, AS_STORAGE_ID2		= #{asStorageId2}		/* AS창고2 */
+				, AREA_CD				= #{areaCd}				/* 지역코드 */
+				, SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		AREA_ID	= #{areaId}
+	</update>
+
+	<select id="iistZipCodeGrid" resultType="biz.app.system.model.ZipcodeMappingVO">
+		<!--
+			Query Name : directDeliverArea.iistZipCodeGrid
+			Description : 우편번호 리스트(10 : 구우편번호, 20 : 신우편번호)
+		-->
+			SELECT	/* QUERYID(directDeliverArea.iistZipCodeGrid) */
+					  A.SEQ				/* 순번 */
+					, A.ZIPCODE			/* 5자리우편번호 */
+					<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_10">
+					, CONCAT(A.SIDO, ' ', A.GUGUN, ' ' , A.DONG, ' ', A.RI, ' ', A.BUNJI) AS ADDR			/* 구주소 */
+					</if>
+					<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+					, CONCAT(B.SIDO, ' ', B.SIGUNGU, ' ', B.STREET, ' ', B.BUILDINGNUM1, CASE WHEN B.BUILDINGNUM2 &lt;&gt; '0' THEN CONCAT('-', B.BUILDINGNUM2) ELSE '' END) AS ADDR	/* 도로명주소 */
+					</if>
+					, A.AREA_YN			/* 직배송여부 */
+					, A.AREA_ID			/* 직배송지역 */
+					, A.MAPPING_CD		/* 우편번호구분 */
+					, (SELECT AREA_NAME FROM DELIVER_AREA_SET WHERE AREA_ID = A.AREA_ID) AS AREA_NM			/* 직배송지역명 */
+			FROM	ZIPCODE_MAPPING A
+			<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+				INNER JOIN ZIPCODE_POST B
+			</if>
+			WHERE	1 =1
+			<if test="mappingCd != null and mappingCd != ''">
+				AND		A.MAPPING_CD = #{mappingCd}
+			</if>
+			<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+				AND		A.ZIPCODE = B.ZIPCODE
+			</if>
+			<if test="deliverNm != null and deliverNm != '' and mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_10">
+				AND		A.DONG LIKE CONCAT(#{deliverNm}, '%')
+			</if>
+			<if test="deliverNm != null and deliverNm != '' and mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+				AND		B.STREET LIKE CONCAT(#{deliverNm}, '%')
+			</if>
+			<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="iistZipCodeGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : directDeliverArea.iistZipCodeGridCount
+			Description : 우편번호 리스트 카운트(10 : 구우편번호, 20 : 신우편번호)
+		-->
+		SELECT	/* QUERYID(directDeliverArea.iistZipCodeGridCount) */
+				COUNT(*)
+		FROM	ZIPCODE_MAPPING A
+		<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+			INNER JOIN ZIPCODE_POST B
+		</if>
+		WHERE	1 =1
+		<if test="mappingCd != null and mappingCd != ''">
+			AND		A.MAPPING_CD = #{mappingCd}
+		</if>
+		<if test="mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+			AND		A.ZIPCODE = B.ZIPCODE
+		</if>
+		<if test="deliverNm != null and deliverNm != '' and mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_10">
+			AND		A.DONG LIKE CONCAT(#{deliverNm}, '%')
+		</if>
+		<if test="deliverNm != null and deliverNm != '' and mappingCd == @framework.common.constants.CommonConstants@ZIP_CODE_20">
+			AND		B.STREET LIKE CONCAT(#{deliverNm}, '%')
+		</if>
+	</select>
+
+	<update id="saveDeliverAreaZipCode" parameterType="biz.app.system.model.ZipcodeMappingPO">
+		<!--
+			Query Name : directDeliverArea.saveDeliverAreaZipCode
+			Description : 직배송 지역 저장
+		-->
+		UPDATE	ZIPCODE_MAPPING SET
+				AREA_YN			= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/** 직배송여부 */
+			  , AREA_ID			= #{areaId}													/** 직배송지역 */
+			  , SYS_UPDR_NO		= #{sysUpdrNo}												/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM		= NOW()														/* 시스템 수정 일시 */
+		WHERE	SEQ = #{seq}
+	</update>
+
+	<select id="getAreaZipCode" resultType="biz.app.system.model.ZipcodeMappingVO">
+		SELECT	/* QUERYID(directDeliverArea.getAreaZipCode) */
+				ZIPCODE
+		FROM	ZIPCODE_MAPPING
+		WHERE 1 = 1
+		AND MAPPING_CD = '${@framework.common.constants.CommonConstants@ZIP_CODE_20}'
+		AND ZIPCODE = #{zipcode}
+	</select>
+
+	<insert id="insertDeliverAreaZipCode" parameterType="biz.app.system.model.ZipcodeMappingPO">
+		<selectKey keyProperty="seq" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_ZIPCODE_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO ZIPCODE_MAPPING (
+			  SEQ				/* 순번 */
+			, ZIPCODE			/* 5자리우편번호 */
+			, AREA_YN			/* 직배송여부 */
+			, MAPPING_CD		/* 우편번호구분 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{seq}			/* 순번 */
+			, #{zipcode}		/* 5자리우편번호 */
+			, '${@framework.common.constants.CommonConstants@COMM_YN_N}'		/* 직배송여부 */
+			, '${@framework.common.constants.CommonConstants@ZIP_CODE_20}'	/* 우편번호구분 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+	<Properties>
+		<Property name="logPath">/LOG/BT/</Property>
+		<Property name="logName">apet_batch</Property>
+		<Property name="logExt">.log</Property>
+		<Property name="deliverySubPath">/DELIVERY/</Property>
+		<Property name="deliveryInfoName">cis_delivery_info</Property>
+		<Property name="deliveryErrorName">cis_delivery_error</Property>
+		<Property name="returnInfoName">cis_return_info</Property>
+		<Property name="returnErrorName">cis_return_error</Property>
+		<Property name="layoutPattern">%d [%t] %-5level %c(%M:%L) - %m%n</Property>
+	</Properties>
+	<Appenders>
+	
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+		</Console>
+		
+		<RollingFile name="${logName}"
+			fileName="${logPath}${logName}${logExt}"
+			filePattern="${logPath}${logName}${logExt}.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" fileIndex="min" />
+		</RollingFile>
+		
+		<RollingFile name="${deliveryInfoName}"
+			fileName="${logPath}${deliverySubPath}${deliveryInfoName}/${deliveryInfoName}${logExt}"
+			filePattern="${logPath}${deliverySubPath}${deliveryInfoName}/${deliveryInfoName}${logExt}.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" fileIndex="min" />
+		</RollingFile>
+		
+		<RollingFile name="${deliveryErrorName}"
+			fileName="${logPath}${deliverySubPath}${deliveryInfoName}/${deliveryErrorName}${logExt}"
+			filePattern="${logPath}${deliverySubPath}${deliveryInfoName}/${deliveryErrorName}${logExt}.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<LevelRangeFilter minLevel="error" maxLevel="error" onMatch="accept" onMismatch="deny"/>
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" fileIndex="min" />
+		</RollingFile>
+		
+		<RollingFile name="${returnInfoName}"
+			fileName="${logPath}${deliverySubPath}${returnInfoName}/${returnInfoName}${logExt}"
+			filePattern="${logPath}${deliverySubPath}${returnInfoName}/${returnInfoName}${logExt}.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" fileIndex="min" />
+		</RollingFile>
+		
+		<RollingFile name="${returnErrorName}"
+			fileName="${logPath}${deliverySubPath}${returnInfoName}/${returnErrorName}${logExt}"
+			filePattern="${logPath}${deliverySubPath}${returnInfoName}/${returnErrorName}${logExt}.%d{yyyy-MM-dd}-%i"
+			filePermissions="rw-r--r--">
+			<LevelRangeFilter minLevel="error" maxLevel="error" onMatch="accept" onMismatch="deny"/>
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" fileIndex="min" />
+		</RollingFile>
+		
+	</Appenders>
+	<Loggers>
+	    
+	    <logger name="biz.app.order.service.interfaces.CisOrderDeliveryServiceImpl" level="info" additivity="false">
+	      <AppenderRef ref="${deliveryInfoName}" />
+	      <AppenderRef ref="${deliveryErrorName}" />
+	    </logger>
+	    
+	    <logger name="biz.app.order.service.interfaces.CisOrderReturnServiceImpl" level="info" additivity="false">
+	      <AppenderRef ref="${returnInfoName}" />
+	      <AppenderRef ref="${returnErrorName}" />
+	    </logger>
+	    
+	    <logger name="batch.excute.delivery.CisDeliveryCommandExecute" level="info" additivity="false">
+	      <AppenderRef ref="${deliveryInfoName}" />
+	      <AppenderRef ref="${deliveryErrorName}" />
+	    </logger>
+	    
+	    <logger name="batch.excute.delivery.CisDeliveryStateChangeExecute" level="info" additivity="false">
+	      <AppenderRef ref="${deliveryInfoName}" />
+	      <AppenderRef ref="${deliveryErrorName}" />
+	    </logger>
+	    
+	    <logger name="batch.excute.delivery.CisReturnCommandExecute" level="info" additivity="false">
+	      <AppenderRef ref="${returnInfoName}" />
+	      <AppenderRef ref="${returnErrorName}" />
+	    </logger>
+	    
+	    <logger name="batch.excute.delivery.CisReturnStateChangeExecute" level="info" additivity="false">
+	      <AppenderRef ref="${returnInfoName}" />
+	      <AppenderRef ref="${returnErrorName}" />
+	    </logger>
+	    
+	    <logger name="jdbc.sqlonly" level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </logger>         
+	    <logger name="jdbc.resultsettable" level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </logger>         
+	    <logger name="framework" level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </logger>
+	    <logger name="biz" level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </logger>
+	    <logger name="batch" level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </logger>
+	    
+	    <Root level="error" additivity="false">
+	      <AppenderRef ref="${logName}" />
+	    </Root>
+	    
+	  </Loggers>
+</Configuration>

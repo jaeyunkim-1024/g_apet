@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	SMS 수신자 Mapper 
+	작성자  	snw 
+	작성일자  	2016.04.22 
+-->
+
+<mapper namespace="smsReceiver">
+
+	
+	<insert id="insertSmsReceiver">
+		<!--
+			Query Name : smsReceiver.insertSmsReceiver
+			Description : SMS 수신자 등록
+		-->
+		INSERT INTO SMS_RECEIVER
+			(
+				SMS_HIST_ID
+				,RCV_SEQ
+				,RCVR_NO
+				,RCVR_NM
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+			)
+			VALUES
+			(
+				#{smsHistId}
+				,#{rcvSeq}
+				,#{rcvrNo}
+				,#{rcvrNm}
+				,#{sysRegrNo}
+				,SYSDATE()
+			)	
+	</insert>
+	
+	
+</mapper>

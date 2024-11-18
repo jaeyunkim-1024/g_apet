@@ -1,0 +1,1381 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	단품
+	작성자  	valueFactory
+	작성일자  	2017.03.03
+-->
+
+<mapper namespace="item">
+
+	<select id="getItem" resultType="biz.app.goods.model.ItemVO">
+		<!--
+			Query Name : item.selectItem
+			Description : 단품 단건 조회
+		-->
+		SELECT	/* QUERYID(item.getItem) */
+					ITEM_NO				/* 단품 번호 */
+					, ITEM_NM			/* 단품 명 */
+					, GOODS_ID			/* 상품 아이디 */
+					, ITEM_STAT_CD		/* 단품 상태 코드 */
+					, ADD_SALE_AMT	/* 추가 판매 금액 */
+					, WEB_STK_QTY		/* 웹 재고 수량 */
+					, SALE_YN			/* 판매 여부 */
+					, SHOW_SEQ			/* 노출 순서 */
+					, FRB_PSB_YN		/* 사은품 가능 여부 */
+					, COMP_ITEM_ID	/* 업체 단품 아이디 */
+					, FN_GET_GOODS_STOCK(GOODS_ID, ITEM_NO) AS REAL_WEB_STK_QTY
+					, SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM		/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM 	ITEM IT
+		WHERE 	1=1
+		<if test="itemNo != null">
+		AND		IT.ITEM_NO = #{itemNo}
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+		AND		IT.GOODS_ID = #{goodsId}
+		</if>
+
+	</select>
+
+	<select id="listItem" resultType="biz.app.goods.model.ItemVO">
+		<!--
+			Query Name : item.listItem
+			Description : 단품 목록 조회
+		-->
+		SELECT	/* QUERYID(item.listItem) */
+					ITEM_NO				/* 단품 번호 */
+					, ITEM_NM			/* 단품 명 */
+					, GOODS_ID			/* 상품 아이디 */
+					, ITEM_STAT_CD		/* 단품 상태 코드 */
+					, ADD_SALE_AMT	/* 추가 판매 금액 */
+					, WEB_STK_QTY		/* 웹 재고 수량 */
+					, SALE_YN			/* 판매 여부 */
+					, SHOW_SEQ			/* 노출 순서 */
+					, FRB_PSB_YN		/* 사은품 가능 여부 */
+					, COMP_ITEM_ID	/* 업체 단품 아이디 */
+					, SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM		/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM 	ITEM
+		WHERE 	1=1
+		<if test="itemStatCd != null and itemStatCd != ''">
+		AND		ITEM_STAT_CD = #{itemStatCd}
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+		AND		GOODS_ID = #{goodsId}
+		</if>
+	</select>
+
+	<update id="updateItemWebStockQtyReset">
+		<!--
+			Query Name : item.updateItemWebStockQtyReset
+			Description : 단품의 웹재고 수정
+		-->
+		UPDATE	 /* QUERYID(ITEM.updateItemWebStockQtyReset) */ ITEM
+		SET		WEB_STK_QTY = #{webStkQty}
+		WHERE	ITEM_NO = #{itemNo}
+	</update>
+
+	<update id="updateItemWebStockQty">
+      <!--
+         Query Name : item.updateItemWebStockQty
+         Description : 단품의 웹재고 증차감
+      -->
+      UPDATE    /* QUERYID(ITEM.updateItemWebStockQty) */ ITEM
+      SET      WEB_STK_QTY = WEB_STK_QTY + #{webStkQty}
+      WHERE   ITEM_NO = #{itemNo}
+      <if test="webStkQty &lt; 0"> AND WEB_STK_QTY + #{webStkQty} &gt;= 0</if>
+   </update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<insert id="insertAttribute" parameterType="biz.app.attribute.model.AttributePO" >
+		<!--
+			Query Name : item.insertAttribute
+			Description : 옵션 등록
+		-->
+		INSERT /* QUERYID(item.insertAttribute) */   INTO ATTRIBUTE (
+			  ATTR_NO			/* 속성 번호 */
+			, ATTR_NM			/* 속성 명 */
+			, USE_YN			/* 사용 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{attrNo }		/* 속성 번호 */
+			, #{attrNm }		/* 속성 명 */
+			, #{useYn }			/* 사용 여부 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+		ON DUPLICATE KEY
+		UPDATE SYS_UPDR_NO = #{sysUpdrNo }
+		, SYS_UPD_DTM = NOW()
+		, USE_YN = #{useYn }
+		<if test="attrNm != null and attrNm != ''">
+		, ATTR_NM = #{attrNm }
+		</if>
+	</insert>
+
+
+	<insert id="insertGoodsAttribute" parameterType="biz.app.goods.model.GoodsAttributePO" >
+		<!--
+			Query Name : item.insertGoodsAttribute
+			Description : 상품 옵션 등록
+		-->
+		INSERT /* QUERYID(item.insertGoodsAttribute) */  INTO GOODS_ATTRIBUTE (
+			  GOODS_ID			/* 상품 아이디 */
+			, ATTR_NO			/* 속성 번호 */
+			, DISP_PRIOR_RANK /* 전시우선순위 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+
+		) VALUES (
+			  #{goodsId }		/* 상품 아이디 */
+			, #{attrNo }		/* 속성 번호 */
+			, #{dispPriorRank}	/* 전시우선순위 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+		ON DUPLICATE KEY
+		UPDATE SYS_REG_DTM = NOW()
+	</insert>
+
+
+	<insert id="insertAttributeValue" parameterType="biz.app.attribute.model.AttributeValuePO" >
+		<!--
+			Query Name : item.insertAttributeValue
+			Description : 옵션값 등록
+		-->
+		INSERT /* QUERYID(item.insertAttributeValue) */ INTO ATTRIBUTE_VALUE (
+			  ATTR_NO			/* 속성 번호 */
+			, ATTR_VAL_NO		/* 속성 값 번호 */
+			, ATTR_VAL			/* 속성 값 */
+			, USE_YN			/* 사용 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{attrNo }		/* 속성 번호 */
+			, #{attrValNo }        /* 속성 값 번호 */
+			, TRIM(REPLACE(#{attrVal },' ',''))	/* 속성 값 */
+			, #{useYn }			/* 사용 여부 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+		ON DUPLICATE KEY UPDATE USE_YN = #{useYn}
+	</insert>
+
+
+	<insert id="insertItemAttributeValue" parameterType="biz.app.goods.model.ItemAttributeValuePO" >
+		<!--
+			Query Name : item.insertItemAttributeValue
+			Description : 단품 옵션값 등록
+		-->
+		INSERT /* QUERYID(item.insertItemAttributeValue) */  INTO ITEM_ATTRIBUTE_VALUE (
+			  ITEM_NO			/* 단품 번호 */
+			, ATTR_NO			/* 속성 번호 */
+			, ATTR_VAL_NO		/* 속성 값 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{itemNo }		/* 단품 번호 */
+			, #{attrNo }		/* 속성 번 */
+			, #{attrValNo }		/* 속성 값 번호 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+
+	<insert id="insertItem" parameterType="biz.app.goods.model.ItemPO" >
+		<!--
+			Query Name : item.insertItem
+			Description : 단품 등록
+		-->
+		<selectKey keyProperty="itemNo,skuCd" resultType="hashmap" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_ITEM_SEQ }') as itemNo
+				<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+					, CONCAT('SKU', LPAD(FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_SKU_SEQ}'), 8, '0')) as skuCd
+				</if>
+				<if test="!goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+					, null as skuCd
+				</if>
+			FROM DUAL
+		</selectKey>
+		INSERT /* QUERYID(item.insertItem) */ INTO ITEM (
+			  ITEM_NO			/* 단품 번호 */
+			, ITEM_NM			/* 단품 명 */
+			, SKU_CD			/* SKU 코드 */
+			, GOODS_ID			/* 상품 아이디 */
+			, ITEM_STAT_CD		/* 단품 상태 코드 */
+			, SHOW_SEQ			/* 노출 순서 */
+			, WEB_STK_QTY		/* 웹 재고 수량 */
+			, SALE_YN			/* 판매 여부 */
+			, ADD_SALE_AMT		/* 추가 판매 금액 */
+			, COMP_ITEM_ID	/* 업체 단품 아이디 */
+			, FRB_PSB_YN		/* 사은품 가능 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{itemNo }		/* 단품 번호 */
+			, TRIM(REPLACE(#{itemNm },' ',''))		/* 단품 명 */
+			, #{skuCd}			/* SKU 코드 */
+			, #{goodsId }		/* 상품 아이디 */
+			, IFNULL(#{itemStatCd }, '${@framework.common.constants.CommonConstants@ITEM_STAT_10}' )	/* 단품 상태 코드 */
+			, IFNULL(#{showSeq }, 0 )		/* 노출 순서 */
+			, IFNULL(#{webStkQty }, 0 )		/* 웹 재고 수량 */
+			, #{saleYn }		/* 판매 여부 */
+			, IFNULL(#{addSaleAmt }, 0)	/* 추가 판매 금액 */
+			, #{compItemId}		/* 업체 단품 아이디 */
+			, IFNULL(#{frbPsbYn }, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )		/* 사은품 가능 여부 */
+			, #{sysRegrNo }		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo }		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<select id="getItemSeq" resultType="Long" >
+		<!--
+			Query Name : item.getItemSeq
+			Description : 단품 seq 가져오기
+		-->
+		SELECT /*QUERYID(item.getItemSeq) */ ITEM_NO FROM ITEM
+		ORDER BY SYS_REG_DTM DESC
+		LIMIT 0,1
+	</select>
+
+	<insert id="insertItemAttrHist" parameterType="biz.app.goods.model.ItemAttrHistPO" >
+		<!--
+			Query Name : item.insertItemAttrHist
+			Description : 단품 옵션 이력 등록
+		-->
+		<selectKey keyProperty="itemAttrHistNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_ITEM_ATTR_HIST_SEQ }') FROM DUAL
+		</selectKey>
+			INSERT /* QUERYID(ITEM.insertItemAttrHist) */ INTO ITEM_ATTR_HIST (
+				  ITEM_ATTR_HIST_NO		/* 단품 속성 이력번호 */
+				, ITEM_NO				/* 단품 번호 */
+				, ATTR1_NO				/* 속성1 번호 */
+				, ATTR1_NM				/* 속성1 명 */
+				, ATTR1_VAL_NO			/* 속성1 값 번호 */
+				, ATTR1_VAL				/* 속성1 값 */
+				, ATTR2_NO				/* 속성2 번호 */
+				, ATTR2_NM				/* 속성2 명 */
+				, ATTR2_VAL_NO			/* 속성2 값 번호 */
+				, ATTR2_VAL				/* 속성2 값 */
+				, ATTR3_NO				/* 속성3 번호 */
+				, ATTR3_NM				/* 속성3 명 */
+				, ATTR3_VAL_NO			/* 속성3 값 번호 */
+				, ATTR3_VAL				/* 속성3 값 */
+				, ATTR4_NO				/* 속성4 번호 */
+				, ATTR4_NM				/* 속성4 명 */
+				, ATTR4_VAL_NO			/* 속성4 값 번호 */
+				, ATTR4_VAL				/* 속성4 값 */
+				, ATTR5_NO				/* 속성5 번호 */
+				, ATTR5_NM				/* 속성5 명 */
+				, ATTR5_VAL_NO			/* 속성5 값 번호 */
+				, ATTR5_VAL				/* 속성5 값 */
+				, USE_YN				/* 사용 여부 */
+				, SHOW_SEQ				/* 노출 순서 */
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			) VALUES (
+				  #{itemAttrHistNo }	/* 단품 속성 이력번호 */
+				, #{itemNo }			/* 단품 번호 */
+				, #{attr1No }			/* 속성1 번호 */
+				, #{attr1Nm }			/* 속성1 명 */
+				, #{attr1ValNo }		/* 속성1 값 번호 */
+				, TRIM(#{attr1Val })			/* 속성1 값 */
+				, #{attr2No }			/* 속성2 번호 */
+				, #{attr2Nm }			/* 속성2 명 */
+				, #{attr2ValNo }		/* 속성2 값 번호 */
+				, TRIM(#{attr2Val })			/* 속성2 값 */
+				, #{attr3No }			/* 속성3 번호 */
+				, #{attr3Nm }			/* 속성3 명 */
+				, #{attr3ValNo }		/* 속성3 값 번호 */
+				, TRIM(#{attr3Val })			/* 속성3 값 */
+				, #{attr4No }			/* 속성4 번호 */
+				, #{attr4Nm }			/* 속성4 명 */
+				, #{attr4ValNo }		/* 속성4 값 번호 */
+				, TRIM(#{attr4Val })			/* 속성4 값 */
+				, #{attr5No }			/* 속성5 번호 */
+				, #{attr5Nm }			/* 속성5 명 */
+				, #{attr5ValNo }		/* 속성5 값 번호 */
+				, TRIM(#{attr5Val })			/* 속성5 값 */
+				, #{useYn }				/* 사용 여부 */
+				, #{showSeq }			/* 노출 순서 */
+				, #{sysRegrNo }			/* 시스템 등록자 번호 */
+				, NOW()					/* 시스템 등록 일시 */
+				, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+				, NOW()					/* 시스템 수정 일시 */
+			)
+	</insert>
+
+
+	<update id="deleteItemAttrHistWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteItemAttrHistWithGoodsId
+			Description : 단품 옵션 이력 수정 처리... 삭제 처리 하지 않음
+			1순위 처리
+		-->
+		UPDATE /* QUERYID(item.deleteItemAttrHistWithGoodsId) */  ITEM_ATTR_HIST A
+		   SET A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N }'
+		 WHERE 1 = 1
+		   AND A.ITEM_NO IN (
+				SELECT B.ITEM_NO FROM ITEM B
+				 WHERE 1 = 1
+				   AND B.GOODS_ID = #{goodsId }
+		)
+	</update>
+
+
+	<update id="deleteAttrValWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteAttrValWithGoodsId
+			Description : 상품 번호로 옵션값 삭제 처리.. 실제 삭제는 하지 않고.. USE_YN 처리
+			2순위 처리
+		-->
+		DELETE /* QUERYID ( item.deleteAttrValWithGoodsId) */
+			 FROM ATTRIBUTE_VALUE
+		 WHERE 1 = 1
+		   AND ATTR_NO IN (
+				SELECT B.ATTR_NO FROM GOODS_ATTRIBUTE B
+				 WHERE 1 = 1
+				   AND B.GOODS_ID = #{goodsId }
+		)
+	</update>
+
+
+	<update id="deleteAttrWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteAttrWithGoodsId
+			Description : 상품 번호로 옵션 삭제 처리.. 실제 삭제는 하지 않고.. USE_YN 처리
+			3순위 처리
+		-->
+		DELETE FROM ATTRIBUTE
+		 WHERE 1 = 1
+		   AND ATTR_NO IN (
+				SELECT B.ATTR_NO FROM GOODS_ATTRIBUTE B
+				 WHERE 1 = 1
+				   AND B.GOODS_ID = #{goodsId }
+		)
+	</update>
+
+
+	<delete id="deleteItemAttrValWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteItemAttrValWithGoodsId
+			Description : 상품 번호로 단품 옵션값 삭제 처리..
+			4순위 처리
+		-->
+		DELETE /* QUERYID(item.deleteItemAttrValWithGoodsId) */ FROM ITEM_ATTRIBUTE_VALUE
+		 WHERE ITEM_NO IN (
+			SELECT B.ITEM_NO FROM ITEM B
+			 WHERE B.GOODS_ID = #{goodsId }
+		)
+	</delete>
+
+
+	<delete id="deleteGoodsAttrWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteGoodsAttrWithGoodsId
+			Description : 상품 번호로 옵션 삭제 처리..
+			5순위 처리
+		-->
+		DELETE /* QUERYID(item.deleteGoodsAttrWithGoodsId) */ FROM GOODS_ATTRIBUTE
+		 WHERE GOODS_ID = #{goodsId }
+	</delete>
+
+	<delete id="deleteItemWithGoodsId" parameterType="java.lang.String" >
+		<!--
+			Query Name : item.deleteItemWithGoodsId
+			Description : 상품 번호로 단품 옵션값 삭제 처리..
+		-->
+		DELETE /* QUERYID(item.deleteItemWithGoodsId) */ FROM ITEM
+		WHERE GOODS_ID = #{goodsId}
+	</delete>
+
+	<select id="pageItem" resultType="biz.app.goods.model.ItemVO" >
+		<!--
+			Query Name : item.pageItem
+			Description : 단품 조회
+		-->
+		SELECT /* QUERYID(item.pageItem) */ A.GOODS_ID			/* 상품 아이디 */
+			 , A.GOODS_NM			/* 상품 명 */
+			 , A.GOODS_STAT_CD		/* 상품 상태 코드 */
+			 , A.MDL_NM				/* 모델 명 */
+			 , A.COMP_NO			/* 업체 번호 */
+			 , B.COMP_NM
+			 , A.BND_NO				/* 브랜드 번호 */
+			 , C.BND_NM_KO
+			 , A.MMFT				/* 제조사 */
+			 , A.SALE_STRT_DTM		/* 판매 시작 일시 */
+			 , A.SALE_END_DTM		/* 판매 종료 일시 */
+			 , A.SHOW_YN				/* 노출 여부 */
+			 , A.GOODS_TP_CD			/* 상품 유형 코드 */
+			 , A.BIGO				/* 비고 */
+			 , IF(F.CSTRT_GOODS_ID IS NULL, A.GOODS_ID, F.CSTRT_GOODS_ID) AS CSTRT_GOODS_ID
+			 , D.SALE_AMT
+			 , G.ITEM_NO
+			 , G.ITEM_NM
+			 , G.ITEM_STAT_CD
+			 , G.ADD_SALE_AMT
+			 , fn_get_goods_stock(G.GOODS_ID, G.ITEM_NO) AS WEB_STK_QTY
+			 , G.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			 , FN_GET_USER_NAME(G.SYS_REGR_NO) AS SYS_REGR_NM
+			 , G.SYS_REG_DTM		/* 시스템 등록 일시 */
+		FROM GOODS_BASE A
+		/* LEFT OUTER JOIN GOODS_CSTRT_INFO F ON (A.GOODS_ID = F.GOODS_ID AND F.GOODS_CSTRT_GB_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_GB_01 }') */
+		LEFT OUTER JOIN COMPANY_BASE B ON (A.COMP_NO = B.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (A.BND_NO = C.BND_NO)
+		LEFT OUTER JOIN GOODS_PRICE D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		JOIN ITEM G ON (G.GOODS_ID = IF(F.CSTRT_GOODS_ID IS NULL, A.GOODS_ID, F.CSTRT_GOODS_ID)
+		<if test="itemNos != null" >
+			<foreach collection="itemNos" item="item" separator="," open="AND G.ITEM_NO IN (" close=")" >
+				#{item }
+			</foreach>
+		</if> )
+		<if test="sysRegDtmStart != null">
+			AND A.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND A.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="goodsStatCd != null and goodsStatCd != ''" >
+		   AND A.GOODS_STAT_CD = #{goodsStatCd }		/* 상품 상태 코드 */
+		</if>
+		<if test="goodsStatCd != null and goodsStatCd != ''" >
+		   AND A.GOODS_STAT_CD = #{goodsStatCd }		/* 상품 상태 코드 */
+		</if>
+		<if test="compNo != null" >
+		   AND A.COMP_NO = #{compNo }					/* 업체 번호 */
+		</if>
+		<if test="bndNo != null" >
+		   AND A.BND_NO = #{bndNo }						/* 브랜드/시리즈 번호 */
+		</if>
+		<if test="goodsIds != null" >
+			<foreach collection="goodsIds" item="item" separator="," open="AND A.GOODS_ID IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+		<if test="goodsNms != null" >
+			<foreach collection="goodsNms" item="item" separator="OR" open="AND (" close=")" >
+				A.GOODS_NM LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		<if test="mdlNms != null" >
+			<foreach collection="mdlNms" item="item" separator="OR" open="AND (" close=")" >
+				A.MDL_NM LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		ORDER BY A.GOODS_ID DESC, G.ITEM_NO
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageItemCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : item.pageItemCount
+			Description : 단품 조회
+		-->
+		SELECT COUNT(*)
+		FROM GOODS_BASE A
+		/* LEFT OUTER JOIN GOODS_CSTRT_INFO F ON (A.GOODS_ID = F.GOODS_ID AND F.GOODS_CSTRT_GB_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_GB_01 }') */
+		JOIN ITEM G ON (G.GOODS_ID = IF(F.CSTRT_GOODS_ID IS NULL, A.GOODS_ID, F.CSTRT_GOODS_ID)
+		<if test="itemNos != null" >
+			<foreach collection="itemNos" item="item" separator="," open="AND G.ITEM_NO IN (" close=")" >
+				#{item }
+			</foreach>
+		</if> )
+		<if test="sysRegDtmStart != null">
+			AND A.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND A.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="goodsStatCd != null and goodsStatCd != ''" >
+		   AND A.GOODS_STAT_CD = #{goodsStatCd }		/* 상품 상태 코드 */
+		</if>
+		<if test="compNo != null" >
+		   AND A.COMP_NO = #{compNo }					/* 업체 번호 */
+		</if>
+		<if test="bndNo != null" >
+		   AND A.BND_NO = #{bndNo }						/* 브랜드/시리즈 번호 */
+		</if>
+		<if test="goodsIds != null" >
+			<foreach collection="goodsIds" item="item" separator="," open="AND A.GOODS_ID IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+		<if test="goodsNms != null" >
+			<foreach collection="goodsNms" item="item" separator="OR" open="AND (" close=")" >
+				A.GOODS_NM LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+		<if test="mdlNms != null" >
+			<foreach collection="mdlNms" item="item" separator="OR" open="AND (" close=")" >
+				A.MDL_NM LIKE CONCAT('%', #{item }, '%')
+			</foreach>
+		</if>
+	</select>
+
+
+	<delete id="deleteAttrValOLD" parameterType="java.lang.Integer" >
+		<!--
+			Query Name : item.deleteAttrVal
+			Description : 옵션값 삭제
+		-->
+		DELETE /* QUERYID(item.deleteAttrValOLD) */
+			FROM ATTRIBUTE_VALUE
+		 WHERE 1 = 1
+		   AND ATTR_NO = #{attrNo }
+	</delete>
+
+	<delete id="deleteAttrVal"  parameterType="biz.app.attribute.model.AttributeSO">
+		<!--
+			Query Name : item.deleteAttrVal
+			Description : 옵션값 삭제
+		-->
+		DELETE /* QUERYID(item.deleteAttrVal) */
+			FROM ATTRIBUTE_VALUE /* 속성값 */
+		 WHERE
+		    ATTR_VAL_NO IN (
+			    SELECT ATTR_VAL_NO
+			    	FROM ITEM_ATTRIBUTE_VALUE IAV INNER JOIN ITEM IT ON IAV.ITEM_NO = IT.ITEM_NO
+			    	WHERE GOODS_ID=#{goodsId} AND IAV.ATTR_NO = #{attrNo }
+			)
+	</delete>
+
+	<update id="updateItem" parameterType="biz.app.goods.model.ItemPO" >
+		<!--
+			Query Name : item.updateItem
+			Description : 단품 수정
+		-->
+		UPDATE	 /* QUERYID(item.updateItem) */ ITEM SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()		/* 시스템 수정 일시 */
+			<if test="itemNm != null and itemNm !='' ">
+				, ITEM_NM			= #{itemNm }		/* 단품 명 */
+			</if>
+				, WEB_STK_QTY		= #{webStkQty }		/* 웹 재고 수량 */
+			<if test="saleYn != null and saleYn !='' ">
+				, SALE_YN			= #{saleYn }		/* 판매 여부 */
+			</if>
+				, ADD_SALE_AMT		= #{addSaleAmt }	/* 추가 판매 금액 */
+				, ITEM_STAT_CD		= #{itemStatCd }	/* 단품 상태 코드 */
+				, SHOW_SEQ			= #{showSeq }		/* 노출 순서 */
+				, FRB_PSB_YN		= #{frbPsbYn }		/* 사은품 가능 여부 */
+		WHERE	1 = 1
+		AND		ITEM_NO				= #{itemNo }
+	</update>
+
+	<delete id="deleteItemAttrVal" parameterType="Long" >
+		<!--
+			Query Name : item.deleteItemAttrVal
+			Description : 옵션값 삭제
+		-->
+		DELETE /* QUERYID(item.deleteItemAttrVal) */
+			FROM ITEM_ATTRIBUTE_VALUE
+		 WHERE 1 = 1
+		   AND ITEM_NO = #{itemNo }
+	</delete>
+
+	<select id="listGoodsAttribute" resultType="biz.app.attribute.model.AttributeVO" >
+		<!--
+			Query Name : item.listGoodsAttribute
+			Description : 상품 상세 상품 옵션 조회
+		-->
+		SELECT /*QUERYID(item.listGoodsAttribute) */
+			C.ATTR_NO
+			, A.ATTR_NM
+			, C.USE_YN
+			, GROUP_CONCAT(DISTINCT C.ATTR_VAL_NO ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL_NO
+			, GROUP_CONCAT(DISTINCT C.ATTR_VAL ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL
+			FROM (
+			  SELECT IAV.ATTR_NO, IAV.ATTR_VAL_NO, USE_YN, ATTR_VAL FROM ITEM_ATTRIBUTE_VALUE IAV
+			  	INNER JOIN ATTRIBUTE_VALUE AV ON IAV.ATTR_NO = AV.ATTR_NO AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+			  WHERE IAV.ITEM_NO IN
+			  	(
+			    	SELECT DISTINCT(ITEM_NO) FROM GOODS_ATTRIBUTE GA
+			    	INNER JOIN ITEM I ON GA.GOODS_ID = I.GOODS_ID
+			    	WHERE
+				    	GA.GOODS_ID = #{goodsId}
+			    )
+			) C INNER JOIN ATTRIBUTE A ON C.ATTR_NO = A.ATTR_NO
+			INNER JOIN GOODS_ATTRIBUTE GAA WHERE GAA.GOODS_ID = #{goodsId} AND C.ATTR_NO = GAA.ATTR_NO
+			GROUP BY ATTR_NM, C.USE_YN, C.ATTR_NO
+			ORDER BY GAA.DISP_PRIOR_RANK ASC
+	</select>
+
+
+	<select id="listGoodsAttributeOld2" resultType="biz.app.attribute.model.AttributeVO" >
+		<!--
+			Query Name : item.listGoodsAttributeOld2
+			Description : 상품 상세 상품 옵션 조회
+		-->
+		SELECT /*QUERYID(item.listGoodsAttributeOld2) */
+			B.ATTR_NO
+			 , B.ATTR_NM
+			 , B.USE_YN
+			 , GROUP_CONCAT(DISTINCT(C.ATTR_VAL_NO) ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL_NO
+			 , GROUP_CONCAT(DISTINCT(C.ATTR_VAL) ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL
+		  FROM GOODS_ATTRIBUTE A
+		  	JOIN ATTRIBUTE B ON (B.ATTR_NO = A.ATTR_NO)
+		  	JOIN ATTRIBUTE_VALUE C ON (C.ATTR_NO = A.ATTR_NO)
+      		JOIN ITEM_ATTRIBUTE_VALUE D ON A.ATTR_NO = D.ATTR_NO
+		 WHERE 1 = 1
+			and B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+      		and C.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		   	AND A.GOODS_ID = #{goodsId }
+		   	AND C.ATTR_VAL_NO = D.ATTR_VAL_NO
+		 GROUP BY B.ATTR_NO, B.ATTR_NM, B.USE_YN
+		 ORDER BY B.ATTR_NO
+	</select>
+
+
+<select id="listGoodsAttributeOld" resultType="biz.app.attribute.model.AttributeVO" >
+		<!--
+			Query Name : item.listGoodsAttributeOld
+			Description : 상품 옵션 조회
+		-->
+		SELECT /*QUERYID(item.listGoodsAttributeOld) */
+			B.ATTR_NO
+			 , B.ATTR_NM
+			 , B.USE_YN
+			 , GROUP_CONCAT(DISTINCT(C.ATTR_VAL_NO) ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL_NO
+			 , GROUP_CONCAT(DISTINCT(C.ATTR_VAL) ORDER BY C.ATTR_VAL_NO SEPARATOR ',') AS ATTR_VAL
+		  FROM GOODS_ATTRIBUTE A
+		  JOIN ATTRIBUTE B ON (B.ATTR_NO = A.ATTR_NO)
+		  INNER JOIN ITEM_ATTRIBUTE_VALUE D ON (D.ATTR_NO = A.ATTR_NO)
+		  JOIN ATTRIBUTE_VALUE C ON (C.ATTR_NO = A.ATTR_NO AND C.ATTR_VAL_NO = D.ATTR_VAL_NO)
+		  INNER JOIN ITEM I ON (A.GOODS_ID = I.GOODS_ID AND I.ITEM_NO = D.ITEM_NO)
+		 WHERE 1 = 1
+			and B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+      		and C.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		   	AND A.GOODS_ID = #{goodsId }
+		 GROUP BY B.ATTR_NO, B.ATTR_NM, B.USE_YN
+		 ORDER BY B.ATTR_NO
+	</select>
+
+	<select id="listGoodsItem" resultType="biz.app.goods.model.ItemVO" >
+		<!--
+			Query Name : item.listGoodsItem
+			Description : 상품 단품 조회
+		-->
+		SELECT /*QUERYID(item.listGoodsItem) */ @R := @R + 1 AS ITEM_LIST_ID
+			 , A.ITEM_NO
+			 , A.ITEM_NM
+			 , A.SALE_YN
+			 , A.ITEM_STAT_CD
+			 , A.SHOW_SEQ
+			 , A.ADD_SALE_AMT
+			 , fn_get_goods_stock(A.GOODS_ID, A.ITEM_NO) AS WEB_STK_QTY
+			 , A.GOODS_ID
+			 , A.FRB_PSB_YN
+			 , B.ATTR1_NO
+			 , B.ATTR1_NM
+			 , B.ATTR1_VAL_NO
+			 , B.ATTR1_VAL
+			 , B.ATTR2_NO
+			 , B.ATTR2_NM
+			 , B.ATTR2_VAL_NO
+			 , B.ATTR2_VAL
+			 , B.ATTR3_NO
+			 , B.ATTR3_NM
+			 , B.ATTR3_VAL_NO
+			 , B.ATTR3_VAL
+			 , B.ATTR4_NO
+			 , B.ATTR4_NM
+			 , B.ATTR4_VAL_NO
+			 , B.ATTR4_VAL
+			 , B.ATTR5_NO
+			 , B.ATTR5_NM
+			 , B.ATTR5_VAL_NO
+			 , B.ATTR5_VAL
+		  FROM ITEM A
+		  JOIN (SELECT @R := 0) VAR
+		  JOIN ITEM_ATTR_HIST B
+			ON ( B.ITEM_NO = A.ITEM_NO 
+				AND B.ITEM_ATTR_HIST_NO = ( SELECT MAX(ITEM_ATTR_HIST_NO) FROM ITEM_ATTR_HIST TT WHERE TT.ITEM_NO = A.ITEM_NO AND ( TT.USE_YN IS NULL OR TT.USE_YN = 'Y' )))
+		 WHERE A.GOODS_ID = #{goodsId }
+		 ORDER BY A.ITEM_NO
+	</select>
+
+
+	<select id="listGoodsAttr" resultType="biz.app.goods.model.GoodsAttributeVO" >
+		<!--
+			Query Name : item.listGoodsAttr
+			Description : 상품 옵션 조회
+		-->
+		SELECT	/* QUERYID(item.listGoodsAttr ) */
+				  ATTR_NO			/* 속성 번호 */
+				, DISP_PRIOR_RANK  /* 전시 우선 순위 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, GOODS_ID			/* 상품 아이디 */
+		FROM	GOODS_ATTRIBUTE
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId }
+	</select>
+
+
+	<select id="listItemAttrValue" resultType="biz.app.goods.model.ItemAttributeValueVO" >
+		<!--
+			Query Name : item.listItemAttrValue
+			Description : 단품 옵션값 조회
+		-->
+		SELECT	/* QUERYID(item.listItemAttrValue ) */
+				  ITEM_NO			/* 단품 번호 */
+				, ATTR_VAL_NO		/* 속성 값 번호 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, ATTR_NO			/* 속성 번 */
+		FROM	ITEM_ATTRIBUTE_VALUE
+		WHERE	1 = 1
+		AND		ITEM_NO			= #{itemNo }
+	</select>
+
+	<select id="listChooseItem" resultType="biz.app.goods.model.ItemVO" >
+		<!--
+			Query Name : item.listChooseItem
+			Description : 단품 옵션값 조회
+		-->
+		SELECT /* QUERYID(item.listChooseItem) */
+			DISTINCT
+			goods.GOODS_ID
+			, goods.GOODS_NM
+			, item.ITEM_NO
+			, item.ITEM_NM
+			, item.WEB_STK_QTY
+			, IFNULL(item.ADD_SALE_AMT, 0) as ADD_SALE_AMT
+			, IFNULL(policy.DLVR_AMT,0) AS DLVR_AMT
+			, IFNULL(policy.RTN_DLVRC,0) AS RTN_DLVRC
+			, IFNULL(policy.EXC_DLVRC,0) AS EXC_DLVRC
+			, goods.STK_MNG_YN
+		FROM ITEM item
+		INNER JOIN goods_base goods ON item.GOODS_ID = goods.GOODS_ID
+		LEFT JOIN ITEM_ATTRIBUTE_VALUE attr ON item.ITEM_NO = attr.ITEM_NO
+		LEFT JOIN delivery_charge_policy policy ON goods.DLVRC_PLC_NO = policy.DLVRC_PLC_NO
+		WHERE 1 = 1
+		AND   item.ITEM_STAT_CD = '${@framework.common.constants.CommonConstants@ITEM_STAT_10}'
+		<if test="goodsId != null and goodsId != ''">
+		AND		item.GOODS_ID = #{goodsId}
+		</if>
+		<if test="itemNo != null and itemNo != ''">
+		AND		item.ITEM_NO			= #{itemNo }
+		</if>
+		<if test="attrNo != null and attrNo != ''">
+		AND		attr.ATTR_NO	= #{attrNo}
+		</if>
+		<if test="attrValNo != null and attrValNo != ''">
+		AND		attr.ATTR_VAL_NO	= #{attrValNo}
+		</if>
+		<if test="itemNos != null">
+			<foreach collection="itemNos" item="item" separator="," open="AND attr.ITEM_NO IN (" close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="limit != null and limit != 0">
+		LIMIT #{limit}
+		</if>
+	</select>
+
+	<select id="listGoodsItems" resultType="biz.app.goods.model.ItemVO" >
+		<!--
+			Query Name : item.listGoodsItems
+			Description : 단품 단품, 세트 조회
+		-->
+		SELECT /* QUERYID(item.listChooseItem) */
+			DISTINCT
+			goods.GOODS_ID		/* 상품 아이디	*/
+			, goods.GOODS_NM	/* 상품명		*/
+			, item.ITEM_NO		/* 아이템 번호 	*/
+			, item.ITEM_NM		/* 아이템명 		*/
+			, item.WEB_STK_QTY	/* 아이템 개수	*/
+			, IFNULL(goods.ORDMKI_YN, 'N') as ORDMKI_YN /* 주문 제작 여부 */
+			, IFNULL(price.SALE_AMT, 0) 	as SALE_AMT		/* 판매금액 */
+			, IFNULL(item.ADD_SALE_AMT, 0) 	as ADD_SALE_AMT
+			, IFNULL(policy.DLVR_AMT,0) 	AS DLVR_AMT
+			, IFNULL(policy.RTN_DLVRC,0) 	AS RTN_DLVRC
+			, IFNULL(policy.EXC_DLVRC,0) 	AS EXC_DLVRC
+			, goods.STK_MNG_YN
+			, (SELECT IMG_PATH FROM GOODS_IMG WHERE GOODS_ID = goods.GOODS_ID AND DLGT_YN = 'Y') AS IMG_PATH /* 상품 대표이미지 경로 */
+		FROM ITEM item
+		INNER JOIN goods_base goods ON item.GOODS_ID = goods.GOODS_ID
+		LEFT JOIN ITEM_ATTRIBUTE_VALUE attr ON item.ITEM_NO = attr.ITEM_NO
+		LEFT JOIN delivery_charge_policy policy ON goods.DLVRC_PLC_NO = policy.DLVRC_PLC_NO
+		LEFT OUTER JOIN (
+		SELECT #{goodsId} GOODS_ID
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) SALE_AMT
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) DC_AMT
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 4) AS UNSIGNED) CP_NO
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 5) AS UNSIGNED) CP_AMT
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 6) AS UNSIGNED) GOODS_AMT_TP_CD
+			, CAST(FN_SPLIT(price_str.GOODS_PRICE_INFO, '|', 7) AS UNSIGNED) SALE_ORG_AMT
+		FROM ( SELECT FN_GET_GOODS_PRICE(#{goodsId}, 1, '10') GOODS_PRICE_INFO ) price_str
+		) price
+		ON item.GOODS_ID = price.GOODS_ID
+		WHERE 1 = 1
+		AND   item.ITEM_STAT_CD = '${@framework.common.constants.CommonConstants@ITEM_STAT_10}'
+		<if test="goodsId != null and goodsId != ''">
+		AND		item.GOODS_ID = #{goodsId}
+		</if>
+		<if test="itemNo != null and itemNo != ''">
+		AND		item.ITEM_NO			= #{itemNo }
+		</if>
+		<if test="attrNo != null and attrNo != ''">
+		AND		attr.ATTR_NO	= #{attrNo}
+		</if>
+		<if test="attrValNo != null and attrValNo != ''">
+		AND		attr.ATTR_VAL_NO	= #{attrValNo}
+		</if>
+		<if test="itemNos != null">
+			<foreach collection="itemNos" item="item" separator="," open="AND attr.ITEM_NO IN (" close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="limit != null and limit != 0">
+		LIMIT #{limit}
+		</if>
+	</select>
+
+	<select id="listGoodsAttributeFO" resultType="biz.app.attribute.model.AttributeVO">
+		<!--
+			Query Name : item.listGoodsAttrFO
+			Description : 단품 속성 조회
+		-->
+		/* QUERYID(item.listGoodsAttributeFO) */
+		SELECT a.GOODS_ID, b.ATTR_NO, b.ATTR_NM, b.USE_YN
+		FROM GOODS_ATTRIBUTE a
+		INNER JOIN ATTRIBUTE  b
+		ON a.ATTR_NO = b.ATTR_NO
+		WHERE a.GOODS_ID = #{goodsId}
+		AND b.use_yn = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</select>
+
+	<select id="listGoodsAttributeValueFO" resultType="biz.app.attribute.model.AttributeValueVO">
+		<!--
+			Query Name : item.listGoodsAttrValueFO
+			Description : 단품 속성 값 조회
+		-->
+		/* QUERYID(item.listGoodsAttributeValueFO) */
+		SELECT b.ATTR_NO, b.ATTR_VAL_NO, b.ATTR_VAL, b.use_yn
+		FROM GOODS_ATTRIBUTE a
+		INNER JOIN ATTRIBUTE_VALUE  b
+		ON a.ATTR_NO = b.ATTR_NO
+		WHERE a.GOODS_ID = #{goodsId}
+		AND	b.use_yn = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		<if test="attrNo != null">
+			AND b.ATTR_NO = #{attrNo}
+		</if>
+		ORDER BY b.ATTR_NO, b.ATTR_VAL_NO
+	</select>
+
+	<select id="listOptionGoodsAttributeFO" resultType="biz.app.attribute.model.AttributeVO" >
+		<!--
+			Query Name : item.listOptionGoodsAttributeFO
+			Description : 옵션 상품 속성 조회
+		-->
+		/* QUERYID(item.listOptionGoodsAttributeFO) */
+		SELECT DISTINCT X.ATTR_NO, X.ATTR_NM, X.USE_YN 
+		FROM (
+			SELECT b.ATTR_NO, b.ATTR_NM, b.USE_YN, a.DISP_PRIOR_RANK
+					, IFNULL(gb.OSTK_GOODS_SHOW_YN, 'Y') AS OSTK_GOODS_SHOW_YN 
+					, CASE WHEN FN_GET_GOODS_STOCK(gb.GOODS_ID, i.ITEM_NO)  <![CDATA[<=]]> 0 THEN 'Y' ELSE 'N' END AS SOLD_OUT_YN
+					FROM GOODS_ATTRIBUTE a
+					INNER JOIN ATTRIBUTE  b
+					ON a.ATTR_NO = b.ATTR_NO
+					inner join goods_base gb on a.goods_id = gb.GOODS_ID 
+					inner join item i on gb.GOODS_ID = i.GOODS_ID 
+					WHERE a.GOODS_ID in (select SUB_GOODS_ID from goods_cstrt_pak gcp where GOODS_ID = #{goodsId})
+					AND b.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'	
+			) X
+			where 1 = 1
+			AND (X.SOLD_OUT_YN = 'N' OR X.OSTK_GOODS_SHOW_YN = 'Y') 
+			ORDER BY X.DISP_PRIOR_RANK ASC
+	</select>
+
+	<select id="listOptionGoodsAttributeValueFO" resultType="biz.app.attribute.model.AttributeValueVO">
+		<!--
+			Query Name : item.listOptionGoodsAttributeValueFO
+			Description : 옵션 상품 속성 값 조회
+		-->
+		/* QUERYID(item.listOptionGoodsAttributeValueFO) */
+		SELECT 	DISTINCT B.ATTR_NO
+				, B.ATTR_VAL_NO
+				, B.ATTR_VAL
+				, B.USE_YN
+				, CASE WHEN GBATTRCNT.GBATTR_CNT - 1 = (IFNULL(#{attrIdx}, 0)) THEN GOODSATTR.GOODS_ID ELSE '' END AS GOODS_ID
+				, CASE WHEN GBATTRCNT.GBATTR_CNT - 1 = (IFNULL(#{attrIdx}, 0)) THEN CAST(FN_SPLIT(FN_GET_GOODS_PRICE(GOODSATTR.GOODS_ID, #{stId}, #{webMobileGbCd}), '|', 1) AS UNSIGNED) ELSE '' END AS SALE_AMT
+				, CASE WHEN GBATTRCNT.GBATTR_CNT - 1 = (IFNULL(#{attrIdx}, 0)) THEN GOODSATTR.SALE_PSB_CD ELSE '' END AS SALE_PSB_CD
+				, CASE WHEN GBATTRCNT.GBATTR_CNT - 1 = (IFNULL(#{attrIdx}, 0)) THEN GOODSATTR.SOLD_OUT_YN ELSE '' END AS SOLD_OUT_YN 
+				, CASE WHEN GBATTRCNT.GBATTR_CNT - 1 = (IFNULL(#{attrIdx}, 0)) THEN GOODSATTR.IO_ALM_YN ELSE '' END AS IO_ALM_YN
+		FROM GOODS_ATTRIBUTE A INNER JOIN ATTRIBUTE_VALUE  B ON A.ATTR_NO = B.ATTR_NO
+		JOIN (
+				SELECT GB.GOODS_ID, IAV.ATTR_NO, IAV.ATTR_VAL_NO, I.ITEM_NO, GB.GOODS_STAT_CD, GB.SALE_STRT_DTM, GB.SALE_END_DTM, GB.IO_ALM_YN,
+						IFNULL(GB.OSTK_GOODS_SHOW_YN, 'Y') AS OSTK_GOODS_SHOW_YN, 
+						CASE WHEN FN_GET_GOODS_STOCK(GB.GOODS_ID, I.ITEM_NO) <![CDATA[<=]]> 0 THEN 'Y' ELSE 'N' END AS SOLD_OUT_YN,
+						CASE								
+							WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND GB.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+			                	THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+			                WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+			                    THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */   
+							WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+							WHEN GB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+							WHEN GB.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+							WHEN FN_GET_GOODS_STOCK(GB.GOODS_ID, I.ITEM_NO)  <![CDATA[<=]]> 0 
+								THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+							ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 																																	/* 정상 */
+						END AS SALE_PSB_CD,
+						GCP.DISP_PRIOR_RANK
+				FROM GOODS_BASE GB JOIN ITEM I ON GB.GOODS_ID = I.GOODS_ID
+				JOIN ITEM_ATTRIBUTE_VALUE IAV ON I.ITEM_NO = IAV.ITEM_NO 
+				JOIN GOODS_CSTRT_PAK GCP ON GB.GOODS_ID = GCP.SUB_GOODS_ID 
+				WHERE 1=1 
+				AND GCP.GOODS_ID = #{goodsId}
+				/* AND GB.SHOW_YN = 'Y' 20210615 APET-1152 */
+				AND GCP.SHOW_YN = 'Y' /* 옵션상품에 노출여부 추가. 20210614 */
+				<if test="attrNo != null">
+					 AND IAV.ATTR_NO = #{attrNo}
+				</if>
+	 		) GOODSATTR ON A.GOODS_ID = GOODSATTR.GOODS_ID AND B.ATTR_NO = GOODSATTR.ATTR_NO AND B.ATTR_VAL_NO = GOODSATTR.ATTR_VAL_NO
+	 	JOIN (
+				SELECT GB.GOODS_ID, COUNT(*) AS GBATTR_CNT
+				FROM GOODS_BASE GB JOIN ITEM I ON GB.GOODS_ID = I.GOODS_ID
+				JOIN ITEM_ATTRIBUTE_VALUE IAV ON I.ITEM_NO = IAV.ITEM_NO 
+				WHERE 1=1 
+				AND GB.GOODS_ID IN (
+					SELECT SUB_GOODS_ID
+					 FROM GOODS_CSTRT_PAK GCP
+					 WHERE GOODS_ID = #{goodsId}
+					 AND SHOW_YN = 'Y' /* 옵션상품에 노출여부 추가. 20210614  */
+				)
+				/* AND GB.SHOW_YN = 'Y' 20210615 APET-1152 */
+				GROUP BY GB.GOODS_ID
+	 		) GBATTRCNT on GOODSATTR.GOODS_ID = GBATTRCNT.GOODS_ID 
+		WHERE 1=1
+		AND GOODSATTR.GOODS_STAT_CD IN ('${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					, '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+					, '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+				)
+		AND	B.USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		AND (GOODSATTR.SOLD_OUT_YN = 'N' OR GOODSATTR.OSTK_GOODS_SHOW_YN = 'Y') 
+		<if test='soldOutExceptYn == "Y"'> 
+		AND GOODSATTR.SOLD_OUT_YN = 'N'
+		</if>
+		<if test="attr1ValNo != null and attr1ValNo != ''">
+		AND GOODSATTR.ITEM_NO in (select ITEM_NO from ITEM_ATTRIBUTE_VALUE where ATTR_NO = #{attr1No} AND ATTR_VAL_NO = #{attr1ValNo})
+		</if>
+		<if test="attr2ValNo != null and attr2ValNo != ''">
+	 	AND GOODSATTR.ITEM_NO in (select ITEM_NO from ITEM_ATTRIBUTE_VALUE where ATTR_NO = #{attr2No} AND ATTR_VAL_NO = #{attr2ValNo})
+	 	</if>
+		<if test="attr3ValNo != null and attr3ValNo != ''">
+	    AND GOODSATTR.ITEM_NO in (select ITEM_NO from ITEM_ATTRIBUTE_VALUE where ATTR_NO = #{attr3No} AND ATTR_VAL_NO = #{attr3ValNo})
+		</if>	    
+		<if test="attr4ValNo != null and attr4ValNo != ''">
+	 	AND GOODSATTR.ITEM_NO in (select ITEM_NO from ITEM_ATTRIBUTE_VALUE where ATTR_NO = #{attr4No} AND ATTR_VAL_NO = #{attr4ValNo})
+	 	</if>
+		<if test="attr5ValNo != null and attr5ValNo != ''">
+	 	AND GOODSATTR.ITEM_NO in (select ITEM_NO from ITEM_ATTRIBUTE_VALUE where ATTR_NO = #{attr5No} AND ATTR_VAL_NO = #{attr5ValNo})
+	 	</if>
+		ORDER BY GOODSATTR.DISP_PRIOR_RANK
+	</select>
+
+	<insert id="insertItemHist" parameterType="biz.app.goods.model.ItemHistPO" >
+		<!--
+			Query Name : item.insertItemHist
+			Description : 단품 이력 등록
+		-->
+		<selectKey keyProperty="itemHistNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_ITEM_HIST_SEQ }') FROM DUAL
+		</selectKey>
+		INSERT INTO ITEM_HIST (
+			  ITEM_HIST_NO		/* 단품 이력 번호 */
+			, ITEM_NO			/* 단품 번호 */
+			, ITEM_NM			/* 단품 명 */
+			, WEB_STK_QTY		/* 웹 재고 수량 */
+			, SALE_YN			/* 판매 여부 */
+			, ADD_SALE_AMT		/* 추가 판매 금액 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+			, ITEM_STAT_CD		/* 단품 상태 코드 */
+			, SHOW_SEQ			/* 노출 순서 */
+		) VALUES (
+			  #{itemHistNo}		/* 단품 이력 번호 */
+			, #{itemNo}			/* 단품 번호 */
+		<choose>
+		<when test="itemNm == null or itemNm =='' ">
+			, ( SELECT ITEM_NM FROM ITEM WHERE ITEM_NO = #{itemNo} )
+		</when>
+		<otherwise>
+			, #{itemNm}			/* 단품 명 */
+		</otherwise>
+		</choose>
+			, #{webStkQty}		/* 웹 재고 수량 */
+			, #{saleYn}			/* 판매 여부 */
+			, #{addSaleAmt}		/* 추가 판매 금액 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{goodsId}		/* 상품 아이디 */
+			, #{itemStatCd}		/* 단품 상태 코드 */
+			, #{showSeq}		/* 노출 순서 */
+		)
+	</insert>
+
+
+	<select id="listItemHist" resultType="biz.app.goods.model.ItemHistVO" >
+		<!--
+			Query Name : item.listItemHist
+			Description : 단품 이력 조회
+		-->
+		SELECT	/* QUERYID(item.listItemHist ) */
+				  A.ITEM_HIST_NO	/* 단품 이력 번호 */
+				, A.ITEM_NO			/* 단품 번호 */
+				, A.ITEM_NM			/* 단품 명 */
+				, A.WEB_STK_QTY		/* 웹 재고 수량 */
+				, A.SALE_YN			/* 판매 여부 */
+				, A.ADD_SALE_AMT	/* 추가 판매 금액 */
+				, A.GOODS_ID		/* 상품 아이디 */
+				, A.ITEM_STAT_CD	/* 단품 상태 코드 */
+				, A.SHOW_SEQ		/* 노출 순서 */
+				, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO /* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM /* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	ITEM_HIST A
+		WHERE	1 = 1
+		AND A.GOODS_ID = #{goodsId }
+		<if test="sysRegDtmStart != null">
+		   AND A.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+		   AND A.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test="sysRegrNm != null and sysRegrNm != ''" >
+		 AND 		FN_GET_USER_NAME(A.SYS_REGR_NO) LIKE CONCAT('%', #{sysRegrNm }, '%')
+		</if>
+		ORDER BY A.ITEM_NO, A.ITEM_HIST_NO DESC
+	</select>
+
+
+
+	<select id="getWebStkQty" resultType="java.lang.Integer">
+		<!--
+			Query Name : item.selectItem
+			Description : 웹재고 조회
+		-->
+		SELECT FN_GET_GOODS_STOCK(#{goodsId}, #{itemNo}) AS WEB_STK_QTY
+	</select>
+
+	<select id="listWebStkQty" resultType="biz.app.goods.model.GoodsBaseVO">
+		<!--
+			Query Name : item.listWebStkQty
+			Description : 웹재고 조회 리스트(재고관리 Y)
+		-->
+		SELECT /* QUERYID(item.listWebStkQty) */ 
+				GOODS_ID
+				, FN_GET_GOODS_STOCK(GOODS_ID, null) AS WEB_STK_QTY 
+		FROM 	GOODS_BASE GB 
+		WHERE   STK_MNG_YN = 'Y' 
+		<foreach collection="goodsIds" item="goodsId" separator="," open="AND GB.GOODS_ID IN (" close=")">#{goodsId}</foreach>
+	</select>
+
+	<update id="updateItemsStatCd" parameterType="java.lang.Integer" >
+		<!--
+			Query Name : item.updateItemsStatCd
+			Description : 단품 상태 수정(옵션 삭제로)
+		-->
+		UPDATE /* QUERYID(item.updateItemsStatCd) */ 	ITEM SET
+				  SYS_UPDR_NO		= #{sysUpdrNo }		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()		/* 시스템 수정 일시 */
+				, ITEM_STAT_CD =  '${@framework.common.constants.CommonConstants@ITEM_STAT520 }' /* 옵션 삭제 */
+		WHERE	1 = 1
+			AND ITEM_NO = #{item}
+	</update>
+
+	<insert id="insertItemsHistory" parameterType="biz.app.goods.model.ItemHistPO" >
+		<!--
+			Query Name : item.insertItemsHistory
+			Description : 단품 이력 등록
+		-->
+		<selectKey keyProperty="itemHistNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_ITEM_HIST_SEQ }') FROM DUAL
+		</selectKey>
+		INSERT  ITEM_HIST (
+			  ITEM_HIST_NO		/* 단품 이력 번호 */
+			, ITEM_NO			/* 단품 번호 */
+			, ITEM_NM			/* 단품 명 */
+			, WEB_STK_QTY		/* 웹 재고 수량 */
+			, SALE_YN			/* 판매 여부 */
+			, ADD_SALE_AMT		/* 추가 판매 금액 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+			, ITEM_STAT_CD		/* 단품 상태 코드 */
+			, SHOW_SEQ			/* 노출 순서 */
+		) SELECT
+			  #{itemHistNo}	AS ITEM_HIST_NO	/* 단품 이력 번호 */
+			, ITEM_NO			/* 단품 번호 */
+			, ITEM_NM			/* 단품 명 */
+			, WEB_STK_QTY		/* 웹 재고 수량 */
+			, SALE_YN			/* 판매 여부 */
+			, ADD_SALE_AMT		/* 추가 판매 금액 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+			, ITEM_STAT_CD		/* 단품 상태 코드 */
+			, SHOW_SEQ			/* 노출 순서 */
+		FROM ITEM
+		WHERE ITEM_NO = #{itemNo}
+	</insert>
+
+	<select id="listAttribute" resultType="biz.app.attribute.model.AttributeValueVO" >
+		<!--
+			Query Name : item.listAttribute
+			Description : 상품 등록시 옵션 조회
+		-->
+		SELECT /* QUERYID(item.listAttribute ) */
+				 A.ATTR_NO	 AS ATTR_NO /* 속성 번호 */
+				, ATTR_NM
+				, IFNULL(MAX(ATTR_VAL_NO),0) AS ATTR_VAL_NO
+		FROM	ATTRIBUTE A
+			LEFT OUTER JOIN ATTRIBUTE_VALUE V
+			ON A.ATTR_NO = V.ATTR_NO
+		WHERE	1 = 1
+		AND A.USE_YN=  '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		<if test="attrNo != null and attrNo != ''">
+		AND A.ATTR_NO = #{attrNo}
+		</if>
+		GROUP BY A.ATTR_NO , ATTR_NM
+	</select>
+
+	<select id="listAttribute_New" resultType="biz.app.attribute.model.AttributeValueVO" >
+		<!--
+			Query Name : item.listAttribute
+			Description : 상품 등록시 옵션 조회
+		-->
+		SELECT /* QUERYID(item.listAttribute ) */
+				 C.ATTR_NO	 AS ATTR_NO /* 속성 번호 */
+				, C.ATTR_NM
+				, FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_ATTR_VAL_NO_SEQ}') AS ATTR_VAL_NO
+		FROM (
+			SELECT A.ATTR_NO
+				,ATTR_NM
+			FROM ATTRIBUTE A
+				LEFT OUTER JOIN ATTRIBUTE_VALUE V  ON A.ATTR_NO = V.ATTR_NO
+			WHERE	1 = 1
+			AND A.USE_YN=  '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+			<if test="attrNo != null and attrNo != ''">
+			/* AND V.USE_YN= '${@framework.common.constants.CommonConstants@COMM_YN_Y }'  2017.06.22 주석처리 */
+			AND A.ATTR_NO = #{attrNo}
+			</if>
+			GROUP BY A.ATTR_NO , ATTR_NM
+		) C
+	</select>
+
+	<select id ="getMaxAttributeValue" resultType="Integer">
+	<!--
+			Query Name : item.getMaxAttributeValue
+			Description : 속성값의 max찾기
+	-->
+	SELECT /* QUERYID(item.getMaxAttributeValue) */
+		IFNULL(MAX(ATTR_VAL_NO),0) AS ATTR_VAL_NO
+	FROM ATTRIBUTE_VALUE
+	WHERE 1=1 AND ATTR_NO = #{attrNo}
+	AND USE_YN = #{useYn}
+	</select>
+
+	<select id="getAttribute" resultType="biz.app.attribute.model.AttributeVO" >
+		<!--
+			Query Name : item.getAttribute
+			Description : 옵션 조회
+		-->
+		SELECT /* QUERYID(item.getAttribute ) */
+				 ATTR_NO	/* 속성 번호 */
+				, ATTR_NM
+				, USE_YN
+		FROM	ATTRIBUTE
+		WHERE	1 = 1
+		AND ATTR_NO = #{attrNo}
+	</select>
+
+	<select id="pageAttribute" resultType="biz.app.attribute.model.AttributeVO">
+		<!--
+			Query Name : item.pageAttribute
+			Description : 옵션 페이지 리스트
+		-->
+		SELECT	/* QUERYID(item.pageAttribute) */
+				 ATTR_NO	/* 속성 번호 */
+				, ATTR_NM
+				, USE_YN
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	ATTRIBUTE
+		WHERE	1 = 1
+		<include refid="item.pageAttributeWhere" />
+		<!-- <include refid="bizCommon.sortSql" /> -->
+		ORDER BY	USE_YN DESC , ATTR_NO DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageAttributeCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : item.pageAttributeCount
+			Description : 옵션 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(item.pageAttributeCount) */
+				COUNT(*)
+		FROM	ATTRIBUTE
+		WHERE	1 = 1
+		<include refid="item.pageAttributeWhere" />
+	</select>
+
+	<sql id="pageAttributeWhere">
+		<if test='attrNo != null'>
+		AND		ATTR_NO	 = #{attrNo}
+		</if>
+		<if test="attrNm != null and attrNm != ''" >
+		 AND 		ATTR_NM LIKE CONCAT('%', #{attrNm }, '%')
+		</if>
+		<if test='useYn != null and useYn neq ""'>
+		AND		USE_YN = #{useYn}
+		</if>
+	</sql>
+
+	<delete id="deleteAttribute" parameterType="biz.app.attribute.model.AttributePO" >
+		<!--
+			Query Name : item.deleteAttribute
+			Description : 옵션 삭제
+		-->
+		DELETE FROM ATTRIBUTE
+		WHERE ATTR_NO = #{attrNo}
+	</delete>
+
+	<resultMap id="itemListInterfaceMap" type="biz.app.goods.model.ItemVO">
+		<id property="goodsId" column="GOODS_ID" />
+		<result property="itemNo" column="ITEM_NO" />
+		<result property="itemNm" column="ITEM_NM" />
+		<result property="itemStatCd" column="ITEM_STAT_CD" />
+		<result property="webStkQty" column="WEB_STK_QTY" />
+		<result property="addSaleAmt" column="ADD_SALE_AMT" />
+		<result property="showSeq" column="SHOW_SEQ" />
+		<result property="compItemId" column="COMP_ITEM_ID" />
+	<collection property="itemAttributeValueVO" column="{goodsId=GOODS_ID,itemNo = ITEM_NO}"
+			javaType="java.util.ArrayList" ofType="biz.app.goods.model.ItemAttributeValueVO"
+			select="getAttributeValueByItemId" />
+	</resultMap>
+	<select id="itemListInterface" resultMap="itemListInterfaceMap">
+		SELECT /* QUERYID(item.itemListInterface) */
+			* FROM ITEM I
+		WHERE GOODS_ID= #{goodsId}
+	</select>
+
+	<select id="getAttributeValueByItemId" parameterType="java.util.Map" resultType="biz.app.goods.model.ItemAttributeValueVO">
+		SELECT /* QUERYID(item.getAttributeValueByItemId) */
+			AV.ATTR_NO,
+			AV.ATTR_VAL_NO,
+			ATTR_VAL ,
+			ATTR_NM,
+			DISP_PRIOR_RANK
+		FROM ITEM_ATTRIBUTE_VALUE IAV
+			 INNER JOIN ATTRIBUTE_VALUE AV ON IAV.ATTR_NO=AV.ATTR_NO AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+			INNER JOIN GOODS_ATTRIBUTE GA ON GA.ATTR_NO = AV.ATTR_NO AND GA.ATTR_NO = IAV.ATTR_NO
+		  	INNER JOIN ATTRIBUTE A ON A.ATTR_NO = AV.ATTR_NO
+		  WHERE
+		  GOODS_ID= #{goodsId}
+		  AND ITEM_NO= #{itemNo}
+		  and AV.USE_YN= '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		  ORDER BY GA.DISP_PRIOR_RANK ASC
+	</select>
+
+	<update id="updateItemWebStockQtyInterface">
+		<!--
+			Query Name : item.updateItemWebStockQtyInterface
+			Description : 인터페이스 단품의 웹재고 변경
+		-->
+		UPDATE	 /* QUERYID(item.updateItemWebStockQtyInterface) */ ITEM
+		SET		WEB_STK_QTY = #{webStkQty}
+		WHERE	ITEM_NO = #{itemNo}
+	</update>
+
+	<select id="getSeqAttrValNo" resultType="Long">
+		SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_ATTR_VAL_NO_SEQ}') AS ATTR_VAL_NO
+	</select>
+
+	<select id="listAttributeInterface" resultType="biz.app.attribute.model.AttributeValueVO" >
+		<!--
+			Query Name : item.listAttributeInterface
+			Description : API 상품 등록시 옵션 조회
+		-->
+			SELECT /* QUERYID(item.listAttributeInterface ) */
+				A.ATTR_NO
+				,ATTR_NM
+			FROM ATTRIBUTE A
+				LEFT OUTER JOIN ATTRIBUTE_VALUE V  ON A.ATTR_NO = V.ATTR_NO
+			WHERE	1 = 1
+			AND A.USE_YN=  '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+			<if test="attrNo != null and attrNo != ''">
+			AND A.ATTR_NO = #{attrNo}
+			</if>
+			GROUP BY A.ATTR_NO , ATTR_NM
+	</select>
+</mapper>

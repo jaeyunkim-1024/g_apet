@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	속성
+	작성자  		snw
+	작성일자  	2017.01.31
+-->
+
+<mapper namespace="itemAttributeValue">
+
+	<select id="listItemAttributeValue" resultType="biz.app.goods.model.ItemAttributeValueVO">
+		<!--
+			Query Name : itemAttributeValue.listItemAttributeValue
+			Description : 단품 속성 값 목록 조회
+		-->
+		SELECT /* QUERYID(itemAttributeValue.listItemAttributeValue) */	IAV.ITEM_NO
+					, AB.ATTR_NO
+					, AB.ATTR_NM
+					, AV.ATTR_VAL_NO
+					, AV.ATTR_VAL
+		FROM 	ITEM_ATTRIBUTE_VALUE IAV
+					,ATTRIBUTE_VALUE AV
+					,ATTRIBUTE AB
+		WHERE 	IAV.ATTR_NO = AV.ATTR_NO
+		AND		IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+		AND		IAV.ATTR_NO = AB.ATTR_NO
+		AND		IAV.ITEM_NO = #{itemNo}
+		ORDER BY  AV.ATTR_NO ASC, AV.ATTR_VAL_NO ASC
+	</select>
+
+	<select id="checkItemAttributeValue" resultType="biz.app.goods.model.ItemAttributeValueVO">
+		<!--
+			Query Name : itemAttributeValue.checkItemAttributeValue
+			Description : 상품번호에 따른 속성 값 존재여부 조회
+		-->
+		SELECT /*QUERYID(itemAttributeValue.checkItemAttributeValue) */
+			DISTINCT(AV.ATTR_VAL_NO), AV.ATTR_VAL FROM ITEM_ATTRIBUTE_VALUE IAV
+		INNER JOIN ATTRIBUTE_VALUE AV ON IAV.ATTR_NO = AV.ATTR_NO AND IAV.ATTR_VAL_NO = AV.ATTR_VAL_NO
+	  	WHERE 1=1 
+		AND AV.USE_YN= '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		AND IAV.ATTR_NO= #{attrNo}
+	    AND ATTR_VAL = #{attrVal}
+		ORDER BY IAV.ATTR_NO ASC
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

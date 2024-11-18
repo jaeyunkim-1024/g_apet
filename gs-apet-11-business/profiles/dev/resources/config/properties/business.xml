@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<comment>business_dev</comment>
+
+	<entry key="envmt.gb">dev</entry><!-- 개발환경 : local, dev, stg, prd -->
+	<entry key="envmt.locale">ko_KR</entry>
+	<entry key="main.home.url">/shop/home</entry><!--  main url 설정 -->
+
+	<!-- 보안 위해 상세 내용 삭제 -->
+
+</properties>

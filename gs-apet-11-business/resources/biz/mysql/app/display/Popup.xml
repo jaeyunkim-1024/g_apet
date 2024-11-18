@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="popup">
+
+	<select id="pagePopupList" resultType="biz.app.display.model.PopupVO">
+		<!--
+			Query Name : popup.pagePopupList
+			Description : 팝업 리스트
+		-->
+		SELECT	/* QUERYID(popup.pagePopupList) */
+				  A.POPUP_NO			/* 팝업 번호 */
+				, A.POPUP_NM			/* 팝업 명 */
+				, A.SVC_GB_CD			/* 서비스 구분 코드 */
+				, A.POPUP_TP_CD     /* 팝업 유형 , 10:일반, 20:상품 */
+				, A.GOODS_ID        /* 상품 ID */  
+				, A.DISP_YN			/* 전시 여부 */
+				, A.WDT_SZ			/* 가로 크기 */
+				, A.HEIT_SZ			/* 세로 크기 */
+				, A.CONTENT			/* 내용 */
+				, A.PST_TOP			/* 위치 TOP */
+				, A.PST_LEFT			/* 위치 LEFT */
+				, A.DISP_STRT_DTM		/* 전시 시작 일시 */
+				, A.DISP_END_DTM		/* 전시 종료 일시 */
+				, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	popup A
+		WHERE	1 = 1
+		<include refid="pagePopupCondition" />
+		ORDER BY ${sidx} ${sord}
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pagePopupListCount" resultType="Integer">
+		<!--
+			Query Name : popup.pagePopupListCount
+			Description : 팝업 목록 : 데이터 수
+		-->
+		SELECT  COUNT(*)	/* QUERYID(popup.pagePopupListCount) */
+		FROM		popup A
+		WHERE   1=1
+	</select>
+
+	<sql id="pagePopupCondition">
+		<!--
+			Query Name : popup.pagePopupListCount
+			Description : 팝업 목록 : 조건절
+		-->
+		<if test='popupNm != null and popupNm != ""'>
+			AND		A.POPUP_NM LIKE CONCAT('%', #{popupNm}, '%' )	/* 팝업 명 */
+		</if>
+ 
+		<if test='svcGbCd != null and svcGbCd != ""'>
+			AND		A.SVC_GB_CD = #{svcGbCd}	/* 서비스 구분 코드 */
+		</if>
+		<if test='dispYn != null and dispYn != ""'>
+			AND		A.DISP_YN = #{dispYn}			/* 전시 여부 */
+		</if>
+		<if test="strtDate != null">
+			AND	A.SYS_REG_DTM &gt;= #{strtDate}
+		</if>
+		<if test="endDate != null">
+			AND	A.SYS_REG_DTM &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)	/* 등록 시작일, 등록 종료일  */
+		</if>
+        <if test="popupTpCd != null and popupTpCd != ''">
+            AND A.POPUP_TP_CD = #{popupTpCd} /* 팝업 유형, 10:일반, 20:상품  */
+        </if>
+        <if test="goodsId != null and goodsId != ''">
+            AND A.GOODS_ID = #{goodsId} /* 상품 아이디 */
+        </if>        
+<!-- 		<if test="stId != null" >
+			AND B.ST_ID = #{stId}
+		</if> -->
+	</sql>
+
+	<resultMap type="biz.app.display.model.PopupVO" id="popupMap">
+		<id     property="popupNo"		column="POPUP_NO"/>				<!-- 팝업 번호 -->
+		<result	property="popupNm"		column="POPUP_NM"/>				<!-- 팝업 명 -->
+		<result	property="svcGbCd"		column="SVC_GB_CD"/>			<!-- 서비스 구분 코드 -->
+		<result	property="content"		column="CONTENT"/>				<!-- 내용 -->
+		<result	property="wdtSz"		column="WDT_SZ"/>				<!-- 가로 크기 -->
+		<result	property="heitSz"		column="HEIT_SZ"/>				<!-- 세로 크기 -->
+		<result	property="pstTop"		column="PST_TOP"/>				<!-- 위치 TOP -->
+		<result	property="pstLeft"		column="PST_LEFT"/>				<!-- 위치 LEFT -->
+		<result	property="popupTpCd"	column="POPUP_TP_CD"/>			<!-- 팝업 유형 코드 -->
+		<collection property="goodsList" ofType="biz.app.display.model.PopupGoodsVO">
+			<id     property="goodsId"		column="GOODS_ID"/>			<!-- 상품 아이디 -->
+			<result property="goodsNm"		column="GOODS_NM"/>			<!-- 상품 명 -->
+			<result property="bndNo"		column="BND_NO"/>			<!-- 브랜드 번호 -->
+			<result property="bndNm"		column="BND_NM"/>			<!-- 노출 브랜드 명 -->
+			<result property="saleAmt"		column="SALE_AMT"/>			<!-- 판매 금액 -->
+			<result property="dcAmt"		column="DC_AMT"/>			<!-- 할인 금액 -->
+			<result property="imgPath"		column="IMG_PATH"/>			<!-- 이미지 경로 -->
+			<result property="prWdsShowYn"	column="PR_WDS_SHOW_YN"/>	<!-- 홍보 문구 노출 여부-->
+			<result property="prWds"		column="PR_WDS"/>			<!-- 홍보 문구 -->
+		</collection>
+	</resultMap>
+	
+	<select id="listPopupFO" resultMap="popupMap">
+		<!--
+			Query Name : popup.listPopupFO
+			Description : FO 팝업창가져오기
+		-->
+		SELECT	/* QUERYID(popup.listPopupFO) */
+			 POPUP.*
+			,CAST(FN_SPLIT(POPUP.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) AS SALE_AMT
+			,CASE
+				WHEN CAST(FN_SPLIT(POPUP.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED) > 0
+					THEN CAST(FN_SPLIT(POPUP.GOODS_PRICE_INFO, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(POPUP.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+				ELSE CAST(FN_SPLIT(POPUP.GOODS_PRICE_INFO, '|', 3) AS UNSIGNED)
+			END AS DC_AMT
+		FROM (
+			SELECT 
+				 P.POPUP_NO
+				,P.POPUP_NM				/* 팝업명 */ 
+				,P.SVC_GB_CD			/* 서비스 구분코드 */ 
+				,P.CONTENT				/* 내용 */ 
+				,P.WDT_SZ				/* 가로크기 */ 
+				,P.HEIT_SZ				/* 세로크기 */ 
+				,P.PST_TOP 				/* 위치 TOP */
+				,P.PST_LEFT 			/* 위치 LEFT */
+				,P.POPUP_TP_CD			/* 팝업 유형 코드 */ 
+			    ,GPM.GOODS_ID 			/* 상품아이디 */  
+			    ,GB.GOODS_NM 			/* 상품명 */  
+			    ,BB.BND_NO				/* 브랜드 번호 */
+			    ,FN_GET_BRAND_NAME(BB.BND_NO) AS BND_NM		/* 노출 브랜드명 */
+			    ,FN_GET_GOODS_PRICE(GPM.GOODS_ID, #{stId}, #{svcGbCd}) AS GOODS_PRICE_INFO
+	   			,GI.IMG_PATH 			/* 이미지경로 */  
+	   			,GB.PR_WDS_SHOW_YN		/* 홍보문구 노출 여부 */
+	   			,GB.PR_WDS				/* 홍보문구 */
+			FROM popup P  
+				 INNER JOIN popup_show_disp_clsf PSDC ON (P.POPUP_NO = PSDC.POPUP_NO)
+				 LEFT OUTER JOIN goods_popup_map GPM ON (P.POPUP_NO = GPM.POPUP_NO)
+				 LEFT OUTER JOIN goods_base GB ON (GPM.GOODS_ID = GB.GOODS_ID)
+				 LEFT OUTER JOIN brand_base BB ON (GB.BND_NO = BB.BND_NO)
+				 LEFT OUTER JOIN goods_img GI ON (GPM.GOODS_ID = GI.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+			WHERE
+				P.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+				<if test="dispClsfNo != null">
+				AND PSDC.DISP_CLSF_NO = #{dispClsfNo}
+				</if>	
+				<if test="popupNo != null">
+				AND P.POPUP_NO = #{popupNo}
+				</if>		
+				AND NOW() BETWEEN P.DISP_STRT_DTM AND P.DISP_END_DTM
+				AND P.SVC_GB_CD = #{svcGbCd}
+			ORDER BY PSDC.DISP_PRIOR_RANK ASC, GPM.DISP_PRIOR_RANK ASC
+		) POPUP
+	</select>
+
+
+	<insert id="insertPopup" parameterType="biz.app.display.model.PopupPO" >
+		<!--
+			Query Name : popup.insertPopup
+			Description : 팝업 등록
+		-->
+		<selectKey keyProperty="popupNo" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_POPUP_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO popup (
+			  POPUP_NO			/* 팝업 번호 */
+			, POPUP_NM			/* 팝업 명 */
+			, POPUP_TP_CD       /* 팝업 유형 코드 */
+			, SVC_GB_CD			/* 서비스 구분 코드 */
+			, DISP_YN			/* 전시 여부 */
+			, WDT_SZ			/* 가로 크기 */
+			, HEIT_SZ			/* 세로 크기 */
+			, CONTENT			/* 내용 */
+			, PST_TOP			/* 위치 TOP */
+			, PST_LEFT			/* 위치 LEFT */
+			, DISP_STRT_DTM		/* 전시 시작 일시 */
+			, DISP_END_DTM		/* 전시 종료 일시 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{popupNo}			/* 팝업 번호 */
+			, #{popupNm}			/* 팝업 명 */
+			, #{popupTpCd}          /* 팝업 유형 코드 */
+			, #{svcGbCd}			/* 서비스 구분 코드 */
+			, #{dispYn}				/* 전시 여부 */
+			, #{wdtSz}				/* 가로 크기 */
+			, #{heitSz}				/* 세로 크기 */
+			, #{content}			/* 내용 */
+			, #{pstTop}				/* 위치 TOP */
+			, #{pstLeft}			/* 위치 LEFT */
+			, #{dispStrtDtm}		/* 전시 시작 일시 */
+			, #{dispEndDtm}			/* 전시 종료 일시 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<update id="updatePopup" parameterType="biz.app.display.model.PopupPO" >
+		<!--
+			Query Name : popup.updatePopup
+			Description : 팝업 수정
+		-->
+		UPDATE	popup SET
+				  POPUP_NM			= #{popupNm}			/* 팝업 명 */
+                , POPUP_TP_CD       = #{popupTpCd}          /* 팝업 유형 코드 */
+                , SVC_GB_CD			= #{svcGbCd}			/* 서비스 구분 코드 */
+				, DISP_YN			= #{dispYn}				/* 전시 여부 */
+				, WDT_SZ			= #{wdtSz}				/* 가로 크기 */
+				, HEIT_SZ			= #{heitSz}				/* 세로 크기 */
+				, CONTENT			= #{content}			/* 내용 */
+				, PST_TOP			= #{pstTop}				/* 위치 TOP */
+				, PST_LEFT			= #{pstLeft}			/* 위치 LEFT */
+				, DISP_STRT_DTM		= #{dispStrtDtm}		/* 전시 시작 일시 */
+				, DISP_END_DTM		= #{dispEndDtm}			/* 전시 종료 일시 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				 
+		WHERE	1 = 1
+		AND		POPUP_NO			= #{popupNo}
+	</update>
+
+
+	<select id="getPopup" resultType="biz.app.display.model.PopupVO" >
+		<!--
+			Query Name : popup.getPopup
+			Description : 팝업 조회
+		-->
+		SELECT	/* QUERYID() */
+				  A.POPUP_NO			/* 팝업 번호 */
+				, A.POPUP_NM			/* 팝업 명 */
+				, A.POPUP_TP_CD         /* 팝업 유형 코드 */
+				, A.SVC_GB_CD			/* 서비스 구분 코드 */
+				, A.DISP_YN			/* 전시 여부 */
+				, A.WDT_SZ			/* 가로 크기 */
+				, A.HEIT_SZ			/* 세로 크기 */
+				, A.CONTENT			/* 내용 */
+				, A.PST_TOP			/* 위치 TOP */
+				, A.PST_LEFT			/* 위치 LEFT */
+				, A.DISP_STRT_DTM		/* 전시 시작 일시 */
+				, A.DISP_END_DTM		/* 전시 종료 일시 */
+				, A.SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM		/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	popup A
+		WHERE	1 = 1
+		AND		POPUP_NO		= #{popupNo}
+	</select>
+
+
+	<insert id="insertPopupShowDispClsf" parameterType="biz.app.display.model.PopupShowDispClsfPO" >
+		<!--
+			Query Name : popup.insertPopupShowDispClsf
+			Description : 팝업 전시번호 등록
+		-->
+		INSERT INTO popup_show_disp_clsf (
+			  DISP_CLSF_NO			/* 전시 분류 번호 */
+			, POPUP_NO				/* 팝업 번호 */
+			, DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{dispClsfNo}			/* 전시 분류 번호 */
+			, #{popupNo}			/* 팝업 번호 */
+			, #{dispPriorRank}		/* 전시 우선 순위 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<delete id="deletePopupShowDispClsf" parameterType="java.lang.Integer" >
+		<!--
+			Query Name : popup.insertPopupShowDispClsf
+			Description : 팝업 전시번호 삭제
+		-->
+		DELETE FROM popup_show_disp_clsf
+		WHERE 1 = 1
+		AND POPUP_NO = #{popupNo}
+	</delete>
+
+
+	<select id="listPopupShowDispClsf" resultType="biz.app.display.model.PopupShowDispClsfVO" >
+		<!--
+			Query Name : popup.listPopupShowDispClsf
+			Description : 팝업 전시번호 조회
+		-->
+		SELECT	/* QUERYID(popup.listPopupShowDispClsf ) */
+				  B.DISP_CLSF_NO			/* 전시 분류 번호 */
+				, FN_GET_DISP_CTG_PATH(B.DISP_CLSF_NO ) DISP_CTG_PATH
+				, B.POPUP_NO				/* 팝업 번호 */
+				, B.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+				, B.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, B.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, FN_GET_USER_NAME(B.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(B.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, D.ST_ID						/* 사이트 ID */
+				, D.ST_NM					/* 사이트 명 */
+		FROM	popup_show_disp_clsf B  
+		INNER JOIN display_category     C ON (C.DISP_CLSF_NO = B.DISP_CLSF_NO)
+		INNER JOIN st_std_info D ON (D.ST_ID = C.ST_ID)
+		WHERE	1 = 1
+		AND		B.POPUP_NO		= #{popupNo}
+		ORDER BY B.DISP_PRIOR_RANK, B.DISP_CLSF_NO
+	</select>
+
+ 
+	<select id="listpopupGoods" resultType="biz.app.display.model.PopupTargetVO">
+		<!--
+			Query Name : popup.listpopupGoods
+			Description : 팝업 대상상품 리스트
+		-->
+		SELECT	/* QUERYID(popup.listpopupGoods) */ A.GOODS_ID
+				, A.GOODS_NM
+				, A.GOODS_STAT_CD
+				, A.MDL_NM
+				, A.COMP_NO
+				, A.MMFT
+				, A.SALE_STRT_DTM
+				, A.SALE_END_DTM
+				, A.SHOW_YN
+				, A.GOODS_TP_CD
+				, A.BIGO
+				, A.BND_NO
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, D.SALE_AMT
+				, F.POPUP_NO
+				, F.DISP_PRIOR_RANK
+		FROM	
+				goods_base A LEFT 
+				JOIN company_base B ON (A.COMP_NO = B.COMP_NO)
+				LEFT JOIN brand_base C ON (A.BND_NO = C.BND_NO)
+				JOIN goods_price D ON (A.GOODS_ID = D.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+				JOIN goods_popup_map F ON A.GOODS_ID = F.GOODS_ID
+		WHERE 
+			F.POPUP_NO = #{popupNo}
+		ORDER BY   F.DISP_PRIOR_RANK ASC
+	</select>
+	
+	<insert id="insertGoodsPopupMap" parameterType="biz.app.display.model.PopupTargetPO" >
+		<!--
+			Query Name : popup.insertGoodsPopupMap
+			Description : 팝업상품등록
+		-->
+		INSERT INTO goods_popup_map (
+			  GOODS_ID              /* 상품번호 */
+			, POPUP_NO				/* 팝업 번호 */
+			, DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsId}			/* 상품번호 */
+			, #{popupNo}			/* 팝업 번호 */
+			, #{dispPriorRank}		/* 전시 우선 순위 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+	<delete id="deleteGoodsPopupMap" parameterType="java.lang.Integer" >
+		<!--
+			Query Name : popup.deleteGoodsPopupMap
+			Description : 팝업 상품삭제
+		-->
+		DELETE FROM goods_popup_map
+		WHERE 1 = 1
+		AND POPUP_NO = #{popupNo}
+	</delete>
+
+</mapper>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set4"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop live prev" id="container">
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<section class="sect lv mn prev">
+						<div class="hdts">
+							<div class="hdt"><span class="tit">LIVE 예고🔔</span></div>
+						</div>
+						<div class="cdts">
+							<ul class="lvprv">
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+								<li><include data-include-html="./Shop_02_02_inc_livep.html"></include></li>
+							</ul>
+							<div class="uimoreview">
+								<a href="javascript:;" class="bt more">지난 LIVE 보러가기</a>
+							</div>
+						</div>
+					</section>
+
+				</div>
+			</div>
+		</main>
+		
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+
+		<script>
+			// ui.shop.pdOpt.using("open");
+		</script>
+
+
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+
+	</div>
+</body>
+</html>

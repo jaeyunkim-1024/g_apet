@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set21","tit":"환불정보"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop order my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>환불정보</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- 주문 배송 -->
+					<div class="delivery-oder-area">
+					
+						<div class="ordersets pc-cut">
+							<section class="sect addr">
+								<div class="hdts"><span class="tit">배송지</span></div>
+								<div class="cdts">
+									<div class="adrset">
+										<div class="name">
+											<em class="t g">우리집</em>
+										</div>
+										<div class="adrs">
+											[01011] 서울특별시 강남구 강남대로 123-12, 101동 101호(논현동,강남아파트) 지하2층 앞뒤좌우
+										</div>
+										<div class="tels">박이슬/010-1234-1234</div>
+										<div class="tels">안심번호 사용</div>
+									</div>
+									<div class="adrreq">
+										<div class="pwf">
+											<em class="t">문앞</em> <em class="p">공동현관 비밀번호 입력</em>
+											<div class="txt">벨 누르지말고 문 앞에 놔주세요~~~~</div>
+										</div>
+										<div class="if_add_pic">
+											<ul>
+												<li>
+													배송완료<br>
+													사진 있을 경우<br>
+													노출 영역
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</section>
+							<section class="sect bprc">
+								<div class="hdts"><span class="tit">결제 정보</span></div>
+								<div class="cdts">
+									<ul class="prcset">
+										<li class="tit k0420"><!-- 04.20 : 수정 -->
+											<div class="dt">최초 결제 정보</div>
+											<div class="dd">
+												<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">상품금액</div>
+											<div class="dd">
+												<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">쿠폰 할인</div>
+											<div class="dd">
+												<span class="prc dis"><em class="p">-10,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">배송비</div>
+											<div class="dd">
+												<span class="prc"><em class="p">+2,500</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">우주코인 추가할인</div>
+											<div class="dd">
+												<span class="prc dis"><em class="p">-1,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+									</ul>
+									<ul class="prcset">
+										<li class="tit k0420_line"><!-- 04.20 : 수정 -->
+											<div class="dt">환불 정보</div>
+											<div class="dd">
+												<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">취소 상품금액</div>
+											<div class="dd">
+												<span class="prc"><em class="p">50,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">쿠폰 할인</div>
+											<div class="dd">
+												<span class="prc dis"><em class="p">-10,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">우주코인 추가할인</div>
+											<div class="dd">
+												<span class="prc dis"><em class="p">-1,000</em><i class="w">원</i></span>
+											</div>
+										</li>
+										<li>
+											<div class="dt">추가 배송비</div>
+											<div class="dd">
+												<span class="prc dis"><em class="p">-2,500</em><i class="w">원</i></span>
+											</div>
+										</li>
+									</ul>
+									<div class="tot">
+										<div class="dt">총 결제금액</div>
+										<div class="dd">
+											<span class="prc"><em class="p">32,500</em><i class="w">원</i></span>
+										</div>
+									</div>
+								</div>
+							</section>
+							<section class="sect binf">
+								<div class="hdts"><span class="tit">결제수단 정보</span></div>
+								<div class="cdts">
+									<div class="result">
+										<div class="hd">
+											<em class="b">신용카드</em> 
+											<a href="javascript:;" class="btn sm">카드영수증</a>
+										</div>
+										<div class="dd">현대카드(1234-****-****-****) / 일시불 </div>
+									</div>
+								</div>
+							</section>
+							<section class="sect bprc">
+								<div class="hdts"><span class="tit">포인트 적립/혜택</span></div>
+								<div class="cdts">
+									<ul class="prcset">
+										<li>
+											<div class="dt">GS&amp;POINT 적립</div>
+											<div class="dd">
+												<span class="prc"><em class="p">150</em><i class="w">P</i></span>
+												<span> 적립예정</span><!-- 21.08.10 APET-1258 lcm01 -->
+											</div>
+										</li>
+										<li>
+											<div class="dt">
+												우주코인
+												<!-- alert -->
+												<div class="alert_pop" data-pop="popCpnGud">
+													<div class="bubble_txtBox wooju"> 
+														<div class="tit">우주코인 적립안내</div>
+														<div class="info-txt">
+															<ul>
+																<li>결제 금액 기준 총 적립 포인트입니다.</li>
+																<li>할인금액과 배송비는 결제금액에서 제외됩니다. </li>
+																<li>포인트는 구매확정 시 적립됩니다.</li>
+																<li>포인트 적립은 1일 1회만 적립됩니다.</li>
+																<li>여러개의 상품을 구매한 경우, 같이 구매한상품이  모두 구매확정 되어야 포인트가 적립됩니다. </li>
+																<li>적립 포인트 산정 시 쿠폰 할인 금액, 배송비, 취소/반품 상품 금액, 포인트 사용금액은 제외됩니다.</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+												<!-- // alert -->
+											</div>
+											<div class="dd">
+												<span class="prc"><em class="blt max">최대</em><em class="p">20,000</em><i class="w">C</i></span>
+												<span> 적립완료</span><!-- 21.08.10 APET-1258 lcm01 -->
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="bts mg"> <!-- 03.29 수정 : mg 클래스 추가 -->
+									<div class="btnSet">
+										<a href="javascript:;" class="btn lg d">주문/배송 목록</a>
+										<a href="javascript:;" class="btn lg b">계속 쇼핑하기</a>
+									</div>
+								</div>
+							</section>
+						</div>
+					</div>
+
+					<!-- // 주문 배송 -->
+
+				</div>
+
+			</div>
+		</main>
+
+		<!-- 21.08.03 APET-1258 lcm01 -->
+		<div class="layers">
+			<article class="popBot popCpnGud k0427" id="popCpnGud"><!-- 04.27 -->
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit">우주코인 적립 안내</h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							<ul class="tplist">
+								<li> 결제 금액 기준 총 적립 포인트입니다.</li> 
+								<li>할인금액과 배송비는 결제금액에서 제외됩니다.</li>
+								<li>포인트는 구매확정 시 적립됩니다. </li>
+								<li>포인트 적립은 1일 1회만 적립됩니다.</li>
+								<li>여러개의 상품을 구매한 경우, 같이 구매한상품이 모두 구매확정 되어야 포인트가 적립됩니다. </li>
+								<li>적립 포인트 산정 시 쿠폰 할인 금액, 배송비, 취소/반품 상품 금액, 포인트 사용금액은 제외됩니다.</li>
+								
+							</ul>
+						</main>
+					</div>
+				</div>
+			</article>
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+
+		</script>
+	</div>
+</body>
+</html>

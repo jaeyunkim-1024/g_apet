@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="banner">
+	
+	<insert id="insertBanner" parameterType="biz.app.banner.model.BannerPO">
+		<selectKey keyProperty="bnrNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_BANNER_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO BNR_MNG(
+			  BNR_NO				/* 배너 번호*/
+			, BNR_ID				/* 배너 ID*/
+			, BNR_TTL				/* 배너 제목*/
+			, ST_ID					/* 사이트 아이디*/
+			, USE_YN				/* 사용 여부*/
+			, BNR_IMG_CD			/* 배너 이미지 코드*/
+			, BNR_IMG_NM			/* 배너 이미지 명*/
+			, BNR_IMG_PATH			/* 배너 이미지 경로*/
+			, BNR_IMG_URL			/* 배너 이미지 URL*/
+			, BNR_MOBILE_IMG_CD		/* 배너 모바일 이미지 코드*/
+			, BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명*/
+			, BNR_MOBILE_IMG_PATH	/* 배너 모바일 이미지 경로*/
+			, BNR_MOBILE_IMG_URL	/* 배너 모바일 이미지 URL*/
+			, BNR_LINK_URL			/* 배너 LINK URL*/
+			, BNR_TP_CD				/* 배너 타입별 코드*/
+			, SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM 			/* 시스템 등록 일시 */
+		) VALUES (
+			  #{bnrNo}
+			, #{bnrId}
+			, #{bnrTtl}
+			, #{stId}
+			, #{useYn}
+			, #{bnrImgCd}
+			, #{bnrImgNm}
+			, #{bnrImgPath}
+			, #{bnrImgUrl}
+			, #{bnrMobileImgCd}
+			, #{bnrMobileImgNm}
+			, #{bnrMobileImgPath}
+			, #{bnrMobileImgUrl}
+			, #{bnrLinkUrl}
+			, #{bnrTpCd}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<select id="getBnrSeq" resultType="java.lang.Long">
+		SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_BANNER_SEQ}') 
+		FROM DUAL
+	</select>
+	
+	<select id="getBanner" resultType="biz.app.banner.model.BannerVO">
+		<!-- 
+			Query Name : banner.getBanner
+			Description : 배너 상세
+		 -->
+		 SELECT
+		   BNR_NO				/* 배너 번호*/
+			, BNR_ID				/* 배너 ID*/
+			, BNR_TTL				/* 배너 제목*/
+			, ST_ID					/* 사이트 아이디*/
+			, USE_YN				/* 사용 여부*/
+			, BNR_IMG_CD			/* 배너 이미지 코드*/
+			, BNR_IMG_NM			/* 배너 이미지 명*/
+			, BNR_IMG_PATH			/* 배너 이미지 경로*/
+			, BNR_IMG_URL			/* 배너 이미지 URL*/
+			, BNR_MOBILE_IMG_CD		/* 배너 모바일 이미지 코드*/
+			, BNR_MOBILE_IMG_NM		/* 배너 모바일 이미지 명*/
+			, BNR_MOBILE_IMG_PATH	/* 배너 모바일 이미지 경로*/
+			, BNR_MOBILE_IMG_URL	/* 배너 모바일 이미지 URL*/
+			, BNR_LINK_URL			/* 배너 LINK URL*/
+			, BNR_TP_CD				/* 배너 타입별 코드*/
+		 FROM BNR_MNG
+		 WHERE BNR_NO = #{bnrNo}
+	</select>
+	
+	<select id="bannerIdCheck" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM BNR_MNG
+		WHERE BNR_ID = #{bnrId}
+	</select>
+	
+	<update id="updateBanner" parameterType="biz.app.banner.model.BannerPO">
+		<!-- 
+			Query Name : banner.updateBanner
+			Description : 배너  수정
+		 -->
+		UPDATE BNR_MNG SET /* QUERYID(banner.updateBanner) */
+			 SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			= NOW()						/* 시스템 수정 일시 */
+			<if test="bnrTtl != null">
+			, BNR_TTL 				= #{bnrTtl}				/* 배너 제목*/
+			</if>
+			<if test="useYn != null">
+			, USE_YN 				= #{useYn}				/* 사용 여부*/
+			</if>
+			<if test="bnrImgCd != null">
+			, BNR_IMG_CD 			= #{bnrImgCd}			/* 배너 이미지 코드*/
+			</if>
+			<if test="bnrImgNm != null">
+			, BNR_IMG_NM 			= #{bnrImgNm}			/* 배너 이미지 명*/
+			</if>
+			<if test="bnrImgPath != null">
+			, BNR_IMG_PATH 			= #{bnrImgPath}			/* 배너 이미지 경로*/
+			</if>
+			<if test="bnrImgUrl != null">
+			, BNR_IMG_URL 			= #{bnrImgUrl}			/* 배너 이미지 URL*/
+			</if>
+			<if test="bnrMobileImgCd != null">
+			, BNR_MOBILE_IMG_CD 	= #{bnrMobileImgCd}		/* 배너 모바일 이미지 코드*/
+			</if>
+			<if test="bnrMobileImgNm != null">
+			, BNR_MOBILE_IMG_NM	 	= #{bnrMobileImgNm}		/* 배너 모바일 이미지 명*/
+			</if>
+			<if test="bnrMobileImgPath != null">
+			, BNR_MOBILE_IMG_PATH 	= #{bnrMobileImgPath}	/* 배너 모바일 이미지 경로*/
+			</if>
+			<if test="bnrMobileImgUrl != null">
+			, BNR_MOBILE_IMG_URL 	= #{bnrMobileImgUrl}	/* 배너 모바일 이미지 URL*/
+			</if>
+			<if test="bnrLinkUrl != null">
+			, BNR_LINK_URL 			= #{bnrLinkUrl}			/* 배너 LINK URL*/
+			</if>
+			<if test="bnrTpCd != null">
+			, BNR_TP_CD 			= #{bnrTpCd}			/* 배너 타입별 코드*/
+			</if>
+		WHERE BNR_NO = #{bnrNo}
+	</update>
+	
+	<update id="updateUseYn" parameterType="biz.app.banner.model.BannerPO">
+		UPDATE BNR_MNG SET 
+			USE_YN = #{useYn}
+		WHERE BNR_NO = #{bnrNo}
+	</update>
+	
+	<select id="deleteBanner" parameterType="biz.app.banner.model.BannerPO">
+		<!-- 
+			Query Name : banner.deleteBanner
+			Description : 배너  삭제
+		 -->
+		DELETE 	/* UQERYID(banner.deleteBanner) */
+		FROM	BNR_MNG 
+		WHERE	BNR_NO = #{bnrNo}
+	</select>
+	
+	<select id="bannerListGrid" resultType="biz.app.banner.model.BannerVO">
+		<!-- 
+			Query Name : banner.bannerListGrid
+			Description : 배너 그리드 리스트
+		 -->
+		SELECT 		/* QUERYID(banner.bannerListGrid) */
+			  BNR_NO				/* 배너 번호*/
+			, BNR_ID				/* 배너 ID*/
+			, BNR_TP_CD				/* 배너 타입별 코드*/
+			, BNR_MOBILE_IMG_PATH	/* 배너 모바일 이미지 경로*/
+			, BNR_IMG_PATH			/* 배너 이미지 경로*/
+			, BNR_TTL				/* 배너 제목*/
+			, ST_ID					/* 사이트 아이디*/
+			, USE_YN				/* 사용 여부*/
+			, BNR_LINK_URL			/* 배너 LINK URL*/
+			, SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM		/*등록자*/
+			, SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM 			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM /* 시스템 수정자 */
+		FROM BNR_MNG
+		WHERE 1 = 1 
+		<if test="stId != null and stId != ''">
+		AND		ST_ID = #{stId}
+		</if>
+		<if test="useYn != null and useYn != ''">
+		AND		USE_YN = #{useYn}
+		</if> 
+		<if test="regStrtDtm != null and regEndDtm != null">
+		AND		SYS_REG_DTM &gt;= #{regStrtDtm} AND SYS_REG_DTM &lt; DATE_ADD(#{regEndDtm}, INTERVAL 1 DAY)
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+		AND		(BNR_ID LIKE CONCAT('%', #{searchVal}, '%') OR BNR_TTL LIKE CONCAT('%', #{searchVal}, '%')) 
+		</if>
+		<if test="bnrTpCd != null and bnrTpCd != ''">
+		AND 	BNR_TP_CD = #{bnrTpCd}
+		</if>
+		ORDER BY BNR_NO DESC
+	</select>
+	
+	<select id="bannerListGridCount" resultType="java.lang.Integer">
+		<!-- 
+			Query Name : banner.bannerListGridCount
+			Description : 배너 그리드 리스트 카운트
+		 -->
+		SELECT 		/* QUERYID(banner.bannerListGridCount) */
+			COUNT(*)
+		FROM BNR_MNG
+		WHERE 1 = 1 
+		<if test="stId != null and stId != ''">
+		AND		ST_ID = #{stId}
+		</if>
+		<if test="useYn != null and useYn != ''">
+		AND		USE_YN 		  = #{useYn}
+		</if> 
+		<if test="regStrtDtm != null and regEndDtm != null">
+		AND		SYS_REG_DTM &gt;= #{regStrtDtm} AND SYS_REG_DTM &lt; DATE_ADD(#{regEndDtm}, INTERVAL 1 DAY)
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+		AND		(BNR_ID LIKE CONCAT('%', #{searchVal}, '%') OR BNR_TTL LIKE CONCAT('%', #{searchVal}, '%')) 
+		</if>
+		<if test="bnrTpCd != null and bnrTpCd != ''">
+		AND 	BNR_TP_CD = #{bnrTpCd}
+		</if>
+		ORDER BY BNR_NO DESC
+	</select>
+	
+	<select id="pageBanner" resultType="biz.app.banner.model.BannerVO">
+		<!--
+			Query Name : banner.pageBanner
+			Description : 배너 페이지 목록
+		-->
+		SELECT
+			BNR_NO					/* 배너 번호 */
+			, BNR_ID				/* 배너 ID */
+			, BNR_TTL				/* 배너 제목 */
+			, USE_YN				/* 사용 여부 */
+			, ST_ID					/* 사이트 아이디 */
+			, BNR_TP_CD				/* 배너 타입별 코드 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM 	BNR_MNG
+		WHERE 1 = 1 
+		<if test="useYn != null and useYn != ''">
+		AND	USE_YN = #{useYn}
+		</if>
+		<if test="regStrtDtm != null and regEndDtm != null">
+		AND		SYS_REG_DTM &gt;= #{regStrtDtm} AND SYS_REG_DTM &lt; DATE_ADD(#{regEndDtm}, INTERVAL 1 DAY)
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+		AND		(BNR_ID LIKE CONCAT('%', #{searchVal}, '%') OR BNR_TTL LIKE CONCAT('%', #{searchVal}, '%')) 
+		</if>
+		<if test="bnrTpCd != null and bnrTpCd != ''">
+		AND BNR_TP_CD = #{bnrTpCd}
+		</if>
+		ORDER BY BNR_NO DESC
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageBannerCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : banner.pageBannerCount
+			Description : 배너 페이지 목록 카운트
+		-->
+		SELECT COUNT(*)
+		FROM 
+		(
+			SELECT
+			BNR_NO					/* 배너 번호 */
+			, BNR_ID				/* 배너 ID */
+			, BNR_TTL				/* 배너 제목 */
+			, USE_YN				/* 사용 여부 */
+			, ST_ID					/* 사이트 아이디 */
+			, BNR_TP_CD				/* 배너 타입별 코드 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM 	BNR_MNG
+		WHERE 1 = 1 
+		<if test="useYn != null and useYn != ''">
+		AND	USE_YN = #{useYn}
+		</if>
+		<if test="regStrtDtm != null and regEndDtm != null">
+		AND		SYS_REG_DTM &gt;= #{regStrtDtm} AND SYS_REG_DTM &lt; DATE_ADD(#{regEndDtm}, INTERVAL 1 DAY)
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+		AND		(BNR_ID LIKE CONCAT('%', #{searchVal}, '%') OR BNR_TTL LIKE CONCAT('%', #{searchVal}, '%')) 
+		</if>
+		<if test="bnrTpCd != null and bnrTpCd != ''">
+		AND BNR_TP_CD = #{bnrTpCd}
+		</if>
+		ORDER BY BNR_NO DESC
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+		) CNT
+	</select>
+	
+	<insert id="insertBannerTag" parameterType="biz.app.banner.model.BannerTagMapPO">
+		<!--
+			Query Name : banner.insertBannerTag
+			Description : 배너 태그 맵핑 insert
+		-->	
+		INSERT INTO BNR_TAG_MAP (
+			BNR_NO
+			, TAG_NO
+			, SYS_REGR_NO 		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM 		/* 시스템 등록 일시 */
+		) VALUES(
+			#{bnrNo}
+			, #{tagNo}
+			, #{sysRegrNo} 		/* 시스템 등록자 번호 */
+			, NOW() 			/* 시스템 등록 일시 */
+		)
+	</insert>
+	
+	<update id="updateBannerTag" parameterType="biz.app.banner.model.BannerTagMapPO">
+		<!--
+			Query Name : banner.updateBannerTag
+			Description : 배너 태그 맵핑 update
+		-->	
+		UPDATE BNR_TAG_MAP SET
+			TAG_NO = #{tagNo}
+			, SYS_UPDR_NO = #{sysUpdrNo} 		
+			, SYS_UPD_DTM = NOW()
+		WHERE 1 = 1
+		AND BNR_NO = #{bnrNo}
+	</update>
+	
+	<delete id="deleteAllBannerTag" parameterType="biz.app.banner.model.BannerTagMapPO">
+		<!--
+			Query Name : banner.deleteAllBannerTag
+			Description : 배너 태그 맵핑 삭제
+		-->	
+		DELETE
+		FROM	BNR_TAG_MAP
+		WHERE 1 = 1 
+		AND BNR_NO = #{bnrNo}
+	</delete>
+	
+	<select id="getBannerTagList" resultType="biz.app.banner.model.BannerTagMapVO">
+		<!--
+			Query Name : banner.getBannerTagList
+			Description : 배너 태그 맵  리스트
+		-->	
+		SELECT
+			BTM.TAG_NO 
+		FROM BNR_TAG_MAP BTM 
+			LEFT JOIN BNR_MNG BM ON(BTM.BNR_NO = BM.BNR_NO)
+		WHERE 1 = 1 
+		<if test="bnrNo != null and bnrNo != ''">
+		AND	BM.BNR_NO = #{bnrNo}
+		</if>
+	</select>
+	
+	<select id="getTagBase" resultType="biz.app.tag.model.TagBaseVO">
+		<!--
+			Query Name : banner.getTagBase
+			Description : 배너 베이스 태그
+		-->	
+		SELECT 
+			TAG_NO 
+			, TAG_NM
+		FROM TAG_BASE
+		WHERE 1 = 1 
+		<if test="tagNo != null and tagNo != ''">
+		AND	TAG_NO = #{tagNo}
+		</if>
+	</select>
+	
+	<select id="getMaxImageSequence" resultType="Long">
+		<!--
+			Query Name : banner.getMaxImageSequence
+			Description : 배너 테이블 pk max 값
+		-->
+		SELECT	IFNULL(MAX(BNR_NO), 0) + 1 AS BNR_NO
+		FROM	BNR_MNG
+		WHERE 	BNR_NO = #{bnrNo}
+	</select>
+	
+</mapper>

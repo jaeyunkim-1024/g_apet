@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+
+
+	<!-- 팝업레이어 A 전체 덮는크기 -->
+	<article class="popLayer a popFilter" id="popFilter">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">필터</h1>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents b filter"> <!-- 03.31 수정 : filter 클래스 추가 -->
+					<div class="remove-area filOneLine fil_remove">				<!-- filOneLine클래스, fil_remove클래스 추가 2021.04.28 수정 -->
+						<div class="swiper-container">
+							<ul class="swiper-wrapper">
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										영양제
+										<button class="close"></button>
+									</span>
+								</li>
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										사은품증정
+										<button class="close"></button>
+									</span>
+								</li>
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										영양제
+										<button class="close"></button>
+									</span>
+								</li>
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										사은품증정
+										<button class="close"></button>
+									</span>
+								</li>
+								
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										사은품증정
+										<button class="close"></button>
+									</span>
+								</li>
+								<li class="swiper-slide">
+									<span class="remove-tag">
+										영양제
+										<button class="close"></button>
+									</span>
+								</li>
+							</ul>
+						</div>
+								
+								
+						
+						
+					</div>
+					<section class="sect k0426" data-sid="ui-tabs"><!-- 04.26 -->
+						<ul class="uiTab a d">
+							<li class="active">
+								<a class="bt" data-ui-tab-btn="tab_a" data-ui-tab-val="tab_a_1" href="javascript:;"><span>상세조건</span></a>
+							</li>
+							<li>
+								<a class="bt" data-ui-tab-btn="tab_a" data-ui-tab-val="tab_a_2" href="javascript:;"><span>브랜드</span></a>
+							</li>
+						</ul>
+						<div data-ui-tab-ctn="tab_a" data-ui-tab-val="tab_a_1" class="active">
+							
+							<div class="filter-area">
+								<div class="filter-item">
+									<strong class="tit">배송유형</strong>
+									<div class="tag">
+										<button>새벽배송</button>
+										<button class="active">위탁배송</button>
+									</div>
+								</div>
+								<div class="filter-item">
+									<strong class="tit">구성/혜택</strong>
+									<div class="tag">
+										<button>자체제작</button>
+										<button>1+1</button>
+										<button>2+1</button>
+										<button>사은품증정</button>
+										<button>추가증정</button>
+									</div>
+								</div>
+								<div class="filter-item">
+									<strong class="tit">연령</strong>
+									<div class="tag">
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+									</div>
+								</div>
+								<div class="filter-item">
+									<strong class="tit">조건명</strong>
+									<div class="tag">
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+										<button>전연령</button>
+										<button>퍼피</button>
+										<button>어덜트</button>
+										<button>시니어</button>
+										<button>임신/수유</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div data-ui-tab-ctn="tab_a" data-ui-tab-val="tab_a_2">
+							
+							<div class="brand-check">
+								<nav class="uisort only_down"><!-- 04.22 : 수정 -->
+									<button type="button" class="bt st"></button>
+									<div class="list">
+										<ul class="menu">
+											<li><button type="button" class="bt" value="v_1">등록일순</button></li>
+											<li><button type="button" class="bt" value="v_2">판매인기순</button></li>
+											<li><button type="button" class="bt" value="v_3">낮은가격순</button></li>
+											<li><button type="button" class="bt" value="v_4">높은가격순</button></li>
+											<li><button type="button" class="bt" value="v_5">후기많은순</button></li>	<!-- CSR-1631 210901 lju02 -->
+											<li><button type="button" class="bt" value="v_6">추천순</button></li>
+										</ul>
+									</div>
+								</nav>
+		
+								<ul class="brand-list">
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+									<li>
+										<label class="checkbox">
+											<input type="checkbox"><span class="txt">선택</span>
+										</label>
+										<span class="num">999</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+					<!-- tab -->
+					
+				</main>
+			</div>
+			
+			<div class="pbt b">
+				<div class="bts">
+					<button type="button" class="btn xl d">초기화</button>
+					<button type="button" class="btn xl a">00개 상품보기</button>
+				</div>
+			</div>
+		</div>
+	</article>
+
+	<script>
+		ui.popLayer.open("popFilter");
+	</script>
+
+
+
+	
+</body>
+</html>

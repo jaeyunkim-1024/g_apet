@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 상품 이미지 보기 -->
+		<article class="popLayer a popPdImgView" id="popPdImgView">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">상품 이미지 보기</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						<section class="pdPhoto">
+							<div class="pdDtPicSld2">
+								<div class="swiper-container">
+									<ul class="swiper-wrapper slide">
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_3.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_3.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></div>
+										</li>
+										<li class="swiper-slide">
+											<div class="box swiper-zoom-container"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></div>
+										</li>
+									</ul>
+								</div>
+							</div>
+							
+
+						</section>
+						
+					</main>
+				</div>
+				<div class="pbt">
+					<div class="pdDtThmSld2">
+						<div class="swiper-container">
+							<ul class="swiper-wrapper slide">
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_3.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_3.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt=""></span></a>
+								</li>
+								<li class="swiper-slide">
+									<a href="javascript:;" class="box"><span class="pic"><img class="img" src="../../_images/_temp/goods_2.jpg" alt=""></span></a>
+								</li>
+							</ul>
+						</div>
+						<div class="sld-nav">
+							<button type="button" class="bt prev">이전</button>
+							<button type="button" class="bt next">다음</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<script>
+			/* 레이어 팝업 open */
+			ui.popLayer.open("popPdImgView");
+			
+			/* swiper */
+			setTimeout(function(){
+				var galleryThumbs = new Swiper(".pdDtThmSld2 .swiper-container", {
+					observer: true,
+					observeParents: true,
+					watchOverflow:true,
+					spaceBetween: 10,
+					slidesPerView: "auto",
+					freeMode: true,
+					navigation: {
+						nextEl: '.pdDtThmSld2 .sld-nav .bt.next',
+						prevEl: '.pdDtThmSld2 .sld-nav .bt.prev',
+					},
+				});
+				var galleryTop = new Swiper('.pdDtPicSld2 .swiper-container', {
+					spaceBetween:20,
+					thumbs: {
+						swiper: galleryThumbs
+					},
+					zoom: {
+						maxRatio: 5,
+					}
+				});
+			},500)
+		</script>
+
+</body>
+</html>

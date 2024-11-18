@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 09. 18.
+	작성자 : kimdp
+-->
+
+<mapper namespace="oborderbase">
+
+	<insert id="insertObOrderBase">
+		<!--
+			Query Name : oborderbase.insertObOrderBase
+			Description : Outbound API 주문 이력 정보 등록
+		-->
+			INSERT INTO OB_ORDER_BASE (
+			  MARKET_NM
+			  ,SELLER_ID			
+			  ,ADD_PRD_NO
+			  ,ADD_PRD_YN
+			  ,BNDL_DLV_SEQ
+			  ,BNDL_DLV_YN
+			  ,CUST_GRD_NM
+			  ,DLV_CST
+			  ,DLV_CST_TYPE
+			  ,BM_DLV_CST
+			  ,BM_DLV_CST_TYPE
+			  ,DLV_NO
+			  ,GBL_DLV_YN
+			  ,MEM_ID
+			  ,MEM_NO
+			  ,ORD_AMT
+			  ,ORD_BASE_ADDR
+			  ,ORD_DLV_REQ_CONT
+			  ,ORD_DT
+			  ,ORD_DTLS_ADDR
+			  ,ORD_MAIL_NO
+			  ,ORD_NM
+			  ,ORD_NO
+			  ,ORD_OPT_WON_STL
+			  ,ORD_PAY_AMT
+			  ,ORD_PRD_SEQ
+			  ,ORD_PRTBL_TEL
+			  ,ORD_QTY
+			  ,ORD_STL_END_DT
+			  ,ORD_TLPHN_NO
+			  ,PRD_NM
+			  ,PRD_NO
+			  ,PRD_STCK_NO
+			  ,RCVR_BASE_ADDR
+			  ,RCVR_DTLS_ADDR
+			  ,RCVR_MAIL_NO
+			  ,RCVR_MAIL_NO_SEQ
+			  ,RCVR_NM
+			  ,RCVR_PRTBL_NO
+			  ,RCVR_TLPHN
+			  ,SEL_PRC
+			  ,SELLER_DSC_PRC
+			  ,SLCT_PRD_OPT_NM
+			  ,TMALL_DSC_PRC
+			  ,TYPE_ADD
+			  ,TYPE_BIL_NO
+			  ,LST_TMALL_DSC_PRC
+			  ,LST_SELLER_DSC_PRC
+			  ,SELLER_STOCK_CD
+			  ,APPMT_DD_DLV_DY
+			  ,APPMT_ELT_REFUSE_YN
+			  ,APPMT_SEL_STOCK_CD
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			  #{marketNm}
+			  ,#{sellerId}			
+			  ,#{obOrderHistoryPO.addPrdNo}
+			  ,#{obOrderHistoryPO.addPrdYn}
+			  ,#{obOrderHistoryPO.bndlDlvSeq}
+			  ,#{obOrderHistoryPO.bndlDlvYn}
+			  ,#{obOrderHistoryPO.custGrdNm}
+			  ,#{obOrderHistoryPO.dlvCst}
+			  ,#{obOrderHistoryPO.dlvCstType}
+			  ,#{obOrderHistoryPO.bmDlvCst}
+			  ,#{obOrderHistoryPO.bmDlvCstType}
+			  ,#{obOrderHistoryPO.dlvNo}
+			  ,#{obOrderHistoryPO.gblDlvYn}
+			  ,#{obOrderHistoryPO.memId}
+			  ,#{obOrderHistoryPO.memNo}
+			  ,#{obOrderHistoryPO.ordAmt}
+			  ,#{obOrderHistoryPO.ordBaseAddr}
+			  ,#{obOrderHistoryPO.ordDlvReqCont}
+			  ,#{obOrderHistoryPO.ordDt}
+			  ,#{obOrderHistoryPO.ordDtlsAddr}
+			  ,#{obOrderHistoryPO.ordMailNo}
+			  ,#{obOrderHistoryPO.ordNm}
+			  ,#{obOrderHistoryPO.ordNo}
+			  ,#{obOrderHistoryPO.ordOptWonStl}
+			  ,#{obOrderHistoryPO.ordPayAmt}
+			  ,#{obOrderHistoryPO.ordPrdSeq}
+			  ,#{obOrderHistoryPO.ordPrtblTel}
+			  ,#{obOrderHistoryPO.ordQty}
+			  ,#{obOrderHistoryPO.ordStlEndDt}
+			  ,#{obOrderHistoryPO.ordTlphnNo}
+			  ,#{obOrderHistoryPO.prdNm}
+			  ,#{obOrderHistoryPO.prdNo}
+			  ,#{obOrderHistoryPO.prdStckNo}
+			  ,#{obOrderHistoryPO.rcvrBaseAddr}
+			  ,#{obOrderHistoryPO.rcvrDtlsAddr}
+			  ,#{obOrderHistoryPO.rcvrMailNo}
+			  ,#{obOrderHistoryPO.rcvrMailNoSeq}
+			  ,#{obOrderHistoryPO.rcvrNm}
+			  ,#{obOrderHistoryPO.rcvrPrtblNo}
+			  ,#{obOrderHistoryPO.rcvrTlphn}
+			  ,#{obOrderHistoryPO.selPrc}
+			  ,#{obOrderHistoryPO.sellerDscPrc}
+			  ,#{obOrderHistoryPO.slctPrdOptNm}
+			  ,#{obOrderHistoryPO.tmallDscPrc}
+			  ,#{obOrderHistoryPO.typeAdd}
+			  ,#{obOrderHistoryPO.typeBilNo}
+			  ,#{obOrderHistoryPO.lstTmallDscPrc}
+			  ,#{obOrderHistoryPO.lstSellerDscPrc}
+			  ,#{obOrderHistoryPO.sellerStockCd}
+			  ,#{obOrderHistoryPO.appmtDdDlvDy}
+			  ,#{obOrderHistoryPO.appmtEltRefuseYn}
+			  ,#{obOrderHistoryPO.appmtSelStockCd}
+			  ,'900001357'
+			  ,NOW()
+			  ,'900001357'
+			  ,NOW()
+			) ON DUPLICATE KEY UPDATE SYS_UPD_DTM = NOW()
+
+	</insert>
+	
+	
+    <select id="pageMarketOrderOrg" resultType="biz.app.market.model.MarketOrderListVO">
+		<!--
+			Query Name : oborderbase.pageMarketOrderOrg
+			Description : 오픈마켓 원 주문 목록 페이징 조회
+		-->
+		<![CDATA[
+		SELECT 	/* QUERYID(oborderbase.pageMarketOrderOrg) */
+				OBO.ORD_SEQ				/* 주문일련번호 */
+				, OBO.MARKET_NM			/* 마켓명 */
+				, OBO.SELLER_ID			/* 판매자아이디 */
+				, OBO.ORD_NO			/* 11번가주문번호 */
+				, OBO.SHOP_ORD_NO		/* 쇼핑몰주문번호 */	
+				, OBO.MARKET_ORD_STD    /* 마켓주문상태(10:결제완료,20:배송준비,30:배송완료,40:취소완료) */
+				, OBO.PRD_NO			/* 11번가상품번호 */
+				, OBO.PRD_NM			/* 11번가상품명 */	
+				, OBO.SHOP_PRD_NO		/* 쇼핑몰매칭상품코드 */
+				, OBO.SHOP_PRD_NM		/* 쇼핑몰매칭상품명 */
+				, OBO.SLCT_PRD_OPT_NM	/* 주문상품옵션명 */
+				, OBO.SHOP_PRD_OPT_NM	/* 쇼핑몰매칭옵션명 */
+				, OBO.ORD_QTY			/* 주문수량 */
+				, OBO.CNC_QTY			/* 취소수량 */
+				, OBO.ORD_AMT			/* 주문금액 */
+				, OBO.ORD_PAY_AMT		/* 결제금액 */
+				, OBO.INVC_NO			/* 송장번호 */
+				, OBO.DLV_CST			/* 배송비 */
+				, OBO.ORD_TLPHN_NO		/* 주문자전화번호 */
+				, OBO.ORD_PRTBL_TEL		/* 구매자휴대폰번호 */
+				, CONCAT(OBO.ORD_TLPHN_NO,'<br/>',OBO.ORD_PRTBL_TEL) AS ORD_FULL_TLPHN	/* 주문자전화번호&구매자휴대폰번호*/
+				, OBO.RCVR_TLPHN		/* 수령자전화번호 */
+				, OBO.RCVR_PRTBL_NO		/* 수령자핸드폰번호 */
+				, CONCAT(OBO.RCVR_TLPHN,'<br/>',OBO.RCVR_PRTBL_NO) AS ORD_RCVR_TLPHN	/* 수령자전화번호&수령자핸드폰번호*/
+				, OBO.RCVR_MAIL_NO		/* 배송지우편번호 */
+				, OBO.RCVR_BASE_ADDR	/* 배송기본주소 */
+				, OBO.RCVR_DTLS_ADDR	/* 배송상세주소 */			
+				, CONCAT('[',OBO.RCVR_MAIL_NO,']',CONCAT(OBO.RCVR_BASE_ADDR,' ',OBO.RCVR_DTLS_ADDR)) AS RCVR_FULL_ADDR /* 배송전체주소 */
+				, OBO.ORD_DLV_REQ_CONT 	/* 배송시 요청사항 */
+				, OBO.ORD_DT			/* 주문일시*/
+				, OBO.ORD_STL_END_DT	/* 결제완료일시*/
+				, CONCAT(OBO.ORD_DT,'<br/>',OBO.ORD_STL_END_DT) AS ORD_FULL_DT	/* 주문일시&결제완료일시*/
+				, OBO.PROC_CD			/* 처리상태(10:주문수집,19:주문수집에러,20:주문등록,29:주문등록에러)*/				
+		FROM 	OB_ORDER_BASE OBO
+		WHERE 	1= 1
+		]]>
+		<include refid="oborderbase.pageMarketOrderOrgWhere" />				
+    </select>
+    
+    <sql id="pageMarketOrderOrgWhere">
+	    <choose>
+	        <when test="searchDtmType == 'type01'">
+				<if test="ordAcptDtmStart != null">
+				AND 		OBO.SYS_REG_DTM <![CDATA[>=]]> #{ordAcptDtmStart}
+				</if>
+				<if test="ordAcptDtmEnd != null">
+				AND 		OBO.SYS_REG_DTM <![CDATA[<]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+				</if>	        	
+	        </when>
+	        <when test="searchDtmType == 'type02'">
+				<if test="ordAcptDtmStart != null">
+				AND 		OBO.SHOP_ORD_DT <![CDATA[>=]]> #{ordAcptDtmStart}
+				</if>
+				<if test="ordAcptDtmEnd != null">
+				AND 		OBO.SHOP_ORD_DT <![CDATA[<]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+				</if>		        
+	        </when>
+	        <when test="searchDtmType == 'type03'">
+				<if test="ordAcptDtmStart != null">
+				AND 		OBO.ORD_STL_END_DT <![CDATA[>=]]> #{ordAcptDtmStart}
+				</if>
+				<if test="ordAcptDtmEnd != null">
+				AND 		OBO.ORD_STL_END_DT <![CDATA[<]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+				</if>		        
+	        </when>	        
+	    </choose>	            
+		<if test="searchMarketNm != null and searchMarketNm != ''">
+		AND 		OBO.MARKET_NM = #{searchMarketNm}
+		</if>
+		<if test="searchMarketSellerId != null and searchMarketSellerId != ''">
+		AND 		OBO.SELLER_ID = #{searchMarketSellerId}
+		</if>		
+		<if test="ordNo != null and ordNo != ''">
+		AND 		OB.ORD_NO = #{ordNo}
+		</if>		    
+		<if test="searchValueOrder != null and searchValueOrder != ''">
+		    <choose>
+		        <when test="searchKeyOrder == 'type01'">
+		AND		OBO.ORD_NO = #{searchValueOrder}
+		        </when>
+		        <when test="searchKeyOrder == 'type02'">
+		AND		OBO.SHOP_ORD_NO = #{searchValueOrder}
+		        </when>
+		    </choose>
+		</if>
+		<if test="arrOrdStatCd != null and arrOrdStatCd.length > 0">
+		AND		OBO.MARKET_ORD_STD IN (
+				    <foreach collection="arrOrdStatCd" item="ordStatCd" separator="," >
+				    #{ordStatCd}
+				    </foreach>
+				    )
+		</if>		    
+	</sql>
+    
+	<select id="pageMarketOrderOrgCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : oborderbase.pageMarketOrderOrgCount
+			Description : pageMarketOrderOrgCount
+		-->
+		SELECT	/* QUERYID(oborderbase.pageMarketOrderOrgCount) */
+				COUNT(*)
+		FROM	
+			OB_ORDER_BASE OBO
+		WHERE 1 = 1
+		<include refid="oborderbase.pageMarketOrderOrgWhere" />
+	</select>    
+</mapper>

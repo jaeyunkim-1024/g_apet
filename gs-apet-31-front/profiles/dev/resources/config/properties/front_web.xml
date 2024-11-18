@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<comment>front_web_dev</comment>
+
+	<entry key="project.gb">front</entry>
+
+	<entry key="site.id">1</entry>
+	<entry key="site.nm">aboutPet</entry>
+	<entry key="site.service">10</entry>
+	<entry key="site.domain">dev.aboutpet.co.kr</entry>
+
+	<!-- 비정형매장 메인 전시번호 -->
+	<entry key="site.main.disp.clsf.no">300000406</entry>
+	<entry key="site.main.tv.disp.clsf.no">300000171</entry>	<!-- 펫tv 메인 배너 -->
+
+	<entry key="disp.clsf.no.topbrand">300000392</entry>		<!-- TOP5 브랜드 -->
+	<entry key="disp.clsf.no.best">300000402</entry>			<!-- 베스트 -->
+	<entry key="disp.clsf.no.main">300000406</entry>			<!-- 메인페이지 -->
+	<entry key="disp.clsf.no.premium">300000408</entry>			<!-- 프리미엄 페이지 -->
+	<entry key="disp.clsf.no.event">300000400</entry>			<!-- 이벤트 메인 -->
+	<entry key="disp.clsf.no.groupbuy">300000414</entry>		<!-- 공동구매 -->
+	<entry key="disp.clsf.no.eventgroup">300000415</entry>		<!-- 팔때사 이벤트 -->
+	
+	<!-- 메인영상 중복제거 순번 적용 노출 순서 -->
+	<entry key="disp.corn.duple.no.main">567:570:568:569:572:501:475:571:478</entry> <!-- 567:570:568:569:572 = 순서[신규영상:최근본영상:인기영상:맞춤추천영상:관심TAG] -->
+
+	<!-- 비정형매장 코너 번호 -->
+	<entry key="disp.corn.no.topbrand">291</entry>				<!-- TOP5 브랜드 -->
+	<entry key="disp.corn.no.best">293</entry>					<!-- 베스트 수동 등록 상품 -->
+	<entry key="disp.corn.no.goods.banner">504</entry>			<!-- 상품상세 공통배너 -->
+	<entry key="disp.corn.no.main">296:297:298:299:300:301:302:348:304:305</entry>			<!-- 메인페이지 -->
+<!-- 서비스 축소..2017.09.28	<entry key="disp.corn.no.main">296:297:347:299:300:301:302:348:304:305</entry>			메인페이지 -->
+	<entry key="disp.corn.no.main.group">347</entry>			<!-- 메인 공동구매 -->
+	<entry key="disp.corn.no.premium">329:330:331</entry>		<!-- 프리미엄 페이지 -->
+	<entry key="disp.corn.no.openevent">299</entry>				<!-- 오픈이벤트 베스트 상품 -->
+	<entry key="disp.corn.no.groupbuy">350:351:352</entry>		<!-- 공동구매 상단 전시 코너 -->
+	<entry key="disp.corn.no.eventgroup">353:354</entry>		<!-- 팔때사 이벤트 -->
+
+	<entry key="disp.corn.no.goods.twc">12569:12571:12572:12673:12675:12677:14112:14203:14269</entry> <!-- 상품 twc 영양정보, 필수정보 카테고리 -->
+
+	<!-- ****************************************** -->
+	<!--         결제 연동			                     -->
+	<!-- ****************************************** -->
+
+	<!-- INIpay -->
+	<entry key="inipay.str.id">INIpayTest</entry>	<!-- 이니시스 상점 키 -->
+
+	<entry key="inipay.version">1.0</entry>	<!-- 버전 -->
+	<entry key="inipay.return.charset">UTF-8</entry>	<!-- Return Charset [UTF-8|EUC-KR] -->
+	<entry key="inipay.return.url">/pay/inipay/indexInipayResult</entry>	<!-- Return URL -->
+	<entry key="inipay.close.url">/pay/inipay/indexInipayClose</entry>	<!-- Return URL -->
+
+	<entry key="inipay.card.nointerest"></entry>	<!-- 가맹점 부담 무이자 여부 설정 -->
+	<entry key="inipay.card.quota.base">2:3:4:5:6:11:12:24:36</entry>	<!-- 할부 개월 수 -->
+
+	<entry key="inipay.card.acceptmethod.point.yn">Y</entry>	<!-- 신용카드 복합필드 :  카드사포인트 사용 여부-->
+	<entry key="inipay.card.acceptmethod.below1000.yn">Y</entry>	<!-- 신용카드 복합필드 : 1000원이하 결제 가능 여부 -->
+
+	<entry key="inipay.bank.acceptmethod.receipt.yn">N</entry>	<!-- 계좌이체 복합필드 : 현금영수증 발급 여부 -->
+	<entry key="inipay.vbank.acceptmethod.receipt.yn">N</entry>	<!-- 가상계좌 복합필드 : 현금영수증 발급 여부 -->
+
+	<!-- 검색엔진  -->
+	<entry key="search.diquest.diver.ip">10.100.30.70</entry>
+	<entry key="search.diquest.diver.port">5555</entry>
+	<!-- 검색엔진  -->
+
+	<!-- 디폴트 noImage -->
+	<entry key="default.noImagePath">/_images/mall/common/default_image.jpg</entry>
+	
+	<!-- 이미지경로 -->
+	<entry key="default.imagePath">/_images/mall</entry>
+	<entry key="default.imageCommonPath">/_images/common</entry>
+	<!-- 이미지경로 -->
+	
+	<!-- ****************************************** -->
+	<!--         비정형 페이지  		                    -->
+	<!-- ****************************************** -->
+	<!-- 펫로그 홈 -->
+	<entry key="disp.clsf.no.petlog">300000163</entry>						<!-- 펫로그 홈 -->
+	<!-- 펫로그 홈 : 코너 번호 -->
+	<entry key="disp.corn.no.petlog.main.tag.poptag">27</entry>				<!-- 태그:인기태그 -->	
+	<entry key="disp.corn.no.petlog.main.tag.admninrec">22</entry>			<!-- 태그:추천태그 -->
+	<entry key="disp.corn.no.petlog.main.banner.likepetlog">24</entry>		<!-- 배너:좋아할만한 펫로그 -->
+	<entry key="disp.corn.no.petlog.main.banner.recmember">26</entry>		<!-- 배너:이친구 어때요 -->	
+	<entry key="disp.corn.no.petlog.main.banner.poptag">28</entry>			<!-- 배너:인기태그 -->
+	<entry key="disp.corn.no.petlog.main.likepetlog">23</entry>				<!-- 좋아할만한 펫로그 -->	
+	<entry key="disp.corn.no.petlog.main.banner.text">21</entry>			<!-- 배너텍스트:서비스지정메세지 -->	
+	
+	<!-- 펫TV 비정형 코너 번호 -->
+	<entry key="disp.corn.no.tv.top.banner">501</entry>					<!-- 최상단 배너 -->
+	<entry key="disp.corn.no.tv.custom.vod">569</entry>					<!-- 맞춤 추전 영상 영역 -->
+	<entry key="disp.corn.no.tv.recently.vod">570</entry>				<!-- 최근 본 영상 영역 -->
+	<entry key="disp.corn.no.tv.new.vod">567</entry>					<!-- 따끈따끈한 영상 영역 -->
+	<entry key="disp.corn.no.tv.popular.vod">568</entry>				<!-- 인기 영상 영역 -->
+	<entry key="disp.corn.no.tv.advertising.banner">475</entry>			<!-- 광고 배너 영역 -->
+	<entry key="disp.corn.no.tv.petschool.vod">571</entry>				<!-- 펫스쿨 영상 영역 -->
+	<entry key="disp.corn.no.tv.interested.vod">572</entry>				<!-- 내가 등록한 관심TAG 영상 영역 -->
+	<entry key="disp.corn.no.tv.series.vod">478</entry>					<!-- 오리지널 시리즈 영상 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_1">1000</entry>				<!-- 시리즈 TAG_1 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_2">1001</entry>				<!-- 시리즈 TAG_2 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_3">1002</entry>				<!-- 시리즈 TAG_3 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_4">1003</entry>				<!-- 시리즈 TAG_4 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_5">1004</entry>				<!-- 시리즈 TAG_5 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_6">1005</entry>				<!-- 시리즈 TAG_6 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_7">1006</entry>				<!-- 시리즈 TAG_7 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_8">1007</entry>				<!-- 시리즈 TAG_8 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_9">1008</entry>				<!-- 시리즈 TAG_9 영역 -->
+	<entry key="disp.corn.no.tv.series.tag_10">1009</entry>				<!-- 시리즈 TAG_10 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_1">1010</entry>					<!-- 영상 TAG_1 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_2">1011</entry>					<!-- 영상 TAG_2 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_3">1012</entry>					<!-- 영상 TAG_3 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_4">1013</entry>					<!-- 영상 TAG_4 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_5">1014</entry>					<!-- 영상 TAG_5 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_6">1015</entry>					<!-- 영상 TAG_6 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_7">1016</entry>					<!-- 영상 TAG_7 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_8">1017</entry>					<!-- 영상 TAG_8 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_9">1018</entry>					<!-- 영상 TAG_9 영역 -->
+	<entry key="disp.corn.no.tv.vod.tag_10">1019</entry>				<!-- 영상 TAG_10 영역 -->
+	
+	<!-- 펫샵 홈 -->
+	<entry key="disp.clsf.no.petshop">300000164</entry>						<!-- 펫샵 홈 -->
+	<entry key="disp.clsf.no.petshop.dog">300000173</entry>					<!-- 펫강아지 홈 -->
+	<entry key="disp.clsf.no.petshop.cat">300000174</entry>					<!-- 펫고양이 홈 -->
+	<entry key="disp.clsf.no.petshop.fish">300000175</entry>				<!-- 펫관상어 홈 -->
+	<entry key="disp.clsf.no.petshop.animal">300000176</entry>				<!-- 펫소동물 홈 -->
+	
+	<entry key="disp.clsf.no.dog">12564</entry>							<!-- 강아지 -->
+	<entry key="disp.clsf.no.cat">12565</entry>							<!-- 고양이 -->
+	<entry key="disp.clsf.no.fish">14111</entry>						<!-- 관상어 -->
+	<entry key="disp.clsf.no.animal">14196</entry>						<!-- 소동물 -->
+	
+	<!-- 펫샵 비정형매장 코너 번호 -->
+	<!-- 강아지 -->
+	<entry key="disp.corn.no.dog.main">505:506:508:509:510:511:512:513:514:515:516:517:518</entry>			<!-- 메인페이지 -->
+	<entry key="disp.corn.no.dog.top.banner">505</entry>				<!-- 상단 배너 -->
+	<entry key="disp.corn.no.dog.shortcut">506</entry>					<!-- 바로가기 영역 -->
+	<entry key="disp.corn.no.dog.recommend.goods">507</entry>			<!-- 사용자 맞춤 추천상품 -->
+	<entry key="disp.corn.no.dog.pet.reg.banner">508</entry>			<!-- 반려동물 등록 배너 -->
+	<entry key="disp.corn.no.dog.offen.goods">509</entry>				<!-- 자주 구매한 상품 -->
+	<entry key="disp.corn.no.dog.time.deal">510</entry>					<!-- 타임딜 -->	
+	<entry key="disp.corn.no.dog.ad.banner">511</entry>					<!-- 광고배너 -->
+	<entry key="disp.corn.no.dog.stock.imminent">512</entry>			<!-- 재고 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.dog.expiration.date">584</entry>			<!-- 유통기한 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.dog.md.goods">513</entry>					<!-- MD 추천상품-->
+	<entry key="disp.corn.no.dog.best">514</entry>						<!-- 베스트20-->
+	<entry key="disp.corn.no.dog.only.goods">515</entry>				<!-- 펫샵 단독 상품-->	
+	<entry key="disp.corn.no.dog.package.goods">516</entry>				<!-- 패키지 상품-->
+	<entry key="disp.corn.no.dog.poppetlog">517</entry>					<!-- 인기있는 펫로그 후기-->
+	<entry key="disp.corn.no.dog.battom.ad.banner">518</entry>			<!-- 광고배너-->
+	<!-- 고양이 -->
+	<entry key="disp.corn.no.cat.top.banner">519</entry>				<!-- 상단 배너 -->
+	<entry key="disp.corn.no.cat.shortcut">520</entry>					<!-- 바로가기 영역 -->
+	<entry key="disp.corn.no.cat.recommend.goods">521</entry>			<!-- 사용자 맞춤 추천상품 -->
+	<entry key="disp.corn.no.cat.pet.reg.banner">535</entry>			<!-- 반려동물 등록 배너 -->
+	<entry key="disp.corn.no.cat.offen.goods">536</entry>				<!-- 자주 구매한 상품 -->
+	<entry key="disp.corn.no.cat.time.deal">537</entry>					<!-- 타임딜 -->	
+	<entry key="disp.corn.no.cat.ad.banner">538</entry>					<!-- 광고배너 -->
+	<entry key="disp.corn.no.cat.stock.imminent">539</entry>			<!-- 재고 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.cat.expiration.date">585</entry>			<!-- 유통기한 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.cat.md.goods">540</entry>					<!-- MD 추천상품-->
+	<entry key="disp.corn.no.cat.best">541</entry>						<!-- 베스트20-->
+	<entry key="disp.corn.no.cat.only.goods">542</entry>				<!-- 펫샵 단독 상품-->	
+	<entry key="disp.corn.no.cat.package.goods">543</entry>				<!-- 패키지 상품-->
+	<entry key="disp.corn.no.cat.poppetlog">544</entry>					<!-- 인기있는 펫로그 후기-->
+	<entry key="disp.corn.no.cat.battom.ad.banner">545</entry>			<!-- 광고배너-->
+	<!-- 관상어 -->
+	<entry key="disp.corn.no.fish.top.banner">546</entry>				<!-- 상단 배너 -->
+	<entry key="disp.corn.no.fish.shortcut">547</entry>					<!-- 바로가기 영역 -->
+	<entry key="disp.corn.no.fish.recommend.goods">548</entry>			<!-- 사용자 맞춤 추천상품 -->
+	<entry key="disp.corn.no.fish.pet.reg.banner">549</entry>			<!-- 반려동물 등록 배너 -->
+	<entry key="disp.corn.no.fish.offen.goods">550</entry>				<!-- 자주 구매한 상품 -->
+	<entry key="disp.corn.no.fish.time.deal">551</entry>				<!-- 타임딜 -->	
+	<entry key="disp.corn.no.fish.ad.banner">552</entry>				<!-- 광고배너 -->
+	<entry key="disp.corn.no.fish.stock.imminent">553</entry>			<!-- 재고 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.fish.expiration.date">586</entry>			<!-- 유통기한 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.fish.md.goods">554</entry>					<!-- MD 추천상품-->
+	<entry key="disp.corn.no.fish.best">555</entry>						<!-- 베스트20-->
+	<entry key="disp.corn.no.fish.only.goods">556</entry>				<!-- 펫샵 단독 상품-->	
+	<entry key="disp.corn.no.fish.package.goods">557</entry>			<!-- 패키지 상품-->
+	<entry key="disp.corn.no.fish.poppetlog">558</entry>				<!-- 인기있는 펫로그 후기-->
+	<entry key="disp.corn.no.fish.battom.ad.banner">559</entry>			<!-- 광고배너-->
+	<!-- 소동물 -->
+	<entry key="disp.corn.no.animal.top.banner">522</entry>				<!-- 상단 배너 -->
+	<entry key="disp.corn.no.animal.shortcut">523</entry>				<!-- 바로가기 영역 -->
+	<entry key="disp.corn.no.animal.recommend.goods">524</entry>		<!-- 사용자 맞춤 추천상품 -->
+	<entry key="disp.corn.no.animal.pet.reg.banner">525</entry>			<!-- 반려동물 등록 배너 -->
+	<entry key="disp.corn.no.animal.offen.goods">526</entry>			<!-- 자주 구매한 상품 -->
+	<entry key="disp.corn.no.animal.time.deal">527</entry>				<!-- 타임딜 -->	
+	<entry key="disp.corn.no.animal.ad.banner">528</entry>				<!-- 광고배너 -->
+	<entry key="disp.corn.no.animal.stock.imminent">529</entry>			<!-- 재고 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.animal.expiration.date">587</entry>		<!-- 유통기한 임박 : 폭풍할인 -->
+	<entry key="disp.corn.no.animal.md.goods">530</entry>				<!-- MD 추천상품-->
+	<entry key="disp.corn.no.animal.best">560</entry>					<!-- 베스트20-->
+	<entry key="disp.corn.no.animal.only.goods">531</entry>				<!-- 펫샵 단독 상품-->	
+	<entry key="disp.corn.no.animal.package.goods">532</entry>			<!-- 패키지 상품-->
+	<entry key="disp.corn.no.animal.poppetlog">533</entry>				<!-- 인기있는 펫로그 후기-->
+	<entry key="disp.corn.no.animal.battom.ad.banner">534</entry>		<!-- 광고배너-->
+
+	<entry key="disp.petshop.package.filters">1PLUS1,2PLUS1,GIFT,GIFTP,ETC</entry>		<!-- 패키지 상품 필터-->
+</properties>

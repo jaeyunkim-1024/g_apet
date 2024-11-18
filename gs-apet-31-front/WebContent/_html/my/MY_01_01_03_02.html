@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업레이어 A 전체 덮는크기 -->
+		<article class="popLayer a popSample1" id="popSample1">
+			<div class="pbd pop-search">
+				<div class="log_hanBoxTop">
+					<a href="javascript:;" class="lhbt_btn l icon_al b"></a>
+					<div class="tit">견종 검색</div>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+							<!-- input -->
+							<!-- 03.08 수정 -->
+							<div class="log_topBbox newDn "><!-- 04.08 newDn 클래스 추가  -->
+								<div class="input del t2"><!-- 04.08 data-txt="검색" 제거  -->
+									<input type="text" placeholder="견종을 입력해주세요" value="" title="텍스트">
+								</div>
+							</div>
+							<!-- // 03.08 수정 -->
+							<!-- // input -->
+							<!-- 위치등록 리스트?? -->
+							<!-- 검색 결과 없을 시 -->
+							<!-- 03.16 수정 -->
+							<div id="petKindNoSearchArea" class="petKindNoSearchArea_box" style="display: none;"><!-- APETQA-6355 관련하여 클래스 petKindNoSearchArea_box 추가함. 2021.08.05 추가 -->
+								<section class="no_data i1 auto_h">
+									<div class="inr">
+										<div class="msg">일치하는 견종이 없습니다.</div>
+									</div>
+								</section>
+							</div>
+							<!-- // 03.16 수정 -->
+							<!-- 검색 결과 없을 시 -->
+							<div class="log_pointEnterList newDn"><!-- 04.08 newDn 클래스 추가  -->
+								<ul>
+									<li class="log_flexBox">
+										<div class="tit">닥스훈트</div>
+									</li>
+									<li class="log_flexBox">
+										<div>
+											<div class="tit">치아와</div>
+											<!-- <div class="con">강남구 역삼동 677-15, 서울</div> -->
+										</div>	
+									</li>
+									<li class="log_flexBox">
+										<div>
+											<div class="tit">도베르만</div>
+										</div>	
+									</li>
+									<li class="log_flexBox">
+										<div>
+											<div class="tit">닥스훈트</div>
+										</div>	
+									</li>
+									<li class="log_flexBox">
+										<div>
+											<div class="tit">치아와</div>
+											<!-- <div class="con">강남구 역삼동 677-15, 서울</div> -->
+										</div>	
+									</li>
+									<li class="log_flexBox">
+										<div>
+											<div class="tit">도베르만</div>
+										</div>	
+									</li>
+									
+								</ul>
+							</div>
+							<!-- // 위치등록 리스트?? -->
+						
+					</main>
+				</div>
+				
+				<!-- 하단 고정 버튼 있을때 쓰세요
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl d" onclick="ui.popLayer.close('popSample1');">취소</button>
+						<button type="button" class="btn xl a">등록</button>
+					</div>
+				</div>
+				-->
+				
+				
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popSample1");
+		</script>
+
+</body>
+</html>

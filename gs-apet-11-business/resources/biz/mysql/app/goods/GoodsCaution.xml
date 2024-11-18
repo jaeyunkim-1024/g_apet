@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품주의사항
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsCaution">
+
+	<!-- 상품 주의사항 목록 -->
+	<select id="listGoodsCaution" resultType="biz.app.goods.model.GoodsCautionVO">
+		SELECT	GOODS_ID
+				,SEQ
+				,CONTENT
+				,DISP_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+		FROM	GOODS_CAUTION
+		WHERE	GOODS_ID = #{goodsId}
+		<if test='dispYn != null and dispYn != ""'>
+		AND		DISP_YN = #{dispYn}
+		</if>
+		ORDER BY SEQ ASC;
+	</select>
+
+
+	<select id="getGoodsCaution" resultType="biz.app.goods.model.GoodsCautionVO" >
+		<!--
+			Query Name : goodsCaution.getGoodsCaution
+			Description : 상품 주의사항 조회
+		-->
+		SELECT	/* QUERYID() */
+				  SEQ				/* 순번 */
+				, CONTENT			/* 내용 */
+				, DISP_YN			/* 전시 여부 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, GOODS_ID			/* 상품 아이디 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_CAUTION
+		WHERE	1 = 1
+		AND		GOODS_ID		= #{goodsId}
+		AND		DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		ORDER BY SEQ DESC
+		LIMIT 1
+	</select>
+
+
+	<insert id="insertGoodsCaution" parameterType="biz.app.goods.model.GoodsCautionPO" >
+		<!--
+			Query Name : goodsCaution.insertGoodsCaution
+			Description : 상품 주의사항 등록
+		-->
+		<selectKey keyProperty="seq" resultType="java.lang.Long" order="BEFORE">
+			SELECT IFNULL(MAX(SEQ), 0) + 1
+			FROM GOODS_CAUTION
+			WHERE GOODS_ID = #{goodsId}
+		</selectKey>
+		INSERT INTO GOODS_CAUTION (
+			  SEQ				/* 순번 */
+			, CONTENT			/* 내용 */
+			, DISP_YN			/* 전시 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, GOODS_ID			/* 상품 아이디 */
+		) VALUES (
+			  #{seq}			/* 순번 */
+			, #{content}		/* 내용 */
+			, '${@framework.common.constants.CommonConstants@COMM_YN_Y }'			/* 전시 여부 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{goodsId}		/* 상품 아이디 */
+		)
+	</insert>
+
+
+	<update id="updateGoodsCationDispYn" parameterType="biz.app.goods.model.GoodsCautionPO" >
+		<!--
+			Query Name : goodsCaution.updateGoodsCationDispYn
+			Description : 상품 주의사항 전시여부 처리
+		-->
+		UPDATE GOODS_CAUTION
+		SET DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N }'
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId}
+	</update>
+
+
+
+</mapper>

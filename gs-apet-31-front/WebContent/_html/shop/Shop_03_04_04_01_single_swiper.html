@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<!-- 팝업 A .popLayer-->
+	<article class="popLayer a popLogRv" id="popLogRv">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit"><em class="tt">로그 후기</em> <em class="nm"><i class="n">1</i>/<i class="s">999</i></em></h1>	<!-- APET-1250 210721 lju02 - 샵 서비스명 변경 -->
+					<!-- <button type="button" class="bt rvlist">후기리스트</button> -->
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="review_log_wrap">	<!-- class명 변경 부분 - 기존: log_review_sld -->
+						<div class="sld-nav">
+							<button type="button" class="bt prev">이전</button>
+							<button type="button" class="bt next">다음</button>
+						</div>
+						
+						<div class="swiper-container slide">
+							<ul class="revlists swiper-wrapper">
+								<li class="review_log_box" data-rel="0">	<!-- class명 변경 부분 - 기존: swiper-slide-->
+									<div class="box">
+										<div class="rhdt">
+											<div class="tinfo">
+												<span class="pic"><img src="../../_images/common/icon-img-profile-default-m@2x.png" alt="사진" class="img"></span>
+												<div class="def">
+													<em class="dd ids">yi11****</em> <em class="dd date">2020.01.01</em> <!--em class="ds me">작성글</em-->
+													<nav class="uidropmu dmenu">
+														<button type="button" class="bt st">메뉴열기</button>
+														<div class="list">
+															<ul class="menu">
+																<li><button type="button" class="bt">수정</button></li>
+																<li><button type="button" class="bt">삭제</button></li>
+															</ul>
+														</div>
+													</nav>
+												</div>
+												<div class="spec"><em class="b">푸들1<span>(암컷)</span></em> <em class="b">4살 </em> <em class="b">4.5kg</em></div>
+											</div>
+											<div class="hpset">
+												<em class="htxt">도움이돼요</em>
+												<button type="button" class="bt hlp on"><i class="n">88</i><b class="t">도움</b></button>
+											</div>
+										</div>
+										<!-- 04.05 : 수정 -->
+										<div class="rcdt">
+											<div class="stpnt starpoint">
+												<span class="stars sm p_4_5"></span>
+											</div>
+											<ul class="satis">
+												<li><span class="dt">맛 만족</span> <span class="dd">잘 먹었어요</span></li>
+												<li><span class="dt">유통기한</span> <span class="dd">넉넉해요</span></li>
+												<li><span class="dt">가성비</span> <span class="dd">만족해요</span></li>
+											</ul>
+											<div class="opts">L Size - 찹앤찹 찹찹트릿 가자미 맛좋은 식품</div>
+											<div class="rvPicSld">
+												<section class="logRvSet">
+													<!-- 펫로그 메인 콘턴츠 area -->
+													<section class="logContentBox review">
+														<!-- picture -->
+														<div class="lcbPicture sw">
+															<!-- div class="log_f_c_pop">90%일치</div -->
+															<!-- slider -->
+															<div class="swiper-container logMain">
+																<div class="swiper-pagination"></div>
+																<ul class="swiper-wrapper slide">
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/f5319437-2e26-4c1e-ad89-0515e3e2cc8d.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/a0f4346c-02d9-4d57-b5f7-905101b43ec8.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://cdn.pixilart.com/photos/orginal/2734019c612371f.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																</ul>
+																<div class="remote-area">
+																	<button class="swiper-button-next" type="button"></button>
+																	<button class="swiper-button-prev" type="button"></button>
+																</div>
+															</div>
+															<!-- // slider -->
+														</div>
+														<!-- // picture -->
+														<!-- both -->
+														<div class="lcbWebRconBox">
+															<!-- span class="iconOm_arr"></span -->
+															<div class="contxtWrap">
+																<div class="lcbConTxt_content">오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+																	앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+																	로그 많이 올릴게여! 히히
+																</div>
+																<!-- more btn -->
+																<button class="btn_logMain_more">더보기</button>
+																<!-- // more btn -->
+															</div>
+															<!-- // content txt -->
+														</div>
+														<!-- // both -->
+													</section>
+													<!-- // 펫로그 메인 콘턴츠 area -->
+												</section>
+											</div>
+										</div>
+										<!-- // 04.05 : 수정 -->
+									</div>
+								</li>
+								<li class="review_log_box" data-rel="1">
+									<div class="box">
+										<div class="rhdt">
+											<div class="tinfo">
+												<span class="pic"><img src="../../_images/common/icon-img-profile-default-m@2x.png" alt="사진" class="img"></span>
+												<div class="def">
+													<em class="dd ids">yi11****</em> <em class="dd date">2020.01.01</em> <!--em class="ds me">작성글</em-->
+													<nav class="uidropmu dmenu">
+														<button type="button" class="bt st">메뉴열기</button>
+														<div class="list">
+															<ul class="menu">
+																<li><button type="button" class="bt">수정</button></li>
+																<li><button type="button" class="bt">삭제</button></li>
+															</ul>
+														</div>
+													</nav>
+												</div>
+												<div class="spec"><em class="b">푸들2<span>(암컷)</span></em> <em class="b">4살 </em> <em class="b">4.5kg</em></div>
+											</div>
+											<div class="hpset">
+												<em class="htxt">도움이돼요</em>
+												<button type="button" class="bt hlp on"><i class="n">88</i><b class="t">도움</b></button>
+											</div>
+										</div>
+										<!-- 04.05 : 수정 -->
+										<div class="rcdt">
+											<div class="stpnt starpoint">
+												<span class="stars sm p_4_5"></span>
+											</div>
+											<ul class="satis">
+												<li><span class="dt">맛 만족</span> <span class="dd">잘 먹었어요</span></li>
+												<li><span class="dt">유통기한</span> <span class="dd">넉넉해요</span></li>
+												<li><span class="dt">가성비</span> <span class="dd">만족해요</span></li>
+											</ul>
+											<div class="opts">L Size - 찹앤찹 찹찹트릿 가자미 맛좋은 식품</div>
+											<div class="rvPicSld">
+												<section class="logRvSet">
+													<!-- 펫로그 메인 콘턴츠 area -->
+													<section class="logContentBox review">
+														<!-- picture -->
+														<div class="lcbPicture sw">
+															<!-- div class="log_f_c_pop">90%일치</div -->
+															<!-- slider -->
+															<div class="swiper-container logMain">
+																<div class="swiper-pagination"></div>
+																<ul class="swiper-wrapper slide">
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/f5319437-2e26-4c1e-ad89-0515e3e2cc8d.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/a0f4346c-02d9-4d57-b5f7-905101b43ec8.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://cdn.pixilart.com/photos/orginal/2734019c612371f.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																</ul>
+																<div class="remote-area">
+																	<button class="swiper-button-next" type="button"></button>
+																	<button class="swiper-button-prev" type="button"></button>
+																</div>
+															</div>
+															<!-- // slider -->
+														</div>
+														<!-- // picture -->
+														<!-- both -->
+														<div class="lcbWebRconBox">
+															<!-- span class="iconOm_arr"></span -->
+															<div class="contxtWrap">
+																<div class="lcbConTxt_content">오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+																	앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+																	로그 많이 올릴게여! 히히
+																</div>
+																<!-- more btn -->
+																<button class="btn_logMain_more">더보기</button>
+																<!-- // more btn -->
+															</div>
+															<!-- // content txt -->
+														</div>
+														<!-- // both -->
+													</section>
+													<!-- // 펫로그 메인 콘턴츠 area -->
+												</section>
+											</div>
+										</div>
+										<!-- // 04.05 : 수정 -->
+									</div>
+								</li>
+								
+								
+								
+								<li class="review_log_box" data-rel="2">
+									<div class="box">
+										<div class="rhdt">
+											<div class="tinfo">
+												<span class="pic"><img src="../../_images/common/icon-img-profile-default-m@2x.png" alt="사진" class="img"></span>
+												<div class="def">
+													<em class="dd ids">yi11****</em> <em class="dd date">2020.01.01</em> <!--em class="ds me">작성글</em-->
+													<nav class="uidropmu dmenu">
+														<button type="button" class="bt st">메뉴열기</button>
+														<div class="list">
+															<ul class="menu">
+																<li><button type="button" class="bt">수정</button></li>
+																<li><button type="button" class="bt">삭제</button></li>
+															</ul>
+														</div>
+													</nav>
+												</div>
+												<div class="spec"><em class="b">3푸들<span>(암컷)</span></em> <em class="b">4살 </em> <em class="b">4.5kg</em></div>
+											</div>
+											<div class="hpset">
+												<em class="htxt">도움이돼요</em>
+												<button type="button" class="bt hlp on"><i class="n">88</i><b class="t">도움</b></button>
+											</div>
+										</div>
+										<!-- 04.05 : 수정 -->
+										<div class="rcdt">
+											<div class="stpnt starpoint">
+												<span class="stars sm p_4_5"></span>
+											</div>
+											<ul class="satis">
+												<li><span class="dt">맛 만족</span> <span class="dd">잘 먹었어요</span></li>
+												<li><span class="dt">유통기한</span> <span class="dd">넉넉해요</span></li>
+												<li><span class="dt">가성비</span> <span class="dd">만족해요</span></li>
+											</ul>
+											<div class="opts">L Size - 찹앤찹 찹찹트릿 가자미 맛좋은 식품</div>
+											<div class="rvPicSld">
+												<section class="logRvSet">
+													<!-- 펫로그 메인 콘턴츠 area -->
+													<section class="logContentBox review">
+														<!-- picture -->
+														<div class="lcbPicture sw">
+															<!-- div class="log_f_c_pop">90%일치</div -->
+															<!-- slider -->
+															<div class="swiper-container logMain">
+																<div class="swiper-pagination"></div>
+																<ul class="swiper-wrapper slide">
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/f5319437-2e26-4c1e-ad89-0515e3e2cc8d.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://vknfvtjnsgec6381690.cdn.ntruss.com/aboutPet/images/log/922738/a0f4346c-02d9-4d57-b5f7-905101b43ec8.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="https://cdn.pixilart.com/photos/orginal/2734019c612371f.gif" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																	<li class="swiper-slide"><div class="inr"><img src="../../_images/_temp/temp_logsImg01.png" alt="img01" /></div></li>
+																</ul>
+																<div class="remote-area">
+																	<button class="swiper-button-next" type="button"></button>
+																	<button class="swiper-button-prev" type="button"></button>
+																</div>
+															</div>
+															<!-- // slider -->
+														</div>
+														<!-- // picture -->
+														<!-- both -->
+														<div class="lcbWebRconBox">
+															<!-- span class="iconOm_arr"></span -->
+															<div class="contxtWrap">
+																<div class="lcbConTxt_content">오래는 오늘 제주도로 여행왔어요:-) 비행기 처음 타봐서 긴장 좀 했는데, 다행히 잘왔어요
+																	앞으로 맛있는거 많이 먹구 신나게 뛰뛰하고 놀다갈고에여!!! 
+																	로그 많이 올릴게여! 히히
+																</div>
+																<!-- more btn -->
+																<button class="btn_logMain_more">더보기</button>
+																<!-- // more btn -->
+															</div>
+															<!-- // content txt -->
+														</div>
+														<!-- // both -->
+													</section>
+													<!-- // 펫로그 메인 콘턴츠 area -->
+												</section>
+											</div>
+										</div>
+										<!-- // 04.05 : 수정 -->
+									</div>
+								</li>
+								
+							</ul>
+						</div>
+					</div>
+				</main>
+			</div>
+			
+		</div>
+	</article>
+	<script>
+		ui.popLayer.open("popLogRv");
+		$(document).on("click",".logRvSet .contxt .bt.tog",function(e){
+			$(this).closest(".rconbox").toggleClass("active");
+		});
+		$(document).on("click",".logRvSet .picture .bt.sound",function(e){
+			$(this).toggleClass("on");
+		});
+		var swiperBox = new Array();
+		
+		
+		var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ? true : false;
+		
+		jQuery(document).ready(function($){
+			if(!isMobile) {
+				//PC
+				/* 메인 스와이프 */
+	            swiperBox.push(new Swiper(".swiper-container.logMain", {
+	                slidesPerView: 1,
+	                slidesPerGroup: 1,
+	                freeMode: false,
+	                
+	                navigation: {
+	                    nextEl: '.swiper-container.logMain .swiper-button-next',
+	                    prevEl: '.swiper-container.logMain .swiper-button-prev',
+	                },
+	                pagination: {
+	                    el: '.swiper-container.logMain .swiper-pagination',
+	                    type: 'fraction',
+	                },
+	                
+	            }));
+				
+				//게시물 슬라이딩
+				
+	            $('.review_log_wrap .revlists > li').each(function(revIndex, element) {
+	            	var $this = $(this);
+	                $this.addClass('list' + revIndex);
+	                
+					
+					//$(this).each(function(){
+					setTimeout(function(){
+						var ww = $("ul.revlists").innerWidth();
+						var mvNext = 910;
+						var mvPrev = 910;
+						var mvSet = 0;
+						var mvEnd = mvSet;
+						//console.log("loading2222a : " + mvEnd, mvNext, ww);
+						
+					
+						$(".sld-nav .bt").click(function(e){
+							var i = $this.index(); 
+			            	if($(this).hasClass("next") === true) {
+			            		
+			            		
+			            		console.log("next");
+			            		//console.log("1 : "  + mvEnd, mvSet, ww);
+			            		var mvEnd = mvSet + ww;
+			            		//console.log("2 : " + mvEnd, mvSet, ww);
+			            		$(".revlists").css("transform","translateX(-" + mvEnd +"px)");
+			            		console.log("3 : " + mvEnd, mvSet, ww, i);
+			            		return mvSet = mvEnd;
+			            		
+			            	}
+			            	else {
+			            		console.log("prev");
+			            		var mvEnd = mvSet - ww;
+			            		$(".revlists").css("transform","translateX(-" + mvEnd +"px)");
+			            		console.log("3 : " + mvEnd, mvSet, ww, i);
+			            		return mvSet = mvEnd;
+			            		
+			            	}
+			            });
+					},300);
+						
+					//});
+				});
+
+				
+			} else {
+				//MOBILE
+				/* 메인 스와이프 */
+	            swiperBox.push(new Swiper(".swiper-container.logMain", {
+	                slidesPerView: 1.11,
+	                slidesPerGroup: 1,
+	                spaceBetween: 10,
+	                centeredSlides: true,
+	                freeMode: false,
+	                navigation: {
+	                    nextEl: '.swiper-container.logMain .swiper-button-next',
+	                    prevEl: '.swiper-container.logMain .swiper-button-prev',
+	                },
+	                pagination: {
+	                    el: '.swiper-container.logMain .swiper-pagination',
+	                    type: 'fraction',
+	                },
+	                
+	            }));
+			}
+		});
+		/* 2021617 APET-1164 lju02 끝 */
+		/* setTimeout(function(){
+			for(var i=0; i<swiperBox.length; i++){
+				swiperBox[i].update();
+			};
+		},500); */
+		/* 게시글 펼쳐보고 버튼 모바일 경우만 작동 */
+		$(".btn_logMain_more").click(function(){
+			$(this).closest(".contxtWrap").addClass("open");
+		});
+
+
+
+		/* 04.12 */
+		//$(".popLogRv .phd .nm .s").text($(".pct .revlists.swiper-wrapper > .swiper-slide").length);
+		/* 모바일 대응 */
+		/* scroll 이벤트 추가 */
+		/* APETQA-5706 210621 lju02 */
+		if(ui.check_brw.mo()){
+			$(document).ready( function() {
+				var $firstChild = $(this).find(".revlists.swiper-wrapper > .swiper-slide");
+				var firstMax = $firstChild.length;
+				
+			});
+		};
+		
+		//2021.07.01 추가	APET-1220 관련 2021.07.22 수정함
+		$(document).ready(function(){
+			$(".contxtWrap").each(function(i, n) {
+				var aad = 32;				//lcbConTxt_content 의 max높이값
+				var bbd = $(n).find(".lcbConTxt_content").height();  //lcbConTxt_content 의 높이값
+				
+				if( bbd > aad ) {							//lcbConTxt_content 의 높이값이 32보다 크면
+					$(n).find(".lcbConTxt_content").css("max-height", 32);
+					$(n).find(".lcbConTxt_content").next().removeClass("onWeb_b");
+				}else if( bbd < aad ) {						//lcbConTxt_content 의 높이값이 32보다 작으면
+					$(n).find(".lcbConTxt_content").next().addClass("onWeb_b");					
+				}
+			});
+		});
+	</script>
+</body>
+</html>

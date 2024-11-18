@@ -1,0 +1,2422 @@
+@charset "UTF-8";
+/* 펫TV button 공통 **********************************************************************************************/
+.tv .btn-area { text-align: center; }
+.tv button {
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  text-decoration: none;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  /* -webkit-tap-highlight-color: transparent; */
+}
+.tv button:focus { outline: 0; }
+.tv button span {
+  overflow: hidden;
+  position: absolute;
+  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+}
+
+
+
+
+/* 펫TV swiper 공통 **********************************************************************************************/
+/* APETQA-5763 210615 lju02 시작 */
+.tv.home .swiper-div{position:relative; }
+.tv.home .main .swiper-slide{width:calc(100vw - 34px);}
+.tv.home .swiper-container{padding-left:20px;}
+.tv.home .swiper-slide{position:relative;width:160px;}	/* APET-1219 210901 lju02 */
+.tv.home .swiper-div .swiper-container .swiper-wrapper > li:first-child{}
+.tv.home .swiper-div .swiper-container .swiper-wrapper > li:last-child{margin-right:20px;}
+.tv.home .swiper-div .swiper-container.full .swiper-slide{margin:0 !important;}
+/* 양옆간격없음 */
+.tv.home .swiper-div .swiper-container.space .swiper-slide:first-child {margin-left: 0;}
+.tv.home .swiper-div .swiper-container.space .swiper-slide:last-child {margin-right: 0;}
+
+/* 더보기버튼 */	/* APETQA-5763 210610 lju02 추가 */
+.page.tv.home .swiper-div .swiper-container .btn-more{width:44px !important;margin: 24px 14px 0 6px !important;
+	-webkit-box-shadow: unset !important;
+			box-shadow: unset !important;
+}	/* APET-1219 210901 lju02 */
+.tv .tag .swiper-div.newDn .swiper-container .btn-more{margin-top:24px !important;}			/* APETQA-5763 210610 lju02 추가 */	/* APETQA-7076 210909 lju02 */
+/* .tv .popul .swiper-div.newDn .swiper-container .btn-more{margin-top:75px !important;} */	/* APETQA-5763 210610 lju02 추가 */
+.tv .school .swiper-div.newDn .swiper-container .btn-more{margin-top:70px !important;}		/* APETQA-5763 210610 lju02 추가 */	/* APETQA-7076 210909 lju02 */
+.tv .swiper-div .swiper-container .btn-more button{background:url('../../_images/tv/btn_contents_more@2x.png') no-repeat 50% 0;background-size:28px;padding-top:31px;}
+.tv .swiper-div .swiper-container .btn-more button i{display:block;font-size:12rem;font-weight:400;color:#9a9a9a;}
+.tv .remote-area{display:none;}
+
+.tv .swiper-div.newDn .swiper-container .btn-more button {margin-right: 30px;}
+/* APETQA-5763 210615 lju02 끝 */
+
+/* 펫TV thumb 공통 *************************************************************************************************/
+.tv .thumb-box { position: relative; }
+.tv .thumb-box.on > a::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid #00c3f4;
+  background:rgba(102, 154, 255, 0.4);
+  border-radius: 6px; 
+}
+.tv .thumb-img,
+.tv .thumb-img-full{position:relative;overflow:hidden;display:block;border-radius:6px;background-position:center;background-size:cover;background-color:#f7f7f7;background-repeat:no-repeat;height:0;padding-top:56.25%;/*padding-bottom:56.25%;*/} /* CSR-1314 APET-1184 210622 lju02 */
+
+
+.homeList.tv .thumb-img {padding-top: 57.98%;height: auto;}
+.seriesHome.tv .thumb-img {height: auto;}
+
+
+
+.h-div .thumb-img {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  /* padding-top: 57.98%; */
+  border-radius: 6px;
+  background-size:  auto 100%;
+  background-position: center;
+  /* background-color: gray; */
+  background-color: #f7f7f7;
+  background-repeat: no-repeat;
+  height: 56.26667vw;
+}
+
+/* .tv.home .thumb-img{height:44.53vw} */
+.tv .thumb-img-full {
+  border-radius: 0 0 6px 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  width: 100%;
+  height: 56.26667%;
+}
+.tv .thumb-box .thumb-img-full::after {
+  content: "";
+  display: block;
+}
+/* 영상시간 */
+.tv .thumb-box .time-tag {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  line-height: 20px;
+  padding: 0 10px;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.tv .thumb-box .time-tag span {
+  display: block;
+  font-size: 11rem;	/* APETQA-6030 210809 lju02 */
+  color: #fff;
+}
+/* 랭킹 */
+.tv .thumb-box .ranking {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  line-height: 28px;
+  background-color: #669aff;
+  color: #fff;
+  font-size: 18rem;
+  text-align: center;
+}
+/* 프로그래스바 */
+.tv .thumb-box .progress-bar {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  bottom: 0;
+  left: 0;
+  background-color: #00c3f4;
+}
+/* 뉴아이콘 */
+.tv .icon-n {
+  position: absolute;
+  width: 22px;
+  line-height: 22px;
+  top: -7px;
+  right: -7px;
+  border-radius: 50%;
+  background: #ff7777;
+  color: #fff;
+  font-size: 11rem;
+  text-align: center;
+  z-index: 9;
+}
+
+.tv .thumb-img + .thumb-info, 
+.tv .thumb-box .thumb-img-full + .thumb-info {
+  margin-top: 10px;
+}
+.tv .thumb-info {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+        
+}
+.tv .thumb-info.top {
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.tv .thumb-info.top .info {height: 53px;}
+.tv.home .thumb-info.top .info{padding-right:10px;}	/* APET-1219 210901 lju02 */
+.tv .school .thumb-info .info .tlt {
+  white-space: nowrap;
+  width:100%;
+  color:#666;
+  display:block;
+}
+.tv .thumb-info .info .tlt {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 14rem;
+  line-height: 18rem;
+  color: #000;
+  word-break:break-word;
+}
+.tv .thumb-info .info .tlt > em {
+  color: #669aff;
+  padding-right: 6px;
+  font-weight: 700;
+}
+.tv .thumb-info .info .tlt + .detail {
+  height: 13px;
+  margin-top: 5px;
+}
+.tv .thumb-info .info .detail {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+/*  -webkit-box-align: center;*/ /* APETQA-4769 210617 lju02 */
+      -ms-flex-align: center;
+          align-items: center;
+}
+.tv .thumb-info .info .detail > * + * {
+  margin-left: 10px;
+}
+.tv .thumb-info .info .detail .match {
+  position: relative;
+  font-size: 12rem;
+  font-weight: 700;
+  /* color: #669aff; */
+}
+.tv .thumb-info .info .detail .match::before {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 100%;
+  height: 6px;
+  background-color: #fff58a;
+}
+.tv .thumb-info .info .detail .read {
+  font-size: 11rem;
+  font-weight: 400;
+  color: #9a9a9a;
+  padding-left: 15px;
+}
+.tv .thumb-info .info .detail .like {
+  background: url(../../_images/tv/icon_video_like@2x.png) no-repeat 0 50%;
+  background-size: 13px;
+}
+.tv .thumb-info .info .detail .play {
+  background: url(../../_images/tv/icon_video_view@2x.png) no-repeat 0 50%;
+  background-size: 13px;
+}
+.tv .thumb-info .info .dash {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.tv .thumb-info .info .dash span {
+  font-size: 11rem;
+  color: #949494;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.tv .thumb-info .info .dash span.name {
+  color: #fff;
+}
+.tv .thumb-info .info .dash span > em {
+  display: inline-block;
+  padding-left: 4px;
+}
+.tv .thumb-info .info .dash span + span::before {
+  content: '';
+  display: block;
+  margin: 0 8px;
+  width: 1px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.tv .thumb-info .info .price {
+  font-size: 12px;
+  font-weight: 400;
+}
+.tv .thumb-info .info .price em {
+  font-size: 16rem;
+  font-weight: 700;
+  color: #000;
+  padding-right: 2px;
+}
+
+/* 일치율 추가_0303 */
+.tv.home .fit .thumb-box .match, 
+.tv.homeList .thumb-info .match {
+  width:64px; 
+  color:#fff;
+  display:block;
+  font-size:12rem; 
+  line-height:20px; 
+  margin-bottom:4px;
+  border-radius:2px;
+  text-align:center;
+  background:#669aff;
+}
+
+
+/* 펫TV 라운드 프로필 *******************************************************************************************************/
+.tv .round-img-pf {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+  margin-right: 6px;
+}
+/* 라운드 이미지 관리자 */
+.tv .round-img-pf.pet {
+  border: 1px solid #ecedef;
+  background-image: url(../../_images/tv/school_webtoon.png);
+}
+.tv.home .round-img-pf{width:24px;height:24px;}	/* APET-1219 210901 lju02 */
+/* 채널정보 */
+.tv .channel-info { 
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 6px; 
+}
+.tv .channel-info .round-img-pf { width: 38px; height: 38px; }
+.tv .channel-info .ch-name { font-size: 14rem; color: #000; font-weight: 00; }
+
+
+
+
+/* 펫TV 비디오 플레이 공통 *********************************************************************************************************/
+.page.tv .video-area {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.page.tv .video-palyer {
+  position: relative;
+  -webkit-box-flex: 1;
+      -ms-flex: auto;
+          flex: auto;
+  overflow: hidden;
+  /* padding-bottom: 56.26%; */
+  height: 375px;
+}
+.page.tv.schoolDetail  .video-palyer {
+  height:100%;
+}
+.tv.detail .page.tv .video-palyer {
+  /*padding-bottom: 56.26%;*/
+  height: 100%;
+}
+.tv.detail .video-palyer .video{/*display:flex; align-items:center;*/}
+.tv.detail .video-palyer .video > div{width:100%;}
+.page.tv .video-palyer .video, .page.tv .video-palyer video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.page.tv .pc-subtit {
+  display: none;
+}
+.page.tv .pc-subtit h2 {
+  font-size: 30rem;
+  font-weight: 700;
+  color: #000;
+}
+.page.tv .pc-subtit .menushop {
+  margin-left: 14px;
+}
+
+.page.tv .mute:before {
+  content:"";
+  background: url(../../_images/common/icon_video_speaker_off_2@2x.png) 50% 50%;
+  width:26px;
+  height:26px;
+  background-size:100%;
+}
+.page.tv .video-area .btn.mute {
+  top:8px; 
+  left:12px;
+  z-index:1;
+  color:#fff; 
+  width:139px;
+  height:28px;
+  font-weight:400;
+  font-size:12rem;
+  line-height:28px;
+  position:absolute;
+  border-radius:15px;
+  padding:0 13px 0 11px;
+  background:rgba(0, 0, 0, 0.6);
+}
+
+
+/* tv 공통 하단바  */
+
+
+.page.tv .bottom-bar {
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+.page.tv .bottom-bar .inner {
+  margin: 0 auto;
+  position: relative;
+  background-color: #131313;
+  padding: 0 20px;
+}
+.page.tv .bottom-bar .bar-btn-area {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 11px 0;
+}
+.page.tv .bottom-bar .bar-btn-area li + li {
+  margin-left: 16px;
+}
+.page.tv .bottom-bar .bar-btn-area button {
+  line-height: 20px;
+  color: #666;
+  font-size: 11rem;
+}
+/* 하단바 버튼 공통 2021.06.28 추가함  / 2021.07.06 수정함
+.page.tv .bottom-bar .bar-btn-area > li {width: 45px;}
+
+.page.tv .bottom-bar .bar-btn-area li.share_li, .page.tv .bottom-bar .bar-btn-area li.bookmark_li {margin-left: 8px; width: 32px;} 
+*/
+.page.tv .bottom-bar .bar-btn-area li.share_li + li.bookmark_li {margin-left: 20px;} /* 2021.07.06 수정함 */
+.page.tv .bottom-bar .bar-btn-area li.like_li + li.share_li {margin-left: 20px;}  /* 2021.07.06 수정함 */
+
+/* 하단바 좋아요 버튼 */
+.page.tv .bottom-bar .bar-btn-area button.btn-like {
+  padding-left: 26px;
+  background: url(../../_images/tv/icon_bar_like_off@2x.png) no-repeat 0 50%;
+  background-size: 20px;
+  color:#fff;
+}/* 2021.07.06 수정함 */
+.page.tv .bottom-bar .bar-btn-area button.btn-like.on {
+  background-image: url(../../_images/tv/icon_bar_like_on@2x.png);
+}
+/* 하단바 댓글 버튼 */
+.page.tv .bottom-bar .bar-btn-area button.btn-comment {
+/*  padding-left: 24px;*/
+  background: url(../../_images/tv/icon_bar_reply@2x.png) no-repeat 0 50%; background-size: 20px; width: auto; text-align: left; padding-left: 26px;} /* 2021.07.06 수정함 */
+/* 하단바 공유 버튼 */
+.page.tv .bottom-bar .bar-btn-area button.btn-share {
+  width: 20px;
+  height: 20px;
+  background: url(../../_images/tv/icon_bar_share@2x.png) no-repeat 50%;
+  background-size: 20px;
+}
+/* 하단바 북마크 버튼 */
+.page.tv .bottom-bar .bar-btn-area button.btn-bookmark {
+  width: 20px;
+  height: 20px;
+  background: url(../../_images/tv/icon_bar_save_off@2x.png) no-repeat 50%;
+  background-size: 20px;
+}
+.page.tv .bottom-bar .bar-btn-area button.btn-bookmark.on {
+  background-image: url(../../_images/shop/icon_bar_save_on@2x.png);
+}
+
+
+/* 하단바 관련상품 버튼 */
+.page.tv .bottom-bar .btn-with-wrap {
+  position: absolute;
+  bottom: 4px;
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 6px 6px 12px 6px;
+  /* overflow: hidden; */
+  
+}
+
+.page.tv .bottom-bar .btn-with-wrap .num{
+  position: absolute; 
+  top:-7px; 
+  right:-7px;
+  display: block; 
+  width: 22px; 
+  height: 22px;
+  background-color: #669aff;
+  border-radius: 50%;
+  font-size: 13rem;
+  font-weight: normal;
+  text-align: center;
+  line-height: 22px;;
+}
+
+.page.tv .bottom-bar .btn-with-prd {
+  /* position: absolute;
+  bottom: 10px;
+  right: 14px; */
+  position: relative;
+  display: block; 
+  width: 42px;
+  height: 42px;
+  border-radius: 6px 6px 12px 6px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+.page.tv .bottom-bar .btn-with-prd strong {
+  background-size: cover;
+  position: absolute;
+  display: block;
+  width: 42px;
+  height: 42px;
+  top:-2px;
+  left:-2px;
+  /* line-height: 46px; */
+  /* font-size: 18rem; */
+  /* color: #fff; */
+  /* z-index: 1; */
+}
+
+.page.tv .bottom-bar .btn-with-prd .num {
+
+}
+
+/* .page.tv .bottom-bar .btn-with-prd strong::before {
+  content: "+";
+  display: inline-block;
+} */
+/* .page.tv .bottom-bar .btn-with-prd strong::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0; */
+  /* border-radius: 6px 6px 12px 6px;
+  background-color: rgba(0, 0, 0, 0.3); */
+  /* border: 2px solid rgba(255, 255, 255, 0.5); 
+} 
+*/
+
+
+
+
+
+
+/* 펫TV 공통 관련상품 레이어팝업 *************************************************************************************************/
+.page.tv .prd-layer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  z-index: 999;
+  -webkit-box-shadow: 2px 0 10px rgba(102, 102, 102, 0.5);
+          box-shadow: 2px 0 10px rgba(102, 102, 102, 0.5);
+  background: #fff;
+}
+.page.tv .prd-layer .top { border-bottom: 1px solid #ecedef; }
+.page.tv .prd-layer .top .inner {
+  padding: 0 40px;
+  max-width: 1220px;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.page.tv .prd-layer .top .inner h2 {
+  font-size: 15rem;
+  color: #000;
+  padding-left: 28px;
+  font-weight: 700;
+  line-height: 50px;
+  background: url(../../_images/tv/icon-bar-shop@2x.png) no-repeat 0 center;
+  background-size: 19px auto;
+}
+.page.tv .prd-layer .top .inner .btn-close {
+  width: 24px;
+  height: 24px;
+  background: url(../../_images/tv/icon_header_close@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.page.tv .prd-layer .cont { background-color: #f7f7f7; }
+.page.tv .prd-layer .cont .swiper-div {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 40px;
+}
+.page.tv .prd-layer .cont .swiper-div li { width: 120px!important; }
+.page.tv .prd-layer .cont .swiper-div li .thumb-img, .page.tv .prd-layer .cont .swiper-div li .thumb-box .thumb-img-full, .page.tv .thumb-box .prd-layer .cont .swiper-div li .thumb-img-full {
+  padding-top: 99.16%;
+}
+.page.tv .prd-layer .cont .swiper-div li .thumb-info {
+  margin-right: 0;
+  margin-left: 0;
+}
+.page.tv .prd-layer .cont .swiper-div li .thumb-info .tlt { font-size: 13rem; }
+.page.tv .prd-layer .cont .btn-zzim {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  background-image: url(../../_images/tv/icon_bar_save_off@2x.png);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 20px;
+}
+.page.tv .prd-layer .cont .btn-zzim.on {background-image:url(../../_images/tv/icon_bar_save_on@2x.png);}
+.page.tv .prd-layer .cont .btn-basket {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background-image: url(../../_images/tv/btn_thumnail_cart@2x.png);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+.tvConnectedTing { display: none; }
+
+
+
+/* 펫TV 시작 ***************************************************************************************************************************/
+/* TV홈 시작 ***************************************************************************************************************************/
+/* APETQA-5763 210608 lju02 시작 */
+/* TV홈 레이아웃 */
+.page.tv.home .contents{padding-bottom:40px;}
+.page.tv.home section.tag{margin-top:30px;}
+.page.tv.home section{padding:30px 0;}
+.page.tv.home section.main{padding-top:11px;}
+.page.tv.home section.school{padding-bottom:0;}
+
+/* TV홈 타이틀 영역 */
+.page.tv.home .title-area{margin:0 0 14px 20px;}
+.page.tv.home .title-area .tit{position:relative;display:inline-block;font-size:20rem;line-height:24rem;font-weight:700;padding-right:20px;}
+.page.tv.home .title-area .tit::after{content:'';display:inline-block;width:20px;height:20px;background:url('../../_images/tv/icon_sub_arrow@2x.png') no-repeat 50%;background-size:100%;position:absolute;top:50%;transform:translate(0, -50%);}
+.page.tv.home .title-area .tit > em{color:#5293ff;}
+.page.tv.home .title-area h1{font-size:20rem;font-weight:700;}
+.page.tv.home .title-area h1 > em{color:#5293ff;}
+.page.tv.home .title-area .sub-tit{font-size:14rem;color:#9ea6b2;}
+.page.tv.home .title-area .sub-tit > em { color: #669aff; }
+
+/* TV홈 타이틀 영역 - 태그 */
+.page.tv.home .title-area .tag-zone{margin-left:-20px;margin-top:10px;margin-bottom:15px;overflow:hidden;overflow-x:auto;
+	-ms-overflow-style: none; /* IE and Edge */
+	   scrollbar-width: none;
+}
+.page.tv.home .title-area .tag-zone::-webkit-scrollbar { display: none; }
+.page.tv.home .title-area .tag-zone ul{white-space:nowrap;padding-left:20px;}
+.page.tv.home .title-area .tag-zone ul li{display:inline-block;}
+.page.tv.home .title-area .tag-zone ul li + li{margin-left:7px;}
+.page.tv.home .title-area .tag-zone ul li button{display:inline-block;font-size:14rem;font-weight:400;line-height:34px;padding:0 12px;border:1px solid #e3e3e3;border-radius:34px;}
+.page.tv.home .title-area .tag-zone ul li button.on{background-color:#669aff;border-color:#669aff;color:#fff;}
+
+/* TV홈 메인 슬라이드 */
+/* 21.06.03 수정 시작 */
+.page.tv.home .main .swiper-slide {padding:0 8px;}
+
+.page.tv.home section.main {padding-top: 10px; }
+.page.tv.home section.main .swiper-div {padding:0 0 0 0; }
+.page.tv.home section.main .swiper-container {padding: 0 0 15px 20px;left:-12px;width: calc(100% + 12px);}
+
+/* CSR-1114 추가 */
+.page.tv.home section.main .remote-area{display:none;position:absolute;display:inline-block;top:0;left:0;width:100vw;}
+.page.tv.home section.main .remote-area .swiper-button-prev{display:none;}
+.page.tv.home section.main .remote-area .swiper-button-next{display:none;top:0;right:0;width:5vw;height:45vh;background:none;}
+@media (orientation: landscape) {
+	.page.tv.home section.main .remote-area .swiper-button-next{height:100vh;}
+}
+
+/* 썸네일영역 */
+.page.tv.home section.main .swiper-container .thumb-img{background-size:auto 100%;padding-top:72.61%;padding-bottom:0;border-radius:6px 6px 38px 6px;background-color:#f7f7f7;
+	-webkit-box-shadow: 2px 11px 16px 0 rgba(0, 0, 0, 0.1);
+			box-shadow: 2px 11px 16px 0 rgba(0, 0, 0, 0.1);
+	z-index:8;transform:translate3d(0px, 0px, 8px);
+}	/* APETQA-6080 210705 lju02 */
+.page.tv.home section.main .swiper-container .thumb-img .time-tag{right:13px;bottom:13px;}
+/* 썸네일 정보 영역 */
+.page.tv.home section.main .swiper-container .thumb-info{display:inline-block;width:calc(100% - 38px);margin-top: 18px;opacity:1;} /* APET-1124 */	/* APETQA-6177 210812 lju02 */
+.page.tv.home section.main .swiper-container .swiper-slide-prev .thumb-info,
+.page.tv.home section.main .swiper-container .swiper-slide-next .thumb-info{opacity:0;-webkit-transition: opacity ease 1s;transition: opacity ease 0.5s;}	/* APETQA-6177 210812 lju02 */
+.page.tv.home section.main .swiper-container .thumb-info .sub{font-size:14rem;font-weight:400;line-height:normal;color:#669aff;margin-bottom:6px;width:100%;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;height:22px;z-index:8;transform:translate3d(0px, 0px, 8px);}	/* APETQA-6177 210705 lju02 */
+.page.tv.home section.main .swiper-container .thumb-info .tlt{font-size:28rem;font-weight:700;line-height:1.21;height:68px;display:block;-webkit-box-orient:vertical;display:-webkit-box;-webkit-line-clamp:2;overflow:hidden;}
+.page.tv.home section.main .swiper-container .thumb-info .detail{font-size:13rem;color:#666;line-height:18rem;margin-top:10px !important;height:36px;width:100%;display:block;-webkit-box-orient:vertical;display:-webkit-box;-webkit-line-clamp:2;overflow:hidden;margin-bottom:25px;}
+/* 메인 슬라이드 페이징 */
+.page.tv.home section.main .swiper-container .swiper-pagination{left:32px;width:calc(100vw - 87px);;display:-webkit-box;display:-ms-flexbox;display:flex;bottom:0;}
+.page.tv.home section.main .swiper-container .swiper-pagination .swiper-pagination-bullet{margin:0;-webkit-box-flex:1;-ms-flex:1;flex:1;height:2px;border-radius:0;opacity:1;background-color:#ecedef;}
+.page.tv.home section.main .swiper-container .swiper-pagination .swiper-pagination-bullet-active{opacity:1;background-color:#000;}
+
+/* TV홈 최근본 슬라이드 */
+.page.tv.home section.recent .swiper-container li{width:92px;}	/* APET-1219 210901 lju02 */
+.page.tv.home section.recent .swiper-container .tlt{margin-top:9px;display:-webkit-box;overflow:hidden;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:13rem;color:#666;line-height:16rem;text-align:center;}
+.page.tv.home section.recent .swiper-container .tlt.k0429{text-align:center;}
+.page.tv.home section.recent .swiper-container .btn-more{margin:36px 20px 0 14px !important;}
+.page.tv.home section.recent .circular{position:relative;overflow:hidden;height:92px;width:92px;border-radius:100%;background-color:#fff;}	/* APET-1219 210901 lju02 */
+.page.tv.home section.recent .circular .inner{position:absolute;z-index:6;top:3px;bottom:3px;left:3px;right:3px;border-radius:100%;border:3px solid #fff;overflow:hidden;background-size:cover;transform:translate3d(0px, 0px, 10px);}
+
+/* TV홈 신규영상 슬라이드 라인추가 */
+.tv .new .swiper-container{padding-left:0px;}
+.page.tv.home section.new .swiper-container .swiper-wrapper{display:block;}
+.page.tv.home section.new .swiper-container .swiper-wrapper li{width:100%;margin-bottom:30px;}
+.page.tv.home section.new .swiper-container .swiper-wrapper li:first-child{margin-left:0;}
+.page.tv.home section.new .swiper-container .swiper-wrapper li:last-child{margin:0;}
+.page.tv.home section.new .swiper-container .thumb-img{border-radius:0 0 6px 0;height:56.27vw;}
+.page.tv.home section.new .swiper-container .thumb-info{padding:0 20px;}
+.page.tv.home section.new .swiper-container .btn-more-rnd{position:relative;text-align:center;}
+.page.tv.home section.new .swiper-container .btn-more-rnd button{padding:0 20px;border:1px solid #ecedef;border-radius:38px;background:#fff;}
+.page.tv.home section.new .swiper-container .btn-more-rnd button i{display:inline-block;font-size:13rem;color:#666;line-height:38px;padding-right:15px;background:url('../../_images/tv/icon_arrow_brand_14_black@2x.png') no-repeat 100% 50%;background-size:14px;}
+.page.tv.home section.new .swiper-container .thumb-info .info{height:auto;}
+.page.tv.home section.new .swiper-container .swiper-wrapper + .swiper-div .btn-more-rnd{margin-top:30px;}
+
+/* TV홈 배너 슬라이드 */
+.tv .banner-wrap .swiper-container{padding-left:0;}
+.page.tv.home .banner{margin:40px auto;}
+
+/* TV홈 펫스쿨 슬라이드 */
+.page.tv.home section.school .swiper-container{padding-left:20px;}
+.page.tv.home section.school .swiper-container {padding-bottom:30px;}
+.page.tv.home section.school .swiper-container .swiper-slide{width:140px !important;border-radius:6px 6px 16px 0;padding-bottom:9px;
+	-webkit-box-shadow: 5px 12px 18px 0 rgba(0, 0, 0, 0.06);
+			box-shadow: 5px 12px 18px 0 rgba(0, 0, 0, 0.06);
+}	/* APET-1219 210901 lju02 */
+.page.tv.home section.school .swiper-container .thumb-img{padding-top:100%;padding-bottom:0;border-radius:6px 6px 0 0;height:140px;}	/* APET-1219 210901 lju02 */
+.page.tv.home section.school .swiper-container .info{padding:0 13px;width:100%;}
+.page.tv.home section.school .thumb-info .info .tlt{line-height:normal;}	/* APET-1219 210901 lju02 */
+
+/* TV홈 독점 슬라이드 */
+.page.tv.home section.alone .swiper-container{padding-left:0;}
+.page.tv.home section.alone .swiper-container .swiper-slide { width: 335px; height:auto;}
+.page.tv.home section.alone .swiper-container .swiper-slide a {height:0px;/*padding-bottom:56.25%*/}/* APETQA-5887 210614 lju02 */
+.page.tv.home section.alone .swiper-container .swiper-slide:first-child { margin-left: 0; }
+.page.tv.home section.alone .swiper-container .swiper-slide:last-child { margin-right: 0; }
+.page.tv.home section.alone .swiper-container .swiper-slide .thumb-img {border-radius:6px 6px 38px 6px;background-size:cover;}
+.page.tv.home section.alone .swiper-container .swiper-pagination {
+  width: auto;
+  top: 10px;
+  bottom: unset;
+  left: calc(50% + 120px);
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 11rem;
+  line-height: 18px;
+  border-radius: 18px;
+  padding: 0 5px;
+}
+/* APETQA-5763 210610 lju02 끝 */
+
+
+/* tv홈영상상세 시작  ********************************************************************************************************/
+body.tv.detail {
+  position: relative;
+  background-color: #000;
+  height: 100vh;
+  color: #fff;
+}
+.page.tv.detail .inr {
+  position: relative;
+  height: /*100vh*/ 100%;
+  min-height:auto !important;
+  display: block;
+  flex-direction: column;
+  overflow-y: auto; 
+}
+.container.page.tv.detail{height:100%;}
+.tv.detail > .wrap{height:100%}
+/* 모바일 3초뒤 영상만 남게 */
+.page.tv.detail .open .tab-area, .page.tv.detail .open .top-area, .page.tv.detail .open .div-right { opacity: 0; }
+.page.tv.detail .inr.off .tab-area, 
+.page.tv.detail .inr.off .div-right, 
+.page.tv.detail .inr.off .tab-area .con ul, 
+.page.tv.detail .inr.off .tvVideoInfoBoth { visibility: hidden; transition:none;}
+.page.tv.detail .inr .off-ly {
+  position: relative;
+  z-index: 9;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display:block;
+}
+
+
+/* TV 홈 태그모아보기 */
+.page.tv.home section.tag .swiper-container{height:153px;}	/* APETQA-7076 210910 lju02 */
+
+
+/* 탑영역 */
+.page.tv.detail .top-area { padding: 16px 20px; }
+.page.tv.detail .top-area .div-flex { display: flex; }
+.page.tv.detail .top-area .div-flex + .thumb-info { margin-top: 8px; }	/* APETQA-6030 210809 lju02 */
+.page.tv.detail .top-area .div-flex p { 
+  flex: 1; word-break: break-word; word-wrap: break-word; font-size: 18rem; line-height: 23rem; color: #fff;font-weight:500;	/* APETQA-6030 210809 lju02 */ 
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.page.tv.detail .bottom-bar .bar-btn-area button {color:#fff;}
+.page.tv.detail .top-area .div-flex .btn-close {
+  width: 24px;
+  height: 24px;
+  background: url(../../_images/tv/icon_header_pipmode@2x.png) no-repeat 50%; 
+  background-size: 100%; 
+}
+/* 닫기 - App 일 경우 */
+.page.tv.detail .top-area .div-flex .btn-close.app {
+  width: 24px;
+  height: 24px;
+  background: url(../../_images/tv/icon_header_close_white@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.page.tv.detail .top-area .dash { display: flex; }
+.page.tv.detail .top-area .dash span { font-size: 13rem; color: #666; }
+.page.tv.detail .top-area .thumb-info .dash span.name { color: #fff; }
+.page.tv.detail .top-area .dash span > em { display: inline-block; padding-left: 4px; }
+.page.tv.detail .top-area .dash span + span::before { background-color: #9a9a9a; }
+.page.tv.detail .top-area .round-img-pf { width: 24px; height: 24px; }
+
+/* 탭영역  */
+.page.tv.detail .tab-area { position: relative; padding-bottom: 80rem; }
+.page.tv.detail .tab-area .tab-wrap { padding: 0 20px; display: flex; justify-content: space-between; }
+.page.tv.detail .tab-area .tabWrap .head {position:relative; padding: 0 20px;}	/* APETQA-6030 210809 lju02 */
+.page.tv.detail .tab-area .swiper-slide { width: 180px; }
+.page.tv.detail .tab-area .swiper-slide .thumb-info .info .tlt { 
+  font-size: 13rem; 
+  line-height: 16rem; 
+  color: #b7b7b7;
+  overflow:hidden; 
+  white-space:normal; 
+  word-break:break-all;
+}
+.page.tv.detail .tab-area .swiper-slide .thumb-info .info .tlt a{font-size:13rem; color:#fff; opacity:0.8;}	/* APETQA-6030 210809 lju02 */
+/* 탭영상 리스트 top 타이틀 */
+.page.tv.detail .tab-area .video-top {
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 20px 0;
+}
+.page.tv.detail .tab-area .video-top .tit { font-size: 14px; }
+.page.tv.detail .tab-area .video-top .tit em { font-size: 14px; }
+.page.tv.detail .tab-area .video-top .tit + .paging { margin-left: 10px; font-size: 13rem; }
+.page.tv.detail .tab-area .video-top .paging { display: flex; color: #ccc; }
+.page.tv.detail .tab-area .video-top .paging strong { font-weight: 700; color: #fff; }
+.page.tv.detail .tab-area .video-top .paging em { padding: 0 3px; }
+
+/* 추천TV 탭관련 */
+/* 채널정보 */
+.page.tv.detail .tab-area .swiper-slide .channel-info { display: flex; margin-bottom: 6px; }
+.page.tv.detail .tab-area .swiper-slide .channel-info .round-img-pf { width: 20px; height: 20px; }
+.page.tv.detail .tab-area .swiper-slide .channel-info .ch-name { font-size: 13rem; color: #b7b7b7; font-weight: 400; }
+.page.tv.detail .tab-area .swiper-slide .channel-info .ch-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* 시즌 */
+.page.tv.detail .tab-area .swiper-slide.season .season-list {
+  position: absolute;
+  height: 100%;
+  width: 46px;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6); 
+}
+.page.tv.detail .tab-area .swiper-slide .season-list span {
+  padding-top: 60%;
+  padding-bottom: 16px;
+  display: block;
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  background-image: url(../../_images/tv/icon_player_playlist@2x.png);
+  background-position: 50% 100%;
+  background-repeat: no-repeat;
+  background-size: 16px; 
+}
+
+/* 영상상세정보 */
+.page.tv.detail .btn-video-layer {vertical-align:top; color: #9b9b9b; font-size: 13px; padding-left: 15px !important; background: url(../../_images/tv/icon_video_view_blue@2x.png) no-repeat 0 50%; background-size: 13px;}
+.page.tv.detail .tvVideoInfoBoth >div {padding-bottom: 50px;}
+.page.tv.detail .tvVideoInfoBoth .cont + .cont { margin-top: 20px; }
+.page.tv.detail .tvVideoInfoBoth .cont.tag { color: #6091f0; }
+.page.tv.detail .tvVideoInfoBoth .cont h3 { margin-bottom: 20px; }
+.page.tv.detail .tvVideoInfoBoth .cont p + p { margin-top: 20px; }
+
+/* tv 영상상세 모바일 페이지 */
+.tv.detail .videoAndListWrap.infoMode .tvVideoInfoBoth{ display:block; }
+.tv.detail .videoAndListWrap.infoMode .head > ul, .videoAndListWrap.infoMode .con > ul{ display:none; }
+.tv.detail .tvVideoInfoBoth {position:absolute; bottom:0; left:0; z-index:10; display:none; width:100%; height:200px; padding:0 20px; font-size:13rem; overflow:auto;}
+.tv.detail .tvVideoInfoBoth > span{color:#669aff;}
+.tv.detail .tvConnectedTing{display:none;}
+.layer-detail .day {color: #808080;}
+
+.tv.detail .commentBoxAp > .head.h2 {top:1px;}
+.tv.detail .commentBoxAp .product-area, .tv.schoolDetail .commentBoxAp .product-area {background-color:#fff;overflow-y:auto;} /* APETQA-5292 210603 */
+.tv.detail .commentBoxAp .uiTab_content, .tv.schoolDetail .commentBoxAp .uiTab_content {overflow:visible;}
+.tv.schoolDetail .commentBoxAp {z-index:210;transform:translateZ(210px);} /* APETQA-5543 210603 */
+.tv.schoolDetail .commentBoxAp .no_data{position:absolute;}	/* APETQA-6101 210701 lju02 */
+
+@media (max-height: 640px) {/* APETQA-6030 210809 lju02 */
+
+	.page.tv.detail .tab-area .swiper-slide{width:137px;}
+	.page.tv.detail .tab-area .swiper-slide .thumb-img{height:unset;}
+	.innerWrap .swiper-slide + .swiper-slide{margin-let:9px;}
+	/* 영상 리스트 640 이하 높이 스크롤 생성 */
+	.tv.detail .video-area{height:300px}
+	.page.tv.detail .tab-area{height:calc(100% - 210px); overflow:auto; padding-bottom:0;}
+	.div-right{bottom:auto; top:300px; height:30px; overflow:hidden;}
+	.tv.detail .tvVideoInfoBoth{top:329px; bottom:0; height:auto;}
+	.div-right .btn-video-layer{position:relative;}
+
+}
+
+/* tap */
+.tapWrap{ height:100%; }
+.tapWrap .head{ height:28px; }
+.tapWrap .con { height:calc(100% - 28px); }
+.tabWrap > .con{position:relative; overflow:hidden; padding:10px 0 0;}
+.tabWrap > .con > ul{position:relative; display:inline-block; width:100%; left:0; font-size:0; white-space:nowrap; vertical-align:top; transition:all ease 0.3s;}
+.tabWrap > .con.off > ul{transition:none;}
+.tabWrap > .con > ul > li{display:inline-block; font-size:15rem; vertical-align:top; color:#fff; overflow:hidden;}
+.tabWrap > .con > ul > li > .tvSlid{overflow:auto;}
+
+/* mobile */
+.tabWrap > .head > ul{font-size:0;}
+.tabWrap > .head > ul > li{display:inline-block; font-size:15rem; color:#fff; opacity:0.8; box-sizing:content-box; cursor:pointer;line-height:normal;}	/* APETQA-6030 210809 lju02 */
+.tabWrap > .head > ul > li.active{/*height:32px;*/padding-bottom:6px;opacity:1; border-bottom:3px solid #fff; vertical-align:top;font-weight: 700;}	/* APETQA-6030 210809 lju02 */
+.tabWrap > .head > ul > li + li{margin-left:24px;}
+
+.tvSlid{overflow-x:auto; overflow-y:hidden;}
+.innerWrap{display:inline-block; padding:10px 20px 0; font-size:0; white-space:nowrap; vertical-align:top;}
+.tvSlid .swiper-slide{display:inline-block; vertical-align:top;}
+.tvSlid > .swiper-slide + .swiper-slide{margin-left:6px;}
+.page.tv .tvSlid .detail { display: none!important; }
+.innerWrap .swiper-slide + .swiper-slide{margin-left:8px;}
+.page.tv.detail .tab-area .tabWrap .video-top{margin-bottom:0;padding-top:0;}	/* APETQA-6030 210809 lju02 */
+.page.tv.detail .contents{height:100%;}
+
+
+/* 댓글 */
+.tv.detail .prd-layer {display:none !important;}
+.tv.detail .commendListBox {height:100%;}
+.tv.detail .commendListBox .tit .nameCardAp {margin-left:3px;}
+.tv.detail .commendListBox > ul {display:table; width:100%; height:100%;}
+.tv.detail .commendListBox > ul > li > .con > .txt {width:calc(100% - 38px);}
+
+.page.tv.detail .commendListBox .nodata > .txt {font-size:14rem; color:#666;}
+.page.tv.detail .commendListBox .nodata > .txt:before {
+  width: 82px;
+  height: 100px;
+  background: url(../../_images/common/img-empty-ghost@2x.png) no-repeat center;
+  background-size: 100%;
+  font-size: 0rem;
+  display: block;
+  vertical-align: middle;
+  content: '';
+  margin: 0px auto 10px;
+}
+.page.tv.detail .commendListBox .nodata {
+  vertical-align:middle;
+  display: table-cell;
+  text-align:center;
+  height: 100%;
+  padding:0;
+}
+
+
+/* mobile */
+.tv.detail .contents.h100{position:relative; height:100%;}
+.tv.detail .videoAndListWrap {overflow:hidden; position:relative; top:0; height:calc(100% - 150px); transition:all ease 0.3s;}
+.tv.schoolDetail .videoAndListWrap {overflow:hidden; position:relative; top:0; height:/*calc(100vh - 150px)*/100%; transition:all ease 0.3s;}
+.tv.detail .top-area{height:105px; transition:all ease 0.3s;}
+.tv.detail .video-area{position:relative; justify-content:center; align-items:center; height:calc(100% - 250px);min-height:calc(100vw * 0.5625);}	/* APETQA-4905 210622 lju02 */
+.tv.detail .tab-area{height:250px; padding-bottom:0;}
+.tv.detail .btn-video-layer.on {color: #669aff;z-index: 99;position: relative;}
+.tv.detail .div-right{position:absolute; top:0px; right:20px; z-index:11;height: 19px;align-items: center;display: flex;}	/* APETQA-6030 210809 lju02 */
+.tv.detail .tab-area .swiper-slide .thumb-info .info{width:100%;}
+.page.tv.detail .video-palyer .video > div{position:absolute; top:50%; transform:translate(0, -50%);}
+
+
+@media screen and (min-width: 780px) and (max-width: 1023px){
+  .page.tv.detail .video-area{padding-bottom:0;}
+  .tapWrap > .con > ul, .tapWrap > .con > ul > li, .tapWrap > .con > ul > li .tvSlid{height:100%;}
+  .tapWrap > .con > ul > li .tvSlid{overflow:auto; }
+  .page.tv.detail .swiper-wrapper{overflow:visible;}
+}
+
+
+
+
+
+/* TV 태그모아보기 시작 ***************************************************************************************************************************/
+.tv.tagSet .tag-title {
+  text-align: center;
+  font-size: 17rem;
+  font-weight: 700;
+  display:none;
+}
+
+.tv.tagSet .list-wrap {
+  margin:15px 20px;
+}
+.tv.tagSet .list-wrap .list-top .uisort>.bt.st {font-size:14rem;}
+.tv.tagSet .list-wrap .list-top {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.tv.tagSet .list-wrap .list-top .uisort {z-index:10;}
+.tv.tagSet .list-wrap .list-top .tag-total {
+  line-height: 28rem;
+  font-size: 14rem;
+  color: #000;
+}
+.tv.tagSet .list-wrap .list-top .tag-total em {
+  display: inline-block;
+  color: #669aff;
+  font-weight: 700;
+  padding-right: 4px;
+}
+
+.tv.tagSet .list-wrap > ul.list {
+  padding-bottom: 20px;
+  margin-top: 18px;
+}
+
+.tv.tagSet .list-wrap > ul.list > li + li {
+  margin-top: 15px;
+}
+
+.tv.tagSet .list-wrap > ul.list .thumb-box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.tv.tagSet .list-wrap > ul.list .div-img {
+  position: relative;
+}
+
+.tv.tagSet .list-wrap > ul.list .thumb-img {
+  width: 144px;
+  padding-top: 56.25%;
+}
+
+.tv.tagSet .list-wrap > ul.list .thumb-info {
+  margin-left: 12px;
+}
+
+.tv.tagSet .list-wrap > ul.list .thumb-info .round-img-pf {
+  display: none;
+}
+
+
+.tv.tagSet .list-wrap > ul.list .thumb-box .thumb-img {height: 81px}
+.tv.tagSet .thumb-info .info .tlt {padding-top: 4px}
+
+
+.tv.tagSet .popLayer.a .pbd .poptents {
+  padding: 0;
+}
+
+.tv.tagSet .popLayer.a .pbd section {
+  position: relative;
+  max-width: 752px;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+
+.tv.tagSet .popLayer.a .pbd section + section {
+  margin-top: 20px;
+}
+
+.tv.tagSet .popLayer.a .pbd section + section::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 0;
+  height: 1px;
+  background-color: #ecedef;
+}
+
+.tv.tagSet .popLayer.a .pbd .channel-info {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.tv.tagSet .popLayer.a .pbd .channel-info .ch-name {
+  font-size: 14rem;
+  color: #000;
+  font-weight: 700;
+}
+
+.tv.tagSet .popLayer.a .pbd .swiper-slide {
+  width: 244px;
+}
+
+.tv.tagSet .popLayer.a .pbd .thumb-info .paging {
+  margin-bottom: 10px;
+  font-size: 12rem;
+  color: #000;
+}
+
+.tv.tagSet .popLayer.a .pbd .thumb-info .paging strong {
+  font-weight: 700;
+}
+
+.tv.tagSet .popLayer.a .pbd .thumb-info .paging em {
+  color: #dde0e4;
+}
+
+.tv.tagSet .popLayer.a .pbd .thumb-info .tlt {
+  -webkit-line-clamp: 3;
+  font-size: 13rem;
+  color: #666;
+  line-height: 16rem;
+}
+
+.tv.tagSet .popLayer.a .pbd .swiper-button-next, .tv.tagSet .popLayer.a .pbd .swiper-button-prev {
+  width: 12px;
+  height: 24px;
+}
+
+
+
+
+/* 시리즈홈 시작 ***************************************************************************************************************************/
+/* 시리즈홈-대표배너 */
+.tv.seriesHome .main-banner .thumb-img { border-radius: 0 0 60px 0; }
+.tv.seriesHome .main-banner .tlt {
+  padding: 20px;
+  line-height: 18rem;
+  color: #666;
+}
+/* 시리즈홈-리스트 영역 */
+.tv.seriesHome .list-wrap {
+  margin: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ecedef;
+}
+/* 시리즈홈-리스트탑 */
+.tv.seriesHome .list-top {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: flex-end;
+  position: relative;
+}
+/* 시리즈홈-리스트탑-시즌선택 */
+.tv.seriesHome .list-top .select-pop { flex: 1; min-height: auto; }
+.tv.seriesHome .list-top .select-pop .btSel {
+  border: 0;
+  padding: 0 20px 0 0;
+  height: auto;
+  color: #000;
+  font-weight: 700;
+  width: auto;
+}
+.tv.seriesHome .list-top .select-pop .btSel::after { top: 4px; right: 0; background-size: 10px auto; }
+.tv.seriesHome .list-top .pop-select.on {touch-action: none;} /* APETQA-5916 딤처리 스크롤x 2021.07.21 수정함 */
+.tv.seriesHome .list-top .pop-select .pct .poptents {touch-action: none;} /* APETQA-5916 딤처리 스크롤x 2021.07.21 수정함 */
+/* 시리즈홈-리스트탑-정렬기준 */
+.tv.seriesHome .list-top .uisort { flex: 0; }
+/* 시리즈홈-리스트 */
+.tv.seriesHome .list-cont > ul.list {
+  padding-bottom: 20px;
+  margin-top: 18px;
+}
+.tv.seriesHome .list-cont > ul.list > li + li { margin-top: 15px; }
+.tv.seriesHome .list-cont > ul.list .thumb-box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.tv.seriesHome .list-cont > ul.list .div-img { position: relative; }
+.tv.seriesHome .list-cont > ul.list .thumb-img {
+  width: 144px;
+  padding-top: 56.25%;
+}
+.tv.seriesHome .list-cont > ul.list .thumb-info { margin-left: 12px; }
+
+/* 시리즈홈-시리즈목록레이어팝업 */
+.tv.seriesHome .popLayer .pbd .poptents { padding: 0; padding-bottom: 50px; }
+.tv.seriesHome .popLayer .pbd section {
+  position: relative;
+  max-width: 752px;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+.tv.seriesHome .popLayer .pbd section + section { margin-top: 20px; }
+.tv.seriesHome .popLayer .pbd section + section::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 0;
+  height: 1px;
+  background-color: #ecedef;
+}
+/* 시리즈홈-시리즈목록레이어팝업-채널명 */
+.tv.seriesHome .popLayer .channel-info {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+.tv.seriesHome .popLayer .channel-info .ch-name {
+  font-size: 14rem;
+  color: #000;
+  font-weight: 700;
+}
+/* 시리즈홈-시리즈목록레이어팝업-시리스목록 */
+.tv.seriesHome .popLayer .swiper-slide { width: 244px; }
+.tv.seriesHome .popLayer .thumb-info .paging {
+  margin-bottom: 10px;
+  font-size: 12rem;
+  color: #000;
+}
+.tv.seriesHome .popLayer .thumb-info .paging strong { font-weight: 700; }
+.tv.seriesHome .popLayer .thumb-info .paging em { color: #dde0e4; }
+.tv.seriesHome .popLayer .thumb-info .tlt {
+  -webkit-line-clamp: 3;
+  font-size: 13rem;
+  color: #666;
+  line-height: 17rem;
+}
+/* 시리즈홈-시리즈목록레이어팝업-스와이트컨트롤버튼 */
+.tv.seriesHome .popLayer .swiper-button-next, 
+.tv.seriesHome .popLayer .swiper-button-prev {
+  width: 12px;
+  height: 24px;
+}
+
+
+/* 펫스쿨 홈 시작 ***************************************************************************************************************************/
+.page.tv.schoolHome .main {
+  margin-bottom: 20px;
+}
+.page.tv.schoolHome .main .thumb-img {
+  border-radius: 0 0 60px 0;
+}
+.page.tv.schoolHome .main .small .thumb-img {border-radius: 0 0 0px 0;height: 23.65vw;padding-top:0;}	/* CSR-1314 APET-1184 210622 lju02 */
+.page.tv.schoolHome .main .swiper-pagination {
+  position: relative;
+  bottom: auto;
+}
+.page.tv.schoolHome .main .swiper-pagination-bullet {
+  height: 5px;
+  width: 5px;
+  margin: 0 1.5px;
+  opacity: .3;
+}
+.page.tv.schoolHome .main .swiper-pagination-bullet-active {
+  width: 10px;
+  border-radius: 2.5px;
+  background-color: #000;
+  opacity: 1;
+}
+
+/* 탭 */
+.page.tv.schoolHome .tab-menu {
+  width:100vw;
+  background-color: #fff;
+  position: -webkit-sticky;position: sticky;
+  top: 55px;
+  z-index: 99;
+  transition:top linear 0.5s;
+}
+body.sc_had_on .page.tv.schoolHome .tab-menu{top:0;width:100vw;}
+.page.tv.schoolHome .tab-menu .inner {
+  border-bottom: 1px solid #ecedef;
+}
+.page.tv.schoolHome .tab-menu li.new a { position: relative; }
+.page.tv.schoolHome .tab-menu li.new a::after { 
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 100%;
+  background-color: #ff7777;
+}
+.page.tv.schoolHome .tab-cont {
+  padding: 0 20px 20px;
+}
+.page.tv.schoolHome .uiTab {height:45px;}
+.page.tv.schoolHome .uiTab.a>li>a {
+  font-size:14rem;
+  color:#333;
+  display:block;
+  font-weight:400;
+  padding:12px 0;
+  height:45px;
+}
+.page.tv.schoolHome .uiTab.a>li>a.active {
+  color:#131313;
+  font-weight:700
+}
+.page.tv.schoolHome .uiTab.a>li>a.active span{
+  display:inline-block;
+}
+.page.tv.schoolHome .uiTab.a>li>a.active span:after {
+  content:"";
+  height:3px;
+  background:#000;
+  position:relative;
+  display:block;
+  top:8px;
+}
+.page.tv.schoolHome .deucation > section {
+  margin-top: 40px;
+}
+/* 타이틀 */
+.page.tv.schoolHome .deucation > section .tit-area {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin-bottom: 10px;
+}
+.page.tv.schoolHome .deucation > section .tit-area h3 {
+  font-size: 16rem;
+  font-weight: 700;
+  color: #000;
+}
+.page.tv.schoolHome .deucation > section .tit-area .level {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+/* 난이도 */
+.page.tv.schoolHome .deucation > section .tit-area .level div {
+  margin-right: 3px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.page.tv.schoolHome .deucation > section .tit-area .level div span {
+  display: none;
+  width: 15px;
+  height: 15px;
+  background: url(../../_images/tv/icon_school_level_on@2x.png) no-repeat 50%;
+  background-size: 100%;
+  font-size: 0;
+}
+.page.tv.schoolHome .deucation > section .tit-area .level div span + span { margin-left: 2px; }
+.page.tv.schoolHome .deucation > section .tit-area .level div.lv1 span:nth-child(1) { display: block; }
+.page.tv.schoolHome .deucation > section .tit-area .level div.lv2 span:nth-child(1), 
+.page.tv.schoolHome .deucation > section .tit-area .level div.lv2 span:nth-child(2) { display: block; }
+.page.tv.schoolHome .deucation > section .tit-area .level div.lv3 span { display: block; }
+.page.tv.schoolHome .deucation > section .tit-area .level strong {
+  font-size: 12rem;
+  color: #666;
+}
+.page.tv.schoolHome .deucation > section .info-text {
+  color: #666;
+  line-height: 18rem;
+}
+/* TV 공통 리스트 탑 토탈 */
+.page.tv .list-total {
+  padding: 0 12px;
+  line-height: 30rem;
+  border-radius: 6px;
+  background-color: #f7f7f7;
+  font-size: 13rem;
+  color: #000;
+  margin: 20px 0 15px;
+}
+.page.tv .list-total .nth {
+  color: #669aff;
+  font-weight: 700;
+}
+/* TV 공통 교육 리스트 */
+.page.tv .edu-list ul {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+.page.tv .edu-list ul li {
+  position: relative;
+  margin-bottom: 15px;
+  width: calc(50% - 8px);
+  margin-right: 16px;
+}
+.page.tv.schoolHome .edu-list li:nth-child(2n) {
+  margin-right: 0 !important;
+}
+.page.tv .edu-list ul li .thumb-box {
+  border-radius: 6px;
+  overflow: hidden;
+}
+.page.tv .edu-list ul li .thumb-img {
+  padding-top: 100%;
+  border-radius: 0;
+}
+.page.tv .edu-list ul li .thumb-info.gray {
+  background-color: #f8f8f8;
+  margin-top: 0;
+  padding: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+.page.tv .edu-list ul li .thumb-info .tlt {
+  color: #333;
+}
+.page.tv.schoolHome .edu-list ul li .thumb-info .tlt{display:inline-block; max-width:calc(100% - 45px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.page.tv.schoolHome .tab-menu .swiper-container .uiTab.swiper-wrapper li.swiper-slide{flex:auto;}/* 21.08.02 APETQA-4826 lcm01 */
+
+/* 난이도 */
+.page.tv .edu-list ul li .thumb-info .level {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.page.tv .edu-list ul li .thumb-info .level span {
+  width: 15px;
+  height: 15px;
+  background: url(../../_images/tv/icon_school_level_off@2x.png) no-repeat 50%;
+  background-size: 100%;
+  font-size: 0;
+}
+.page.tv .edu-list ul li .thumb-info .level span + span {
+  margin-left: 2px;
+}
+.page.tv .edu-list ul li .thumb-info .level.lv1 span:nth-child(1) {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+.page.tv .edu-list ul li .thumb-info .level.lv2 span:nth-child(1), .page.tv .edu-list ul li .thumb-info .level.lv2 span:nth-child(2) {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+.page.tv .edu-list ul li .thumb-info .level.lv3 span {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+
+
+
+
+/* 펫스쿨 상세 시작 ***********************************************************************************************************************/
+.popup-layer.k0427{outline:none;}
+body.schoolDetail {
+  background-color: #000;
+  color: #fff;
+}
+/* 레이어 팝업 */
+.schoolDetail .popup-layer {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 200;
+  background-color: #fff;
+  /* 교육팁 레이어 */
+  /* QnA 레이어 */
+}
+.schoolDetail .popup-layer .popup-wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  height: 100%;
+  background-color: #fff;
+}
+.schoolDetail .popup-layer .top {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-weight: 700;
+  color: #000;
+  padding: 15px 20px 0;
+}
+.schoolDetail .popup-layer .top h2 {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  font-size: 18rem;
+  font-weight: 700;
+  text-align: center;
+}
+.schoolDetail .popup-layer .content {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow: hidden;
+  padding: 20px;
+}
+.schoolDetail .popup-layer .content main {
+  overflow: auto;
+  height: 100%;
+}
+
+.schoolDetail .popup-layer img {
+  display: block;
+  width: 100%;
+}
+.schoolDetail .popup-layer.typeA .top .btnPopClose {
+  position: relative;
+  right: auto;
+  top: auto;
+  width: 25px;
+  height: 25px;
+  background: url(../../_images/tv/icon_bottom_close@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.schoolDetail .popup-layer.typeB {
+  top: auto;
+  height:50%;
+}
+.schoolDetail .popup-layer.typeB {
+  border-radius: 20px 20px 0 0;
+}
+.schoolDetail .popup-layer.typeB::before {
+  content: '';
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  /*background-color: #000;*/
+  /*opacity: .7;*/
+  z-index: -1;
+  top: 0;
+}
+.schoolDetail .popup-layer.typeB .top {
+  margin-top: 10px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ecedef;
+}
+.schoolDetail .popup-layer.typeB .top::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(50% - 16px);
+  display: block;
+  width: 31px;
+  height: 4px;
+  border-radius: 15px;
+  background: #ddd;
+}
+.schoolDetail .popup-layer.typeB .top h2 {
+  font-size: 15rem;
+  text-align: left;
+}
+.schoolDetail .popup-layer.typeB .top .btnPopClose {
+  width: 18px;
+  height: 18px;
+  background: url(../../_images/tv/icon_bottom_close@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.schoolDetail .popup-layer .tip-list li {
+  color: #666;
+  font-size: 14rem;
+}
+.schoolDetail .popup-layer .tip-list li + li {
+  margin-top: 20px;
+}
+.schoolDetail .popup-layer .qna-list li + li {
+  margin-top: 20px;
+}
+.schoolDetail .popup-layer .qna-list li.open .btnTog {
+  background-image: url(../../_images/tv/icon_list_more_black_close@2x.png);
+}
+.schoolDetail .popup-layer .qna-list .hBox {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.schoolDetail .popup-layer .qna-list .hBox .tit {
+  position: relative;
+  padding-left: 28px;
+  font-size: 14rem;
+  line-height: 20rem;
+  color: #000;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+.schoolDetail .popup-layer .qna-list .hBox .tit::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 0;
+  top: 2px;
+  background: url(../../_images/tv/icon_list_qna_q@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.schoolDetail .popup-layer .qna-list .hBox .btnTog {
+  width: 20px;
+  height: 20px;
+  background: url(../../_images/tv/icon_list_more_black@2x.png) no-repeat 50%;
+  background-size: 13px 12px;
+}
+.schoolDetail .popup-layer .qna-list .cBox {
+  margin-top: 10px;
+  border-radius: 6px;
+  padding: 15px;
+  background-color: #f7f7f7;
+}
+.schoolDetail .popup-layer .qna-list .cBox p {
+  position: relative;
+  padding-left: 28px;
+  font-size: 14rem;
+  line-height: 22rem;
+  color: #333;
+}
+.schoolDetail .popup-layer .qna-list .cBox p::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 0;
+  top: 2px;
+  background: url(../../_images/tv/icon_list_qna_a@2x.png) no-repeat 50%;
+  background-size: 100%;
+}
+.page.tv.schoolDetail .inner-wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  /* height: calc(100vh - 50px);  수정 */
+  /*height: 100vh;*/
+  height:100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+.page.tv.schoolDetail .schoolD-wrap .swiper-div, .page.tv.schoolDetail .swiper-container, .page.tv.schoolDetail .swiper-wrapper, .page.tv.schoolDetail .swiper-slide {
+  /*height: 100%;*/
+  width: 100%;
+}
+.page.tv.schoolDetail .schoolD-wrap .swiper-div{height:100%;}
+.page.tv.schoolDetail .swiper-container{height:100%;}
+.page.tv.schoolDetail .schoolD-wrap .div-wrap {
+  /*height: 100%;*/
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: block;
+  overflow: auto;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+.page.tv.schoolDetail .schoolD-wrap {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+.page.tv.schoolDetail .schoolD-wrap .video-area {
+  -webkit-box-flex: 0;
+      -ms-flex: 1;
+          flex: 1;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone {
+  position: relative;
+  -webkit-box-flex: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
+  overflow: hidden;
+  overflow-y: auto;
+  /*height:calc(100% - 375px) !important;*/
+  height:100px;
+  padding-bottom:58px;
+}
+.container.tv.schoolDetail{height:100%}
+.page.tv.schoolDetail .contents{height:calc(100% - 44px);}
+.page.tv.schoolDetail > .inr{height:100% !important; min-height:auto !important;}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top {
+  padding: 18px 20px 10px;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .tit {
+  font-size: 16rem;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type {
+  margin-top: 10px;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li + li {
+  margin-left: 30px;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li strong {
+  font-size: 14rem;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 10px;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level span {
+  width: 15px;
+  height: 15px;
+  background: url(../../_images/tv/icon_school_level_off@2x.png) no-repeat 50%;
+  background-size: 100%;
+  font-size: 0;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level span + span {
+  margin-left: 2px;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level.lv1 span:nth-child(1) {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level.lv2 span:nth-child(1), .page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level.lv2 span:nth-child(2) {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .level.lv3 span {
+  background-image: url(../../_images/tv/icon_school_level_on@2x.png);
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .top .type ul li .material span {
+  color: #ccc;
+}
+
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .cont {
+  padding:0 20px;
+  word-break: break-all;
+  font-size: 13rem;
+  line-height: 1.38;
+  color:#bebebe;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .info .cont.k0426{padding-bottom:19px;}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip {
+  position: relative;
+  padding: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .txt-btn {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: #ccc;
+  text-decoration: underline;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .txt-btn h2 {
+  font-size: 14rem;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .round-img-pf {
+  width: 24px;
+  height: 24px;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .btn-rnd {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .btn-rnd button {
+  color: #ccc;
+  border-radius: 30px;
+  line-height: 30px;
+  width: 65px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.page.tv.schoolDetail .schoolD-wrap .info-zone .tip .btn-rnd button + button {
+  margin-left: 6px;
+}
+.page.tv.schoolDetail .schoolD-wrap .info-zone {
+/*  height: 40% !important;*/
+  /*padding-bottom: 110px; *//*수정테스트*/
+}
+
+.page.tv.schoolDetail .video-area {
+  background-color: #000;
+}
+
+.page.tv.schoolDetail .video-area .swiper-div {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.page.tv.schoolDetail .video-area .swiper-div .swiper-container .swiper-wrapper li {
+  width: 100%;
+  margin: 0;
+}
+
+.page.tv.schoolDetail .paging-wrap {
+  width: 100%;
+  padding: 18px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+
+  /* 이하추가 수정 */
+  position: fixed;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  bottom: 44px;
+  z-index: 5;
+  /* opacity: 0.8; */
+}
+
+.page.tv.schoolDetail .paging-wrap .swiper-pagination {
+  position: relative;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.page.tv.schoolDetail .paging-wrap .swiper-pagination .swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  background: #7f7f7f;
+}
+
+.page.tv.schoolDetail .paging-wrap .swiper-pagination .swiper-pagination-bullet + span {
+  margin-left: 5px;
+}
+
+.page.tv.schoolDetail .paging-wrap .swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #669aff;
+}
+
+.page.tv.schoolDetail .paging-wrap button {
+  font-size: 15rem;
+  color: #999;
+  background: url(../../_images/tv/icon_sub_back_white_opacity@2x.png) no-repeat;
+  background-size: 20px;
+  background-position: 0 50%;
+}
+
+.page.tv.schoolDetail .paging-wrap .btn-prev.on,
+.page.tv.schoolDetail .paging-wrap .btn-next.on {color:#669aff}
+
+.page.tv.schoolDetail .paging-wrap button.btn-prev {
+  padding-left: 20px;
+}
+
+.page.tv.schoolDetail .paging-wrap button.btn-next {
+  background-image: url(../../_images/tv/icon_sub_arrow_white_opacity@2x.png);
+  padding-right: 20px;
+  background-position: 100% 50%;
+}
+
+.page.tv.schoolDetail .paging-wrap button.btn-blue {
+  color: #669aff;
+  background-image: url(../../_images/tv/icon_sub_arrow_blue@2x.png);
+  padding-right: 20px;
+  background-position: 100% 50%;
+}
+
+
+
+/* 펫스쿨완료 시작 ***********************************************************************************************************************88*/
+body.schoolCom {
+  background-color: #000;
+  color: #fff;
+  padding-bottom: 30px;
+}
+body.schoolCom section + section { margin-top: 30px; }
+
+.tv .pageHead.black>.inr { background-color: #000; }
+.tv .pageHead.black .back {
+  background: url(../../_images/tv/icon_header_back_white@2x.png) no-repeat;
+  background-size: 100%;
+}
+
+body.schoolCom .title-area { margin-bottom: 10px; }
+body.schoolCom .title-area h3 {
+  font-weight: 700;
+  padding-left: 20px;
+}
+
+/* 안료안내 */
+.schoolCom .finish {
+  padding: 10px 40px;
+  text-align: center;
+  color: #fff;
+}
+.schoolCom .finish h2 {
+  font-size: 20rem;
+  font-weight: 700;
+  color: #669aff;
+  margin: 20px 0;
+}
+.schoolCom .finish p {
+  line-height: 18rem;
+  margin-bottom: 16px;
+}
+
+.schoolCom .pc-subtit {display:block !important;}
+.schoolCom .finish .btn-rnd {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 32px;
+  padding: 0 15px;
+  line-height: 32rem;
+  color: #fff;
+}
+.schoolCom .finish .btn-rnd + button { margin-left: 10px; }
+.schoolCom .finish .btn-rnd.add {
+  position: relative;
+  padding-left: 30px;
+  background: url(../../_images/tv/icon_school_zzim.png) no-repeat 11px 50%;
+  background-size: 14px;
+}
+.schoolCom .finish .btn-rnd.add.on {
+  color: #669aff;
+  font-weight: 700;
+  background-image: url(../../_images/tv/icon_school_zzim_on.png);
+  border-color: #669aff;
+}
+
+/* 로그등록 */
+.schoolCom .add-movie { 
+  text-align: center;
+  
+  padding: 0 20px;
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+.schoolCom .add-movie p { line-height: 18rem; }
+.schoolCom .add-movie button {
+  width: 100%;
+  font-size: 15rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: #669aff;
+  border-radius: 4px;
+  line-height: 50px;
+  margin-top: 15px;
+}
+
+/* 따라잡기 영역 */
+.schoolCom .catch .swiper-container{padding-left:20px;}/* APETQA-5763 210615 lju02 */
+.schoolCom .catch .swiper-slide .thumb-box {
+  height:100%;
+  border-radius:6px;
+  overflow:hidden; 
+  height:230px;
+}
+.schoolCom .catch .swiper-slide .thumb-img {
+  padding-top: 133.33%;
+}
+.schoolCom .catch .swiper-slide .thumb-video {
+  height:100%;
+  display:inline-block;
+}
+
+.schoolCom .catch .swiper-slide .thumb-video::after,
+.schoolCom .catch .swiper-slide .thumb-img::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 70%;
+  left:0;
+  bottom: 0;
+  background: -webkit-gradient(linear, left bottom, left top, from(rgba(0, 0, 0, 0.65)), to(rgba(0, 0, 0, 0)));
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+}
+.schoolCom .catch .swiper-slide .thumb-info {
+  position: absolute;
+  bottom: 0;
+  padding: 8px;
+  color: #fff;
+}
+.schoolCom .catch .swiper-slide .thumb-info .info .tlt {
+  font-size: 12rem;
+  color: #fff !important;
+}
+.schoolCom .catch .round-img-pf {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #fff;
+}
+/* 다음교육 */
+.schoolCom .continue .edu-list.swiper-container{padding-left:20px;}/* APETQA-5763 210615 lju02 */
+.schoolCom .continue .edu-list ul { flex-wrap: nowrap!important; }
+.schoolCom .continue .swiper-slide {
+  width: 144px!important;
+}
+.schoolCom .catch .swiper-slide:last-child{width:200px;}
+.schoolCom .catch .swiper-slide:last-child .thumb-box{margin-right:20px;}
+.schoolCom .continue .swiper-slide:last-child{width:164px !important;}
+.schoolCom .continue .swiper-slide:last-child .thumb-box{margin-right:20px;}
+
+.page.tv.schoolCom .continue .edu-list ul li .thumb-img{border-radius:6px;}/* APETQA-5763 210615 lju02 */
+.page.tv.schoolCom .continue .thumb-img { padding-top: 100%; }
+.page.tv.schoolCom .continue .edu-list ul li .thumb-info.gray {
+  background-color: #000;
+  padding: 0;
+  margin-top: 5px;
+}
+.page.tv.schoolCom .continue .edu-list ul li .thumb-info .tlt { 
+  font-size: 13rem;
+  color: #fff;
+}
+
+
+
+/* TV 홈공통리스트 시작 ***************************************************************************************************************************/
+.tv .homeList .contents { padding-bottom: 30px; }
+.tv .homeList .log_connectTingWrap .tvConnectedTing > span {
+  font-size:12rem; 
+  font-weight: 700; 
+  margin-left:4px;
+  vertical-align:middle;
+}
+.tv .homeList .log_connectTingWrap .tvConnectedTing:after {content:unset;}
+.tv .homeList .log_connectTingWrap .tvConnectedTing:before {
+  content: "";
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	background: url(../../_images/tv/icon-bar-shop@2x.png) no-repeat center;
+	background-size: 19px auto;
+}
+
+.tv .homeList .list-wrap > ul.list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.tv .homeList .list-wrap > ul.list > li {
+  margin-bottom: 50px;
+  width: 288px;
+}
+
+.tv .homeList .list-wrap > ul.list > li + li {
+  margin-left: 16px;
+}
+
+.tv .homeList .list-wrap > ul.list > li:nth-child(5n) {
+  margin-left: 0;
+}
+
+.tv .homeList .list-wrap > ul.list .div-img {
+  position: relative;
+}
+
+.tv .homeList .list-wrap > ul.list .thumb-img {
+  /* width: 288px; */
+  padding-top: 167px;
+  background-size: cover;
+  width: 100vw;
+  height: 56.21vw!important;
+}
+
+.tv .homeList .list-wrap > ul.list.k0420 .thumb-img{height:54.14vw;}
+.tv .thumb-img.k0420{height:44.54vw}
+.tv .thumb-img.s0427{height:56.20vw; border-radius: 0 0 38px 0 !important;}
+.tv.detail .thumb-img{height:108px;}
+
+.tv .homeList .list-wrap > ul.list .thumb-info {
+  margin-top: 8px;
+}
+
+.tv .homeList .list-wrap > ul.list .detail.top {
+  margin-bottom: 5px;
+}
+
+.tv .homeList .list-wrap > ul.list .tag-txt {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.tv .homeList .list-wrap > ul.list .tag-txt a {
+  display: block;
+  font-size: 12rem;
+  color: #669aff;
+  padding-right: 3px;
+}
+
+.tv .homeList .title-area {
+  margin-bottom: 11px;
+}
+
+.tv .homeList .title-area h2 {
+  font-size: 14rem;
+  font-weight: 700;
+}
+
+.tv .homeList .popular-wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 50px;
+}
+
+.tv .homeList .popular-wrap .ch-profile {
+  -webkit-box-flex: 0;
+      -ms-flex: 0;
+          flex: 0;
+  margin-top: 20px;
+  text-align: center;
+  padding: 0 12px;
+}
+
+.tv .homeList .popular-wrap .ch-profile .round-img-pf {
+  width: 72px;
+  height: 72px;
+  margin: 16px auto;
+}
+
+.tv .homeList .popular-wrap .ch-profile .tit {
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.tv .homeList .popular-wrap .popular-list {
+  width: calc(100% - 97px);
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding: 0 0 0 58px;
+}
+
+
+.tv .homeList .thumb-box .div-header{font-size:0;}
+.tv .homeList .thumb-box .div-header{padding:0 20px;}
+.tv .homeList .thumb-box .div-header > .pic{display:inline-block; width:32px; height:32px; border-radius:100%; overflow:hidden;}
+.tv .homeList .thumb-box .div-header > .tit{display:inline-block; width:calc(100% - 32px); height:32px; padding:0 0 0 8px; font-size:12rem; color:#000; line-height:32px; vertical-align:top;}
+.tv .homeList .thumb-box .div-header + .div-img{padding-top:8px;}
+.tv .homeList .list-wrap > ul.list .thumb-img .logBtnBasic28{position:absolute; top:10px; right:10px;}
+
+.list-wrap{}
+.tv .homeList .list-wrap > ul.list > li{display:block; width:100%; margin-bottom:0;}
+.tv .homeList .list-wrap > ul.list > li + li{margin-left:0; margin-top:30px;}
+.tv .homeList .list-wrap > ul.list .div-img{/*height:56.2vw;*/}
+.tv .homeList .list-wrap > ul.list .thumb-img{width:auto; height:211px; padding-top:0;}
+.tv .homeList .list-wrap > ul.list .thumb-info{padding-left:20px; padding-right:20px;}
+/* .tv .homeList .list-wrap .thumb-info .info .detail .play, .tv .list-wrap .thumb-info .info .detail .like{padding-left:0; background:none;} */
+.tv .homeList .list-wrap .thumb-info .info .detail .play{padding-left:0; background:none;}
+.tv .homeList .list-wrap .thumb-info .info .detail .play:before {content:"재생수";}
+.tv .homeList .list-wrap .thumb-info .info .detail .play:before, 
+.tv .list-wrap .thumb-info .info .detail .like:before{font-size:11rem; color:#9a9a9a; }
+/* .tv .list-wrap .thumb-info .info .detail .like:before{content:"";} */
+/* APETQA-4839 210618 lju02 시작 */
+.tv .homeList .list-wrap .thumb-info .info .detail .play:after{margin-left:6px; vertical-align:middle; content:""; display:inline-block; width:1px; height:10px; background:#ecedef;}
+.tv .homeList .list-wrap .thumb-info .info .detail .read:before{padding-right:2px;}
+.tv .homeList .list-wrap .thumb-info .info .detail .read.like {padding-left:0;background:none;}
+.tv .homeList .list-wrap .thumb-info .info .detail .read.like:before{content:"좋아요";font-size: 11rem;color: #9a9a9a;}
+.tv .homeList .list-wrap .thumb-info .info .detail > * + * {margin-left: 8px;}
+/* APETQA-4839 210618 lju02 끝 */
+.thumb-box .lcbmenuBar .log_connectTingWrap{right:20px;}
+
+.tv .homeList .list-wrap > ul.list .thumb-img, 
+.tv .list-wrap > ul.list .thumb-img-full{border-radius:0 0 6px 0;}
+.tv .homeList .popular{padding-left:20px;}
+.tv .homeList .list-wrap + .popular{margin-top:42px;}
+.tv .homeList .popular .popular-wrap .ch-profile{display:inline-block; flex:none; align-items:center; width:25vw; height:32.0vw; padding:0; margin:0;}
+.tv .homeList .popular .popular-wrap .ch-profile .ch-profile-inner{display:flex; align-items:center; width:100%;}
+.tv .homeList .popular .popular-wrap .ch-profile .ch-profile-inner > div{width:100%;}
+.tv .homeList .popular .popular-wrap .popular-list{display:inline-block; width:calc(75% - 10px); padding-left:0;}
+.tv .homeList .popular .swiper-div{padding-left:10px;}
+.tv .homeList .popular .swiper-div .swiper-container .swiper-wrapper::-webkit-scrollbar { display: none; }
+.tv .homeList .popular .swiper-div .swiper-container .swiper-wrapper > li {width: 192px; }
+.tv .homeList .popular .swiper-div .swiper-container .swiper-wrapper > li:first-child{margin-left:0;}
+.tv .homeList .popular .swiper-wrapper{display:inline-block; font-size:0; white-space:nowrap; overflow:auto;}
+.tv .homeList .popular .swiper-wrapper .swiper-slide {display:inline-block; width:55vw;}
+.tv .homeList .popular .swiper-wrapper .swiper-slide + .swiper-slide{margin-left:8px;}
+.tv .homeList .popular  .thumb-info .info .tlt{white-space:normal;}
+.tv .homeList .homeList .popular .title-area h2{font-size:14rem;}
+.tv .homeList .popular .popular-wrap .popular-list .thumb-img{padding-bottom:0;} /* APETQA-5887 210611 lju02 */
+
+/* .tv .homeList .popular .popular-wrap .ch-profile .round-img-pf{width:100%; height:25vw;} */
+
+
+/* 320 대응 */
+@media screen and (max-width:321px){
+  .tv.detail .video-area{height:300px}
+  .page.tv.detail .tab-area{height:calc(100% - 300px); overflow:auto; padding-bottom:0;}
+  .div-right{bottom:auto; top:300px; height:30px; overflow:hidden;}
+  .tv.detail .tvVideoInfoBoth{top:329px; bottom:0; height:auto;}
+  .div-right .btn-video-layer{position:relative;}
+
+  /*
+  .tv.schoolDetail .videoAndListWrap {height:calc(100vh - 158px)}
+  .page.tv .video-palyer{height:100%;}
+  .page.tv.schoolDetail .schoolD-wrap .info-zone{}
+  */
+}
+
+
+
+.page.tv.schoolDetail .popup-layer{z-index:-1; margin-top:-100000px;}
+.page.tv.schoolDetail .popup-layer.open{z-index:200; margin-top:0;}
+
+
+
+/* 가로모드 */
+@media screen and (orientation: landscape){
+  .tv.detail > .wrap,
+  .container.page.tv.detail,
+  .page.tv.detail .inr,
+  .page.tv.detail .inr .off-ly,
+  .page.tv.detail .contents,
+  .tv.detail .video-area,
+  .tv.detail .page.tv .video-palyer,
+  .tv.detail .video-palyer .video
+  {height:auto;}
+  .page.tv.detail .inr .off-ly{position:relative;}
+  .tv.detail .tab-area {height:320px !important; padding:22px 0 16px;}
+  .tv.detail .div-right {bottom:275px;}
+  .tv.detail .tvVideoInfoBoth {height:270px; padding:0 20px 60px;}
+  .tv.detail .videoAndListWrap {position:relative; z-index:1; width:100%; height:auto !important;}
+  .page.tv.detail .video-palyer .video > div{position:relative; top:auto; transform:none;}
+  
+
+  .page.tv.schoolDetail .schoolD-wrap .info-zone{height:auto !important;}
+  .page.tv.schoolDetail .video-palyer{height:auto;/* padding-bottom: 56.26%;*/ overflow:visible}
+  .page.tv.schoolDetail .schoolD-wrap .div-wrap{display:block; height:auto;}
+  .page.tv.schoolDetail .schoolD-wrap .div-wrap *{touch-action:pan-y !important; -ms-touch-action: pan-y !important;}
+  .video-area{position:relative;}
+  .page.tv.schoolDetail .swiper-container{height:auto;}
+  .page.tv.schoolDetail .schoolD-wrap .swiper-div{height:auto;}
+  .page.tv.schoolDetail .inner-wrap{height:auto;}
+  .page.tv.schoolDetail .contents{height:auto;}
+  .page.tv.schoolDetail .schoolD-wrap{height:auto;}
+  .page.tv.schoolDetail .swiper-div .swiper-wrapper{height:auto;}
+  .page.tv.schoolDetail > .inr{height:auto !important;}
+  .container.tv.schoolDetail{height:auto;}
+  
+
+
+
+  .page.tv.schoolDetail .schoolD-wrap {overflow:auto;}
+  .page.tv.schoolDetail .schoolD-wrap .info-zone {overflow:visible !important; padding-bottom:100px;}
+
+  .tv.schoolDetail .popup-layer.typeB {height:80% !important;}
+  .page.tv.detail .video-palyer .video{position:static;}
+
+  /*
+  .page.tv.detail .video-area .video-palyer {width:100%; height:100%;}
+  .page.tv.detail .top-area{position:absolute; top:0; left:0; z-index:2; width:100%;}
+  .page.tv.detail .tab-area{bottom:-42%; left:0; z-index:5; width:100%; height:247px; padding: 12px 0; background:rgba(0,0,0,0.6)}
+  .page.tv.detail .tab-area .tabWrap .video-top{padding-bottom:5px;}
+  .page.tv.detail .tab-area .swiper-slide .thumb-info .info .tlt{padding-top:10px;}
+  .div-right{bottom:202px;}  
+  
+  .page.tv.detail .top-area{height:50px; padding-bottom:0;}
+  .page.tv.detail .video-area .video-palyer{position:absolute; top:0; left:0; width:100%; height:100%;}
+  .page.tv.detail .video-area{height:100%;  padding:0;}
+  .videoAndListWrap{position:absolute; top:0; left:0; z-index:1; width:100%; height:100%;}
+
+  .page.tv.detail .contents .top-area{opacity:0; transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .div-right{opacity:0; transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .tvVideoInfoBoth{opacity:0;transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .tab-area .tabWrap .video-top{opacity:0; transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .tab-area .tabWrap .head{opacity:0; transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .tab-area{background:rgba(0,0,0,0);}
+  .page.tv.detail .contents .thumb-info{opacity:0; transition: opacity ease 0.5s;}
+  .page.tv.detail .contents .tvSlid{opacity:0; transition: opacity ease 0.5s;}
+
+  .page.tv.detail .contents.hMode1 .top-area{opacity:0;}
+  .page.tv.detail .contents.hMode1 .div-right{opacity:0;}
+  .page.tv.detail  .contents.hMode1 .tvVideoInfoBoth{opacity:0;}
+  .page.tv.detail .contents.hMode1 .tab-area .tabWrap .video-top{opacity:0;}
+  .page.tv.detail .contents.hMode1 .tab-area .tabWrap .head{opacity:0;}
+  .page.tv.detail .contents.hMode1  .tab-area{background:rgba(0,0,0,0)}
+  .page.tv.detail .contents.hMode1 .thumb-info{opacity:1;}
+  .page.tv.detail .contents.hMode1 .tvSlid{opacity:1;}
+
+  .page.tv.detail .contents.hMode2 .top-area{opacity:1;}
+  .page.tv.detail .contents.hMode2 .div-right{opacity:1;}
+  .page.tv.detail  .contents.hMode2 .tvVideoInfoBoth{opacity:1;}
+  .page.tv.detail .contents.hMode2 .tab-area .tabWrap .video-top{opacity:1;}
+  .page.tv.detail .contents.hMode2 .tab-area .tabWrap .head{opacity:1;}
+
+  .page.tv.detail .contents.hMode2 .tab-area{background:rgba(0,0,0,0.6)}
+  .page.tv.detail .contents.hMode2 .thumb-info{opacity:1;}
+  .page.tv.detail .contents.hMode2 .tvSlid{opacity:1;}
+
+  .page.tv.detail .contents.hMode2 .tab-area{opacity:1;}
+  .page.tv.detail .contents.hMode2 .tab-area > .head{opacity:0;}
+  .contents.hMode2 .div-right{opacity:0;}
+  .contents.hMode2 .tvVideoInfoBoth{opacity:0;}
+  */
+}
+
+
+/* 04.21 */
+.swiper-div.k0421{}
+.seriesHome.tv .swiper-div.k0421 .thumb-img{height:137px;}
+.seriesHome.tv .swiper-div.k0421 .swiper-slide{width:254px; padding-left:10px;}
+.seriesHome.tv .swiper-div.k0421 .swiper-slide.swiper-slide-active{width:264px; padding-left:20px;}
+.seriesHome.tv .swiper-div.k0421 .swiper-slide:first-child{width:264px; padding-left:20px;}
+
+/* 2021.0505 펫TV 앱 마진문제 */
+.petTvMb .thumb-info {
+  margin-top:10px !important;
+}
+
+/* APET-1139 210611 TV 전시 코너 추가 시작 */
+/* video */
+.tv .series .thumb-img {height:0;padding-top: 56.26%;}

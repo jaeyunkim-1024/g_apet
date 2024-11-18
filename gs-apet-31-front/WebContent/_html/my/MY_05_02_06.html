@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set16","tit":"반품신청"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page shop my" id="container">
+			<div class="inr">			
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="pc-tit">
+						<h2>취소신청</h2>
+					</div>
+					<div class="exchange-area pc-reposition">
+						<div class="item-box pc-reposition">
+							<p class="tit">반품비용 확인</p>
+							<div class="price-area">
+								<div class="gray-box t02">
+									<div class="list">
+										<ul>
+											<li>
+												<p class="txt1">반품 배송비</p>
+												<p class="txt3">50,000원</p>
+											</li>
+											<li>
+												<p class="txt1">결제방법</p>
+												<p class="txt2">환불금액에서 차감</p>
+											</li>
+										</ul>
+									</div>
+								</div>
+							
+							</div>
+							
+						</div>
+						<div class="item-box pc-reposition">
+							<p class="tit">예상 환불 금액</p>
+							<div class="price-area">
+								<!-- <div class="gray-box">
+									<div class="list">
+										<ul>
+											<li>
+												<p class="txt1">환불 금액</p>
+												<p class="txt2">50,000원</p>
+											</li>
+											<li>
+												<p class="txt1">환불 포인트</p>
+												<p class="txt2">2,500P</p>
+											</li>
+										</ul>
+									</div>
+								</div> -->
+								<!--  APET-1258 210803 lju02 -->
+								<div class="addPoint delivery mb0">
+									<ul class="">
+										<li class="ttl"><span>환불 금액</span>	<span class="savePoint">60,000원</span></li>
+										<li><span>신용카드 환불</span>			<span class="savePoint">57,500원</span></li>
+										<li><span>GS&POINT 환불</span>			<span class="savePoint">2,000P</span></li>
+									</ul>
+								</div>
+								<!--  //APET-1258 210803 lju02 -->
+								<div class="list">
+									<ul>
+										<li>
+											<p class="txt1">취소 상품금액</p>
+											<p class="txt2">10,000원</p>
+										</li>
+										<li>
+											<p class="txt1">환불 배송비</p>
+											<p class="txt2">10,000원</p>
+										</li>
+										<li>
+											<p class="txt1">쿠폰 할인</p>
+											<p class="txt2 color">-5,000원</p>
+										</li>
+										<li>
+											<p class="txt1">배송비</p>
+											<p class="txt2 color">-2,500원</p>
+										</li>
+										<li>
+											<div class="dt">추가 배송비 
+												<!-- alert -->
+												<div class="alert_pop" data-pop="popCpnGud"><!-- 04.20 : 추가 -->
+													<div class="bubble_txtBox" style="width:267px;">
+														<div class="tit">추가 배송비</div>
+														<div class="info-txt">
+															<ul>
+																<li>
+																	취소/반품/교환 시 발생한 배송비 금액입니다.
+																</li>
+																<li>
+																	도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+																</li>
+																<li>
+																	취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+																</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+												<!-- // alert -->
+											</div>
+											<div class="dd">
+												<span class="prc c_r"><em class="p">+2,500</em><i class="w">원</i></span>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<p class="info-t2">환불 예정 금액이 마이너스(-)인 관계로 마이페이지에서 신청이 불가합니다. 고객센터로 문의해주세요.</p>
+							</div>
+						</div>
+						<div class="item-box pc-reposition">
+							<p class="tit mb">환불 수단</p> <!-- 03.29 수정 :  클래스 mb 추가  -->
+							<p class="means"><span>신용카드</span>국민은행(1234-****-****-****)</p>
+						</div>
+						<div class="info-txt t2 pc-reposition">
+							<ul>
+								<li>반품은 상품 수거 후 상품 이상 유무를 확인한 뒤 주문 시 결제 수 단으로 환불됩니다.</li>
+								<li>가상계좌 결제의 경우 입력하신 환불 계좌로 환불 됩니다.</li>
+								<li>판매자 과실 사유로 인한 교환/반품은 비용 발생 없이 처리됩니다. </li>
+								<li>판매자 과실 사유로 인한 교환/반품 신청 후 상품에 이상이 없을 경우 반송 처리 될 수 있으며, 배송비를 입금해주셔야 합니다.</li>
+								<li>사은품이 있을 경우 같이 반송해야하며 사은품 누락 시 교환/반품이 불가할 수 있습니다.</li>
+							</ul>
+						</div>
+						<div class="btnSet space pc-reposition">
+							<a href="javascript:;" class="btn lg d">이전</a>
+							<a href="javascript:;" class="btn lg a">반품 신청</a>
+						</div>
+						
+					</div>
+					
+					
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 04.20 : 추가 -->
+			<!-- 쿠폰이용안내 -->
+			<!-- @@ PC에선 하단 팝업.  MO에선 툴팁으로 해달래요 ㅜㅜ -->
+			<article class="popBot popCpnGud" id="popCpnGud">
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit">추가 배송비</h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							
+							<ul class="tplist">
+								<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>
+								<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>
+							</ul>
+						</main>
+					</div>
+				</div>
+			</article>
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+
+		</script>
+	</div>
+</body>
+</html>

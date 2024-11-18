@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.pc.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	
+	<style>
+		html, body{overflow:hidden;}
+	</style>
+</head>
+<body class="body">
+
+	<!-- 팝업윈도우 A .popLayer.win -->
+	<!-- 21.08.10 APET-1258 lcm01 -->
+	<!-- <article class="popLayer win a fixWin"> -->
+	<article class="popLayer a on popWoozooJoin" id="popSample1">
+	<!-- //21.08.10 APET-1258 lcm01 -->
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">우주멤버십 등록</h1>
+					<button type="button" class="btnPopClose">닫기</button><!-- 21.08.10 APET-1258 lcm01 -->
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="uicardinput">
+						<ul class="list">
+							<li>
+								<div class="hdt">멤버십 번호</div>
+								<div class="cdt">
+									<div class="cardnums">
+										<div class="input"><input type="password" placeholder="****" title="1,2,3,4번째카드번호"></div>  
+										<div class="input"><input type="password" placeholder="****" title="5,6,7,8번째카드번호"></div> 
+										<div class="input"><input type="password" placeholder="****" title="9,10,11,12번째카드번호"></div> 
+										<div class="input"><input type="password" placeholder="****" title="13,14,15,16번째카드번호"></div>
+									</div>
+								</div>
+								<p class="validation-check">멤버십 번호를 다시 확인해주세요</p><!-- 21.08.25 APETQA-6790 lcm01 -->
+							</li>
+							<li>
+								<div class="hdt">비밀번호</div>
+								<div class="cdt">
+									<div class="input"><input type="password" placeholder="숫자 6자리 입력" title="숫자 6자리 입력"></div>  
+								</div>
+								<p class="validation-check">비밀번호가 일치하지 않습니다. (1/5)</p><!-- 21.08.25 APETQA-6790 lcm01 -->
+							</li>
+						</ul>
+
+						<ul class="agreeset">
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">개인정보 수집 및 이용동의</a></span>
+								</span>
+							</li>
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">개인정보 제3자 제공동의</a></span>
+								</span>
+							</li>
+						</ul>
+
+						<div class="btnSet bot ">
+							<button type="button" class="btn lg d cancel">취소</button>
+							<button type="button" class="btn lg a save">등록</button>
+						</div>
+					</div>
+					
+				</main>
+			</div>
+			
+		</div>
+	</article>
+
+</body>
+</html>

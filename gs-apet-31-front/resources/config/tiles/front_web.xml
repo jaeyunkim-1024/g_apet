@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>    
+
+	<definition name="exception/error" template="/WEB-INF/view/common/exception/error.jsp"></definition>
+
+	<!--#######################################################
+	#  None Layout
+	########################################################-->
+
+	<definition name="none/*/*" template="/WEB-INF/view/{1}/{2}.jsp" />		
+	<definition name="none/*/*/*" template="/WEB-INF/view/{1}/{2}/{3}.jsp" />		
+	<definition name="none/*/*/*/*" template="/WEB-INF/view/{1}/{2}/{3}/{4}.jsp" />		
+
+	<!--#######################################################
+	#  Layout
+	########################################################-->
+	
+	<!-- 기본 -->
+	<definition name="default" template="/WEB-INF/tiles/indexLayout.jsp">
+		<put-attribute name="definitionNm" value="default" />
+ 		<put-attribute name="meta" value="/WEB-INF/tiles/include/meta.jsp" />
+<!-- 		<put-attribute name="search" value="/WEB-INF/tiles/b2c/include/search.jsp" /> -->
+		<put-attribute name="layerPop" value="/WEB-INF/tiles/include/layerPop.jsp" />
+	</definition>
+	
+	<!-- 일반 -->
+ 	<definition name="common" extends="default">
+ 		<put-attribute name="definitionNm" value="common" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+		
+	<!-- PC만 헤더 -->
+	<definition name="header_pc" extends="default">
+		<put-attribute name="definitionNm" value="header_pc" />		
+ 		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+ 		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+	</definition>
+	
+	<!-- PC만 header,footer있음 / MO는 없음 -->
+	<definition name="noheader_mo" extends="default">
+		<put-attribute name="definitionNm" value="noheader_mo" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	<!-- PC는 모두, MO는 header, menubar만 -->
+	<definition name="common_my_mo" extends="default">
+		<put-attribute name="definitionNm" value="common_my_mo" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	<!-- header Only -->
+	<definition name="header_only" extends="default">
+		<put-attribute name="definitionNm" value="header_only" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />		
+	</definition>
+	
+	
+	<!-- footer없음 -->
+	<definition name="mypage" extends="default"> 
+		<put-attribute name="definitionNm" value="mypage" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb_my.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	<!-- lnb 없음 -->
+	<definition name="no_lnb" extends="default"> 
+		<put-attribute name="definitionNm" value="no_lnb" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	<!-- 마이페이지 MO화면 footer 없음 -->
+	<definition name="mypage_mo_nofooter" extends="default"> 
+		<put-attribute name="definitionNm" value="mypage_mo_nofooter" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb_my.jsp" />
+		<put-attribute name="menubar" value="/WEB-INF/tiles/include/menubar.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	<!-- 마이페이지 MO화면 footer 없음, menubar 없음 -->
+	<definition name="mypage_mo_nomenubar" extends="default"> 
+		<put-attribute name="definitionNm" value="mypage_mo_nomenubar" />
+		<put-attribute name="header" value="/WEB-INF/tiles/include/header.jsp" />
+		<put-attribute name="gnb" value="/WEB-INF/tiles/include/gnb.jsp" />
+		<put-attribute name="lnb" value="/WEB-INF/tiles/include/lnb_my.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/include/footer.jsp" />
+	</definition>
+	
+	
+	<!-- 중복되는 스크립트 삽입부분 -->
+	<definition name="script.common.mo" template="/WEB-INF/tiles/include/js/common_mo.jsp"/>
+	<definition name="script.member" template="/WEB-INF/tiles/include/js/member.jsp"/>
+	<definition name="script.goods" template="/WEB-INF/tiles/include/js/goods.jsp"/>
+	<definition name="script.order" template="/WEB-INF/tiles/include/js/order.jsp"/>
+	<definition name="script.petlog" template="/WEB-INF/tiles/include/js/petlog.jsp"/>	
+	<definition name="script.petshop" template="/WEB-INF/tiles/include/js/petshop.jsp"/>
+	<definition name="script.pettv" template="/WEB-INF/tiles/include/js/pettv.jsp"/>
+	<definition name="script.gsr" template="/WEB-INF/tiles/include/js/gsr.jsp"/>
+
+	<!-- 헤더 푸터 다 없음 빈페이지 js include만 있음 (모바일 결제 팝업에서 사용) -->
+	<definition name="blank" extends="default">
+		<put-attribute name="definitionNm" value="blank" />
+		<put-attribute name="header" value="" />
+		<put-attribute name="gnb" value="" />
+		<put-attribute name="lnb" value="" />
+		<put-attribute name="menubar" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<!-- PC 용 타이트 헤더 -->
+	<definition name="header.title" template="/WEB-INF/tiles/include/header_title.jsp"/>
+</tiles-definitions>

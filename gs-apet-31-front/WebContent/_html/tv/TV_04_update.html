@@ -1,0 +1,1701 @@
+<!doctype html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#333333">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+    <script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+
+    <script>
+        $(function(){
+
+            // Swiper
+            var swiperSchool = new Swiper('.school .swiper-container', {
+                spaceBetween: 8,
+                slidesPerView: "auto",
+                navigation: {
+                    nextEl: '.school .swiper-button-next',
+                    prevEl: '.school .swiper-button-prev',
+                }
+            });
+            
+            // var swiperPrd = new Swiper('.prd-layer .swiper-container', {
+            //     spaceBetween: 8,
+            //     slidesPerView: "auto",
+            //     breakpoints: {
+            //         1280: {
+            //             spaceBetween: 20,
+            //             slidesPerView: 6,
+            //             slidesPerGroup:1,
+            //             freeMode: true,				
+            //         }
+            //     },
+            //     using: function() {
+            //         this.slide = new Swiper(this.els, this.opt);				
+			//     }
+            // });
+            
+            // 연관상품레이어
+            $(".prd-layer").each(function(idx){
+                varslide = [];
+                varslide[idx] = new Swiper($(this).find('.swiper-container'), {
+                    slidesPerView: "auto",
+                    spaceBetween: 20, 
+                    observer: true,
+					observeParents: true,
+					watchOverflow:true,
+                    freeMode: false,
+                    navigation: {
+                                nextEl: $(this).find('.swiper-button-next'),
+                                prevEl: $(this).find('.swiper-button-prev'),
+                    },
+                    breakpoints: {
+						1023: {
+							spaceBetween: 8,
+							slidesPerView: "auto",
+							slidesPerGroup:1,
+							freeMode: true,
+						}
+					}
+                });
+            });
+
+            $(".prd-layer").css("bottom","-" + $(".prd-layer").height() + "px");
+            $(".btn-with-prd").click(function(){
+                $(".prd-layer").stop().animate({bottom:0},250);
+            });
+            $(".prd-layer .top .inner .btn-close").click(function(){
+                $(".prd-layer").stop().animate({bottom:"-" + $(".prd-layer").height() + "px"},250);
+            });
+
+            $(".btn-video-layer").click(function(){
+                $(this).toggleClass("on");
+                if($(this).hasClass("on")){
+                    $(this).parents(".videoAndListWrap").addClass("infoMode");
+                }else{
+                    $(this).parents(".videoAndListWrap").removeClass("infoMode");
+                };
+            });
+
+            /* tab width관련 */
+            /*$(".tab-area").bind("click",function(e){
+                e.stopPropagation();
+            });
+
+            $(".contents").data({"data-hcMode":null});
+
+            $(".contents").bind("touchstart",function(e){
+                if(etcsReturn(e)) return;
+                var ev = e.originalEvent;
+                // $(".infoMode").removeClass("infoMode");
+                // $(".btn-video-layer.on").removeClass("on");
+                $(".tab-area").data({"data-tsy":ev.touches[0].screenY});
+                $(".tab-area").data({"data-tsx":ev.touches[0].screenX});
+                if($(".tab-area").attr("style") === undefined){
+                    var p = window.innerHeight * 0.01;
+                    var css = $(".tab-area").css("bottom").match(/\-?\d+(\.\d+)?/g);
+                    $(".tab-area").data({"data-cp":Math.ceil(css / p)});
+                }else{
+                    $(".tab-area").data({"data-cp":String($(".tab-area").attr("style")).match(/(?!=bottom ?\: ?)\-?\d+(\.\d+)?/g)});
+                };
+                $(".tab-area").data({"data-mode":null});
+            }).bind("touchmove",function(e){
+                if(etcsReturn(e)) return;
+                var ev = e.originalEvent;
+                console.log("data hcMode : " + $(".contents").data("data-hcMode"))
+                if($(".contents").data("data-hcMode") === null){
+                    console.log("css : " + $(".contents").attr("class"));
+                    $(".contents").data({"data-hcMode":"mode1"});
+                    $(".contents").removeClass("hMode1").removeClass("hMode2");
+                    $(".contents").addClass("hMode1");
+                };
+
+                $(".tab-area").data({"data-py":($(".tab-area").data("data-tsy") - ev.touches[0].screenY)});
+                var p = ($(".tab-area").data("data-py") / (window.innerHeight * 0.01));
+                $(".tab-area").data({"data-py":(Number(p) + Number($(".tab-area").data("data-cp")))});
+                if($(".tab-area").data("data-py") >= 0){
+                    $(".tab-area").data({"data-py":0});
+                }else if($(".tab-area").data("data-py") <= -42){
+                    $(".tab-area").data({"data-py":-42});
+                }else ;
+                $(".tab-area").data({"data-py":$(".tab-area").data("data-py")});
+                
+                $(".tab-area").data({"data-disX":Math.floor(($(".tab-area").data("data-tsx") - ev.touches[0].screenX) / (window.innerWidth * 0.01))});
+                $(".tab-area").data({"data-disY":Math.floor($(".tab-area").data("data-py") - $(".tab-area").data("data-cp"))});
+
+
+                if($(".tab-area").data("data-tsy") - ev.touches[0].screenY != 0 && ($(".tab-area").data("data-mode") === null || $(".tab-area").data("data-mode") === true)){
+                    $(".tab-area").data({"data-mode":true});
+                }else if($(".tab-area").data("data-tsx") - ev.touches[0].screenX != 0 ){
+                    $(".tab-area").data({"data-mode":false});
+                };
+
+                if($(".tab-area").data("data-mode")){
+                    $(".tab-area").css("bottom",$(".tab-area").data("data-py")+"%");
+                    setTingsPosition();
+                };
+
+            }).bind("touchend",function(e){
+                if(etcsReturn(e)) return;
+                var ev = e.originalEvent;
+                if($(".tab-area").data("data-cp") == -40 && $(".tab-area").data("data-py") == -42){
+                    $(".contents").removeClass("hMode1").removeClass("hMode2");
+                    $(".tab-area").css({"bottom":"-40%"});
+                    $(".contents").data({"data-hcMode":null});
+                }else if($(".tab-area").data("data-py") == 0){
+                    $(".contents").addClass("hMode2").removeClass("hMode1");
+                }else{
+                    if($(".tab-area").data("data-mode") === true){
+                        if($(".tab-area").data("data-cp") == 0 && $(".tab-area").data("data-py") <= -5){
+                            $(".tab-area").animate({"bottom":"-40%"},
+                                {
+                                deration: 100,
+                                step: function(){
+                                    setTingsPosition(); 
+                                },
+                                complete: function(){
+                                    if($(".tab-area").data("data-py") <= -30 && $(".tab-area").data("data-py") >= -40){
+                                        $(".contents").addClass("hMode1").removeClass("hMode2");
+                                    }else{
+                                        $(".contents").removeClass("hMode2").removeClass("hMode1");
+                                        $(".infoMode").removeClass("infoMode");
+                                        $(".btn-video-layer.on").removeClass("on");
+                                    };
+                                    $(".contents").data({"data-hcMode":null});
+                                    console.log("111111111111")
+                                }
+                                });
+                        }else if($(".tab-area").data("data-mode")){
+                            if($(".tab-area").data("data-py") <= -30){
+                                $(".tab-area").animate({"bottom":"-40%"},
+                                {
+                                deration: 100,
+                                step: function(){
+                                    setTingsPosition();
+                                },
+                                complete: function(){
+                                    $(".contents").removeClass("hMode2").addClass("hMode1");
+                                    console.log("22222222222222")
+                                }
+                                });
+                            }else{
+                                $(".tab-area").animate({"bottom":"0"},
+                                {
+                                deration: 250,
+                                step: function(){
+                                    setTingsPosition();
+                                },
+                                complete: function(){
+                                    $(".contents").removeClass("hMode1").addClass("hMode2");
+                                    console.log("333333333333")
+                                }
+                                });
+                            };
+                        };
+                    };  
+                };
+            }).bind("click",function(){
+                var check = window.matchMedia("(orientation:landscape)").matches;
+                if(check) if($(".contents").data("data-hcMode") === null) $(".contents").removeClass("hMode2").addClass("hMode1");
+            });
+            */
+
+            /* 가로모드 시 위치 잡아 주는 함수 */
+            function setTingsPosition(){
+                $(".div-right").css("bottom",window.innerHeight - $(".tabWrap > .head").offset().top - 20);
+                $(".tvVideoInfoBoth").height(window.innerHeight - $(".div-right").offset().top - 40);
+            };
+
+            /* 예외처리 */
+            function etcsReturn(e){
+                if(e.target.getAttribute("class") == "tvVideoInfoBoth" || $(e.target).parents(".acSelect").length || $(e.target).parents(".tvSlid").length || window.matchMedia("(orientation:portrait)").matches){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
+            /* tab width 설정 */
+            $(window).resize(reFn);
+            reFn();
+
+            function reFn(){
+                var $li = $(".tabWrap > .con > ul > li");
+                var check = window.matchMedia('(orientation:landscape)').matches;
+                $li.width($(window).width());
+                var w = window.innerWidth;
+                if(w >= 1024){
+                    $(".videoAndListWrap .tab-area").height($(".videoAndListWrap .video-area").height())
+                }else{
+                    $(".videoAndListWrap .tab-area").removeAttr("style");
+                };
+                if(check){
+                    $(".acSelect").each(function(i,n){
+                        var $this = $(n);
+                        var wh = window.innerHeight;
+                        var h = $this.innerHeight();
+                        if(h >= wh){
+                            $this.css("height",wh)
+                        }else{
+                            $this.css("max-height",wh)
+
+                        };
+                    });
+                };
+                
+                /* 가로 모드 체크 */
+                // var horizontal = window.matchMedia("(orientation:portrait)").matches;
+                // if(horizontal){
+                //     $(".div-right, .tvVideoInfoBoth").removeAttr("style");
+                // }else{
+                //     setTingsPosition(); /* 가로모드 시 위치 잡아 주는 함수 */
+                // };
+            };
+        });
+    </script>
+
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+        <!-- 헤더 MO-->
+		<!-- <include class="header mo" data-include-html="../inc/header_mo_tv.html"></include> -->
+		<!-- 헤더 PC-->
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+        
+
+		<main class="container page tv detail" id="container">
+            <div class="inr">  <!-- 3초뒤 off 클래스 추가, 댓글레이어시 open 클래스 추가 -->
+
+                <!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="top-area" onClick="ui.selAc.open('.acSelect')">
+                        <div class="div-flex">
+                            <p>가나다라마바사아자차가나다라마바사아자차가나다라마바사아자차가나다라마바사아자차가나다라마바사아자차</p>
+                            <!-- 0120 개발요청 모바일웹 버튼추가 -->
+                            <button class="btn-close app"><span>닫기</span></button> <!-- 모바일 앱 -->
+                            <button class="btn-close"><span>닫기</span></button> <!-- 모바일 웹 -->
+                        </div>
+    
+                        <div class="thumb-info">
+                            <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                            <div class="info">
+                                <div class="dash">
+                                    <span class="name">애니뭘봐</span>
+                                    <span>
+                                        재생수 <em>430,947</em>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- //top-area -->
+                    
+                    <div class="videoAndListWrap">
+                        <!-- 동영상 영역 -->
+                        <div class="video-area">
+                            <div class="video-palyer">
+                                <!-- 0120 개발요청 - video 태그 삭제, 대체 div 추가  -->
+                                <div class="video"></div>
+                                <!-- <video id="movie1" title="동영상 타이틀" autoplay="" muted="">
+                                    <source src="../../_images/tv/temp_flower.webm" type="video/webm">
+                                    <source src="../../_images/tv/temp_flower.mp4" type="video/mp4">
+                                </video> -->
+                            </div>
+                        </div>
+                        <!-- //동영상 영역 -->
+                        
+                        <!-- 탭 wrap -->
+                        <div class="tab-area">
+                            <!-- tab wrap -->
+                            <!-- 개발전달 0118 html 수정 -->
+                            <div class="tabWrap">
+                                <!-- tap header -->
+                                <div class="head" style="padding:0 20px;">
+                                    <ul>
+                                        <li class="active" onClick="ui.tab2(this)"><span>전체시리즈</span></li>
+                                        <li onClick="ui.tab2(this)"><span>추천TV</span></li>
+                                    </ul>
+                                </div>
+                                <!-- //tab header -->
+                                <!-- tab content -->
+                                <div class="con">
+                                    <ul>
+                                        <li>
+                                            <div class="video-top">
+                                                <p class="tit"><em>[애니멀봐] 시즌</em></p>
+                                                <div class="paging">
+                                                    <strong>2</strong>
+                                                    <em>/</em>
+                                                    <span>10</span>
+                                                </div>
+                                            </div>
+                                            <div class="tvSlid"> 
+                                                <div class="innerWrap">
+                                                    <div class="swiper-slide">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                    <div class="detail">
+                                                                        <span class="read play">1000</span>
+                                                                        <span class="read like">1000</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box on">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                    <div class="detail">
+                                                                        <span class="read play">1000</span>
+                                                                        <span class="read like">1000</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                    <div class="detail">
+                                                                        <span class="read play">1000</span>
+                                                                        <span class="read like">1000</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:00%;"></div></a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                    <div class="detail">
+                                                                        <span class="read play">1000</span>
+                                                                        <span class="read like">1000</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                    <div class="detail">
+                                                                        <span class="read play">1000</span>
+                                                                        <span class="read like">1000</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide season">
+                                                        <div class="thumb-box">
+                                                            <div class="div-respon">
+                                                                <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                    <!-- 마지막 영상 목록 노출 -->
+                                                                    <div class='season-list'>
+                                                                        <span>4</span>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="thumb-info">
+                                                                    <div class="info">
+                                                                        <div class="tlt">다음시즌</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="tvSlid"> 
+                                                <div class="innerWrap">
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel-info">
+                                                            <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="ch-name">몽몽이네이야기</div>
+                                                        </div>
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="thumb-box on">
+                                                            <i class="icon-n">N</i>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag"><span>10:00</span></div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel-info">
+                                                            <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="ch-name">몽몽이네이야기</div>
+                                                        </div>
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="thumb-box">
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide addTit">
+                                                        <div class="channel thumb-info">
+                                                            <div class="profile" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                            <div class="info">
+                                                                <div class="tit">몽몽이네이야기</div>
+                                                            </div>
+                                                        </div>
+                    
+                                                        <div class="thumb-box">
+                                                            <div class="channel-info">
+                                                                <div class="round-img-pf" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+                                                                <div class="ch-name">몽몽이네이야기</div>
+                                                            </div>
+                                                            <a href="#" class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                                                <div class="time-tag">
+                                                                    <span>10:00</span>
+                                                                </div>
+                                                                <div class="progress-bar" style="width:30%;"></div>
+                                                            </a>
+                                                            <div class="thumb-info">
+                                                                <div class="info">
+                                                                    <div class="tlt"><em>90%일치</em>뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- //tab content -->
+                            </div>
+                            <!-- //개발전달 0118 html 수정 -->
+                            <!-- // tab wrap -->
+                        </div>
+                        <!-- tab-area -->
+                        <!-- 영상정보 레이아웃 -->
+                        
+                        <div class="div-right">
+                            <button class="btn-video-layer">영상정보</button> <!-- 버튼 클릭시 on 클래스 추가 -->
+                        </div>
+                        <div class="tvVideoInfoBoth layer-detail">
+                            <div>
+                                <div class="cont day">2020. 09.16</div>
+                                <div class="cont">
+                                    등록하신 관심태그와 90% 일치해요!
+                                    등록하신 마이펫과 80% 일치해요!
+                                    최근 시청하신 영상과 80% 일치해요!
+                                </div>
+                                <div class="cont">
+                                    영상 상세 설명글입니다.
+                                    영상 상세 설명글 영상 상세 설명글 영상 상세 설명글 영상 상세 설명글
+                                    영상 상세 설명글 영상 상세 설명글 영상 상세 설명글 영상 상세 설명글!! 상세글은 최대 100글자까지 입력 가능합니다.
+                                </div>
+    
+                                <div class="cont tag">
+                                    <span>#일상스토리</span>
+                                    <span>#나레이터_멍델_댕댕이</span>
+                                </div>
+                                
+                                <div class="cont">
+                                    <h3>음원저작권</h3>
+                                    <p>
+                                        노래 Bom(나만, 봄)
+                                        아티스트 BOL4(볼빨간사춘기)
+                                        라이선스 제공자 Kakao M; Peermusic, Sony ATV Publishing, CMRRA, SOLAR Music Rights Management 및 음악 권리 단체 12개
+                                    </p>
+                                    <p>
+                                        노래 Stars over me
+                                        아티스트 BOL4
+                                        앨범 私だけ、春
+                                        라이선스 제공자 Kakao M, KING RECORD CO., LTD.(KING RECORDS 대행); Sony ATV Publishing, UNIAO BRASILEIRA DE EDITORAS DE MUSICA – UBEM
+                                    </p>
+                                </div>
+            
+                            </div>
+                        </div>
+                        <!-- // 영상정보 레이아웃 -->
+                    </div>
+
+				</div><!-- //contents -->
+            </div><!-- //inr -->
+
+
+            <!-- select 레이어 팝업 -->
+            <div class="acSelect">
+                <input type="text" class="acSelInput" readonly />
+                <div class="head">
+                    <div class="con">
+                        <div class="tit">재생속도</div>
+                        <a href="javascript:;" class="close" onClick="ui.selAc.close(this)"></a>
+                    </div>
+                </div>
+                <div class="con">
+                    <ul>
+                        <li onClick="ui.selAc.liClick(this)">0.5x</li>
+                        <li onClick="ui.selAc.liClick(this)">0.75x</li>
+                        <li onClick="ui.selAc.liClick(this)">1x</li>
+                        <li onClick="ui.selAc.liClick(this)">1.25x</li>
+                        <li onClick="ui.selAc.liClick(this)">1.5x</li>
+                        <li onClick="ui.selAc.liClick(this)">2x</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- //select 레이어 팝업 -->
+
+            <!-- 하단바 -->
+            <div class="bottom-bar">
+                <div class="inner">
+                    <ul class="bar-btn-area">
+                        <li>
+                            <button class="btn-like">299</button>
+                        </li>
+                        <li>
+                            <button class="btn-comment" onClick="ui.commentBox.open('.tvcommentBox')">13</button>
+                        </li>
+                        <li>
+                            <button class="btn-share"><span>공유</span></button>
+                        </li>
+                        <li>
+                            <button class="btn-bookmark"><span>북마크</span></button>
+                        </li>
+                    </ul>
+                    <buttron class="tvConnectedTing">연관상품</buttron>
+                    <button class="btn-with-prd" onClick="ui.commentBox.open('.relation-pop');"><!-- 2021.02.04 : onClick이벤트 추가 -->
+                        <strong style="background-image:url(../../_images/tv/@temp01.jpg);">4</strong>
+                    </button>
+                </div>
+            </div>
+            <!-- //하단바 -->
+
+            <!-- // 2021.02.04 : 추가  -->
+            <!-- 연관상품 레이어-->
+            <div class="prd-layer">
+                <div class="top">
+                    <div class="inner">
+                        <h2>연관상품</h2>
+                        <button class="btn-close" type="button"><span>닫기</span></button>
+                    </div>
+                </div>
+                <div class="cont">
+                    <div class="swiper-div">
+                        <div class="swiper-container space">
+                            <ul class="swiper-wrapper">
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="thumb-box">
+                                        <div class="thumb-img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+                                            <button class="btn-zzim" type="button"><span>북마크</span></button>
+                                            <button class="btn-basket" type="button"><span>장바구니</span></button>
+                                        </div>
+                                        <div class="thumb-info">
+                                            <div class="info">
+                                                <div class="tlt">반려견 습식사료 아미로 후코이단 홀리티 20개</div>
+                                                <div class="price">
+                                                    <span><em>20,000</em>원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- //Swiper -->
+                </div>
+            </div>
+            <!-- // 연관상품 레이어-->
+            <!-- 댓글 -->
+            <div class="commentBoxAp tvcommentBox type01">
+                <div class="head">
+                    <div class="con">
+                        <div class="tit">
+                            댓글 4개
+                        </div>
+                        <a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+                    </div>
+                </div>
+                <div class="con">
+                    <div class="box">
+                        <div class="commendListBox">
+                            <ul>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04<span class="nameCardAp">작성자</span></div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">수정</b></a></li>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">삭제</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">뽕실뽕실한 우리집 강아지</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                                <li>
+                                    <div class="pic"></div>
+                                    <div class="con">
+                                        <div class="tit">hhlee04</div>
+                                        <div class="txt">너무 귀엽네요 ~~! 몇개월인가요? 저희집 강아지랑 닮았어요~</div>
+                                        <div class="date">2020.10.22</div>
+                                    </div>
+                                    <!-- select box -->
+                                    <div class="menu dopMenuIcon" onClick="ui.popSel.open(this)">
+                                        <div class="popSelect">
+                                            <input type="text" class="popSelInput">
+                                            <div class="popSelInnerWrap">
+                                                <ul>
+                                                    <li><a class="bt" href="javascript:;"><b class="t">신고</b></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // select box -->
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="input">
+                        <span></span>
+                        <textarea type="text" placeholder="댓글을 입력해주세요."></textarea>
+                        <button onClick="ui.popSel.open(this)">등록</button>
+                    </div>
+                </div>
+            </div>
+            <!-- //댓글 -->
+
+            <!-- 연관상품 장바구니 -->
+            <div class="commentBoxAp relation-pop pop-relation-box">
+                <div class="head h2 bnone">
+                    <div class="con">
+                        <div class="tit">
+                            댓글 4개
+                        </div>
+                        <a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+                    </div>
+                </div>
+                <div class="con">
+                    <!-- tab -->
+                    <section class="sect petTabContent">
+                        <!-- tab header -->
+                        <ul class="uiTab b">
+                            <li class="active">
+                                <a class="bt" href="javascript:;">연관상품(5)</a>
+                            </li>
+                            <li class="">
+                                <a class="bt active" href="javascript:;">장바구니</a>
+                            </li>
+                        </ul>
+                        <!-- // tab header -->
+                        <!-- tab content -->
+                        <div class="uiTab_content">
+                            <ul>
+                                <li>
+                                    <!-- 연관 상품 -->
+                                    <div class="product-area" style="padding:20px 20px 0;">
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="img-box">
+                                                <img src="/../_images/tv/@temp01.jpg" alt="">
+                                                <button class="keep">보관하기</button>
+                                                <button class="cart">장바구니</button>
+                                            </div>
+                                            <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                            <div class="price">
+                                                <strong class="num">23,000</strong>
+                                                <span>원</span>
+                                                <strong class="discount">10%</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- // 연관 상품 -->
+                                </li>
+                                <li>
+                                    <!-- 장바구니 -->
+                                    <div class="all-check">
+                                        <label class="checkbox t01">
+                                            <input type="checkbox"><span class="txt">전체 선택</span>
+                                        </label>
+                                    </div>
+                                    <div class="mo-inner-scroll">
+                                        <div class="cart-tit-only-pc">
+                                            <span class="ico-log-relation"></span>연관상품
+                                            <button class="ctop-close" onClick="ui.commentBox.close(this)"></button>
+                                        </div>
+                                        <div class="cart-area">
+                                            <div class="check-list swiper-container swiper-none-mo">
+                                                <ul class="list swiper-wrapper">
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">바로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="swiper-slide">
+                                                        <div class="untcart">
+                                                            <label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+                                                            <div class="box">
+                                                                <div class="tops">
+                                                                    <div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+                                                                    <div class="name">
+                                                                        <div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+                                                                        <div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="amount">
+                                                                    <div class="uispiner">
+                                                                        <input type="text" value="1" class="amt" disabled>
+                                                                        <button type="button" class="bt minus">수량더하기</button>
+                                                                        <button type="button" class="bt plus">수량빼기</button>
+                                                                    </div>
+                                                                    <div class="prcs">
+                                                                        <span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+                                                                        <a href="javascript:;" class="btn sm a buy">로구매</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <p class="info-t1">최근에 장바구니에 담은 상품 5개까지만 노출됩니다.</p>
+                                                <div class="btn-area">
+                                                    <a href="javascript:;" class="btn round">장바구니 전체보기 <span class="arrow"></span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>	
+                                    <!-- // 장바구니 -->	
+                                    <div class="all-bought-cart">구매하기</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- // tab content -->
+                    </section>
+                    <!-- // tab -->
+                </div>
+            </div>
+            <!-- //연관상품 장바구니 -->
+            <!-- // 2021.02.04 : 추가  -->
+
+        </main><!-- //container -->
+    </div><!--// wrap -->
+    
+</body>
+</html>

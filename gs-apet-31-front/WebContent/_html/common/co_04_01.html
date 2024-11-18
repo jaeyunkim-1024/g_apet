@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set19","tit":"<b class=e>d</b>타이틀","formCss":"open"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		
+		<!-- <include class="lnb" data-include-html="../inc/lnb.html"></include> -->
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					
+					<!-- 공통 검색  -->
+					<div class="search-wrap">
+						<!-- 최근 태그  -->
+						<div class="lately-tag">
+							<p class="tit">최근 검색어</p>
+							<!-- 검색 내역 없을 경우 노출  -->
+							<!-- <p class="txt-info">검색 내역이 없습니다.</p> -->
+							<!-- 검색 내역 없을 경우 노출  -->
+							<!-- 2021.04.06 : 수정 -->
+							<div class="scroll-x">
+								<div class="scroll swiper-container keyword">
+									<ul class="swiper-wrapper">
+										<li class="swiper-slide"><p class="tag">태그태그태그태그<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">교육<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">추가증정<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">태그<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">교육<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">추가증정<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">태그태그태그태그<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">교육<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">추가증정<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">태그태그태그태그<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">태그태그태그태그<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">검색어<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">교육<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">추가증정<button class="remove">삭제</button></p></li>
+										<li class="swiper-slide"><p class="tag">태그<button class="remove">삭제</button></p></li>
+									</ul>
+								</div>
+							</div>
+							<!-- 04.12 : 수정 -->
+							<script>
+								$(function(){
+									/* document 늦게 읽어지면 swiper 정상 작동 안되서 넣어 놨어요 */
+									console.log(ui.check_brw.mo())
+									if(ui.check_brw.mo()){
+										var keyword = new Swiper('.swiper-container.keyword',{
+											freeMode: false,
+											slidesPerView: "auto",
+										});
+										setTimeout(function(){
+											keyword.update();
+										},1500)
+									}
+								})
+							</script>
+							<!-- // 04.12 : 수정 -->
+							<!-- // 2021.04.06 : 수정 -->
+						</div>
+						<!-- // 최근 태그  -->
+						<div class="block-wrap">
+							<!-- 추천태그 -->
+							<div class="recommendation-tag">
+								<div class="swiper-container">
+									<div class="swiper-wrapper">
+										<div class="swiper-slide">
+											<div class="cont">
+												<p class="tit"><span>관심태그</span> 맞춤추천</p>
+												<div class="tag-box">
+													<button class="tag">태그</button>
+													<button class="tag">검색어 관심태그</button>
+													<button class="tag">검색어</button>
+													<button class="tag">추가증정</button>
+													<button class="tag">검색어 교육</button>
+													<button class="tag">태그</button>
+												</div>
+											</div>
+										</div>
+										<div class="swiper-slide">
+											<div class="cont">
+												<p class="tit"><span>마이펫</span> 맞춤추천</p>
+												<div class="tag-box">
+													<button class="tag">태그</button>
+													<button class="tag">검색어 관심태그</button>
+													<button class="tag">검색어</button>
+													<button class="tag">추가증정</button>
+													<button class="tag">검색어</button>
+													<button class="tag">검색어 관심태그</button>
+												</div>
+											</div>
+										</div>
+										<div class="swiper-slide">
+											<div class="cont">
+												<p class="tit"><span>내 활동</span> 맞춤추천</p>
+												<div class="tag-box">
+													<button class="tag">태그</button>
+													<button class="tag">교육</button>
+													<button class="tag">검색어 관심태그</button>
+													<button class="tag">추가증정</button>
+													<button class="tag">검색어</button>
+													<button class="tag">태그</button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- Add Pagination -->
+									<div class="swiper-pagination"></div>
+								</div>
+							</div>
+							<!-- // 추천태그 -->
+							<!-- 인기 검색어 -->
+							<div class="search-list">
+								<div class="swiper-container t01"> <!-- class t01 추가 -->
+									<p class="tit">인기 검색어</p>
+									<div class="swiper-wrapper">
+										<div class="swiper-slide">
+											<ul class="item">
+												<li>
+													<a href="javascript:;">
+														<span class="num">1</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking"></span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">2</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking down">2</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">3</span>
+														<p class="txt">
+															검색어
+															<span>지금바로 다시보기!</span>
+														</p>
+														<span class="ranking up">1</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">4</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking up">2</span>
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;">
+														<span class="num">5</span>
+														<p class="txt">
+															검색어
+															<span>#패션</span>
+															<span>#겨울산책</span>
+														</p>
+														<span class="ranking down">3</span>
+													</a>
+												</li>
+											</ul>
+										</div>
+										<div class="swiper-slide">
+											<ul class="item">
+												<li>
+													<span class="num">6</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking"></span>
+												</li>
+												<li>
+													<span class="num">7</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking down">2</span>
+												</li>
+												<li>
+													<span class="num">8</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking up">1</span>
+												</li>
+												<li>
+													<span class="num">9</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking up">2</span>
+												</li>
+												<li>
+													<span class="num">10</span>
+													<p class="txt">
+														검색어
+														<span>#패션</span>
+														<span>#겨울산책</span>
+													</p>
+													<span class="ranking down">3</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+									<div class="swiper-pagination"></div>
+								</div>
+								<!-- 하단 배너  -->
+								<div class="b-banner">
+									<div class="swiper-container t02"><!-- class t02 추가 -->
+										<div class="swiper-wrapper">
+											<div class="swiper-slide"><a href="javascript:;" class="box"><img class="mo" src="../../_images/_temp/temp_banner01.png" alt="배너"></a></div>
+											<div class="swiper-slide"><a href="javascript:;" class="box"><img class="mo" src="../../_images/_temp/temp_banner01.png" alt="배너"></a></div>
+											<div class="swiper-slide"><a href="javascript:;" class="box"><img class="mo" src="../../_images/_temp/temp_banner01.png" alt="배너"></a></div>
+										</div>
+										<div class="swiper-pagination"></div>
+									</div>
+								</div>
+								<!-- 하단 배너  -->
+							</div>
+							<!-- // 인기 검색어 -->
+						</div>
+
+						
+
+						
+					</div>
+
+					
+					<!-- // 공통 검색  -->
+					
+					
+				</div>
+			</div>
+		</main>
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+			
+
+		
+				setTimeout(function(){
+					var check = ($('link[href *= "style.mo.css"]').length) ? true : false; 
+					console.log(check);
+					if(check) {
+						var swiper = new Swiper('.recommendation-tag .swiper-container', {
+							slidesPerView: "auto",	// APETQA-5515 210615 lju02
+							centeredSlides: false,
+							spaceBetween: 0,
+							pagination: {
+								el: '.swiper-pagination',
+								clickable: true,
+							},
+						});
+						var swiper2 = new Swiper('.search-list .swiper-container.t01', {
+							slidesPerView: '1',
+							centeredSlides: false,
+							spaceBetween: 0,
+							pagination: {
+								el: '.search-list .swiper-pagination',
+								clickable: true,
+							},
+						});
+						
+					}
+
+				},50);
+				var swiper3 = new Swiper('.search-list .b-banner .swiper-container.t02', {
+					slidesPerView: '1',
+					centeredSlides: false,
+					spaceBetween: 0,
+					pagination: {
+						el: '.search-list .b-banner .swiper-pagination',
+						clickable: true,
+					},
+				});
+		</script>
+	</div>
+</body>
+</html>

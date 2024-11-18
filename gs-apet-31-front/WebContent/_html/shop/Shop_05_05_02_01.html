@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set8","tit":"간편 결제 관리","btr":""}'></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page shop cardmag" id="container">
+
+			<div class="inr">			
+
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="uicardimag">
+						<ul class="list">
+							<li>
+								<div class="box">
+									<div class="cname">국민카드</div>
+									<div class="cnums">123456*********111*</div>
+									<nav class="uidropmu dmenu">
+										<button type="button" class="bt st">메뉴열기</button>
+										<div class="list">
+											<ul class="menu">
+												<li><button type="button" class="bt">삭제</button></li>
+											</ul>
+										</div>
+									</nav>
+								</div>
+							</li>
+							<li>
+								<div class="box">
+									<div class="cname">국민카드</div>
+									<div class="cnums">123456*********111*</div>
+									<nav class="uidropmu dmenu">
+										<button type="button" class="bt st">메뉴열기</button>
+										<div class="list">
+											<ul class="menu">
+												<li><button type="button" class="bt">삭제</button></li>
+											</ul>
+										</div>
+									</nav>
+								</div>
+							</li>
+							<li class="nodata">
+								<div class="msg">
+									<p class="tit">등록된 카드 정보가 없습니다.</p>
+									<p class="txt">자주 사용하는 카드를 등록하세요 <br> <b class="t">최초 1회</b> 등록 후, 바로 사용 가능합니다.</p>
+								</div>
+							</li>
+						</ul>
+					</div>
+					
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

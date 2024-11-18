@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="goodsTagMap">
+
+	<insert id="insertGoodsTagMap" parameterType="biz.app.goods.model.GoodsTagMapPO" >
+		<!--
+			Query Name : GoodsFiltAttr.insertGoodsTagMap
+			Description : 상품 태그 매핑 등록
+		-->
+		INSERT INTO GOODS_TAG_MAP(
+			GOODS_ID
+			, TAG_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{goodsId}
+			, #{tagNo}
+			, #{sysRegrNo}
+			, now()
+		)
+	</insert>
+	
+	<select id="listGoodsTagMap" resultType="biz.app.goods.model.GoodsTagMapVO" >
+		<!--
+			Query Name : GoodsFiltAttr.listGoodsTagMap
+			Description : 상품 태그 매핑 리스트
+		-->
+		SELECT
+			GTM.GOODS_ID
+			, GTM.TAG_NO
+		    , TB.TAG_NM
+			, GTM.SYS_REGR_NO
+			, GTM.SYS_REG_DTM
+		FROM GOODS_TAG_MAP GTM
+		JOIN TAG_BASE TB ON ( GTM.TAG_NO = TB.TAG_NO )
+		WHERE 1 = 1
+		AND GTM.GOODS_ID = #{goodsId}
+	</select>
+	
+	<delete id="deleteGoodsTagMap" parameterType="biz.app.goods.model.GoodsTagMapPO" >
+		<!--
+			Query Name : GoodsFiltAttr.deleteGoodsTagMap
+			Description : 상품 태그 매핑 삭제
+		-->
+		DELETE FROM GOODS_TAG_MAP
+		WHERE 1 = 1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+
+</mapper>

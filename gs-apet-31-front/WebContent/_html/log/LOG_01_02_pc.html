@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.pc.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			var hTimer = setInterval(function(){
+				$("#header_pc .tmenu .list li:eq(1)").addClass("active").siblings().removeClass("active")
+				if($("#header_pc").length) clearInterval(hTimer);
+			});
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<header class="header pc cu">
+			<div class="hdr">
+				<div class="inr">
+					<div class="tdt">
+						<ul class="menu">
+							<li><a href="javascript:;" class="bt">로그인/회원가입</a></li>
+							<li><a href="javascript:;" class="bt">이벤트</a></li>
+							<li><a href="javascript:;" class="bt">고객센터</a></li>
+						</ul>
+					</div>
+					<div class="hdt">
+						<!-- mobile -->
+						<button class="mo-header-btnType02">취소</button><!-- on 클래스 추가 시 활성화 -->
+						<!-- // mobile -->
+						<button class="btnGnb" type="button">메뉴</button>
+						<!-- .logo.shop : 샵일 경우 아이콘 -->
+						<!-- .logo.tv : TV일 경우 아이콘 -->
+						<!-- .logo.log : LOG일 경우 아이콘 -->
+						<h1 class="logo log"><a class="bt" href="../../_html/shop/Shop_01.html">AboutPet</a></h1>
+						<nav class="menushop">
+							<button type="button" class="bt st">강아지</button>
+							<div class="list">
+								<ul class="menu">
+									<li class="active"><a class="bt" href="javascript:;"><b class="t">강아지</b></a></li>
+									<li><a class="bt" href="javascript:;"><b class="t">고양이</b></a></li>
+									<li><a class="bt" href="javascript:;"><b class="t">관상어</b></a></li>
+									<li><a class="bt" href="javascript:;"><b class="t">소동물</b></a></li>
+								</ul>
+							</div>
+						</nav>
+						<!-- -->
+						<!-- mobile -->
+						<button class="mo-header-backNtn">뒤로</button>
+						<div class="mo-heade-tit">타이틀</div>
+						<div class="mo-header-rightBtn">
+							<button class="mo-header-btnType01">
+								<span class="mo-header-icon"></span>
+								시리즈목록
+							</button>
+						</div>
+						<button class="mo-header-close"></button>
+						<!-- // mobile -->
+						<nav class="tmenu">
+							<ul class="list">
+								<li class="active"><a href="javascript:;" class="bt">펫TV</a></li>
+								<li><a href="javascript:;" class="bt">펫로그</a></li>
+								<li><a href="../../_html/shop/Shop_01.html" class="bt">펫샵</a></li>
+								<li><a href="javascript:;" class="bt">MY</a></li>
+							</ul>
+						</nav>
+					</div>
+					<div class="cdt">
+						<div class="schs">
+							<div class="form">
+								<input type="text" class="kwd" placeholder="어바웃펫이 만든 깐깐사료 30% 할인">
+								<button type="button" class="btnSch">검색</button>
+							</div>
+						</div>
+						<div class="menu">
+							<button class="bt alim" type="button">알림</button>
+							<button class="bt cart" type="button">장바구니</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log main" id="contents">
+					<!-- 타이틀 -->
+					<div class="logTitleArea">
+						<h1>
+							#멍스타그램
+						</h1>
+						<div class="btnSet por">
+							<a href="javascript:;" class="btn lg a">팔로우</a>
+						</div>
+					</div>
+					<!-- // 타이틀 -->
+					<!-- content -->
+					<div class="logPicMetric_wrap">
+						<div class="lpmTop">
+							<ul>
+								<li>
+									<div class="resultBbox"> 로그  <span>43개</span></div>
+								</li>
+								<li style="text-align:right;">
+									<nav class="uisort">
+										<button type="button" class="bt st" value="v_1">등록일순</button>
+										<div class="list">
+											<ul class="menu">
+												<li class="active"><button type="button" class="bt" value="v_1">최신순</button></li>
+												<li><button type="button" class="bt" value="v_2">인기순</button></li>
+											</ul>
+										</div>
+									</nav>
+								</li>
+							</ul>
+						</div>
+						<div class="logPicMetric">
+							<ul>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg004.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg005.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg006.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg007.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg008.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i01"></span>
+										<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<span class="logIcon_pic i02"></span>
+										<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg004.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg005.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg006.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg007.jpg" alt="">
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="logPicBox">
+										<img src="../../_images/_temp/temp_logimg008.jpg" alt="">
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!-- // content -->
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+        <include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"","talk_mo":"hide","foot_pc":"","talk_pc":""}'></include>
+	</div>
+</body>
+</html>

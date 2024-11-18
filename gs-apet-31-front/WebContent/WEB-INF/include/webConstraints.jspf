@@ -1,0 +1,15 @@
+<%--	
+ - Class Name	: /include/webConstraints.jspf
+ - Description	: JSP Fragment For prelude
+ - Since		: 2020.12.18
+ - Author		: KKB
+--%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%@ taglib prefix="frame" uri="frame.tag"%>
+<frame:useConstants var="frontConstants" className="front.web.config.constants.FrontWebConstants"/>
+<frame:useConstants var="exceptionConstants" className="framework.common.constants.ExceptionConstants"/>

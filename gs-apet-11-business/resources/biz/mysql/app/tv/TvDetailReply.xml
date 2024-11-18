@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tvDetailReply">
+	<resultMap type="biz.app.tv.model.TvDetailReplyVO" id="tvDetailReplyMap">
+ 		<result property="vdId"					column="VD_ID"/>
+		<result property="aplySeq"				column="APLY_SEQ"/>
+		<result property="mbrNo"				column="MBR_NO"/>
+		<result property="mbrNm"				column="MBR_NM"/>
+		<result property="loginId"				column="LOGIN_ID"/>
+		<result property="nickNm"				column="NICK_NM"/>
+		<result property="aply" 				column="APLY"/>
+		<result property="contsStatCd"			column="CONTS_STAT_CD"/>
+		<result property="sysRegrNo"			column="SYS_REGR_NO"/>
+		<result property="sysRegDtm"			column="SYS_REG_DTM"/>
+		<result property="sysRegDt" 			column="SYS_REG_DT"/>
+		<result property="sysUpdrNo"			column="SYS_UPDR_NO"/>
+		<result property="sysUpdDtm"			column="SYS_UPD_DTM"/>
+		<result property="sysUpdDt" 			column="SYS_UPD_DT"/>
+		<result property="replyGb"  			column="REPLY_GB"/>
+		<result property="srisNm"  				column="SRIS_NM"/>
+		<result property="prflImg"  			column="PRFL_IMG"/>
+
+		<collection property="tvDetailRplList" javaType="java.util.ArrayList" column="{vdId=VD_ID}" ofType="biz.app.tv.model.TvDetailReplyVO">
+			<result property="vdId"					column="VD_ID2"/>
+			<result property="aplySeq"				column="APLY_SEQ2"/>
+			<result property="mbrNo"				column="MBR_NO2"/>
+			<result property="mbrNm"				column="MBR_NM2"/>
+			<result property="loginId"				column="LOGIN_ID2"/>
+			<result property="nickNm"				column="NICK_NM2"/>
+			<result property="rpl" 					column="RPL2"/>
+			<result property="contsStatCd"			column="CONTS_STAT_CD2"/>
+			<result property="rplRegrNo"			column="RPL_REGR_NO2"/>
+			<result property="rplRegDtm"			column="RPL_REG_DTM2"/>
+			<result property="rplRegDt" 			column="RPL_REG_DT2"/>
+			<result property="rplUpdrNo"			column="RPL_UPDR_NO2"/>
+			<result property="rplUpdDtm"			column="RPL_UPD_DTM2"/>
+			<result property="rplUpdDt" 			column="RPL_UPD_DT2"/>
+			<result property="replyGb"  			column="REPLY_GB2"/>
+			<result property="srisNm"  				column="SRIS_NM2"/>
+			<result property="srisPrflImg"  		column="SRIS_PRFL_IMG"/>
+		</collection>
+ 	</resultMap>
+ 	
+ 	<select id="selectTvDetailReplyList" resultMap="tvDetailReplyMap">
+		<!--
+			Query Name : tvDetailReply.selectTvDetailReplyList
+			Description : 펫TV 상세 > 영상 댓글 목록 조회
+		-->
+		/* QUERYID(tvDetailReply.selectTvDetailReplyList) */
+		SELECT *
+		FROM
+		(
+			SELECT
+				ACR.VD_ID /*영상Id*/
+				, ACR.APLY_SEQ /*댓글순번*/
+				, ACR.MBR_NO /*회원번호*/
+				, MB.MBR_NM /*회원명*/
+				, MB.LOGIN_ID /*로그인ID*/
+				, IFNULL(MB.NICK_NM, '어바웃펫 회원') AS NICK_NM /*회원닉네임*/
+				, ACR.APLY /*댓글*/
+				, ACR.CONTS_STAT_CD /*컨텐츠상태코드*/
+				, ACR.SYS_REGR_NO /*시스템 등록자번호*/
+				, ACR.SYS_REG_DTM /*시스템 등록 일시*/
+				, DATE_FORMAT(ACR.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 등록일*/
+				, ACR.SYS_UPDR_NO /*시스템 수정자번호*/
+				, ACR.SYS_UPD_DTM /*시스템 수정 일시*/
+				, DATE_FORMAT(ACR.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /*시스템 수정일*/
+				, 'A' AS REPLY_GB
+				, ACS.SRIS_NM
+				, MB.PRFL_IMG
+			FROM APET_CONTENTS_REPLY ACR
+			INNER JOIN MEMBER_BASE MB ON ACR.MBR_NO = MB.MBR_NO
+			INNER JOIN APET_CONTENTS AC ON ACR.VD_ID = AC.VD_ID
+			INNER JOIN APET_CONTENTS_SERIES ACS ON AC.SRIS_NO = ACS.SRIS_NO
+			WHERE 1 = 1
+				AND ACR.VD_ID = #{vdId}
+				AND ACR.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_10}'
+			<if test="aplySeq != null and aplySeq != ''">
+		    	AND ACR.APLY_SEQ = #{aplySeq}
+			</if>
+				<!--AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' 탈퇴한 회원도 댓글 노출되고 닉네임을 '어바웃펫 회원' 으로 노출되도록 수정(CSR-1138)-->
+		) A
+		LEFT JOIN (
+			SELECT
+				ACR.VD_ID AS VD_ID2 /*영상Id*/
+				, ACR.APLY_SEQ AS APLY_SEQ2 /*댓글순번*/
+				, ACR.MBR_NO AS MBR_NO2 /*회원번호*/
+				, MB.MBR_NM AS MBR_NM2 /*회원명*/
+				, MB.LOGIN_ID AS LOGIN_ID2 /*로그인ID*/
+				, IFNULL(MB.NICK_NM, '어바웃펫 회원') AS NICK_NM2 /*회원닉네임*/
+				, ACR.RPL AS RPL2 /*답변*/
+				, ACR.CONTS_STAT_CD AS CONTS_STAT_CD2 /*컨텐츠상태코드*/
+				, ACR.RPL_REGR_NO AS RPL_REGR_NO2 /*답변 등록자번호*/
+				, ACR.RPL_REG_DTM AS RPL_REG_DTM2 /*답변 등록 일시*/
+				, DATE_FORMAT(ACR.RPL_REG_DTM, '%Y-%m-%d') AS RPL_REG_DT2 /*답변 등록일*/
+				, ACR.RPL_UPDR_NO AS RPL_UPDR_NO2 /*답변 수정자번호*/
+				, ACR.RPL_UPD_DTM AS RPL_UPD_DTM2 /*답변 수정 일시*/
+				, DATE_FORMAT(ACR.RPL_UPD_DTM, '%Y-%m-%d') AS RPL_UPD_DT2 /*답변 수정일*/
+				, 'R' AS REPLY_GB2
+				, ACS.SRIS_NM AS SRIS_NM2
+				, (SELECT PHY_PATH 
+					FROM APET_ATTACH_FILE FILE 
+					WHERE 1 = 1
+						AND FILE.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+					ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG
+			FROM APET_CONTENTS_REPLY ACR
+			INNER JOIN MEMBER_BASE MB ON ACR.MBR_NO = MB.MBR_NO
+			INNER JOIN APET_CONTENTS AC ON ACR.VD_ID = AC.VD_ID
+			INNER JOIN APET_CONTENTS_SERIES ACS ON AC.SRIS_NO = ACS.SRIS_NO
+			WHERE 1 = 1
+				AND ACR.VD_ID = #{vdId}
+				AND ACR.RPL IS NOT NULL
+			<if test="aplySeq != null and aplySeq != ''">
+				AND ACR.APLY_SEQ = #{aplySeq}
+			</if>
+		) R ON A.APLY_SEQ = R.APLY_SEQ2
+		ORDER BY A.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+ 	</select>
+ 	
+ 	<select id="selectTvDetailReplyListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tvDetailReply.selectTvDetailReplyListCount
+			Description : 펫TV 상세 > 영상 댓글 목록 조회 수
+		-->
+		/* QUERYID(tvDetailReply.selectTvDetailReplyList) */
+		SELECT COUNT(*)
+		FROM
+		(
+			SELECT
+				ACR.VD_ID /*영상Id*/
+				, ACR.APLY_SEQ /*댓글순번*/
+				, ACR.MBR_NO /*회원번호*/
+				, MB.MBR_NM /*회원명*/
+				, MB.LOGIN_ID /*로그인ID*/
+				, IFNULL(MB.NICK_NM, '어바웃펫 회원') AS NICK_NM /*회원닉네임*/
+				, ACR.APLY /*댓글*/
+				, ACR.CONTS_STAT_CD /*컨텐츠상태코드*/
+				, ACR.SYS_REGR_NO /*시스템 등록자번호*/
+				, ACR.SYS_REG_DTM /*시스템 등록 일시*/
+				, DATE_FORMAT(ACR.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 등록일*/
+				, ACR.SYS_UPDR_NO /*시스템 수정자번호*/
+				, ACR.SYS_UPD_DTM /*시스템 수정 일시*/
+				, DATE_FORMAT(ACR.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /*시스템 수정일*/
+				, COUNT(*) OVER() AS TOT_CNT
+				, 'A' AS REPLY_GB
+				, ACS.SRIS_NM
+				, MB.PRFL_IMG
+			FROM APET_CONTENTS_REPLY ACR
+			INNER JOIN MEMBER_BASE MB ON ACR.MBR_NO = MB.MBR_NO
+			INNER JOIN APET_CONTENTS AC ON ACR.VD_ID = AC.VD_ID
+			INNER JOIN APET_CONTENTS_SERIES ACS ON AC.SRIS_NO = ACS.SRIS_NO
+			WHERE 1 = 1
+				AND ACR.VD_ID = #{vdId}
+				AND ACR.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_10}'
+			<if test="aplySeq != null and aplySeq != ''">
+				AND ACR.APLY_SEQ = #{aplySeq}
+			</if>
+				<!--AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' 탈퇴한 회원도 댓글 노출되고 닉네임을 '어바웃펫 회원' 으로 노출되도록 수정(CSR-1138)-->
+		) A
+		LEFT JOIN (
+			SELECT
+				ACR.VD_ID AS VD_ID2 /*영상Id*/
+				, ACR.APLY_SEQ AS APLY_SEQ2 /*댓글순번*/
+				, ACR.MBR_NO AS MBR_NO2 /*회원번호*/
+				, MB.MBR_NM AS MBR_NM2 /*회원명*/
+				, MB.LOGIN_ID AS LOGIN_ID2 /*로그인ID*/
+				, IFNULL(MB.NICK_NM, '어바웃펫 회원') AS NICK_NM2 /*회원닉네임*/
+				, ACR.RPL AS RPL2 /*답변*/
+				, ACR.CONTS_STAT_CD AS CONTS_STAT_CD2 /*컨텐츠상태코드*/
+				, ACR.RPL_REGR_NO AS RPL_REGR_NO2 /*답변 등록자번호*/
+				, ACR.RPL_REG_DTM AS RPL_REG_DTM2 /*답변 등록 일시*/
+				, DATE_FORMAT(ACR.RPL_REG_DTM, '%Y-%m-%d') AS RPL_REG_DT2 /*답변 등록일*/
+				, ACR.RPL_UPDR_NO AS RPL_UPDR_NO2 /*답변 수정자번호*/
+				, ACR.RPL_UPD_DTM AS RPL_UPD_DTM2 /*답변 수정 일시*/
+				, DATE_FORMAT(ACR.RPL_UPD_DTM, '%Y-%m-%d') AS RPL_UPD_DT2 /*답변 수정일*/
+				, COUNT(*) OVER() AS TOT_CNT2
+				, 'R' AS REPLY_GB2
+				, ACS.SRIS_NM AS SRIS_NM2
+				, (SELECT PHY_PATH 
+					FROM APET_ATTACH_FILE FILE 
+					WHERE 1 = 1
+						AND FILE.FL_NO = ACS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'
+					ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG
+			FROM APET_CONTENTS_REPLY ACR
+			INNER JOIN MEMBER_BASE MB ON ACR.MBR_NO = MB.MBR_NO
+			INNER JOIN APET_CONTENTS AC ON ACR.VD_ID = AC.VD_ID
+			INNER JOIN APET_CONTENTS_SERIES ACS ON AC.SRIS_NO = ACS.SRIS_NO
+			WHERE 1 = 1
+				AND ACR.VD_ID = #{vdId}
+				AND ACR.RPL IS NOT NULL
+			<if test="aplySeq != null and aplySeq != ''">
+				AND ACR.APLY_SEQ = #{aplySeq}
+			</if>
+		) R ON A.APLY_SEQ = R.APLY_SEQ2
+ 	</select>
+ 	
+ 	<insert id="insertTvDetailReplyRptp" parameterType="biz.app.tv.model.TvDetailReplyRptpPO">
+ 		<!--
+			Query Name : tvDetailReply.insertTvDetailReplyRptp
+			Description : 펫TV 상세 > 영상 신고 등록
+		-->
+		/* QUERYID(tvDetailReply.insertTvDetailReplyRptp) */
+ 		INSERT INTO APET_CONTENTS_REPLY_RPTP (
+ 			RPTP_NO
+ 			, VD_ID
+ 			, APLY_SEQ
+ 			, MBR_NO
+ 			, RPTP_CONTENT
+ 			, RPTP_RSN_CD
+ 			, SYS_REGR_NO
+ 			, SYS_REG_DTM
+ 			, SYS_UPDR_NO
+ 			, SYS_UPD_DTM
+ 		) VALUES (
+ 			#{rptpNo}
+ 			, #{vdId}
+ 			, #{aplySeq}
+ 			, #{mbrNo}
+ 			, #{rptpContent}
+ 			, #{rptpRsnCd}
+ 			, #{sysRegrNo}
+ 			, NOW()
+ 			, #{sysUpdrNo}
+ 			, NOW()
+ 		)
+ 	</insert>
+ 	
+ 	<insert id="insertTvDetailReply" parameterType="biz.app.tv.model.TvDetailReplyPO">
+		<!--
+			Query Name : tvDetailReply.insertTvDetailReply
+			Description : 펫TV 상세 > 영상 사용자 댓글 등록
+		-->
+		/* QUERYID(tvDetailReply.insertTvDetailReply) */
+		<selectKey keyProperty="aplySeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_APET_CONTENTS_REPLY_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO APET_CONTENTS_REPLY (
+ 			VD_ID
+ 			, APLY_SEQ
+ 			, MBR_NO
+ 			, APLY
+ 			, CONTS_STAT_CD
+ 			, SYS_REGR_NO
+ 			, SYS_REG_DTM
+ 			, SYS_UPDR_NO
+ 			, SYS_UPD_DTM
+		) VALUES (
+ 			#{vdId}
+ 			, #{aplySeq}
+ 			, #{mbrNo}
+ 			, #{aply}
+ 			, #{contsStatCd}
+ 			, #{sysRegrNo}
+ 			, NOW()
+ 			, #{sysUpdrNo}
+ 			, NOW()
+		)
+	</insert>
+	
+	<update id="updateTvDetailReply" parameterType="biz.app.tv.model.TvDetailReplyPO">
+		<!--
+			Query Name : tvDetailReply.updateTvDetailReply
+			Description : 펫TV 상세 > 영상 사용자 댓글 수정
+		-->
+		/* QUERYID(tvDetailReply.updateTvDetailReply) */
+		UPDATE APET_CONTENTS_REPLY SET
+			APLY = #{aply}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+			AND VD_ID = #{vdId}
+			AND MBR_NO = #{mbrNo}
+	</update>
+	
+	<update id="deleteTvDetailReply" parameterType="biz.app.tv.model.TvDetailReplyPO">
+		<!--
+			Query Name : tvDetailReply.deleteTvDetailReply
+			Description : 펫TV 상세 > 영상 사용자 댓글 삭제
+		-->
+		/* QUERYID(tvDetailReply.deleteTvDetailReply) */
+		DELETE FROM APET_CONTENTS_REPLY
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+			AND VD_ID = #{vdId}
+			AND MBR_NO = #{mbrNo}
+	</update>
+	
+	<select id="getTvDetailReplyRptpCnt" resultType="java.lang.Integer">
+		<!--
+			Query Name : tvDetailReply.getTvDetailReplyRptpCnt
+			Description : 펫TV 상세 > 신고된 댓글 신고수 조회
+		-->
+		/* QUERYID(tvDetailReply.getTvDetailReplyRptpCnt) */
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_REPLY_RPTP
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+			AND VD_ID = #{vdId}
+	</select>
+	
+	<update id="updateTvDetailReplyRptpStat" parameterType="biz.app.tv.model.TvDetailReplyRptpPO">
+		<!--
+			Query Name : tvDetailReply.updateTvDetailReplyRptpStat
+			Description : 펫TV 상세 > 신고된 댓글 신고 차단
+		-->
+		/* QUERYID(tvDetailReply.updateTvDetailReplyRptpStat) */
+		UPDATE APET_CONTENTS_REPLY SET
+			CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_30}'
+			, SYS_UPD_DTM = NOW()
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+	</update>
+	
+	<select id="tvDetailReplyRptpDupChk" resultType="java.lang.Integer">
+		<!--
+			Query Name : tvDetailReply.tvDetailReplyRptpDupChk
+			Description : 펫TV 상세 > 댓글 신고 중복 체크
+		-->
+		/* QUERYID(tvDetailReply.tvDetailReplyRptpDupChk) */
+		SELECT COUNT(*)
+		FROM APET_CONTENTS_REPLY_RPTP
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+			AND VD_ID = #{vdId}
+			AND MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="getReplyRptpMbrNo" resultType="java.lang.Long">
+		<!--
+			Query Name : tvDetailReply.getReplyRptpMbrNo
+			Description : 펫TV 상세 > 신고된 댓글의 작성자 회원 번호 조회
+		-->
+		/* QUERYID(tvDetailReply.getReplyRptpMbrNo) */
+		SELECT MBR_NO
+		FROM APET_CONTENTS_REPLY
+		WHERE 1 = 1
+			AND APLY_SEQ = #{aplySeq}
+			AND VD_ID = #{vdId}
+	</select>
+	
+	<select id="selectTvDetailReplyMentionMbrList" resultType="biz.app.tv.model.TvDetailReplyMentionMbrVO">
+ 		<!--
+			Query Name : tvDetailReply.selectTvDetailReplyMentionMbrList
+			Description : 펫TV 영상상세 > 댓글 멘션 회원정보 조회
+		-->
+		/* QUERYID(tvDetailReply.selectTvDetailReplyMentionMbrList) */
+		SELECT
+			A.SRL_NO /*순번*/
+			, A.VD_ID /*영상ID*/
+			, A.APLY_NO /*댓글순번*/
+			, A.METN_SEQ /*멘션순번*/
+			, A.METN_TG_MBR_NO /*대상 회원번호(멘션당한 회원)*/
+			, A.METN_MBR_NO /*회원번호(로그인한 회원)*/
+			, A.SYS_REGR_NO /*시스템 등록자*/
+			, A.SYS_REG_DTM /*시스템 등록 일시*/
+			, A.SYS_UPDR_NO /*시스템 수정자*/
+			, A.SYS_UPD_DTM /*시스템 수정 일시*/
+			, IFNULL(B.NICK_NM, '어바웃펫회원') AS NICK_NM /*대상 회원닉네임*/
+			, B.MBR_STAT_CD /*대상 회원상태코드*/
+		  FROM TB_APET_RPL_METN A
+		  	INNER JOIN MEMBER_BASE B
+		  		ON A.METN_TG_MBR_NO = B.MBR_NO
+		 WHERE A.VD_ID = #{vdId}
+		   AND A.APLY_NO = #{aplyNo}
+		   AND A.METN_MBR_NO = #{metnMbrNo}
+ 	</select>
+	
+	<insert id="insertTvDetailReplyMentionMbr" parameterType="biz.app.tv.model.TvDetailReplyMentionMbrPO" >
+		<!--
+			Query Name : tvDetailReply.insertTvDetailReplyMentionMbr
+			Description : 펫TV 영상상세 > 댓글 멘션 회원정보 저장
+		-->
+		/* QUERYID(tvDetailReply.insertTvDetailReplyMentionMbr) */
+		INSERT INTO TB_APET_RPL_METN
+		(
+			VD_ID
+			, APLY_NO
+			, METN_SEQ
+			, METN_TG_MBR_NO
+			, METN_MBR_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)
+		VALUES
+		(
+			#{vdId}
+			, #{aplyNo}
+			, #{metnSeq}
+			, #{metnTgMbrNo}
+			, #{metnMbrNo}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+ 	</insert>
+ 	
+ 	<delete id="deleteTvDetailReplyMentionMbr" parameterType="biz.app.tv.model.TvDetailReplyPO">
+ 		<!--
+			Query Name : tvDetailReply.deleteTvDetailReplyMentionMbr
+			Description : 펫TV 영상상세 > 댓글 멘션 회원정보 삭제
+		-->
+		/* QUERYID(tvDetailReply.deleteTvDetailReplyMentionMbr) */
+		DELETE FROM TB_APET_RPL_METN
+		 WHERE VD_ID = #{vdId}
+		   AND APLY_NO = #{aplySeq}
+		   AND METN_MBR_NO = #{mbrNo}
+ 	</delete>
+ 	
+</mapper>

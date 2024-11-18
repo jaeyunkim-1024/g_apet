@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mobileapp">
+
+	<select id="pageMobileVersion" resultType="biz.app.mobileapp.model.MobileVersionVO">
+		<!--
+			Query Name : mobileapp.pageMobileVersion
+			Description : APP 버전관리 페이지 목록
+		-->
+		SELECT	/* QUERYID(mobileapp.pageMobileVersion) */
+			VER_NO					/* 앱 버전 번호 */
+			, MOBILE_OS				/* 모바일 OS */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@MOBILE_OS_GB}' AND DTL_CD = MOBILE_OS) AS MOBILE_OS_NM /*모바일 OS명*/
+			, APP_VER				/* 앱 버전 */
+			, MESSAGE				/* 업데이트 공지 내용 */
+			, REQUIRED_YN			/* 필수 업데이트 여부 */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@APP_UPDATE_YN}' AND DTL_CD = REQUIRED_YN) AS REQUIRED_YN_NM /*필수 업데이트명*/
+			, UPDATE_URL			/* 업데이트 URL */
+			, MARKET_REG_DTM		/* 마켓 등록일시 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, DATE_FORMAT(SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /* 등록일 */
+			, DATE_FORMAT(SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /* 수정일 */
+		  FROM
+			MOBILE_VERSION
+		 WHERE 1 = 1
+       	<if test="arrMobileOs != null and arrMobileOs.length > 0">
+		   AND	MOBILE_OS IN (
+					    <foreach collection="arrMobileOs" item="mobileOs" separator="," >
+					    #{mobileOs}
+					    </foreach>
+					    )
+		</if>
+       	<if test="verUpStrtDtm != null">
+		   AND DATE_FORMAT(MARKET_REG_DTM, '%Y-%m-%d') <![CDATA[>=]]> DATE_FORMAT(#{verUpStrtDtm}, '%Y-%m-%d')
+		</if>
+		<if test="verUpEndDtm != null">
+		   AND DATE_FORMAT(MARKET_REG_DTM, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{verUpEndDtm}, '%Y-%m-%d')
+		</if>
+        <include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageMobileVersionCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : mobileapp.pageMobileVersionCount
+			Description : APP 버전관리 페이지 목록 카운트
+		-->
+		SELECT	/* QUERYID(mobileapp.pageMobileVersionCount) */
+			COUNT(*)
+		  FROM
+			MOBILE_VERSION
+		 WHERE 1 = 1
+		<if test="arrMobileOs != null and arrMobileOs.length > 0">
+		   AND MOBILE_OS IN (
+					    <foreach collection="arrMobileOs" item="mobileOs" separator="," >
+					    #{mobileOs}
+					    </foreach>
+					    )
+		</if>
+       	<if test="verUpStrtDtm != null">
+		   AND DATE_FORMAT(MARKET_REG_DTM, '%Y-%m-%d') <![CDATA[>=]]> DATE_FORMAT(#{verUpStrtDtm}, '%Y-%m-%d')
+		</if>
+		<if test="verUpEndDtm != null">
+		   AND DATE_FORMAT(MARKET_REG_DTM, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{verUpEndDtm}, '%Y-%m-%d')
+		</if>
+	</select>
+	
+	<select id="getMobileVersion" resultType="biz.app.mobileapp.model.MobileVersionVO">
+		<!--
+			Query Name : mobileapp.getMobileVersion
+			Description : APP 버전관리 정보 조회
+		-->
+		SELECT	/* QUERYID(mobileapp.getMobileVersion) */
+			MV.VER_NO					/* 앱 버전 번호 */
+			, MV.MOBILE_OS				/* 기기 OS */
+			, MV.APP_VER				/* 앱 버전 */
+			, MV.MESSAGE				/* 업데이트 공지 내용 */
+			, MV.REQUIRED_YN			/* 필수 업데이트 여부 */
+			, MV.UPDATE_URL			/* 업데이트 URL */
+			, MV.MARKET_REG_DTM		/* 마켓 등록일시 */
+			, MV.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, MV.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, MV.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, MV.SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(MV.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(MV.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, FN_GET_USER_ID(MV.SYS_REGR_NO) AS SYS_REGR_ID /* 등록자ID */
+			, FN_GET_USER_ID(MV.SYS_UPDR_NO) AS SYS_UPDR_ID /* 수정자ID */
+			, CASE WHEN MV.APP_VER = (SELECT APP_VER FROM MOBILE_VERSION WHERE MOBILE_OS = MV.MOBILE_OS ORDER BY APP_VER DESC LIMIT 1) THEN 'Y' ELSE 'N' END AS NOW_VER_YN /* 최신버전여부 */
+		  FROM MOBILE_VERSION MV
+		 WHERE 1 = 1
+           AND MV.VER_NO = #{verNo}
+	</select>
+	
+	<select id="checkMobileVersion" resultType="java.lang.Integer">
+		<!--
+			Query Name : mobileapp.checkMobileVersion
+			Description : APP 버전관리 앱 버전 존재여부 체크
+		-->
+		SELECT	/* QUERYID(mobileapp.checkMobileVersion) */
+			 COUNT(*)
+		  FROM MOBILE_VERSION
+		 WHERE 1 = 1
+		<if test="verNo != null and verNo != ''">
+           AND VER_NO <![CDATA[<>]]> #{verNo}
+       	</if>
+       	<if test="(mobileOs != null and mobileOs != '') and (appVer != null and appVer != '')">
+           AND MOBILE_OS = #{mobileOs}
+           AND app_ver = #{appVer}
+       	</if>
+	</select>
+
+	<insert id="insertMobileVersion" parameterType="biz.app.mobileapp.model.MobileVersionPO">
+		<!--
+			Query Name : mobileapp.insertMobileVersion
+			Description : APP 버전관리 등록
+		-->
+		<selectKey keyProperty="verNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MOBILE_VERSION_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO MOBILE_VERSION (	/* QUERYID(mobileapp.insertMobileVersion) */
+			VER_NO
+			,MOBILE_OS				/* 기기 OS */
+			,APP_VER				/* 앱 버전 */
+			,MESSAGE				/* 업데이트 공지 내용 */
+			,REQUIRED_YN			/* 필수 업데이트 여부 */
+			,UPDATE_URL				/* 업데이트 URL */
+			,MARKET_REG_DTM			/* 마켓 등록일시 */
+			,SYS_REGR_NO			/* 시스템 등록자 번호 */
+			,SYS_REG_DTM			/* 시스템 등록 일시 */
+			,SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{verNo}
+			,#{mobileOs} 
+			,#{appVer} 
+			,#{message} 
+			,#{requiredYn} 
+			,#{updateUrl} 
+			,#{marketRegDtm} 
+			,#{sysRegrNo}
+			,NOW()	
+			,#{sysUpdrNo}
+			,NOW()
+		)
+	</insert>
+
+	<update id="updateMobileVersion" parameterType="biz.app.mobileapp.model.MobileVersionPO">
+		<!--
+			Query Name : mobileapp.updateMobileVersion
+			Description : APP 버전관리 수정
+		-->
+		UPDATE MOBILE_VERSION	/* QUERYID(mobileapp.updateMobileVersion) */
+		SET MOBILE_OS = #{mobileOs}						/* 기기 OS */
+			, APP_VER = #{appVer}						/* 앱 버전 */
+			, MESSAGE = #{message}						/* 업데이트 공지 내용 */
+			, REQUIRED_YN = #{requiredYn}				/* 필수 업데이트 여부 */
+			, UPDATE_URL = #{updateUrl}					/* 업데이트 URL */
+			, MARKET_REG_DTM = #{marketRegDtm}			/* 마켓 등록일시 */
+			, SYS_UPDR_NO = #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()						/* 시스템 수정 일시 */
+		WHERE VER_NO = #{verNo}
+	</update>
+
+	<delete id="deleteMobileVersion" parameterType="biz.app.mobileapp.model.MobileVersionPO">
+		<!--
+			Query Name : mobileapp.deleteMobileVersion
+			Description : APP 버전관리 삭제
+		-->
+		DELETE FROM MOBILE_VERSION /* QUERYID(mobileapp.deleteMobileVersion) */
+		 WHERE VER_NO IN (${verNos})
+	</delete>
+	
+	<select id="listAppVersion" resultType="biz.app.mobileapp.model.MobileVersionVO">
+		<!--
+			Query Name : mobileapp.listAppVersion
+			Description : APP 버전관리 정보 목록
+		-->
+		SELECT	/* QUERYID(mobileapp.listAppVersion) */
+			DISTINCT(APP_VER)		/* 앱 버전 */
+		  FROM MOBILE_VERSION
+		 WHERE 1 = 1
+		<if test="appId != null and appId != ''">
+           AND APP_ID = #{appId}
+       	</if>
+       	ORDER BY APP_VER
+	</select>
+	
+	<update id="updateBeforeVersionMarketRegDtmToday" parameterType="biz.app.mobileapp.model.MobileVersionPO">
+		<!--
+			Query Name : mobileapp.updateBeforeVersionMarketRegDtmToday
+			Description : APP 버전관리 등록 시 이전버전 중 업데이트 일시가 오늘보다 큰것들 현재 날짜로 업데이트
+		-->
+		UPDATE MOBILE_VERSION	/* QUERYID(mobileapp.updateBeforeVersionMarketRegDtmToday) */
+		SET MARKET_REG_DTM	= NOW()			/* 마켓 등록일시 */
+		WHERE MOBILE_OS = #{mobileOs}
+		  AND APP_VER <![CDATA[ < ]]> #{appVer}
+		  AND #{marketRegDtm} <![CDATA[ < ]]> MARKET_REG_DTM
+	</update>
+	
+	<select id="selectNewMobileVersionInfo" resultType="biz.app.mobileapp.model.MobileVersionAppVO">
+		<!--
+			Query Name : mobileapp.selectNewMobileVersionInfo
+			Description : APP 최신버전 정보 조회
+		-->
+		SELECT	/* QUERYID(mobileapp.selectNewMobileVersionInfo) */
+			VER_NO					/* 앱 버전 번호 */
+			, MOBILE_OS				/* 기기 OS */
+			, APP_VER				/* 앱 버전 */
+			, MESSAGE				/* 업데이트 공지 내용 */
+			, REQUIRED_YN			/* 필수 업데이트 여부 */
+			, UPDATE_URL			/* 업데이트 URL */
+			, DATE_FORMAT(MARKET_REG_DTM, '%Y-%m-%d %H:%i')	AS MARKET_REG_DTM	/* 마켓 등록일시 */
+		  FROM MOBILE_VERSION
+		 WHERE MOBILE_OS = #{mobileOs}
+		ORDER BY APP_VER DESC
+		LIMIT 1
+	</select>
+
+</mapper>

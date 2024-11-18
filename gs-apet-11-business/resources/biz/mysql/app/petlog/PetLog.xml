@@ -1,0 +1,2285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	업체 공지
+	작성자  	kwj
+	작성일자  	2016.03.07
+-->
+
+<mapper namespace="petLog">	
+
+	<select id="pagePetLogBase" parameterType="biz.app.petlog.model.PetLogListSO" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name	: petLog.pagePetLogBase
+			Description	: 펫로그 목록 조회
+		-->
+		SELECT 	/* QUERYID(petLog.pagePetLogBase) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT											/* 펫로그 내용 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호 */
+			, T1.SRT_PATH									/* 단축 경로 */
+			, T1.PET_LOG_CHNL_CD
+			, T1.PST_NM										/* 위치명 */
+			, IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */
+			, CONCAT(
+				 IF( T1.IMG_PATH1 IS NULL, '',  T1.IMG_PATH1 ) 
+				,IF( T1.IMG_PATH2 IS NULL, '',  CONCAT('|', T1.IMG_PATH2) ) 
+				,IF( T1.IMG_PATH3 IS NULL, '',  CONCAT('|', T1.IMG_PATH3) ) 
+				,IF( T1.IMG_PATH4 IS NULL, '',  CONCAT('|', T1.IMG_PATH4) ) 
+				,IF( T1.IMG_PATH5 IS NULL, '',  CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL							
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, T1.VD_PATH 									/* 펫로그 영상id */		
+			, T1.VD_THUM_PATH 								/* 펫로그 영상썸네일 경로 */
+			, T1.PET_LOG_CHNL_CD				
+			, T3.NICK_NM 									/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL								/* 펫로그 등록자 펫로그 URL */
+			, T3.PET_LOG_SRT_URL 							/* 펫로그 short URL */
+			, T3.LOGIN_ID 									/* 펫로그 등록자 로그인id */
+			, IFNULL(T1.HITS, 0) AS HITS						/* 펫로그 조회수 */
+			, T1.CONTS_STAT_CD									/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN					/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}') AS BOOKMARK_CNT /* 펫로그 찜 갯수 */			
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO 
+			   AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}') AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+			/* , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	펫로그 연관상품여부 */
+		<if test="loginMbrNo != null and loginMbrNo != 0">
+			, (SELECT IF( COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL AND MBR_NO = #{loginMbrNo}) AS RPTP_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+		</if>		
+			, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */	
+			, T1.POST_NO_NEW			/* 우편번호 */ 
+			, T1.PRCL_ADDR 				/* 지번주소 */
+			, T1.ROAD_ADDR 				/* 도로명주소 */
+			, T1.LOG_LITD 				/* 위도 */
+			, T1.LOG_LTTD 				/* 경도 */
+			, T1.ENC_CPLT_YN			/* 인코딩 여부 */				
+		FROM
+			PET_LOG_BASE T1		
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)		
+		WHERE 1=1
+		<if test="snctYn != null and snctYn != ''">		
+		 AND IFNULL(SNCT_YN, 'N') = #{snctYn }	
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+		  AND T1.MBR_NO = #{mbrNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != 0">
+		  AND T1.PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test ='pageType != null and pageType != "" and pageType == "M"'>
+		  AND (T1.ENC_CPLT_YN = "Y" OR T1.VD_PATH IS NULL)
+		</if>
+		AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY T1.SYS_REG_DTM DESC	
+	<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pagePetLogBaseCount" parameterType="biz.app.petlog.model.PetLogBaseSO" resultType="java.lang.Integer">
+		<!--
+			Query Name	: petLog.pagePetLogBaseCount
+			Description	: 펫로그 목록 count
+		-->
+		SELECT COUNT(*)
+		FROM /* QUERYID(petLog.pagePetLogBaseCount) */
+			PET_LOG_BASE T1		
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)	
+		WHERE 1=1
+		<if test="snctYn != null and snctYn != ''">		
+		 AND IFNULL(SNCT_YN, 'N') = #{snctYn }	
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+		  AND T1.MBR_NO = #{mbrNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != 0">
+		  AND T1.PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test ='pageType != null and pageType != "" and pageType == "M"'>
+		  AND (T1.ENC_CPLT_YN = "Y" OR T1.VD_PATH IS NULL)
+		</if>
+		AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>
+	
+	<select id="getPetLogBaseSeq" resultType="java.lang.Long">
+		SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_LOG_BASE_SEQ}') AS PET_LOG_NO
+		FROM DUAL
+	</select>
+	
+	
+	
+	<insert id="insertPetLogBase" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.insertPetLogBase
+			Description : insertPetLogBase
+		-->	
+		INSERT INTO PET_LOG_BASE (
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, DSCRT				/* 설명  */
+			, MBR_NO			/* 회원번호 */
+			, LOG_LITD			/* 경도 */
+			, LOG_LTTD			/* 위도 */
+			, PST_NM			/* 위치 명 */
+			, PRCL_ADDR			/* 지번주소 */
+			, ROAD_ADDR			/* 도로주소 */
+			, POST_NO_NEW		/* 신 우편번호 */
+			, PST_AGR_YN		/* 위치동의 여부 */
+			, IMG_PATH1			/* 이미지 경로 */
+			, IMG_PATH2			/* 이미지 경로 */
+			, IMG_PATH3			/* 이미지 경로 */
+			, IMG_PATH4			/* 이미지 경로 */
+			, IMG_PATH5			/* 이미지 경로 */
+			, VD_PATH			/* 영상경로 */
+			, VD_THUM_PATH		/* 영상썸네일 경로 */
+			, SRT_PATH			/* 단축경로 */
+			, HITS				/* 조회수 */
+			, CONTS_STAT_CD		/* 컨텐츠 상태코드 */
+			, RVW_YN			/* 후기 여부 */
+			, GOODS_RCOM_YN		/* 연관상품 추천 여부*/
+			, PET_LOG_CHNL_CD	/* 펫로그 채널 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{petLogNo}		
+			, #{dscrt}			
+			, #{mbrNo}		
+			, #{logLitd}		
+			, #{logLttd}	
+			, #{pstNm}		
+			, #{prclAddr}			
+			, #{roadAddr}			
+			, #{postNoNew}	
+			, #{pstAgrYn}		
+			, #{imgPath1}			
+			, #{imgPath2}			
+			, #{imgPath3}			
+			, #{imgPath4}			
+			, #{imgPath5}			
+			, #{vdPath}	
+			, #{vdThumPath}		
+			, #{srtPath}			
+			, 0			
+			, #{contsStatCd}			
+			, #{rvwYn}	
+			, #{goodsRcomYn}	
+			, #{petLogChnlCd}	
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	
+	<update id="updatePetLogBase" parameterType="biz.app.petlog.model.PetLogBasePO">
+		UPDATE	PET_LOG_BASE SET
+				 SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		<if test="(dscrt != null and dscrt != '') or dscrt != orginDscrt">
+				, DSCRT			= #{dscrt}				/* 설명 */
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">				  
+				, CONTS_STAT_CD	= #{contsStatCd}		/* 컨텐츠 상태 코드 */
+		</if>
+		<if test="vdPath != null and vdPath != ''">				  
+				, VD_PATH		= #{vdPath}				/* 영상경로 */
+		</if>
+		<if test="vdThumPath != null and vdThumPath != ''">				  
+				, VD_THUM_PATH	= #{vdThumPath}			/* 영상경로 */
+		</if>		
+		<if test="goodsRcomYn != null and goodsRcomYn != ''">				  
+				, GOODS_RCOM_YN	= #{goodsRcomYn}		/* 연관상품추천 여부 */
+		</if>
+		<if test="imgPath1 != null and imgPath1 != ''">				  		
+				, IMG_PATH1		= #{imgPath1}			/* 이미지 경로1 */
+				, IMG_PATH2		= #{imgPath2}			/* 이미지 경로2 */
+				, IMG_PATH3		= #{imgPath3}			/* 이미지 경로3 */
+				, IMG_PATH4		= #{imgPath4}			/* 이미지 경로4 */
+				, IMG_PATH5		= #{imgPath5}			/* 이미지 경로5 */
+		</if>
+				, LOG_LITD		= #{logLitd}			/* 경도 */
+				, LOG_LTTD		= #{logLttd}			/* 위도 */ 
+				, PRCL_ADDR		= #{prclAddr}			/* 지번주소 */
+				, ROAD_ADDR		= #{roadAddr}			/* 도로주소 */
+				, PST_NM		= #{pstNm}				/* 위치명 */
+		WHERE	1 = 1
+		AND		PET_LOG_NO			= #{petLogNo}
+		<if test="updateGb != null and updateGb != ''">						
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_NO = #{petLogNo} AND PET_LOG_APLY_SEQ IS NULL ) >= 5
+		</if>
+	</update>
+	
+	<update id="updatePetLogSrtPathHits" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.updatePetLogSrtPathHits
+			Description : 펫로그 단축경로, 조회 수 전용 update
+		-->	
+		UPDATE	PET_LOG_BASE SET
+				 SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		<if test="srtPath != null and srtPath != ''">				  
+				, SRT_PATH			= #{srtPath}		/* 단축 경로 */
+		</if>
+		<if test="hits != null and hits != 0">		
+				, HITS			= IFNULL(HITS, 0)+1				/* 조회수 */
+		</if>
+		WHERE	1 = 1
+		AND		PET_LOG_NO			= #{petLogNo}
+		<if test="updateGb != null and updateGb != ''">						
+			AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_NO = #{petLogNo} AND PET_LOG_APLY_SEQ IS NULL ) >= 5
+		</if>
+	</update>		
+	
+	<delete id="deletePetLogBase" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.deletePetLogBase
+			Description : deletePetLogBase
+		-->
+		DELETE
+		FROM	PET_LOG_BASE
+		WHERE	1=1
+		AND		PET_LOG_NO			= #{petLogNo}
+	</delete>
+	
+	
+	<insert id="insertPetLogBaseDelete" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.insertPetLogBaseDelete
+			Description : insertPetLogBaseDelete
+		-->	
+		INSERT INTO PET_LOG_BASE_DELETE (
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, NOW()				
+		)
+	</insert>
+	
+
+	<insert id="insertPetLogTagMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.insertPetLogTagMap
+			Description : insertPetLogTagMap
+		-->	
+		INSERT INTO PET_LOG_TAG_MAP (
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, #{tagNo}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+	
+	<delete id="deletePetLogTagMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.deletePetLogTagMap
+			Description : deletePetLogTagMap
+		-->
+		DELETE
+		FROM	PET_LOG_TAG_MAP
+		WHERE	1=1
+		AND PET_LOG_NO			= #{petLogNo}
+	</delete>		
+	
+	<insert id="insertPetLogRptp" parameterType="biz.app.petlog.model.PetLogRptpPO">
+		<!--
+			Query Name : petLog.insertPetLogRptp
+			Description : insertPetLogRptp
+		-->	
+		<selectKey keyProperty="petLogRptpNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_LOG_RPTP_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO  PET_LOG_RPTP(
+			PET_LOG_RPTP_NO		/* 펫로그 신고 번호 */
+			, PET_LOG_NO		/* 펫로그 번호 */
+<if test="petLogAplySeq != null and petLogAplySeq != ''">			
+			, PET_LOG_APLY_SEQ	/* 펫로그 댓글 순번 */
+</if>
+			, RPTP_CONTENT		/* 신고 내용 */
+			, MBR_NO
+			, RPTP_RSN_CD		/* 신고 사유코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogRptpNo}			
+			, #{petLogNo}
+<if test="petLogAplySeq != null and petLogAplySeq != ''">						
+			, #{petLogAplySeq}	
+</if>
+			, #{rptpContent}
+			, #{mbrNo}
+			, #{rptpRsnCd}
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>	
+	
+	<delete id="deletePetLogRptp" parameterType="biz.app.petlog.model.PetLogRptpPO">
+		<!--
+			Query Name : petLog.deletePetLogRptp
+			Description : deletePetLogRptp
+		-->
+		DELETE
+		FROM	PET_LOG_RPTP
+		WHERE	1=1
+		AND PET_LOG_RPTP_NO			= #{petLogRptpNo}
+	</delete>
+	
+	<select id="listPetLogReply" parameterType="biz.app.petlog.model.PetLogListSO" resultType="biz.app.petlog.model.PetLogReplyVO">
+		<!--
+			Query Name	: petLog.listPetLogReply
+			Description	: 펫로그 댓글 조회
+		-->
+		SELECT 	/* QUERYID(petLog.listPetLogReply) */
+			  T1.PET_LOG_APLY_SEQ
+			, T1.PET_LOG_NO 
+			, T1.MBR_NO
+			, T1.APLY
+			, T1.CONTS_STAT_CD
+			, T1.SYS_REGR_NO
+			, T1.SYS_REG_DTM
+			, T1.SYS_UPDR_NO
+			, T1.SYS_UPD_DTM
+			, IFNULL(T3.NICK_NM , '어바웃펫 회원') AS NICK_NM
+			, T3.PRFL_IMG
+			, T3.PET_LOG_URL
+			, T3.MBR_STAT_CD
+		<if test="mbrNo != null and mbrNo != 0">
+			, (SELECT IF( COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ = T1.PET_LOG_APLY_SEQ AND MBR_NO = #{mbrNo}) AS RPTP_YN
+		</if>
+		FROM PET_LOG_REPLY	T1	
+		INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)	
+		WHERE 1=1
+		AND T1.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}'
+		<if test="petLogNo != null and petLogNo != 0">
+		  AND T1.PET_LOG_NO = #{petLogNo}
+		</if>
+		ORDER BY T1.PET_LOG_APLY_SEQ DESC	
+	</select>
+
+
+	<insert id="insertPetLogReply" parameterType="biz.app.petlog.model.PetLogReplyPO">
+		<!--
+			Query Name : petLog.insertPetLogReply
+			Description : insertPetLogReply
+		-->	
+		<selectKey resultType="Long" keyProperty="petLogAplySeq" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO  PET_LOG_REPLY(
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, MBR_NO			/* 회원번호 */
+			, APLY				/* 댓글  */
+			, CONTS_STAT_CD		/* 컨텐츠 상태코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, #{mbrNo}	
+			, #{aply}
+			, #{contsStatCd}
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+	
+	<update id="updatePetLogReply" parameterType="biz.app.petlog.model.PetLogReplyPO">
+		UPDATE	PET_LOG_REPLY SET
+				 SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+		<if test="aply != null and aply != ''">		
+				, APLY		= #{aply}					/* 댓글 */
+		</if>
+		<if test="contsStatCd != null and contsStatCd != ''">				  
+				, CONTS_STAT_CD		= #{contsStatCd}	/* 컨텐츠 상태 코드 */
+		</if>		
+		WHERE	1 = 1
+		AND		PET_LOG_APLY_SEQ			= #{petLogAplySeq}
+		<if test ="updateGb != null and updateGb != ''">
+		AND (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ = #{petLogAplySeq} ) >= 5   
+		</if>
+	</update>	
+		
+	
+	<delete id="deletePetLogReply" parameterType="biz.app.petlog.model.PetLogReplyPO">
+		<!--
+			Query Name : petLog.deletePetLogReply
+			Description : deletePetLogReply
+		-->
+		DELETE
+		FROM	PET_LOG_REPLY
+		WHERE	1=1
+		AND PET_LOG_APLY_SEQ			= #{petLogAplySeq}
+	</delete>		
+	
+	<insert id="insertPetLogShare" parameterType="biz.app.petlog.model.PetLogSharePO">
+		<!--
+			Query Name : petLog.insertPetLogShare
+			Description : insertPetLogShare
+		-->	
+		<selectKey keyProperty="petLogShrNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_LOG_SHARE_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO  PET_LOG_SHARE(
+			PET_LOG_SHR_NO		/* 펫로그 공유 순번 */
+			, PET_LOG_NO		/* 공유 펫로그 번호 */
+			, MBR_NO			/* 회원번호 */
+			, SHR_PET_LOG_URL	/* 공유 펫로그 URL */
+			, SHR_CHNL_CD		/* 공유채널코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogShrNo}			
+			, #{petLogNo}			
+			, #{mbrNo}	 
+			, #{shrPetLogUrl}
+			, #{shrChnlCd}
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>	
+	
+	<delete id="deletePetLogShare" parameterType="biz.app.petlog.model.PetLogSharePO">
+		<!--
+			Query Name : petLog.deletePetLogShare
+			Description : deletePetLogShare
+		-->
+		DELETE
+		FROM	PET_LOG_SHARE
+		WHERE	1=1
+		AND PET_LOG_SHR_NO			= #{petLogShrNo}
+	</delete>
+	
+	<insert id="insertPetLogInterest" parameterType="biz.app.petlog.model.PetLogInterestPO">
+		<!--
+			Query Name : petLog.insertPetLogInterest
+			Description : insertPetLogInterest
+		-->	
+		INSERT INTO  PET_LOG_INTEREST(
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, MBR_NO			/* 회원번호 */
+			, INTS_GB_CD		/* 관심구분코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, #{mbrNo}	
+			, #{intsGbCd}
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>	
+	
+	<delete id="deletePetLogInterest" parameterType="biz.app.petlog.model.PetLogInterestPO">
+		<!--
+			Query Name : petLog.deletePetLogInterest
+			Description : deletePetLogInterest
+		-->
+		DELETE
+		FROM	PET_LOG_INTEREST
+		WHERE	1=1
+		<if test="intsPetLogNo != null and intsPetLogNo != 0">			
+		  AND INTS_PET_LOG_NO			= #{intsPetLogNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != 0">	 
+		  AND PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">	 
+		  AND MBR_NO = #{mbrNo}
+		</if>
+		<if test="intsGbCd != null and intsGbCd != ''">	 
+		  AND INTS_GB_CD = #{intsGbCd}
+		</if>		
+	</delete>
+
+	<insert id="insertPetLogGoodsReviewMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.insertPetLogGoodsReviewMap
+			Description : insertPetLogGoodsReviewMap
+		-->	
+		INSERT INTO PET_LOG_GOODS_REVIEW_MAP (
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, GOODS_ESTM_NO		/* 상품평 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, #{goodsEstmNo}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+
+	<delete id="deletePetLogGoodsReviewMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.deletePetLogGoodsReviewMap
+			Description : deletePetLogGoodsReviewMap
+		-->
+		DELETE
+		FROM	PET_LOG_GOODS_REVIEW_MAP
+		WHERE	1=1
+		AND PET_LOG_NO			= #{petLogNo}
+	</delete>
+	
+	<insert id="insertPetLogRltMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.insertPetLogRltMap
+			Description : insertPetLogRltMap
+		-->	
+		INSERT INTO PET_LOG_RLT_MAP (
+			  PET_LOG_NO		/* 펫로그 번호 */
+			, RLT_ID			/* 연관 아이디 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{petLogNo}			
+			, #{rltId}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+
+	<delete id="deletePetLogRltMap" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.deletePetLogRltMap
+			Description : deletePetLogRltMap
+		-->
+		DELETE
+		FROM	PET_LOG_RLT_MAP
+		WHERE	1=1
+		AND PET_LOG_NO	= #{petLogNo}
+		AND RLT_ID		= #{rltId}	
+	</delete>
+
+
+	<insert id="insertPetLogMentionMember" parameterType="biz.app.petlog.model.PetLogMentionMemberPO">
+		<!--
+			Query Name : petLog.insertPetLogMentionMember
+			Description : insertPetLogMentionMember
+		-->	
+		<selectKey keyProperty="mntNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_LOG_MENTION_MEMBER_SEQ}') FROM DUAL
+		</selectKey>		
+		INSERT INTO PET_LOG_MENTION_MEMBER (
+			  MNT_NO			/* 언급 번호 */
+			, PET_LOG_NO		/* 펫로그 번호 */
+			, MNT_MBR_NO		/* 언급 회원 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{mntNo}			
+			, #{petLogNo}			
+			, #{mntMbrNo}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+
+	<delete id="deletePetLogMentionMember" parameterType="biz.app.petlog.model.PetLogMentionMemberPO">
+		<!--
+			Query Name : petLog.deletePetLogGoodsReviewMap
+			Description : deletePetLogGoodsReviewMap
+		-->
+		DELETE
+		FROM	PET_LOG_MENTION_MEMBER
+		WHERE	1=1
+		<if test="mntNo != null and mntNo != 0">
+		AND MNT_NO = #{mntNo}
+		</if>
+		<if test="petLogNo != null and petLogNo != 0">
+		AND PET_LOG_NO = #{petLogNo}
+		</if>
+	</delete>
+	
+	
+	
+	
+	<select id="getMbrBaseInfo" parameterType="biz.app.petlog.model.PetLogMemberSO" resultType="biz.app.petlog.model.PetLogMemberVO">
+		<!--
+			Query Name : petLog.getMbrBaseInfo
+			Description : 회원정보 조회
+		-->
+		SELECT /* QUERYID(petLog.getMbrBaseInfo) */
+			  MBR_NO
+			  , NICK_NM				/* 닉네임 */
+			  , PET_LOG_URL			/* 펫로그 URL */
+			  , PRFL_IMG			/* 프로필 이미지 */
+			  , PET_LOG_ITRDC		/* 펫로그 소개 */
+			  , PET_LOG_SRT_URL 	/* 펫로그 short URL */
+			  , MBR_STAT_CD
+			  , IFNULL(PST_INFO_AGR_YN, 'N') AS PST_INFO_AGR_YN		/* 위치정보 동의 여부 */
+		 <if test="mbrNo != null and mbrNo != 0">	
+		 	<choose>
+		 		<when test='searchType == "include"'>
+			  , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_BASE PL WHERE PL.MBR_NO = T1.MBR_NO) AS PET_REG_YN
+				</when>		 			 		
+				<when test='searchType == "myPetLog"'>
+			  , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_BASE PL WHERE PL.MBR_NO = T1.MBR_NO) AS PET_REG_YN
+<!-- 			  , (SELECT COUNT(1) FROM FOLLOW_MAP_MEMBER WHERE MBR_NO = T1.MBR_NO ) AS FOLLOWING_CNT  		/* 팔로잉 회원 수 */ -->
+<!-- 			  , (SELECT COUNT(1) FROM FOLLOW_MAP_TAG WHERE MBR_NO = T1.MBR_NO ) AS FOLLOWING_TAG_CNT		/* 팔로잉 태그 수 */ -->
+<!-- 			  , (SELECT COUNT(1) FROM FOLLOW_MAP_MEMBER WHERE MBR_NO_FOLLOWED = T1.MBR_NO ) AS FOLLOWER_CNT	/* 팔로워 수 */ -->
+				</when>	
+			</choose>
+		 </if>
+		 <if test="loginMbrNo != null and loginMbrNo != 0">
+		      , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM FOLLOW_MAP_MEMBER WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo} ) AS FOLLOW_YN
+		 </if>
+		  FROM MEMBER_BASE T1
+		 WHERE 1=1	
+		 <if test="nickNm != null and nickNm != ''">	 
+		   AND T1.NICK_NM = #{nickNm}
+		 </if>
+		 <if test="mbrNo != null and mbrNo != 0">
+		   AND T1.MBR_NO = #{mbrNo}
+		 </if>		 
+		 LIMIT 0 , 1
+	</select>	
+	
+	<select id="listLikePetLogByDispCorn" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name : petLog.pagePetLogByDispClsfCornNo
+			Description : 좋아할만한 목록 조회 - 비정형 전시코너 번호 기준
+		-->
+		SELECT /* QUERYID(petLog.listLikePetLogByDispCorn) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT										/* 펫로그 내용 */
+			, T1.SRT_PATH									/* 단축 경로 */
+			, T1.PST_NM										/* 위치명 */
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, T1.VD_PATH 									/* 펫로그 영상 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 									/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL								/* 펫로그 등록자 펫로그 URL */
+			, T1.CONTS_STAT_CD								/* 펫로그 컨텐츠 상태 코드 */
+			, T1.SYS_REG_DTM								/* 시스템 등록 일시 */	
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN				/* 펫로그 후기여부 */		
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, CONCAT(
+				 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+				,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+				,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) ) 
+				,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+				,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	 /* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}') AS BOOKMARK_CNT /* 펫로그 찜 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}') AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+			/* , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	펫로그 연관상품여부 */
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+		</if>
+			, T1.ENC_CPLT_YN			/* 인코딩 여부 */				
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+        <if test="dispCornNo != null and dispCornNo != ''">			
+			INNER JOIN ( SELECT DCI.PET_LOG_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND  #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND  #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+				) T2 ON T1.PET_LOG_NO = T2.PET_LOG_NO
+		</if>
+		WHERE 1=1
+		/*  AND IFNULL(SNCT_YN, 'N') = 'N'	*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+		  AND T1.MBR_NO = #{mbrNo}
+		</if>
+		<if test="petLogNos != null">		
+		 	<foreach collection="petLogNos" item="petLog" separator="," open="AND T1.PET_LOG_NO IN (" close=")">
+					#{petLog }
+		   	</foreach>
+		</if>
+        <if test="dispCornNo != null and dispCornNo != '' and loginMbrNo != null and loginMbrNo != 0" >	
+           AND T1.MBR_NO <![CDATA[<>]]> #{loginMbrNo}		 
+		   AND NOT EXISTS (SELECT 1 FROM FOLLOW_MAP_MEMBER
+		  				WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo} )
+		</if> 		
+		AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY T1.SYS_REG_DTM DESC	
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="listLikePetLogByDispCornCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : petLog.pagePetLogByDispClsfCornNo
+			Description : 좋아할만한 목록 조회 - 비정형 전시코너 번호 기준
+		-->
+		SELECT /* QUERYID(petLog.listLikePetLogByDispCornCount) */
+			COUNT(*)
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+        <if test="dispCornNo != null and dispCornNo != ''">			
+			INNER JOIN ( SELECT DCI.PET_LOG_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND  #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND  #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+				) T2 ON T1.PET_LOG_NO = T2.PET_LOG_NO
+		</if>
+		WHERE 1=1
+		/*  AND IFNULL(SNCT_YN, 'N') = 'N'	*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="mbrNo != null and mbrNo != 0">
+		  AND T1.MBR_NO = #{mbrNo}
+		</if>
+		<if test="petLogNos != null">		
+		 	<foreach collection="petLogNos" item="petLog" separator="," open="AND T1.PET_LOG_NO IN (" close=")">
+					#{petLog }
+		   	</foreach>
+		</if>
+        <if test="dispCornNo != null and dispCornNo != '' and loginMbrNo != null and loginMbrNo != 0" >	
+           AND T1.MBR_NO <![CDATA[<>]]> #{loginMbrNo}		 
+		   AND NOT EXISTS (SELECT 1 FROM FOLLOW_MAP_MEMBER
+		  				WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo} )
+		</if> 		
+		AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY T1.SYS_REG_DTM DESC	
+	</select>
+	
+	
+	<select id="listRecMbrPetLogByDispCorn" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name : petLog.listMemberByDispClsfCornNo
+			Description : 이친구어때요? 목록 조회 - 비정형 전시코너 번호 기준
+		-->
+		SELECT /* QUERYID(petLog.listRecMbrPetLogByDispCorn) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT										/* 펫로그 내용 */
+			, T1.SRT_PATH									/* 단축 경로 */
+			, T1.PST_NM										/* 위치명 */
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, T1.VD_PATH 									/* 펫로그 영상 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 									/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL								/* 펫로그 URL */			
+			, T1.CONTS_STAT_CD									/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN					/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+	<if test="loginMbrNo != null and loginMbrNo != 0">			
+			, (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM FOLLOW_MAP_MEMBER T2  WHERE T2.MBR_NO_FOLLOWED = T1.MBR_NO  AND T2.MBR_NO = #{loginMbrNo} ) AS FOLLOW_YN
+	</if>	
+			, T1.ENC_CPLT_YN			/* 인코딩 여부 */
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+        <if test="dispCornNo != null and dispCornNo != ''">			
+			JOIN ( SELECT DCI.MBR_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+						JOIN MEMBER_BASE MB ON MB.MBR_NO = DCI.MBR_NO
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+			        AND MB.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+			        <if test = "loginMbrNo != null and loginMbrNo != 0" >
+			        	AND NOT EXISTS (SELECT 1 FROM FOLLOW_MAP_MEMBER
+		  				WHERE MBR_NO_FOLLOWED = DCI.MBR_NO AND MBR_NO = #{loginMbrNo} )
+		  			</if>
+			        ORDER BY DCI.DISP_PRIOR_RANK 
+			        <include refid="bizCommon.pageSql" />
+				) T2 ON (T1.MBR_NO = T2.MBR_NO)
+		</if>		  
+		 WHERE 1=1	
+		 <if test="nickNm != null and nickNm != 0">	 
+		   AND T1.NICK_NM = #{nickNm}
+		 </if>
+		 <if test="recMbrNo != null and recMbrNo != 0">
+		   AND T1.MBR_NO = #{recMbrNo}
+		 </if>	
+		 <if test="contsStatCd != null and contsStatCd != ''">
+		   AND T1.CONTS_STAT_CD = #{contsStatCd }
+		 </if>
+         <if test="dispCornNo != null and dispCornNo != '' and loginMbrNo != null and loginMbrNo != 0" >	
+           AND T1.MBR_NO <![CDATA[<>]]> #{loginMbrNo}		 
+		 </if> 
+		   AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		 ORDER BY T1.SYS_REG_DTM DESC	
+<!-- 		<include refid="bizCommon.pageSql" /> -->
+		LIMIT 0 , 6
+	</select>
+	
+	<select id="listRecMbrPetLogByDispCornCount" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)	
+			FROM
+			PET_LOG_BASE T1
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+        <if test="dispCornNo != null and dispCornNo != ''">			
+			JOIN ( SELECT DCI.MBR_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+						JOIN MEMBER_BASE MB ON MB.MBR_NO = DCI.MBR_NO
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+			        AND MB.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+			        ORDER BY DCI.DISP_PRIOR_RANK 
+			        LIMIT 1
+				) T2 ON (T1.MBR_NO = T2.MBR_NO)
+		</if>		  
+		 WHERE 1=1	
+		 <if test="nickNm != null and nickNm != 0">	 
+		   AND T1.NICK_NM = #{nickNm}
+		 </if>
+		 <if test="recMbrNo != null and recMbrNo != 0">
+		   AND T1.MBR_NO = #{recMbrNo}
+		 </if>	
+		 <if test="contsStatCd != null and contsStatCd != ''">
+		   AND T1.CONTS_STAT_CD = #{contsStatCd }
+		 </if>
+         <if test="dispCornNo != null and dispCornNo != '' and loginMbrNo != null and loginMbrNo != 0" >	
+           AND T1.MBR_NO <![CDATA[<>]]> #{loginMbrNo}		 
+		   AND NOT EXISTS (SELECT 1 FROM FOLLOW_MAP_MEMBER
+		  				WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo} )
+		 </if> 
+		   AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		 ORDER BY T1.SYS_REG_DTM DESC		
+	</select>
+
+	<select id="pageTagPetLog" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name : petLog.pageTagPetLog
+			Description : 인기태그 게시물
+		-->
+		SELECT /* QUERYID(petLog.pageTagPetLog) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT										/* 펫로그 내용 */
+			, T1.PET_LOG_CHNL_CD
+			, T1.SRT_PATH									/* 단축 경로 */
+			, T1.PST_NM										/* 위치명 */
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, CONCAT(
+				 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+				,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+				,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) ) 
+				,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+				,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL			
+			, IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */
+			, T1.VD_PATH 									/* 펫로그 영상 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+			, T2.NICK_NM 			
+			, T2.PET_LOG_URL 			
+			, T2.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */
+			, T1.CONTS_STAT_CD									/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN					/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, T1.SYS_REG_DTM
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}') AS REPLY_CNT	/* 펫로그 댓글 갯수 */
+			, (SELECT TAG_NM FROM TAG_BASE WHERE TAG_NO = T3.TAG_NO) AS TAG_NM
+			, T3.TAG_NO
+			, T1.ENC_CPLT_YN			/* 인코딩 여부 */
+		<if test="loginMbrNo  != null and loginMbrNo  != 0">			
+			, (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM FOLLOW_MAP_TAG WHERE TAG_NO_FOLLOWED = T3.TAG_NO AND MBR_NO = #{mbrNo} ) AS FOLLOW_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+		</if>				
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN PET_LOG_TAG_MAP T3 ON (T3.PET_LOG_NO = T1.PET_LOG_NO)
+			INNER JOIN MEMBER_BASE T2 ON (T2.MBR_NO = T1.MBR_NO)
+		WHERE 1=1
+		/* AND IFNULL(T1.SNCT_YN, 'N') = 'N'	*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="tag != null and tag != ''">
+		  AND EXISTS (SELECT 1
+		  			  FROM TAG_BASE T2
+		  			  WHERE T2.TAG_NO = T3.TAG_NO 
+		  			  AND T2.TAG_NM = #{tag}
+		  			  )
+		</if>
+		<if test="tagNms != null and tagNms !=''" >
+			 AND EXISTS (SELECT 1
+		  			  FROM TAG_BASE T2
+		  			  WHERE T2.TAG_NO = T3.TAG_NO 
+		  			  AND T2.TAG_NM 
+			<foreach item="item" collection="tagNms" open="IN (" separator="," close=")">
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="tagNo != null and tagNo != ''">
+		  AND T3.TAG_NO = #{tagNo}
+		</if>	
+		AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	<include refid="bizCommon.sortSql" />
+		<choose>
+			<when test ="tagNms != null and tagNms !=''">
+				LIMIT 6
+			</when>
+			<otherwise>
+			<include refid="bizCommon.pageSql" />
+			</otherwise>
+		</choose>
+	</select>
+
+	
+ 	<select id="pageTagPetLogCount" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.pageTagPetLogCount
+			Description	: 인기태그 목록  count
+	 -->	
+		SELECT /* QUERYID(petLog.pageTagPetLogCount) */
+				COUNT(1)
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN PET_LOG_TAG_MAP T3 ON (T3.PET_LOG_NO = T1.PET_LOG_NO)
+			INNER JOIN MEMBER_BASE T2 ON (T2.MBR_NO = T1.MBR_NO)
+		WHERE 1=1
+		/* AND IFNULL(T1.SNCT_YN, 'N') = 'N'	*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+		<if test="tag != null and tag != ''">
+		  AND EXISTS (SELECT 1
+		  			  FROM TAG_BASE T2
+		  			  WHERE T2.TAG_NO = T3.TAG_NO 
+		  			  AND T2.TAG_NM = #{tag}
+		  			  )
+		</if>
+		<if test="tagNo != null and tagNo != ''">
+		  AND T3.TAG_NO = #{tagNo}
+		</if>
+		AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>
+	
+<!-- 	<select id="listFollowPetLog" resultType="biz.app.petlog.model.PetLogBaseVO">
+		
+			Query Name	: petLog.listFollowPetLog
+			Description	: 펫로그 게시물(회원이 팔로우한 회원 또는 태그의 최신 게시물 5개)
+		
+		SELECT 
+			  T1.PET_LOG_NO							/* 펫로그 번호 */
+			, T1.DSCRT								/* 펫로그 내용 */
+			, CONCAT(
+				 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+				,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+				,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) ) 
+				,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+				,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH1
+			, IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */			
+			, T1.VD_PATH 							/* 펫로그 영상 */
+			, T1.VD_THUM_PATH 						/* 펫로그 영상썸네일 경로 */				
+			, T1.MBR_NO								/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 							/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG							/* 펫로그 등록자 프로필 이미지 */
+			, T1.CONTS_STAT_CD						/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN		/* 펫로그 후기여부 */
+			, IFNULL(T1.SNCT_YN, 'N') AS SNCT_YN	/* 펫로그 제재여부 */
+			, T1.SYS_REG_DTM 
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '10') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO) AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+			, (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	/* 펫로그 연관상품여부 */			
+		FROM 
+			(SELECT 
+				  T1.PET_LOG_NO						
+				, T1.DSCRT										
+				, T1.IMG_PATH1 									
+				, T1.IMG_PATH2 									
+				, T1.IMG_PATH3 									
+				, T1.IMG_PATH4 									 
+				, T1.IMG_PATH5 									
+				, T1.VD_PATH 									
+				, T1.VD_THUM_PATH
+				, T1.MBR_NO										
+				, T1.CONTS_STAT_CD								
+				, T1.RVW_YN										
+				, T1.SNCT_YN									
+				, T1.SYS_REG_DTM 			
+			FROM
+				PET_LOG_BASE T1
+			WHERE 1=1
+			AND EXISTS (SELECT 1
+			  			  FROM FOLLOW_MAP_MEMBER T2
+			  			  WHERE T2.MBR_NO_FOLLOWED = T1.MBR_NO
+			  			  AND T2.MBR_NO = #{mbrNo}
+			  			  )
+			UNION  ALL
+			SELECT 
+				  T1.PET_LOG_NO						
+				, T1.DSCRT										
+				, T1.IMG_PATH1 									
+				, T1.IMG_PATH2 									
+				, T1.IMG_PATH3 									
+				, T1.IMG_PATH4 									 
+				, T1.IMG_PATH5 									
+				, T1.VD_PATH 									
+				, T1.VD_THUM_PATH
+				, T1.MBR_NO										
+				, T1.CONTS_STAT_CD								
+				, T1.RVW_YN										
+				, T1.SNCT_YN									
+				, T1.SYS_REG_DTM 
+			FROM
+				PET_LOG_BASE T1
+				INNER JOIN PET_LOG_TAG_MAP T2 ON (T2.PET_LOG_NO = T1.PET_LOG_NO)
+			WHERE 1=1
+			AND EXISTS (SELECT 1
+			  			  FROM FOLLOW_MAP_TAG
+			  			  WHERE TAG_NO_FOLLOWED = T2.TAG_NO
+			  			  AND MBR_NO = #{mbrNo}
+			  			  )
+			GROUP BY T1.PET_LOG_NO
+			) T1 
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+		GROUP BY T1.PET_LOG_NO
+		ORDER BY T1.SYS_REG_DTM DESC
+		LIMIT 0, 5
+	</select> -->
+	
+	<select id="pageFollowPetLog" resultType="biz.app.petlog.model.PetLogBaseVO">
+	<!--	
+			Query Name	: petLog.pageFollowPetLog
+			Description	: 펫로그 게시물(회원이 팔로우한 회원 또는 태그의 최신 게시물 5개)
+	 -->	
+		SELECT 
+			  T1.PET_LOG_NO							/* 펫로그 번호 */
+			, T1.PET_LOG_TYPE						/* 펫로그 타입- 태그팔로우일때만(T) */
+			, T1.TAG_NM								/* 태그 - 태그팔로우일때만(T) */
+			, T1.DSCRT								/* 펫로그 내용 */
+			, T1.SRT_PATH							/* 단축 경로 */
+			, T1.PST_NM								/* 위치명 */
+			, T1.PET_LOG_CHNL_CD
+			, CONCAT(
+				 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+				,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+				,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) ) 
+				,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+				,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL
+			, IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */			
+			, T1.VD_PATH 							/* 펫로그 영상 */
+			, T1.VD_THUM_PATH 						/* 펫로그 영상썸네일 경로 */				
+			, T1.MBR_NO								/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 							/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG							/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL						/* 펫로그 URL */
+			, T1.CONTS_STAT_CD						/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN		/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, T1.SYS_REG_DTM 
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	 /* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}') AS BOOKMARK_CNT /* 펫로그 찜 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}' ) AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+			/* , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	펫로그 연관상품여부 */
+			, T1.ENC_CPLT_YN	
+		<if test="loginMbrNo != null and loginMbrNo != 0">
+			, (SELECT IF( COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL AND MBR_NO = #{loginMbrNo}) AS RPTP_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+		</if>
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+		</if>		
+		FROM 
+			(
+			SELECT 
+				  T1.PET_LOG_NO		
+				, '' AS PET_LOG_TYPE				
+				, '' AS TAG_NM
+				, T1.DSCRT										
+				, T1.SRT_PATH
+				, T1.PST_NM	
+				, T1.PET_LOG_CHNL_CD
+				, T1.IMG_PATH1 									
+				, T1.IMG_PATH2 									
+				, T1.IMG_PATH3 									
+				, T1.IMG_PATH4 									 
+				, T1.IMG_PATH5 									
+				, T1.VD_PATH 									
+				, T1.VD_THUM_PATH
+				, T1.MBR_NO										
+				, T1.CONTS_STAT_CD								
+				, T1.RVW_YN		
+				, T1.GOODS_RCOM_YN								
+				, T1.SNCT_YN									
+				, T1.SYS_REG_DTM 	
+				, T1.ENC_CPLT_YN		
+			FROM
+				PET_LOG_BASE T1
+			WHERE 1=1
+			AND MBR_NO = #{loginMbrNo}
+			AND T1.SYS_REG_DTM BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>
+			UNION  ALL
+			SELECT 
+				  T1.PET_LOG_NO						
+				, '' AS PET_LOG_TYPE	
+				, '' AS TAG_NM			
+				, T1.DSCRT										
+				, T1.SRT_PATH
+				, T1.PST_NM	
+				, T1.PET_LOG_CHNL_CD
+				, T1.IMG_PATH1 									
+				, T1.IMG_PATH2 									
+				, T1.IMG_PATH3 									
+				, T1.IMG_PATH4 									 
+				, T1.IMG_PATH5 									
+				, T1.VD_PATH 									
+				, T1.VD_THUM_PATH
+				, T1.MBR_NO										
+				, T1.CONTS_STAT_CD								
+				, T1.RVW_YN		
+				, T1.GOODS_RCOM_YN								
+				, T1.SNCT_YN									
+				, T1.SYS_REG_DTM 
+				, T1.ENC_CPLT_YN			
+			FROM
+				(
+			        SELECT
+			          MBR_NO_FOLLOWED
+			        FROM
+			          FOLLOW_MAP_MEMBER T2
+			        WHERE  T2.MBR_NO = #{loginMbrNo}
+			      ) F
+					INNER JOIN LATERAL 
+					(
+					   SELECT * 
+						FROM  pet_log_base S 
+					   WHERE S.MBR_NO=F.MBR_NO_FOLLOWED
+					     AND S.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 1 DAY)
+					   ORDER BY S.SYS_REG_DTM DESC
+					   LIMIT 5
+					) T1 ON TRUE
+			INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>			
+			UNION  ALL
+			SELECT 
+				  T1.PET_LOG_NO						
+				, 'T' AS PET_LOG_TYPE	/* 태그 팔로우 게시물 */		
+				, (SELECT TAG_NM FROM TAG_BASE WHERE TAG_NO = A.TAG_NO) AS TAG_NM	
+				, T1.DSCRT										
+				, T1.SRT_PATH
+				, T1.PST_NM	
+				, T1.PET_LOG_CHNL_CD
+				, T1.IMG_PATH1 									
+				, T1.IMG_PATH2 									
+				, T1.IMG_PATH3 									
+				, T1.IMG_PATH4 									 
+				, T1.IMG_PATH5 									
+				, T1.VD_PATH 									
+				, T1.VD_THUM_PATH
+				, T1.MBR_NO										
+				, T1.CONTS_STAT_CD	
+				, T1.GOODS_RCOM_YN							
+				, T1.RVW_YN										
+				, T1.SNCT_YN									
+				, T1.SYS_REG_DTM
+				, T1.ENC_CPLT_YN 
+			FROM
+				(
+				SELECT
+				 B.PET_LOG_NO, B.TAG_NO
+				FROM follow_map_tag A
+				INNER JOIN pet_log_tag_map B ON A.TAG_NO_FOLLOWED = B.TAG_NO
+				WHERE A.MBR_NO = #{loginMbrNo}
+				  AND B.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 1 DAY)
+				ORDER BY  B.SYS_REG_DTM DESC 
+				LIMIT 20
+			) A 
+			INNER JOIN PET_LOG_BASE T1 ON T1.PET_LOG_NO = A.PET_LOG_NO
+			INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>			
+			GROUP BY T1.PET_LOG_NO
+			) T1 
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+			AND T1.ENC_CPLT_YN = 'Y' OR (T1.ENC_CPLT_YN ='N' AND T1.MBR_NO = #{loginMbrNo})
+		GROUP BY T1.PET_LOG_NO
+<!-- 		ORDER BY T1.SYS_REG_DTM DESC -->
+<!-- 		LIMIT 0, 5 -->
+	<include refid="bizCommon.sortSql" />
+	<include refid="bizCommon.pageSql" /> 		
+	</select>
+	
+	
+	<select id="pageFollowPetLogCount" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.pageFollowPetLogCount
+			Description	: 펫로그 게시물  count
+	 -->	
+		SELECT /* QUERYID(petLog.pageFollowPetLogCount) */
+				SUM(CNT)
+		FROM
+			(
+			SELECT COUNT(*) AS CNT FROM PET_LOG_BASE T1
+			WHERE 1=1
+			     AND MBR_NO = #{loginMbrNo}
+			     AND T1.SYS_REG_DTM BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()
+				<if test="contsStatCd != null and contsStatCd != ''">
+				  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+				</if>
+			UNION  ALL
+			SELECT 
+				 COUNT(*) AS CNT		
+			FROM
+				(SELECT MBR_NO_FOLLOWED FROM FOLLOW_MAP_MEMBER T2 WHERE T2.MBR_NO = #{loginMbrNo}) F
+			INNER JOIN LATERAL(
+			   SELECT * FROM  pet_log_base S 
+			   WHERE S.MBR_NO=F.MBR_NO_FOLLOWED
+			         AND S.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 1 DAY)
+			   ORDER BY S.SYS_REG_DTM DESC
+			   LIMIT 5
+			) T1 ON TRUE
+			INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>			
+			UNION  ALL
+			SELECT 
+				  COUNT(*) AS CNT
+			FROM
+				(
+				SELECT
+				 B.PET_LOG_NO, B.TAG_NO
+				FROM follow_map_tag A
+				INNER JOIN pet_log_tag_map B ON A.TAG_NO_FOLLOWED = B.TAG_NO
+				WHERE A.MBR_NO = #{loginMbrNo}
+				  AND B.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 1 DAY)
+				ORDER BY  B.SYS_REG_DTM DESC 
+				LIMIT 20
+			) A 
+			INNER JOIN PET_LOG_BASE T1 ON T1.PET_LOG_NO = A.PET_LOG_NO
+			INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+		  	  AND T1.CONTS_STAT_CD = '10'
+		  	  AND T1.ENC_CPLT_YN = 'Y' OR (T1.ENC_CPLT_YN ='N' AND T1.MBR_NO = #{loginMbrNo})
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>			
+			) T1 
+	</select>
+	
+	<select id="listTagByDispCorn" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.listTagByDispCorn
+			Description	: 인기태그 목록  - BO 등록
+	 -->	
+		SELECT /* QUERYID(petLog.listTagByDispCorn) */
+			T1.TAG_NM
+		FROM TAG_BASE T1
+			 JOIN ( SELECT DCI.TAG_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+				  ) T2 ON (T1.TAG_NO = T2.TAG_NO)				  
+		<if test="limit != null and limit != 0">
+		LIMIT		${limit}
+		</if>	
+	</select>	
+		
+	<select id="getPetLogInterestCount" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.getPetLogInterestCount
+			Description	: 펫로그 관심  count
+	 -->	
+		SELECT /* QUERYID(petLog.getPetLogInterestCount) */
+				COUNT(1)
+		FROM  PET_LOG_INTEREST
+		WHERE 1=1
+		<if test="petLogNo != null and petLogNo != 0">	 
+		  AND PET_LOG_NO = #{petLogNo}
+		</if>
+		<if test="intsGbCd != null and intsGbCd != ''">	 
+		  AND INTS_GB_CD = #{intsGbCd}
+		</if>	
+		<if test="mbrNo != null and mbrNo != 0">
+		  AND MBR_NO = #{mbrNo}
+		</if>
+	</select>
+	
+	<select id="getPetLogReplyCount" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.getPetLogReplyCount
+			Description	: 펫로그 댓글 count
+	 -->	
+		SELECT /* QUERYID(petLog.getPetLogReplyCount) */
+				COUNT(1)
+		FROM  PET_LOG_REPLY
+		WHERE 1=1
+		 AND CONTS_STAT_CD != '${@framework.common.constants.CommonConstants@CONTS_STAT_30}'
+		<if test="petLogNo != null and petLogNo != 0">	 
+		  AND PET_LOG_NO = #{petLogNo}
+		</if>
+	</select>
+	
+	
+	<insert id="insertFollowMapMember" parameterType="biz.app.petlog.model.FollowMapPO">
+		<!--
+			Query Name : petLog.insertFollowMapMember
+			Description : insertFollowMapMember
+		-->	
+		INSERT INTO FOLLOW_MAP_MEMBER (
+			  MBR_NO			/* 회원 번호 */
+			, MBR_NO_FOLLOWED	/* FOLLOWED 회원 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{mbrNo}			
+			, #{mbrNoFollowed}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+
+	<delete id="deleteFollowMapMember" parameterType="biz.app.petlog.model.FollowMapPO">
+		<!--
+			Query Name : petLog.deleteFollowMapMember
+			Description : deleteFollowMapMember
+		-->
+		DELETE
+		FROM	FOLLOW_MAP_MEMBER
+		WHERE	1=1
+		AND MBR_NO_FOLLOWED = #{mbrNoFollowed}
+		AND MBR_NO			= #{mbrNo}
+	</delete>
+	
+	<insert id="insertFollowMapTag" parameterType="biz.app.petlog.model.FollowMapPO">
+		<!--
+			Query Name : petLog.insertFollowMapTag
+			Description : insertFollowMapTag
+		-->	
+		INSERT INTO FOLLOW_MAP_TAG (
+			  MBR_NO			/* 회원 번호 */
+			, TAG_NO_FOLLOWED	/* FOLLOWED 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{mbrNo}			
+			, #{tagNoFollowed}			
+			, #{sysRegrNo}		
+			, NOW()				
+		)
+	</insert>
+
+	<delete id="deleteFollowMapTag" parameterType="biz.app.petlog.model.FollowMapPO">
+		<!--
+			Query Name : petLog.deleteFollowMapTag
+			Description : deleteFollowMapTag
+		-->
+		DELETE
+		FROM	FOLLOW_MAP_TAG
+		WHERE	1=1
+		AND TAG_NO_FOLLOWED = #{tagNoFollowed}
+		AND MBR_NO			= #{mbrNo}
+	</delete>
+	
+	<select id="isFollowMapMember" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.isFollowMapMember
+			Description	: isFollowMapMember
+	 -->	
+		SELECT /* QUERYID(petLog.isFollowMapMember) */
+				IF(COUNT(*) > 0, 'Y', 'N') FOLLOW_YN
+		FROM  FOLLOW_MAP_MEMBER
+		WHERE MBR_NO_FOLLOWED = #{mbrNoFollowed}  
+		AND MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="isFollowMapTag" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.isFollowMapTag
+			Description	: isFollowMapTag
+	 -->	
+		SELECT /* QUERYID(petLog.isFollowMapTag) */
+				IF(COUNT(*) > 0, 'Y', 'N') FOLLOW_YN
+		FROM  FOLLOW_MAP_TAG
+		WHERE TAG_NO_FOLLOWED = #{tagNoFollowed}  
+		AND MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="listMyFollower" resultType="biz.app.petlog.model.PetLogMemberVO">
+	<!--	
+			Query Name	: petLog.listMyFollower
+			Description	: listMyFollower
+	 -->
+		SELECT /* QUERYID(petLog.listMyFollower) */
+			T1.MBR_NO
+		  , T2.NICK_NM			/* 닉네임 */
+		  , T2.PET_LOG_URL		/* 펫로그 URL */
+		  , T2.PRFL_IMG		/* 프로필 이미지 */	
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  , ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM  FOLLOW_MAP_MEMBER  WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo}) AS FOLLOW_YN
+		</if>	  
+		FROM  FOLLOW_MAP_MEMBER T1
+		INNER JOIN MEMBER_BASE T2 ON (T2.MBR_NO = T1.MBR_NO)
+		WHERE 1=1
+		AND T1.MBR_NO_FOLLOWED = #{mbrNo}  
+		AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY T1.SYS_REG_DTM DESC
+	</select>	
+		
+	<select id="listMyFollowing" resultType="biz.app.petlog.model.FollowMapVO">
+	<!--	
+			Query Name	: petLog.listMyFollowing
+			Description	: listMyFollowing
+	 -->
+		SELECT /* QUERYID(petLog.listMyFollowing) */
+			'T' AS FOLLOW_TYPE
+			, T1.TAG_NO_FOLLOWED AS FOLLOWED_NO
+			, T1.SYS_REG_DTM 
+			, T2.TAG_NM AS FOLLOWED_NM
+			, '' AS PET_LOG_URL
+			, '' AS PRFL_IMG
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  , ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM  FOLLOW_MAP_TAG  WHERE TAG_NO_FOLLOWED = T1.TAG_NO_FOLLOWED AND MBR_NO = #{loginMbrNo}) AS FOLLOW_YN	
+		</if>	  			
+		FROM  FOLLOW_MAP_TAG T1
+		INNER JOIN TAG_BASE T2 ON (T1.TAG_NO_FOLLOWED = T2.TAG_NO)
+		LEFT OUTER JOIN (SELECT DISTINCT TAG_NO 
+						FROM PET_LOG_BASE T3
+						INNER JOIN PET_LOG_TAG_MAP T4 ON (T3.PET_LOG_NO = T4.PET_LOG_NO)
+						WHERE T3.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}'
+						) T5 ON (T5.TAG_NO = T1.TAG_NO_FOLLOWED)
+		WHERE 1=1 
+		AND T1.MBR_NO = #{mbrNo}				  
+		UNION ALL
+		SELECT 
+			'M' AS FOLLOW_TYPE
+			, T1.MBR_NO_FOLLOWED AS FOLLOWING_NO
+			, T1.SYS_REG_DTM			
+			, T2.NICK_NM AS FOLLOWING_NM
+			, T2.PET_LOG_URL
+			, T2.PRFL_IMG
+		<if test="loginMbrNo != null and loginMbrNo != 0">		  
+		  , ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+			FROM  FOLLOW_MAP_MEMBER  WHERE MBR_NO_FOLLOWED = T1.MBR_NO_FOLLOWED AND MBR_NO = #{loginMbrNo}) AS FOLLOW_YN	
+		</if>	  			
+		FROM  FOLLOW_MAP_MEMBER T1
+		INNER JOIN MEMBER_BASE T2 ON (T1.MBR_NO_FOLLOWED = T2.MBR_NO)
+		WHERE 1=1
+		AND T1.MBR_NO = #{mbrNo}
+		AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY SYS_REG_DTM DESC		
+	</select>
+	
+	<select id="getMyFollowerCnt" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.myFollowerCnt
+			Description	: myFollowerCnt
+	 -->
+		SELECT /* QUERYID(petLog.myFollowCnt) */
+			COUNT(1) AS FOLLOWER_CNT
+		FROM  FOLLOW_MAP_MEMBER T1
+		INNER JOIN MEMBER_BASE T2 ON (T1.MBR_NO = T2.MBR_NO)
+		WHERE 1=1
+		AND T1.MBR_NO_FOLLOWED = #{mbrNo}  
+		AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+	</select>	
+	
+	<select id="getMyFollowingCnt" resultType="java.lang.Integer">
+	<!--	
+			Query Name	: petLog.myFollowingCnt
+			Description	: myFollowingCnt
+	 -->
+	 	SELECT /* QUERYID(petLog.getMyFollowingCnt) */
+	 		SUM(T.CNT) AS FOLLOWING_CNT
+	 	FROM
+		 	(
+		 	SELECT 
+				COUNT(1) AS CNT
+			FROM  FOLLOW_MAP_TAG T1
+			INNER JOIN TAG_BASE T2 ON (T1.TAG_NO_FOLLOWED = T2.TAG_NO)
+			LEFT OUTER JOIN (SELECT DISTINCT TAG_NO
+							FROM PET_LOG_BASE T3
+							INNER JOIN PET_LOG_TAG_MAP T4 ON (T3.PET_LOG_NO = T4.PET_LOG_NO)
+							WHERE T3.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}'
+							) T5 ON (T5.TAG_NO = T1.TAG_NO_FOLLOWED)
+			WHERE 1=1
+			AND T1.MBR_NO = #{mbrNo}			
+			UNION ALL
+			SELECT 
+				COUNT(1) AS CNT
+			FROM  FOLLOW_MAP_MEMBER T1
+			INNER JOIN MEMBER_BASE T2 ON (T1.MBR_NO_FOLLOWED = T2.MBR_NO)
+			WHERE 1=1
+			AND T1.MBR_NO = #{mbrNo}
+			AND T2.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+			) T	 	
+	</select>
+	
+	<select id="isPetLogReport" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.isPetLogReport
+			Description	: isPetLogReport
+	 -->
+		SELECT IF( COUNT(*) > 0, 'Y', 'N') AS RPTP_YN
+		FROM PET_LOG_RPTP 
+		WHERE PET_LOG_NO = #{petLogNo} 		
+	<choose>
+		<when test="petLogAplySeq != null and petLogAplySeq != ''">			
+		AND PET_LOG_APLY_SEQ = #{petLogAplySeq}
+		</when>
+		<otherwise>
+		AND PET_LOG_APLY_SEQ IS NULL 
+		</otherwise>
+	</choose>
+		AND MBR_NO = #{mbrNo}
+	</select>
+	
+	<update id="updateMemberBase" parameterType="biz.app.member.model.MemberBasePO">
+		<!--
+			Query Name : petLog.updateMemberBase
+			Description : updateMemberBase
+		-->
+		UPDATE	MEMBER_BASE SET
+			  SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+			, PET_LOG_ITRDC	= #{petLogItrdc}
+	<if test="petLogSrtUrl != null and petLogSrtUrl != ''">			
+			,  PET_LOG_SRT_URL	= #{petLogSrtUrl}
+	</if>				  
+	<if test="pstInfoAgrYn != null and pstInfoAgrYn != ''">			
+			,  PST_INFO_AGR_YN	= #{pstInfoAgrYn}
+	</if>	
+	<if test="prflImg != null and prflImg != ''">			
+			,  PRFL_IMG	= #{prflImg}
+	</if>
+		WHERE	1 = 1
+		AND		MBR_NO			= #{mbrNo}
+	</update>
+	
+	
+	<update id="updatePegLogBaseHits" parameterType="biz.app.petlog.model.PetLogBasePO">
+		<!--
+			Query Name : petLog.updatePegLogBaseHits
+			Description : updatePegLogBaseHits
+		-->		 
+		UPDATE	PET_LOG_BASE SET
+		SET HITS = IFNULL(HITS, 0) + 1
+		WHERE PET_LOG_NO = #{petLogNo}
+	</update>
+	
+	<select id ="getPopularTagNm" resultType="biz.app.petlog.model.PetLogBaseVO">
+		SELECT
+			TB.TAG_NM
+			, PLB.VD_PATH
+			, PLB.MBR_NO
+			, PLB.IMG_PATH1
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = PLB.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	/* 펫로그 좋아요 갯수 */
+		FROM
+			TAG_BASE TB 
+		INNER JOIN PET_LOG_TAG_MAP PLTM ON (PLTM.TAG_NO = TB.TAG_NO)
+		INNER JOIN PET_LOG_BASE PLB ON (PLB.PET_LOG_NO = PLTM.PET_LOG_NO)
+		WHERE 1=1
+		<if test ="contsStatCd != '' and contsStatCd != null"> 
+		AND CONTS_STAT_CD = #{contsStatCd}
+		</if>
+		<if test ="tag != '' and tag != null">
+		AND TB.TAG_NM = #{tag}				
+		</if> 
+	<include refid="bizCommon.sortSql" />
+	LIMIT 0 , 1					
+	</select>
+	
+	
+	<select id="getNickNameList" resultType="biz.app.member.model.MemberBaseVO">
+        SELECT /* QUERYID(petLog.getNickNameList) */
+            NICK_NM
+             , PRFL_IMG
+        FROM MEMBER_BASE
+        WHERE NICK_NM LIKE CONCAT(#{nickNm }, '%')
+        AND PET_LOG_URL IS NOT NULL
+    </select>
+    
+	<select id="listDisplayClsfCorner" resultType="biz.app.display.model.DisplayCornerTotalVO">
+		<!--
+			Query Name : petLog.listDisplayClsfCorner
+			Description : 전시 분류별 코너 정보 리스트
+			- FO (PC/MO)
+		-->
+		SELECT /* QUERYID(petLog.listDisplayClsfCorner) */
+			 DCO.DISP_CORN_NO				/* 전시 코너 번호 */
+			,DCO.DISP_CORN_TP_CD			/* 전시 코너 타입 코드 */
+			,DCO.SHOW_CNT					/* 노출 개수 */
+			,DCO.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			,DCC.DISP_CLSF_CORN_NO 			/* 전시 분류 코너 번호 */
+			,DCC.DISP_CLSF_NO 				/* 전시 분류 번호 */
+			,DCC.DISP_SHOW_TP_CD 			/* 전시 노출 타입 코드 */
+			,DCC.DISP_PRD_SET_YN 			/* 전시 기간 설정 여부 */
+			,DCC.DISP_STRTDT 				/* 전시 시작일자 */
+			,DCC.DISP_ENDDT 				/* 전시 종료일자 */
+			,DCC.CNTS_TTL 					/* 콘텐츠 타이틀 */
+			,DCC.CNTS_DSCRT 				/* 콘텐츠 설명 */
+			,DCC.CORN_IMG_NM 				/* 코너 이미지 명 */
+			,DCC.CORN_IMG_PATH 				/* 코너 이미지 경로 */
+			,DCC.CORN_MOBILE_IMG_NM 		/* 코너 모바일 이미지 명 */
+			,DCC.CORN_MOBILE_IMG_PATH 		/* 코너 모바일 이미지 경로 */
+			,DCC.LINK_URL 					/* 코너 링크 경로 */
+			,DCC.MOBILE_LINK_URL 			/* 코너 모바일 링크 경로 */
+			,DCC.BG_COLOR 					/* 코너 BG 컬러값 */
+			,DCC.GOODS_AUTO_YN 				/* 상품 자동 여부 */
+			,DCC.DEL_YN 					/* 삭제 여부 */
+			,DCC.BG_COLOR 					/* 배경 색상 */
+			,DCC.LINK_URL 					/* more 링크 */
+			,DCC.MOBILE_LINK_URL			/* 모바일 LINK URL */
+		FROM DISPLAY_CORNER DCO
+   			INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CORN_NO = DCO.DISP_CORN_NO
+		WHERE DCC.DISP_CLSF_NO = #{dispClsfNo}
+			AND DCC.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		    AND DCO.DISP_CORN_TP_CD = '90'
+		ORDER BY DCO.DISP_PRIOR_RANK
+	</select>    
+	<select id="listDisplayCornerPetLogMember" resultType="biz.app.display.model.DisplayCornerItemVO">
+		<!--
+			Query Name : petLog.listDisplayCornerPetLogMember
+			Description : 전시 코너 아이템 리스트(이 친구 어때요 리스트)
+		-->
+		SELECT	/* QUERYID(petLog.listDisplayCornerPetLogMember) */
+			DCI.DISP_CNR_ITEM_NO
+			, DCI.DISP_CLSF_CORN_NO 	/* 전시 분류 코너 번호 */
+			, DCI.PET_LOG_NO 			/* 펫로그 번호 */
+			, MB.LOGIN_ID 				/* 로그인 아이디 */
+			, MB.MBR_NO 				/* 회원 번호 */
+			, MB.MBR_GB_CD 				/* 회원 구분 코드 */
+			, (SELECT COUNT(PLB.MBR_NO) FROM PET_LOG_BASE PLB WHERE PLB.MBR_NO = MB.MBR_NO) AS PET_LOG_CNT	/* 펫로그 수 */
+			, DCI.DISP_STRTDT 			/* 전시 시작일자 */
+			, DCI.DISP_ENDDT 			/* 전시 종료일자 */
+			, DCI.DISP_PRIOR_RANK 		/* 전시 우선 순위 */
+			, DCI.DEL_YN 				/* 삭제 여부 */
+	        , DCI.SYS_REGR_NO 			/* 시스템 등록자 번호 */
+			, DCI.SYS_REG_DTM 			/* 시스템 등록 일시 */
+			, DCI.SYS_UPDR_NO 			/* 시스템 수정자 번호 */
+			, DCI.SYS_UPD_DTM 			/* 시스템 수정 일시 */
+		FROM DISPLAY_CORNER_ITEM DCI
+		INNER JOIN PET_LOG_BASE PLB ON PLB.MBR_NO = DCI.MBR_NO
+		INNER JOIN MEMBER_BASE MB ON MB.MBR_NO = PLB.MBR_NO
+		INNER JOIN DISPLAY_CLSF_CORNER DCC ON DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO
+		WHERE 1 = 1
+			AND DCI.DISP_STRTDT <![CDATA[<=]]> DATE_FORMAT(NOW() ,'%Y-%m-%d')
+			AND DCI.DISP_ENDDT <![CDATA[>=]]> DATE_FORMAT(NOW() ,'%Y-%m-%d')
+			AND DCI.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND DCC.DISP_CORN_NO = #{dispCornNo}
+			AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+		GROUP BY MB.MBR_NO
+		ORDER BY DCI.DISP_PRIOR_RANK ASC
+	</select>	
+	<select id="listRecMbrPetLog" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name : petLog.listRecMbrPetLog
+			Description : 이친구어때요? 목록 조회 - 비정형 전시코너 번호 기준
+		-->
+		SELECT /* QUERYID(petLog.listRecMbrPetLog) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.DSCRT										/* 펫로그 내용 */
+			, T1.SRT_PATH									/* 단축 경로 */
+			, T1.PST_NM										/* 위치명 */
+			, T1.IMG_PATH1 									/* 펫로그 이미지1 */
+			, T1.IMG_PATH2 									/* 펫로그 이미지2 */
+			, T1.IMG_PATH3 									/* 펫로그 이미지3 */
+			, T1.IMG_PATH4 									/* 펫로그 이미지4 */ 
+			, T1.IMG_PATH5 									/* 펫로그 이미지5 */
+			, T1.VD_PATH 									/* 펫로그 영상 */
+			, T1.MBR_NO										/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 									/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG									/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL								/* 펫로그 URL */			
+			, T1.CONTS_STAT_CD									/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN					/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, T1.ENC_CPLT_YN			/* 인코딩 여부 */
+	<if test="loginMbrNo != null and loginMbrNo != 0">			
+			, (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM FOLLOW_MAP_MEMBER T2  WHERE T2.MBR_NO_FOLLOWED = T1.MBR_NO  AND T2.MBR_NO = #{loginMbrNo} ) AS FOLLOW_YN
+	</if>	
+		FROM
+			PET_LOG_BASE T1
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			JOIN ( SELECT DCI.MBR_NO 
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+						JOIN MEMBER_BASE MB ON MB.MBR_NO = DCI.MBR_NO
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+			        AND MB.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+			        ORDER BY DCI.DISP_PRIOR_RANK 
+				) T2 ON (T1.MBR_NO = T2.MBR_NO)
+		 WHERE 1=1	
+		   AND T1.MBR_NO = #{recMbrNo}
+		   AND T1.CONTS_STAT_CD = #{contsStatCd }
+         <if test="loginMbrNo != null and loginMbrNo != 0" >	
+           AND T1.MBR_NO <![CDATA[<>]]> #{loginMbrNo}		 
+		   AND NOT EXISTS (SELECT 1 FROM FOLLOW_MAP_MEMBER
+		  				WHERE MBR_NO_FOLLOWED = T1.MBR_NO AND MBR_NO = #{loginMbrNo} )
+		 </if> 
+		   AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		 ORDER BY T1.SYS_REG_DTM DESC	
+		 LIMIT 0,6
+	</select>	
+	
+	<select id="listadminRecTag" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.listadminRecTag
+			Description	: 관리자추천태그 목록  - BO 등록
+	 -->	
+		SELECT /* QUERYID(petLog.listadminRecTag) */
+			T1.TAG_NM
+			,T2.DISP_PRIOR_RANK
+		FROM TAG_BASE T1
+			 JOIN ( SELECT DCI.TAG_NO , DCI.DISP_PRIOR_RANK
+					FROM DISPLAY_CORNER_ITEM DCI 
+						JOIN DISPLAY_CLSF_CORNER DCC ON (DCC.DISP_CLSF_CORN_NO = DCI.DISP_CLSF_CORN_NO)
+					WHERE DCC.DISP_CORN_NO = #{dispCornNo}
+			        AND DCC.DISP_CLSF_NO = #{dispClsfNo}
+			        AND ((DCC.DISP_PRD_SET_YN = 'Y' AND #{previewDt } BETWEEN DCC.DISP_STRTDT AND DCC.DISP_ENDDT)
+			            OR  DCC.DISP_PRD_SET_YN = 'N'
+			        	)
+			        AND #{previewDt } BETWEEN DCI.DISP_STRTDT AND DCI.DISP_ENDDT
+			        AND DCI.DEL_YN = 'N'
+			        AND DCC.DEL_YN = 'N'
+				  ) T2 ON (T1.TAG_NO = T2.TAG_NO)
+		ORDER BY T2.DISP_PRIOR_RANK ASC				  			  
+		LIMIT		${limit}
+	</select>		
+	
+	
+	<select id="getFollowTagNm" resultType="java.lang.String">
+	<!--	
+			Query Name	: petLog.getFollowTagNm
+			Description	: getFollowTagNm
+	 -->	
+		
+		SELECT /* QUERYID(petLog.getFollowTagNm) */ 
+<!-- 		SUBSTRING_INDEX(SUBSTR(PLB.DSCRT FROM INSTR(PLB.DSCRT , "#")) , "#" , 2) AS TAG_NM -->
+			TB.TAG_NM
+			, INSTR(CONCAT(REPLACE(PLB.DSCRT , '\r\n' , '') , ' ') , CONCAT('#' , TB.TAG_NM , ' ')) AS TAG_IDX
+		FROM PET_LOG_TAG_MAP PLTM
+		INNER JOIN TAG_BASE TB ON PLTM.TAG_NO = TB.TAG_NO
+		INNER JOIN FOLLOW_MAP_TAG FMT ON PLTM.TAG_NO = FMT.TAG_NO_FOLLOWED 
+		INNER JOIN PET_LOG_BASE PLB ON(PLB.PET_LOG_NO = #{petLogNo})
+		WHERE PLTM.PET_LOG_NO = #{petLogNo}
+		AND FMT.MBR_NO = #{mbrNo}
+		AND NOT EXISTS ( SELECT 1 FROM FOLLOW_MAP_MEMBER FMM WHERE FMM.MBR_NO = #{mbrNo} AND FMM.MBR_NO_FOLLOWED = #{excludeMbrNo})
+		ORDER BY TAG_IDX LIMIT 1
+	</select>	
+	
+	<select id="getPetLogFlag" resultType="biz.app.petlog.model.PetLogBaseSO">
+	<!--	
+			Query Name	: petLog.getPetLogFlag
+			Description	: getPetLogFlag
+	 -->	
+		SELECT 	/* QUERYID(petLog.getPetLogFlag) */
+			  T1.PET_LOG_NO									/* 펫로그 번호 */
+		FROM
+			PET_LOG_BASE T1		
+			INNER JOIN 	MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)		
+		WHERE 1=1
+		AND T1.PET_LOG_NO = #{petLogNo}
+		AND T1.MBR_NO = #{mbrNo}
+		AND T3.MBR_STAT_CD != '50' /*탈퇴 회원 아닌 회원 중*/
+		ORDER BY T1.SYS_REG_DTM DESC 
+	</select>	
+	
+	<select id="getPetLogDeleteInfo" resultType="biz.app.petlog.model.PetLogBaseVO">
+		SELECT 
+			PLB.PET_LOG_NO
+			, PLB.MBR_NO
+		FROM PET_LOG_BASE PLB
+		JOIN PET_LOG_GOODS_REVIEW_MAP PLGRM 
+		ON PLB.PET_LOG_NO = PLGRM.PET_LOG_NO 
+		JOIN GOODS_COMMENT GC 
+		ON PLGRM.GOODS_ESTM_NO = GC.GOODS_ESTM_NO 
+		WHERE GC.GOODS_ESTM_NO = #{goodsEstmNo}
+	</select>
+	
+	<update id ="encCpltYnUpdate" parameterType="biz.app.petlog.model.PetLogBasePO">
+		UPDATE
+			PET_LOG_BASE
+		SET
+			ENC_CPLT_YN = #{encCpltYn}
+		WHERE
+			VD_PATH = #{vdPath}		
+	</update>
+	
+	<select id ="checkRegPet" parameterType="java.lang.Long" resultType="java.lang.Integer">  
+		SELECT
+			COUNT(PET_NO)
+		FROM 
+			PET_BASE
+		WHERE 
+			MBR_NO = #{mbrNo}			
+	</select>
+		
+	<select id="getPetLogMentionMember" resultType="biz.app.petlog.model.PetLogMentionMemberVO">
+		SELECT
+			PLMM.PET_LOG_NO
+			, PLMM.MNT_MBR_NO
+		FROM PET_LOG_MENTION_MEMBER PLMM 
+		WHERE PET_LOG_NO = #{petLogNo}
+	</select>
+	
+	
+	<!-- 내가 쓴 게시물 , 팔로워 게시물  -->
+	<select id ="pagePetLogMainList" resultType="biz.app.petlog.model.PetLogBaseVO">
+		SELECT /* QUERYID(petLog.pagePetLogMainList) */
+	  			T1.PET_LOG_NO							/* 펫로그 번호 */
+				, T1.DSCRT								/* 펫로그 내용 */
+				, T1.PET_LOG_TYPE						/* 태그 팔로잉 체크 여부 */
+				, T1.SRT_PATH							/* 단축 경로 */
+				, T1.PST_NM								/* 위치명 */
+				, T1.PET_LOG_CHNL_CD
+				, CONCAT(
+					 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+					,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+					,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) )
+					,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+					,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL
+				, IF( T1.IMG_PATH5 IS NULL, 
+					IF(T1.IMG_PATH4 IS NULL, 
+						IF(T1.IMG_PATH3 IS NULL, 
+							IF(T1.IMG_PATH2 IS NULL, 
+								IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */			
+				, T1.VD_PATH 							/* 펫로그 영상 */
+				, T1.VD_THUM_PATH 						/* 펫로그 영상썸네일 경로 */				
+				, T1.MBR_NO								/* 펫로그 등록자 회원번호*/
+				, T3.NICK_NM 							/* 펫로그 등록자 닉네임 */
+				, T3.PRFL_IMG							/* 펫로그 등록자 프로필 이미지 */
+				, T3.PET_LOG_URL						/* 펫로그 URL */
+				, T1.CONTS_STAT_CD						/* 펫로그 컨텐츠 상태 코드 */
+				, IFNULL(T1.RVW_YN, 'N') AS RVW_YN		/* 펫로그 후기여부 */
+				, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+				, T1.SYS_REG_DTM 
+				, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	 /* 펫로그 좋아요 갯수 */
+				, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}') AS BOOKMARK_CNT /* 펫로그 찜 갯수 */
+				, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}') AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+				/* , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	펫로그 연관상품여부 */
+				, T1.ENC_CPLT_YN	
+				<if test="loginMbrNo != null and loginMbrNo != 0">
+					, (SELECT IF( COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL AND MBR_NO = #{loginMbrNo}) AS RPTP_YN
+				</if>
+				<if test="loginMbrNo != null and loginMbrNo != 0">		  
+				  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+					FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+				</if>
+				<if test="loginMbrNo != null and loginMbrNo != 0">		  
+				  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+					FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+				</if>		
+				FROM
+	((SELECT 		T1.PET_LOG_NO						
+					, T1.DSCRT	
+					, '' AS PET_LOG_TYPE
+					, T1.SRT_PATH
+					, T1.PST_NM	
+					, T1.PET_LOG_CHNL_CD
+					, T1.IMG_PATH1 									
+					, T1.IMG_PATH2 									
+					, T1.IMG_PATH3 									
+					, T1.IMG_PATH4 									 
+					, T1.IMG_PATH5 									
+					, T1.VD_PATH 									
+					, T1.VD_THUM_PATH
+					, T1.MBR_NO										
+					, T1.CONTS_STAT_CD	
+					, T1.GOODS_RCOM_YN							
+					, T1.RVW_YN										
+					, T1.SNCT_YN									
+					, T1.SYS_REG_DTM
+					, T1.ENC_CPLT_YN  FROM PET_LOG_BASE T1
+					WHERE 1=1
+					AND MBR_NO = #{loginMbrNo}
+					AND T1.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY)
+					<if test="contsStatCd != null and contsStatCd != ''">
+					  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+					</if>
+					ORDER BY T1.SYS_REG_DTM DESC
+	)
+	UNION ALL
+	(SELECT 		T1.PET_LOG_NO			
+					, T1.DSCRT	
+					, '' AS PET_LOG_TYPE
+					, T1.SRT_PATH
+					, T1.PST_NM	
+					, T1.PET_LOG_CHNL_CD
+					, T1.IMG_PATH1 									
+					, T1.IMG_PATH2 									
+					, T1.IMG_PATH3 									
+					, T1.IMG_PATH4 									 
+					, T1.IMG_PATH5 									
+					, T1.VD_PATH 									
+					, T1.VD_THUM_PATH
+					, T1.MBR_NO										
+					, T1.CONTS_STAT_CD	
+					, T1.GOODS_RCOM_YN							
+					, T1.RVW_YN										
+					, T1.SNCT_YN									
+					, T1.SYS_REG_DTM
+					, T1.ENC_CPLT_YN 
+					FROM (SELECT MBR_NO_FOLLOWED FROM FOLLOW_MAP_MEMBER T2 WHERE T2.MBR_NO = #{loginMbrNo} ) F
+					INNER JOIN LATERAL (
+					SELECT * 
+					FROM PET_LOG_BASE S 
+					WHERE S.MBR_NO = F.MBR_NO_FOLLOWED 
+					AND S.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY) 
+					AND S.CONTS_STAT_CD = 10 ORDER BY S.SYS_REG_DTM DESC
+					) T1 ON TRUE
+					INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+					WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+					<if test="contsStatCd != null and contsStatCd != ''">
+					  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+					</if>
+	)
+	UNION ALL
+	(SELECT 		T1.PET_LOG_NO			
+					, T1.DSCRT	
+					, 'CHECK' AS PET_LOG_TYPE
+					, T1.SRT_PATH
+					, T1.PST_NM	
+					, T1.PET_LOG_CHNL_CD
+					, T1.IMG_PATH1 									
+					, T1.IMG_PATH2 									
+					, T1.IMG_PATH3 									
+					, T1.IMG_PATH4 									 
+					, T1.IMG_PATH5 									
+					, T1.VD_PATH 									
+					, T1.VD_THUM_PATH
+					, T1.MBR_NO										
+					, T1.CONTS_STAT_CD	
+					, T1.GOODS_RCOM_YN							
+					, T1.RVW_YN										
+					, T1.SNCT_YN									
+					, T1.SYS_REG_DTM
+					, T1.ENC_CPLT_YN 
+				FROM PET_LOG_BASE T1
+				INNER JOIN PET_LOG_TAG_MAP PLTM ON(T1.PET_LOG_NO = PLTM.PET_LOG_NO)
+				INNER JOIN TAG_BASE TB ON PLTM.TAG_NO = TB.TAG_NO
+				INNER JOIN FOLLOW_MAP_TAG FMT ON PLTM.TAG_NO = FMT.TAG_NO_FOLLOWED 
+				WHERE PLTM.PET_LOG_NO = T1.PET_LOG_NO 
+				AND T1.SYS_REG_DTM > DATE_SUB(NOW() , INTERVAL 7 DAY)
+				AND FMT.MBR_NO = #{loginMbrNo}
+				AND NOT EXISTS ( SELECT 1 FROM FOLLOW_MAP_MEMBER FMM WHERE FMM.MBR_NO = #{loginMbrNo} AND FMM.MBR_NO_FOLLOWED = T1.MBR_NO)
+				AND  T1.CONTS_STAT_CD = '10'
+				AND T1.MBR_NO != #{loginMbrNo}
+				GROUP BY T1.PET_LOG_NO 
+	)) T1
+	 INNER JOIN MEMBER_BASE T3 ON(T1.MBR_NO = T3.MBR_NO)
+	 WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+	 AND (T1.ENC_CPLT_YN = 'Y' OR (T1.ENC_CPLT_YN ='N' AND T1.MBR_NO = #{loginMbrNo}) OR T1.VD_PATH IS NULL)
+	 <if test ="recommendPage != 1">
+	 	AND T1.PET_LOG_NO <![CDATA[<=]]> #{compareLogNo}
+	 </if>
+	<include refid="bizCommon.sortSql" />
+	<include refid="bizCommon.pageSql" /> 	
+	</select>
+	
+	<select id ="pagePetLogMainListCount" resultType="java.lang.Integer">
+		SELECT /* QUERYID(petLog.pagePetLogMainListCount) */
+				SUM(CNT)
+		FROM
+			(
+			SELECT COUNT(*) AS CNT FROM PET_LOG_BASE T1
+			WHERE 1=1
+			     AND MBR_NO = #{loginMbrNo}
+			     AND T1.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY)
+				<if test="contsStatCd != null and contsStatCd != ''">
+				  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+				</if>
+			UNION  ALL
+			SELECT 
+				 COUNT(*) AS CNT		
+			FROM
+				(SELECT MBR_NO_FOLLOWED FROM FOLLOW_MAP_MEMBER T2 WHERE T2.MBR_NO = #{loginMbrNo}) F
+			INNER JOIN LATERAL(
+			   SELECT * FROM  pet_log_base S 
+			   WHERE S.MBR_NO=F.MBR_NO_FOLLOWED
+			         AND S.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY)
+			   ORDER BY S.SYS_REG_DTM DESC
+			) T1 ON TRUE
+			INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+			WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		<if test="contsStatCd != null and contsStatCd != ''">
+		  	AND T1.CONTS_STAT_CD = #{contsStatCd }
+		</if>			
+			 AND (T1.ENC_CPLT_YN = 'Y' OR (T1.ENC_CPLT_YN ='N' AND T1.MBR_NO = #{loginMbrNo}) OR T1.VD_PATH IS NULL)
+		 <if test ="recommendPage != 1">
+			AND T1.PET_LOG_NO <![CDATA[<=]]> #{compareLogNo}
+		 </if>
+		 	UNION ALL
+			SELECT COUNT(*) FROM ( 
+			SELECT PLB.* FROM PET_LOG_BASE PLB 
+			INNER JOIN PET_LOG_TAG_MAP PLTM ON PLB.PET_LOG_NO = PLTM.PET_LOG_NO
+			INNER JOIN FOLLOW_MAP_TAG FMT ON PLTM.TAG_NO = FMT.TAG_NO_FOLLOWED
+			INNER JOIN MEMBER_BASE T3 ON T3.MBR_NO = PLB.MBR_NO
+			WHERE PLB.SYS_REG_DTM > DATE_SUB(NOW() , INTERVAL 7 DAY)
+				AND FMT.MBR_NO = #{loginMbrNo}
+				AND T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+				AND NOT EXISTS ( SELECT 1 FROM FOLLOW_MAP_MEMBER FMM WHERE FMM.MBR_NO = #{loginMbrNo} AND FMM.MBR_NO_FOLLOWED = PLB.MBR_NO)
+				AND  PLB.CONTS_STAT_CD = '10' AND(PLB.ENC_CPLT_YN = 'Y' OR (PLB.ENC_CPLT_YN ='N' AND PLB.MBR_NO = #{loginMbrNo}) OR PLB.VD_PATH IS NULL)
+				GROUP BY PLB.PET_LOG_NO) AS T1
+			) T1
+	</select>
+	
+	<!-- 신규 게시물 -->
+	<select id ="pageNewPetLogMainList" resultType="biz.app.petlog.model.PetLogBaseVO">
+		SELECT /* QUERYID(petLog.pageNewPetLogMainList) */
+			T1.PET_LOG_NO							/* 펫로그 번호 */
+			, T1.DSCRT								/* 펫로그 내용 */
+			, T1.SRT_PATH							/* 단축 경로 */
+			, T1.PST_NM								/* 위치명 */
+			, T1.PET_LOG_CHNL_CD
+			, CONCAT(
+			 IF( T1.IMG_PATH1 IS NULL, '', T1.IMG_PATH1 ) 
+			,IF( T1.IMG_PATH2 IS NULL, '', CONCAT('|', T1.IMG_PATH2) ) 
+			,IF( T1.IMG_PATH3 IS NULL, '', CONCAT('|', T1.IMG_PATH3) )
+			,IF( T1.IMG_PATH4 IS NULL, '', CONCAT('|', T1.IMG_PATH4) ) 
+			,IF( T1.IMG_PATH5 IS NULL, '', CONCAT('|', T1.IMG_PATH5) )) AS IMG_PATH_ALL
+			,IF( T1.IMG_PATH5 IS NULL, 
+				IF(T1.IMG_PATH4 IS NULL, 
+					IF(T1.IMG_PATH3 IS NULL, 
+						IF(T1.IMG_PATH2 IS NULL, 
+							IF(T1.IMG_PATH1 IS NULL,0 ,1),2),3) ,4), 5) AS IMG_CNT /* 펫로그 이미지 갯수 */		
+			, T1.VD_PATH 							/* 펫로그 영상 */
+			, T1.VD_THUM_PATH 						/* 펫로그 영상썸네일 경로 */				
+			, T1.MBR_NO								/* 펫로그 등록자 회원번호*/
+			, T3.NICK_NM 							/* 펫로그 등록자 닉네임 */
+			, T3.PRFL_IMG							/* 펫로그 등록자 프로필 이미지 */
+			, T3.PET_LOG_URL						/* 펫로그 URL */
+			, T1.CONTS_STAT_CD						/* 펫로그 컨텐츠 상태 코드 */
+			, IFNULL(T1.RVW_YN, 'N') AS RVW_YN		/* 펫로그 후기여부 */
+			, IFNULL(T1.GOODS_RCOM_YN, 'N') AS GOODS_RCOM_YN	/* 연관상품추천 여부 */
+			, T1.SYS_REG_DTM 
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT 	 /* 펫로그 좋아요 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}') AS BOOKMARK_CNT /* 펫로그 찜 갯수 */
+			, (SELECT COUNT(*) FROM PET_LOG_REPLY WHERE PET_LOG_NO = T1.PET_LOG_NO AND CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@PETLOG_DISP_GB_10}') AS REPLY_CNT 							/* 펫로그 댓글 갯수 */
+			/* , (SELECT IF(COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_GOODS_MAP WHERE PET_LOG_NO = T1.PET_LOG_NO) AS GOODS_MAP_YN 	펫로그 연관상품여부 */
+			, T1.ENC_CPLT_YN
+			<if test="loginMbrNo != null and loginMbrNo != 0">
+				, (SELECT IF( COUNT(*) > 0, 'Y', 'N') FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL AND MBR_NO = #{loginMbrNo}) AS RPTP_YN
+			</if>
+			<if test="loginMbrNo != null and loginMbrNo != 0">		  
+			  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+				FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{loginMbrNo}) AS LIKE_YN
+			</if>
+			<if test="loginMbrNo != null and loginMbrNo != 0">		  
+			  	, ( SELECT IF(COUNT(*) > 0, 'Y', 'N') 
+				FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{loginMbrNo}) AS BOOKMARK_YN
+			</if>		
+			FROM PET_LOG_BASE T1 
+		INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+		LEFT  JOIN PET_LOG_TAG_MAP T2 ON(T2.PET_LOG_NO = T1.PET_LOG_NO)
+		WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		 AND (T1.ENC_CPLT_YN = 'Y' OR T1.VD_PATH IS NULL)
+		AND T1.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY)
+		AND T1.MBR_NO != #{loginMbrNo}
+		<if test="searchExcludeLogNo != null">		
+		 	<foreach collection="searchExcludeLogNo" item="petLog" separator="," open="AND T1.PET_LOG_NO NOT IN (" close=")">
+					#{petLog }
+		   	</foreach>
+		</if>
+		AND NOT EXISTS ( SELECT 1 FROM FOLLOW_MAP_MEMBER FMM WHERE FMM.MBR_NO = #{loginMbrNo} AND FMM.MBR_NO_FOLLOWED = T1.MBR_NO)
+		AND NOT EXISTS ( SELECT 1  
+		FROM FOLLOW_MAP_TAG FMT
+		INNER JOIN PET_LOG_TAG_MAP PLTM ON (PLTM.PET_LOG_NO = T1.PET_LOG_NO)
+		WHERE FMT.TAG_NO_FOLLOWED = PLTM.TAG_NO AND FMT.MBR_NO = #{loginMbrNo})
+		<if test ="compareNewLogNo != null and compareNewLogNo !=''">
+			AND T1.PET_LOG_NO <![CDATA[<=]]> #{compareNewLogNo}
+		</if>
+		GROUP BY T1.PET_LOG_NO 
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" /> 
+	</select>
+	
+	<select id ="pageNewPetLogMainListCount" resultType="java.lang.Integer">
+		SELECT /* QUERYID(petLog.pageNewPetLogMainListCount) */
+			COUNT(*)
+		FROM 
+			PET_LOG_BASE T1 
+		INNER JOIN MEMBER_BASE T3 ON (T3.MBR_NO = T1.MBR_NO)
+		LEFT  JOIN PET_LOG_TAG_MAP T2 ON(T2.PET_LOG_NO = T1.PET_LOG_NO)
+		WHERE T3.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' /*탈퇴 회원 아닌 회원 중*/
+		 AND (T1.ENC_CPLT_YN = 'Y' OR T1.VD_PATH IS NULL)
+		AND T1.SYS_REG_DTM > DATE_SUB(NOW(), INTERVAL 7 DAY)
+		AND T1.MBR_NO != #{loginMbrNo}
+		AND NOT EXISTS ( SELECT 1 FROM FOLLOW_MAP_MEMBER FMM WHERE FMM.MBR_NO = #{loginMbrNo} AND FMM.MBR_NO_FOLLOWED = T1.MBR_NO)
+		AND NOT EXISTS ( SELECT 1  
+		FROM FOLLOW_MAP_TAG FMT
+		INNER JOIN PET_LOG_TAG_MAP PLTM ON (PLTM.PET_LOG_NO = T1.PET_LOG_NO)
+		WHERE FMT.TAG_NO_FOLLOWED = PLTM.TAG_NO AND FMT.MBR_NO = #{loginMbrNo})
+		<if test ="compareNewLogNo != null and compareNewLogNo !=''">
+	 		AND T1.PET_LOG_NO <![CDATA[<=]]> #{compareNewLogNo}
+	 	</if>
+	 	<if test="searchExcludeLogNo != null">		
+		 	<foreach collection="searchExcludeLogNo" item="petLog" separator="," open="AND T1.PET_LOG_NO NOT IN (" close=")">
+					#{petLog }
+		   	</foreach>
+		</if>
+	</select>
+	
+	<insert id ="insertPetLogReplyMention" parameterType="biz.app.petlog.model.PetLogMentionMemberPO">
+		INSERT INTO TB_PET_LOG_RPL_METN(
+			PET_LOG_NO
+			, APLY_NO
+			, METN_SEQ
+			, METN_TG_MBR_NO
+			, METN_MBR_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)VALUES(
+			#{petLogNo}
+			, #{aplyNo}
+			, #{metnSeq}
+			, #{metnTgMbrNo}
+			, #{metnMbrNo}
+			, #{metnMbrNo}
+			, NOW()
+			, #{metnMbrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<select id ="petLogReplyMentionList" resultType="biz.app.petlog.model.PetLogMentionMemberVO" parameterType="biz.app.petlog.model.PetLogMentionMemberSO">
+		SELECT
+			SRL_NO
+			, PET_LOG_NO
+			, APLY_NO
+			, METN_SEQ
+			, METN_TG_MBR_NO
+			, METN_MBR_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		FROM
+			TB_PET_LOG_RPL_METN
+		WHERE
+			APLY_NO = #{aplyNo}	
+		AND 
+			PET_LOG_NO = #{petLogNo}
+	</select>
+	
+	<delete id ="deletePetLogReplyMention" parameterType="biz.app.petlog.model.PetLogMentionMemberSO">
+		DELETE FROM
+			TB_PET_LOG_RPL_METN
+		WHERE 
+			PET_LOG_NO = #{petLogNo}
+		AND
+			APLY_NO = #{aplyNo}		
+	</delete>
+</mapper>

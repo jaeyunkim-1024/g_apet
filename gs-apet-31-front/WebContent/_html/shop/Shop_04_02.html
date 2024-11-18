@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 쿠폰적용 전체 덮는크기 -->
+		<article class="popLayer a popCoupon" id="popCoupon">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">쿠폰적용</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						<div class="aplycpn">
+							<label class="checkbox"><input type="checkbox"><span class="txt">최대 할인 쿠폰 적용</span></label>
+						</div>
+						<section class="sect info">
+							<div class="pdset">
+								<div class="pic"><img src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지" class="img"></div>
+								<div class="disc">
+									<span class="name">반려견 습식사료 아미로 후코이단 홀리티 20개 set 반려견 습식사료 아미로 후코이단 홀리티 20개 set 반려견 습식사료 아미로 후코이단 홀리티 20개 set</span>
+									<div class="opt k0423">L Size - 찹앤찹 찹찹트릿 가자미 맛좋은 식품</div><!-- 04.23 -->
+								</div>
+							</div>
+							<div class="totprc">
+								<div class="price ptp">
+									<span class="tit">판매가</span>
+									<span class="prc"><em class="p">20,000</em><i class="w">원</i></span>
+								</div>
+								<div class="price dis">
+									<i class="cq m">-</i>
+									<span class="tit">할인금액</span>
+									<span class="prc"><em class="p">2,000</em><i class="w">원</i></span>
+								</div>
+								<div class="price cpn">
+									<i class="cq e">=</i>
+									<span class="tit">쿠폰 적용가</span>
+									<span class="prc"><em class="p">18,000</em><i class="w">원</i></span>
+								</div>
+							</div>
+						</section>
+						<section class="sect list">
+							<ui class="cplist">
+								<li>
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_a">
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="p">10</em><i class="w">%</i></em>
+												<em class="prc"><em class="p">-2000</em><i class="w">원</i></em>
+											</div>
+											<div class="cdd">
+												<div class="dt">신규가입 5% 할인 쿠폰</div>
+												<div class="dd">최소 50,000원 이상 구매시 최대 10,000원</div>
+											</div>
+										</div>
+									</label>
+								</li>
+								<li class="disabled"><!-- 21.06.09 APETQA-4871 lcm01 클래스추가-->
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_a" disabled>
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="p">10</em><i class="w">%</i></em>
+												<em class="prc"><em class="p">-2000</em><i class="w">원</i></em>
+												<span class="msg">다른 상품 적용중</span>
+											</div>
+											<div class="cdd">
+												<div class="dt">신규가입 5% 할인 쿠폰</div>
+												<div class="dd">최소 50,000원 이상 구매시 최대 10,000원</div>
+											</div>
+										</div>
+									</label>
+								</li>
+								<li class="disabled"><!-- 21.06.09 APETQA-4871 lcm01 클래스추가-->
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_a">
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="p">10</em><i class="w">%</i></em>
+												<em class="prc"><em class="p">10</em><i class="w">%</i></em>
+											</div>
+											<div class="cdd">
+												<div class="dt">신규가입 5% 할인 쿠폰</div>
+												<div class="dd">최소 50,000원 이상 구매시 최대 10,000원</div>
+											</div>
+										</div>
+									</label>
+								</li>
+								<li>
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_a">
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="t">적용안함</em></em>
+											</div>
+										</div>
+									</label>
+								</li>
+							</ui>
+						</section>
+						<section class="sect cart">
+							<div class="htt"><span class="tit">배송비 할인 쿠폰</span></div>
+							<ui class="cplist">
+								<li>
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_b">
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="p">10</em><i class="w">%</i></em>
+												<em class="prc"><em class="p">-2000</em><i class="w">원</i></em>
+												<span class="msg">다른 상품 적용중</span>
+											</div>
+											<div class="cdd">
+												<div class="dt">신규가입 5% 할인 쿠폰</div>
+												<div class="dd">최소 50,000원 이상 구매시 최대 10,000원</div>
+											</div>
+										</div>
+									</label>
+								</li>
+								<li>
+									<label class="radio">
+										<input type="radio" name="rdb_cpupon_b">
+										<div class="txt">
+											<div class="hdd">
+												<em class="amt"><em class="t">적용안함</em></em>
+											</div>
+										</div>
+									</label>
+								</li>
+							</ui>
+						</section>
+						<section class="sect warn">
+							<div class="hdt">
+								<span class="tit">유의사항</span>
+								<button type="button" data-ui-tog="btn" data-ui-tog-val="tog_cpn_warn" class="bt tog">더보기</button>
+							</div>
+							<div class="cdt" data-ui-tog="ctn" data-ui-tog-val="tog_cpn_warn">
+								<p>내용 내용 내용 내용 내용 내용 </p>
+								<p>내용 내용 내용 내용 내용 내용 </p>
+								<p>내용 내용 내용 내용 내용 내용 </p>
+								<p>내용 내용 내용 내용 내용 내용 </p>
+								<p>내용 내용 내용 내용 내용 내용 </p>
+								<p>내용 내용 내용 내용 내용 내용 </p>
+							</div>
+						</section>
+						
+					</main>
+				</div>
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl a btnCpAply">총 <i class="n">-2,000</i>원 할인 쿠폰 적용</button>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popCoupon");
+		</script>
+
+</body>
+</html>

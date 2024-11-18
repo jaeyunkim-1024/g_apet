@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상담 처리
+	작성자  		snw
+	작성일자  	2017.01.25
+-->
+
+<mapper namespace="counselProcess">
+
+	<select id="listCounselProcess" resultType="biz.app.counsel.model.CounselProcessVO" >
+		<!--
+			Query Name : counselProcess.listCounselProcess
+			Description : CS 처리 리스트 추출
+		-->
+		SELECT	/* QUERYID(counselProcess.listCounselProcess) */
+					PRCS_NO					/* 처리 번호 */
+					, CUS_NO				/* 상담 번호 */
+					, PRCS_CONTENT			/* 처리 내용 */
+					, CUS_RPL_CD			/* 상담 회신 코드 */
+					, RPL_HD_CONTENT		/* 회신 헤더 내용 */
+					, RPL_CONTENT			/* 회신 내용 */
+					, RPL_FT_CONTENT		/* 회신 푸터 내용 */
+					, FL_NO					/* 파일 번호 */
+					, SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, SYS_REG_DTM			/* 시스템 등록 일시 */
+					, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, CUS_PRCS_DTM			/* 상담 처리 일시 */
+					, CUS_PRCSR_NO			/* 상담 처리자 번호 */
+					, FN_GET_USER_NAME(CUS_PRCSR_NO) AS CUS_PRCSR_NM
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		COUNSEL_PROCESS
+		WHERE	1 = 1
+		AND		CUS_NO		= #{cusNo}
+		ORDER BY PRCS_NO ASC
+	</select>
+
+	<insert id="insertCounselProcess">
+		<!--
+			Query Name : counselProcess.insertCounselProcess
+			Description : CS 처리 등록
+		-->
+		<selectKey keyProperty="prcsNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COUNSEL_PROCESS_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COUNSEL_PROCESS (
+			PRCS_NO					/* 처리 번호 */
+			, CUS_NO					/* 상담 번호 */
+			, PRCS_CONTENT		/* 처리 내용 */
+			, CUS_RPL_CD			/* 상담 회신 코드 */
+			, RPL_HD_CONTENT		/* 회신 헤더 내용 */
+			, RPL_CONTENT			/* 회신 내용 */
+			, RPL_FT_CONTENT		/* 회신 푸터 내용 */
+			, FL_NO					/* 파일 번호 */
+			, CUS_PRCSR_NO		/* 상담 처리자 번호 */
+			, CUS_PRCS_DTM		/* 상담 처리 일시 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{prcsNo}					/* 처리 번호 */
+			, #{cusNo}				/* 상담 번호 */
+			, #{prcsContent}			/* 처리 내용 */
+			, #{cusRplCd}				/* 상담 회신 코드 */
+			, #{rplHdContent}		/* 회신 헤더 내용 */
+			, #{rplContent}			/* 회신 내용 */
+			, #{rplFtContent}			/* 회신 푸터 내용 */
+			, #{flNo}					/* 파일 번호 */
+			, #{cusPrcsrNo}			/* 상담 처리자 번호 */
+			, NOW()					/* 상담 처리 일시 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>	
+	
+	<select id="getCounselProcess" resultType="biz.app.counsel.model.CounselProcessVO">
+		<!--
+			Query Name : counselProcess.getCounselProcess
+			Description : 상담 처리 상세 조회
+		-->
+		SELECT	/* QUERYID(counsel.getCounselProcess) */
+					  PRCS_NO				/* 처리 번호 */
+					, RPL_CONTENT			/* 회신 내용 */
+					, CUS_RPL_CD			/* 상담 회신 코드 */
+					, FL_NO					/* 파일 번호 */
+					, RPL_HD_CONTENT		/* 회신 헤더 내용 */
+					, RPL_FT_CONTENT		/* 회신 푸터 내용 */
+					, PRCS_CONTENT			/* 처리 내용 */
+					, CUS_NO				/* 상담 번호 */
+					, SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, SYS_REG_DTM			/* 시스템 등록 일시 */
+					, SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, CUS_PRCS_DTM			/* 상담 처리 일시 */
+					, CUS_PRCSR_NO			/* 상담 처리자 번호 */
+					, FN_GET_USER_NAME(CUS_PRCSR_NO) AS CUS_PRCSR_NM
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		COUNSEL_PROCESS
+		WHERE	PRCS_NO		= #{prcsNo}
+	</select>
+	
+	<select id="checkCounselProcess" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(*)
+		FROM	COUNSEL_PROCESS CP
+		LEFT JOIN COUNSEL CS ON(CP.CUS_NO = CS.CUS_NO)
+		WHERE 1 = 1
+		<if test="cusNo != null and cusNo != ''">
+		AND	CP.CUS_NO = #{cusNo}
+		</if>
+	</select>
+	
+	<update id="updateCounselProcess" parameterType="biz.app.counsel.model.CounselProcessPO">
+		UPDATE COUNSEL_PROCESS
+		SET	  CUS_PRCS_DTM = NOW()
+			, CUS_PRCSR_NO = #{cusPrcsrNo}
+			, RPL_CONTENT = #{rplContent}
+		WHERE 1 = 1 
+		<if test="cusNo != null and cusNo != ''">
+		AND	CUS_NO = #{cusNo}
+		</if>
+	</update>
+	
+</mapper>

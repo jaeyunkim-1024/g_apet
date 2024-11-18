@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set12","tit":"펫로그 후기 작성"}'></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page shop logrev mod" id="container">
+
+			<div class="inr">			
+
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- /_html/log/LOG_04.html  로그 등록하기 가이드 참고 -->
+					<div class="log_makePicWrap">
+						<div class="con">
+							<ul>
+								<li>
+									<a href="javascript:;" class="lmp_addpicBt first" onclick="ui.commentBox.open('.logCommentBox');openPictureCon()">
+										<div>
+											<span class="lmp_addPicIcon"></span>
+											<div class="txt">사진 최대 5장 또는<br>영상 30초 업로드 가능합니다.</div>
+										</div>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+										<img src="../../_images/_temp/log_logMade01.png" alt="">
+										<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+											<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+											<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+											<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_colseBt"></a>
+									<div class="pic">
+											<a href="javascript:;" class="pic_icon"></a>
+									</div>
+								</li>
+								<li>
+									<a href="javascript:;" class="lmp_addpicBt">
+										<div>
+											<span class="lmp_addPicIcon"></span>
+											<div class="txt">추가/편집</div>
+										</div>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="log_basicPw">
+						<div class="log_nBoxText">오늘은 어떤 추억이 있었나요?</div>
+					</div>
+
+					<div class="log_basicPw">
+						<div class="log_tagTextBox">
+							<div class="lttbTextArea none">
+								공백포함100자입니다👍 #해시태그 는파란색으로표시됩니다. 일이삼사오육칠팔구십 <span class="tagColor">#태그택태그</span> <span class="tagColor">#태그로그로그로그로그로그로</span> <a href="javascript:;" class="tagColor">#산책</a>
+							</div>
+							<textarea style="height:105px; display:none;">
+								공백포함100자입니다👍 #해시태그 는파란색으로표시됩니다. 일이삼사오육칠팔구십 #태그택태그 #태그로그로그로그로그로그로#산책
+							</textarea>
+							<div class="lttbTagArea" style="display:block;">
+								<ul>
+									<li>#태그</li>
+									<li>#태그</li>
+									<li>#태그</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="log_topBbox">
+						<div class="top_tit"><div class="tit">위치 등록</div><a href="javascript:;" class="log_arrIcon"></a></div>
+					</div>	
+					<div class="logTagScrollBox">
+						<div class="log_tagBoxWrap">
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+						</div>
+					</div>
+					<div class="log_topBbox">
+						<div class="top_tit" style="padding-bottom:5px;"><div class="tit">위치 등록</div><a href="javascript:;" class="log_arrIcon"></a></div>
+					</div>	
+					<div class="pointTxtArea">
+						위치추천을 위해 위치서비스를 활성화 하세요.
+					</div>
+					<div class="log_pointEnterList mt16">
+						<ul>
+							<li>
+								<div class="tit">LG 아트센터</div>
+								<div class="con">534m 거리</div>
+								<a href="javascript:;" class="log_pelClose"></a>
+							</li>
+						</ul>
+					</div>
+					<div class="log_topBbox">
+						<div class="top_tit"><div class="tit">연관상품 추천받기</div></div>
+						<div class="con_input">
+							<label class="checkbox"><input type="checkbox"><span class="txt">등록한 이미지와 비슷한 상품이 자동 추천됩니다.</span></label>
+						</div>
+					</div>	
+					<div class="commentBoxAp logCommentBox" data-priceh="100%">
+						<div class="head">
+							<div class="con">
+								<div class="tit cen">
+									사진선택
+								</div>
+								<a href="javascript:;" class="btn_left" onClick="ui.commentBox.close(this)">완료</a>
+								<a href="javascript:;" class="btn_right logColorBlue" onClick="ui.commentBox.close(this)" disabled>취소</a><!-- 'logColorBlue' 클래스 추가 시 파란색 글씨 //  'disabled' 제거 시 검정색 글씨 // 'disabled' attribute 있을 시 회식 글씨  -->
+							</div>
+						</div>
+						<div class="con">
+							<div class="box full">
+							</div>
+						</div>
+					</div>
+
+					<div class="set gud">
+						<div class="hdt">
+							<span class="tit">유의사항</span>
+						</div>
+						<div class="cdt info-txt open">
+							<ul>
+								<li>개인정보가 포함된 문의 시 비공개로 문의해 주시기 바랍니다.</li>
+								<li>저작권 침해, 음락, 욕설, 비방글, 판매, 광고 및 홍보성의 글은 임의로 삭제 처리 될 수 있습니다.</li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

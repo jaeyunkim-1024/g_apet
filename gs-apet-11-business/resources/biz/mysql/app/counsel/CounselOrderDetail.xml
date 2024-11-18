@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상담
+	작성자  		snw
+	작성일자  	2017.01.25
+-->
+
+<mapper namespace="counselOrderDetail">
+	
+	<insert id="insertCounselOrderInfo">
+		<!--
+			Query Name : counselOrderDetail.insertCounselOrderInfo
+			Description : 1:1문의 주문정보 등록
+		-->
+		INSERT INTO COUNSEL_ORDER_DETAIL (
+			  CUS_NO			/* 상담 번호 */
+			, ORD_DTL_SEQ		/* 주문 상세 순번 */
+			, ORD_NO			/* 주문 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		) VALUES (
+			  #{cusNo}
+			, #{ordDtlSeq}
+			, #{ordNo}
+			, now()
+			, #{sysRegrNo}
+			, now()
+			, #{sysUpdrNo}
+		)
+	</insert>
+
+	<select id="listCounselOrderInfo" resultType="biz.app.counsel.model.CounselOrderDetailVO">
+		<!--
+			Query Name : counselOrderDetail.listCounselOrderInfo
+			Description : 1:1문의 주문정보 목록 조회
+		-->
+		SELECT	/* QUERYID(counselOrderDetail.listCounselOrderInfo) */
+					COD.CUS_NO
+					, COD.ORD_NO
+					, COD.ORD_DTL_SEQ
+					, OD.GOODS_NM
+					, OD.ITEM_NM
+					, COD.SYS_REG_DTM		/* 시스템 등록 일시 */
+					, COD.SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, COD.SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, COD.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+		FROM		COUNSEL_ORDER_DETAIL COD
+					,ORDER_DETAIL OD
+		WHERE	COD.ORD_NO = OD.ORD_NO
+		AND		COD.ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+		AND		COD.CUS_NO = #{cusNo}
+	</select>
+
+</mapper>

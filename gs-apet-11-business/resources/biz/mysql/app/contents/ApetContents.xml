@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="apetContents">
+	<insert id="insertApetContents" parameterType="biz.app.contents.model.ApetContentsPO">
+		<!--
+			Query Name	: apetContents.insertApetContents
+			Description	: Apet 콘텐츠 등록
+		-->
+		INSERT INTO APET_CONTENTS (	/* QUERYID(apetContents.insertApetContents) */
+			  VD_ID					/* 영상 ID */
+			, VD_GB_CD				/* 영상 구분 코드 */
+			, TP_CD					/* 타입 코드 */
+			, SRIS_NO				/* 시리즈 번호 */
+			, SESN_NO				/* 시즌 번호 */
+			, FL_NO					/* 파일 번호 */
+			, THUM_AUTO_YN			/* 썸네일 자동 여부 */
+			, DISP_YN				/* 전시 여부 */
+			, TTL					/* 제목 */
+			, CONTENT				/* 내용 */
+			, CRIT					/* 저작권 */
+			, VD_TP_CD				/* 컨텐츠 타입 코드 */
+			, HITS					/* 조회수 */
+			, PET_GB_CD				/* 펫 구분 코드 */
+			, EUD_CONTS_CTG_L_CD	/* 교육용 컨텐츠 카테고리_L_코드 */
+			, EUD_CONTS_CTG_M_CD	/* 교육용 컨텐츠 카테고리_M_코드 */
+			, EUD_CONTS_CTG_S_CD	/* 교육용 컨텐츠 카테고리_S_코드 */
+			, LOD_CD				/* 난이도 코드 */
+			, PRPM_CD				/* 준비물 코드 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{vdId}
+			, #{vdGbCd}
+			, #{tpCd}
+			, #{srisNo}
+			, #{sesnNo}
+			, #{flNo}
+			, #{thumAutoYn}
+			, #{dispYn}
+			, #{ttl}
+			, #{content}
+			, #{crit}
+			, #{vdTpCd}
+			, #{hits}
+			, #{petGbCd}				
+			, #{eudContsCtgLCd}
+			, #{eudContsCtgMCd}	
+			, #{eudContsCtgSCd}
+			, #{lodCd}
+			, #{prpmCd}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateApetContents" parameterType="biz.app.contents.model.EduContsPO">
+		UPDATE APET_CONTENTS SET 
+			SYS_UPD_DTM				= NOW()
+			, SYS_UPDR_NO			= #{sysUpdrNo}
+			<if test="vdGbCd != null and vdGbCd != ''">
+				, VD_GB_CD				= #{vdGbCd}
+			</if>
+			<if test="tpCd != null and tpCd != ''">
+				, TP_CD					= #{tpCd}
+			</if>
+			<if test="srisNo != null and srisNo != ''">
+				, SRIS_NO				= #{srisNo}
+			</if>
+			<if test="sesnNo != null and sesnNo != ''">
+				, SESN_NO				= #{sesnNo}
+			</if>
+			<if test="flNo != null and flNo != ''">
+				, FL_NO					= #{flNo}
+			</if>
+			<if test="thumAutoYn != null and thumAutoYn != ''">
+				, THUM_AUTO_YN					= #{thumAutoYn}
+			</if>
+			<if test="dispYn != null and dispYn != ''">
+				, DISP_YN				= #{dispYn}
+			</if>
+			<if test="ttl != null and ttl != ''">
+				, TTL					= #{ttl}
+			</if>
+			<if test="content != null and content != ''">
+				, CONTENT				= #{content}
+			</if>
+			<if test="crit != null and crit != ''">
+				, CRIT					= #{crit}
+			</if>
+			<if test="vdTpCd != null and vdTpCd != ''">
+				, VD_TP_CD				= #{vdTpCd}
+			</if>
+			<if test="hits != null and hits != ''">
+				, HITS					= #{hits}
+			</if>
+			<if test="petGbCd != null and petGbCd != ''">
+				, PET_GB_CD				= #{petGbCd}
+			</if>
+			<if test="eudContsCtgLCd != null and eudContsCtgLCd != ''">
+				, EUD_CONTS_CTG_L_CD	= #{eudContsCtgLCd}
+			</if>
+			<if test="eudContsCtgMCd != null and eudContsCtgMCd != ''">
+				, EUD_CONTS_CTG_M_CD	= #{eudContsCtgMCd}
+			</if>
+			<if test="eudContsCtgSCd != null and eudContsCtgSCd != ''">
+				, EUD_CONTS_CTG_S_CD	= #{eudContsCtgSCd}
+			</if>
+			<if test="lodCd != null and lodCd != ''">
+				, LOD_CD				= #{lodCd}
+			</if>
+			<if test="prpmCd != null and prpmCd != ''">
+				, PRPM_CD				= #{prpmCd}
+			</if>			
+		WHERE VD_ID=#{vdId}
+	</update>
+	
+	<insert id="insertApetContentsHist" parameterType="biz.app.contents.model.EduContsVO">
+		<!--
+			Query Name	: apetContents.insertApetContents
+			Description	: Apet 콘텐츠 이력 등록
+		-->
+		INSERT INTO APET_CONTENTS_HIST (	/* QUERYID(apetContents.insertApetContentsHist) */
+			HIST_NO					/* 이력 번호 */
+			, VD_ID					/* 영상 ID */
+			, VD_GB_CD				/* 영상 구분 코드 */
+			, TP_CD					/* 타입 코드 */
+			, SRIS_NO				/* 시리즈 번호 */
+			, SESN_NO				/* 시즌 번호 */
+			, FL_NO					/* 파일 번호 */
+			, THUM_AUTO_YN			/* 썸네일 자동 여부 */
+			, DISP_YN				/* 전시 여부 */
+			, TTL					/* 제목 */
+			, CONTENT				/* 내용 */
+			, CRIT					/* 저작권 */
+			, VD_TP_CD				/* 컨텐츠 타입 코드 */
+			, HITS					/* 조회수 */
+			, PET_GB_CD				/* 펫 구분 코드 */
+			, EUD_CONTS_CTG_L_CD	/* 교육용 컨텐츠 카테고리_L_코드 */
+			, EUD_CONTS_CTG_M_CD	/* 교육용 컨텐츠 카테고리_M_코드 */
+			, EUD_CONTS_CTG_S_CD	/* 교육용 컨텐츠 카테고리_S_코드 */
+			, LOD_CD				/* 난이도 코드 */
+			, PRPM_CD				/* 준비물 코드 */
+			, SRT_URL				/* Short Url */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+		) VALUES (
+			#{histNo}
+			, #{vdId}
+			, #{vdGbCd}
+			, #{tpCd}
+			, #{srisNo}
+			, #{sesnNo}
+			, #{flNo}
+			, #{thumAutoYn}
+			, #{dispYn}
+			, #{ttl}
+			, #{content}
+			, #{crit}
+			, #{vdTpCd}
+			, #{hits}
+			, #{petGbCd}				
+			, #{eudContsCtgLCd}
+			, #{eudContsCtgMCd}	
+			, #{eudContsCtgSCd}
+			, #{lodCd}
+			, #{prpmCd}
+			, #{srtUrl}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

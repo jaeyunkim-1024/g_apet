@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 팝업레이어 A 전체 덮는크기 -->
+		<article class="popLayer a popSample1 pc_popSize_500" id="popSample1">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">댓글 신고<button type="button" class="btnPopClose">닫기</button></h1>
+					</div>
+				</div>
+				<div class="pct h_auto_p">
+					<!-- 03.19 수정 -->
+					<main class="poptents report"> 
+						<div class="lay-gray-box">
+							신고접수 시 운영정책에 따라 검토 후 해당글이 삭제됩니다.<br />
+							신고 관련된 자세한 사항은 고객센터로 연락주세요.
+						</div>
+						<div class="member-input">
+							<strong class="tit mb18">신고 사유</strong>
+							<ul class="list">
+								<li><label class="radio"><input type="radio" name="radio1"><span class="txt">혐오 콘텐츠</span></label></li>
+								<li><label class="radio"><input type="radio" name="radio1"><span class="txt">지적 재산권 위반</span></label></li>
+								<li><label class="radio"><input type="radio" name="radio1"><span class="txt">기타</span></label></li>
+							</ul>
+						</div>
+						<div class="textarea m"><textarea placeholder="신고사유를 입력해주세요. 선택사항입니다." style="height:260px;"></textarea></div>
+						<div class="log_btnWrap">
+							<a href="javascript:;" class="btn lg onWeb_if">취소</a>
+							<a href="javascript:;" class="btn a lg">완료</a>
+						</div>
+					</main>
+					<!-- // 03.19 수정 -->
+				</div>
+				
+				<!-- 하단 고정 버튼 있을때 쓰세요
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl d" onclick="ui.popLayer.close('popSample1');">취소</button>
+						<button type="button" class="btn xl a">등록</button>
+					</div>
+				</div>
+				-->
+				
+				
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popSample1");
+		</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	NicePay Noti (입금완료 처리)
+	작성자 		valfac
+	작성일자  	2021. 03. 02.
+-->
+
+<mapper namespace="nicePayNoti">
+	<update id="updateOrderInfoVirtualAccount" parameterType="biz.interfaces.nicepay.model.response.data.VirtualAccountOrderVO">
+		UPDATE ORDER_BASE OB 
+		INNER JOIN ORDER_DETAIL OD ON OB.ORD_NO = OD.ORD_NO 
+		SET 
+			OB.ORD_STAT_CD		= #{ordStatCd, jdbcType=VARCHAR},
+			OB.ORD_CPLT_DTM		= #{ordCpltDtm, jdbcType=TIMESTAMP},
+			OD.ORD_DTL_STAT_CD	= #{ordDtlStatCd, jdbcType=VARCHAR}
+		WHERE OB.ORD_NO	= #{ordNo, jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updatePayInfoVirtualAccount" parameterType="biz.app.pay.model.PayBaseVO">
+		UPDATE pay_base
+		SET 
+			PAY_STAT_CD		=#{payStatCd,	jdbcType=VARCHAR},
+			PAY_CPLT_DTM	=#{payCpltDtm,	jdbcType=TIMESTAMP},
+			PAY_AMT			=#{payAmt,		jdbcType=NUMERIC},
+			STR_ID			=#{strId,		jdbcType=VARCHAR},
+			CFM_RST_CD		=#{cfmRstCd,	jdbcType=VARCHAR},
+			CFM_RST_MSG		=#{cfmRstMsg,	jdbcType=VARCHAR},
+			DPSTR_NM		=#{dpstrNm,		jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler},
+			LNK_RSPS_RST	=#{lnkRspsRst,	jdbcType=VARCHAR},
+			SYS_UPDR_NO		= '2',
+			SYS_UPD_DTM		= now()
+		WHERE 
+			DEAL_NO = #{dealNo}
+	</update>
+	
+	<resultMap type="biz.app.pay.model.PayBaseVO" id="payBaseMap" >
+		<result property="lnkRspsRst" column="LNK_RSPS_RST" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		
+	</resultMap>
+	
+	<select id="selectList" parameterType="biz.app.pay.model.PayBaseVO" resultMap="payBaseMap">
+		SELECT
+			PAY_NO,
+			ORD_CLM_GB_CD,
+			ORD_NO,
+			CLM_NO,
+			PAY_GB_CD,
+			PAY_MEANS_CD,
+			PAY_STAT_CD,
+			ORG_PAY_NO,
+			PAY_CPLT_DTM,
+			PAY_AMT,
+			STR_ID,
+			DEAL_NO,
+			CFM_NO,
+			CFM_DTM,
+			CFM_RST_CD,
+			CFM_RST_MSG,
+			CARDC_CD,
+			CARD_NO,
+			INSTMNT_INFO,
+			BANK_CD,
+			ACCT_NO,
+			OOA_NM,
+			DPSTR_NM,
+			DPST_SCHD_DT,
+			DPST_SCHD_AMT,
+			DPST_CHECK_MSG,
+			CNC_YN,
+			LNK_RSPS_RST
+		FROM
+			PAY_BASE
+		WHERE
+			PAY_NO &lt; 2
+	</select>
+	
+	<update id="updateCryptoTest" parameterType="biz.app.pay.model.PayBaseVO">
+		UPDATE ABOUTPET.PAY_BASE
+		SET 
+			LNK_RSPS_RST = #{lnkRspsRst,	jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}
+		WHERE PAY_NO=1
+	</update>
+	
+	<select id="selectTargetList" parameterType="hashmap" resultType="hashmap">
+		select
+			distinct ${fieldName}
+		from
+			${tableName}
+	</select>
+	
+	<update id="updateTargetField" parameterType="hashmap">
+		update
+			${tableName}
+		set
+			${fieldName} = #{postCrypto}
+		where
+			${fieldName} = #{preCrypto}
+			
+	</update>
+	
+</mapper>

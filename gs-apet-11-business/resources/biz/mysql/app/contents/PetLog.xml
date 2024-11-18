@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	업체 공지
+	작성자  	kwj
+	작성일자  	2016.03.07
+-->
+
+<mapper namespace="petLogMgmt"> 
+	
+
+	<select id="pagePetLog" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="biz.app.contents.model.PetLogMgmtVO">
+		<!--
+			Query Name	: petLogMgmt.pagePetLog
+			Description	: 펫로그 목록 조회
+		-->
+		SELECT	/* QUERYID(petLogMgmt.pagePetLog) */ 
+		T1.*		
+		FROM (
+			SELECT
+				<choose>		
+					<when test="orderingGb == @framework.common.constants.CommonConstants@PETLOG_ORDERING_TP_20">					
+					ROW_NUMBER() OVER(ORDER BY HITS) AS ROW_INDEX,
+					</when>
+					<when test="orderingGb == @framework.common.constants.CommonConstants@PETLOG_ORDERING_TP_30">
+					ROW_NUMBER() OVER(ORDER BY GOOD_CNT) AS ROW_INDEX,					
+					</when>	
+					<otherwise>
+					ROW_NUMBER() OVER(ORDER BY PET_LOG_NO) AS ROW_INDEX,					  	
+					</otherwise>			
+				</choose>				
+				 PET_LOG_NO 
+				, DSCRT
+				, MBR_NO
+				, LOGIN_ID
+				, HITS
+				, CONTS_STAT_CD
+				, SNCT_YN
+				, GOOD_CNT
+				, CLAIM_CNT			
+				, CONCAT(DATE_FORMAT(SYS_REG_DTM, '%Y.%m.%d'), '\n', '(', DATE_FORMAT(SYS_UPD_DTM, '%Y.%m.%d'), ')') AS REG_MOD_DTM 
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, SRT_PATH
+				, VD_THUM_PATH
+				, PETLOG_CONTS_GB			
+				, NICK_NM
+				, PST_NM
+				, SHARE_CNT
+				, GOODS_RCOM_YN
+				, PET_LOG_CHNL_CD 
+			FROM
+			(
+				SELECT  
+					  T1.PET_LOG_NO			/* 펫로그 번호 */
+					, T1.DSCRT					/* 펫로그 내용 */
+					, T1.MBR_NO				/* 펫로그 등록자 */			
+					-- , FN_GET_USER_ID(T1.MBR_NO) AS LOGIN_ID 	/* 펫로그 등록자 id */
+					, T1.HITS					/* 펫로그 조회수 */
+					, T1.CONTS_STAT_CD			/* 펫로그 전시여부 */
+					, T1.SNCT_YN				/* 펫로그 제재여부 */
+					-- , (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '10') AS GOOD_CNT 	/* 펫로그 좋아요 갯수 */
+					-- , (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL) AS CLAIM_CNT 	/* 펫로그 신고 갯수 */				
+					-- , (SELECT NICK_NM FROM MEMBER_BASE WHERE MBR_NO = T1.MBR_NO) AS NICK_NM											/* 닉네임 */
+					, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */	
+					, T1.SRT_PATH				/* 단축경로 */				
+					, CASE WHEN T1.VD_THUM_PATH IS NULL OR T1.VD_THUM_PATH = '' THEN  T1.IMG_PATH1
+						   ELSE T1.VD_THUM_PATH END AS VD_THUM_PATH
+					, CASE WHEN T1.VD_PATH IS NULL OR T1.VD_PATH = '' THEN '${@framework.common.constants.CommonConstants@PETLOG_CONTS_GB_20}' 
+						   ELSE '${@framework.common.constants.CommonConstants@PETLOG_CONTS_GB_10}' END AS PETLOG_CONTS_GB				
+					, T1.PST_NM				/* 위치 */
+					-- , (SELECT COUNT(*) FROM PET_LOG_SHARE WHERE PET_LOG_NO = T1.PET_LOG_NO) AS SHARE_CNT	/* 공유수 */
+					, T1.GOODS_RCOM_YN			/* 펫로그 상품추천여부 */
+					, T1.PET_LOG_CHNL_CD		/* 펫로그 채널코드 */		
+					, IFNULL(T2.GOOD_CNT,0 ) AS GOOD_CNT
+					, IFNULL(T3.CLAIM_CNT,0) AS CLAIM_CNT
+					, T4.NICK_NM
+					, IFNULL(T5.SHARE_CNT, 0) AS SHARE_CNT		
+					, T4.LOGIN_ID
+				FROM
+					PET_LOG_BASE T1					
+					LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS GOOD_CNT FROM PET_LOG_INTEREST WHERE INTS_GB_CD = '10' GROUP BY PET_LOG_NO) T2 ON (T1.PET_LOG_NO = T2.PET_LOG_NO)
+					LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS CLAIM_CNT FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ IS NULL GROUP BY PET_LOG_NO) T3 ON (T1.PET_LOG_NO = T3.PET_LOG_NO)
+					LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS SHARE_CNT FROM PET_LOG_SHARE GROUP BY PET_LOG_NO) T5 ON (T1.PET_LOG_NO = T5.PET_LOG_NO)
+					JOIN (SELECT MBR_NO, NICK_NM, LOGIN_ID FROM MEMBER_BASE WHERE MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}') T4 ON (T1.MBR_NO = T4.MBR_NO)
+					<if test="dispCallYn == @framework.common.constants.CommonConstants@COMM_YN_Y">
+					JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = T1.PET_LOG_NO)
+					JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+					JOIN GOODS_COMMENT_LINK GCL ON (CMT.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO) 
+					JOIN ORDER_DETAIL OD ON (OD.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+					WHERE CMT.SYS_DEL_YN  = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+					AND OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+					</if>
+			) T1			
+			WHERE 1=1 
+			<include refid="pagePetLogWhere" />			
+			) T1	
+			ORDER BY ROW_INDEX DESC				 	
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<sql id="pagePetLogWhere">
+		<if test="sysRegDtmStart != null">
+			  AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+			  AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>			
+			<if test="contsStatCd != null and contsStatCd != ''">
+			  AND T1.CONTS_STAT_CD = #{contsStatCd }
+			</if>
+			<if test="dscrt != null and dscrt != ''">
+			  AND T1.DSCRT LIKE CONCAT('%', #{dscrt }, '%') 
+			</if>
+			<if test="goodsMapYn != null and goodsMapYn != ''">
+			  AND T1.GOODS_RCOM_YN = #{goodsMapYn }		   
+			</if>
+			<if test="mbrNo != null and mbrNo != 0">
+			  AND T1.MBR_NO = #{mbrNo}
+			</if>
+			<if test="petLogNo != null"> 
+			  AND T1.PET_LOG_NO = #{petLogNo }
+			</if>		
+			<if test="rptpCnt != null"> 
+			  AND T1.CLAIM_CNT = #{rptpCnt }
+			</if>		
+			<if test="srtPath != null and srtPath !=''"> 
+			  AND T1.SRT_PATH = #{srtPath }
+			</if>
+			<if test="tags != null">
+			  AND EXISTS (SELECT 1
+			  			  FROM TAG_BASE T2 JOIN PET_LOG_TAG_MAP T3 ON (T2.TAG_NO = T3.TAG_NO)
+			  			  WHERE T3.PET_LOG_NO = T1.PET_LOG_NO
+			  			  <foreach collection="tags" item="item" separator="," open="AND T2.TAG_NM IN (" close=")">
+								REPLACE(#{item }, '#', '')
+					   	  </foreach>
+			  			  )		   
+			</if>
+			<if test="rptpRsnCd != null and rptpRsnCd !=''">
+			  AND EXISTS (SELECT 1 
+			  			  FROM PET_LOG_RPTP T4
+			  			  WHERE T4.PET_LOG_APLY_SEQ IS NULL 
+			  			    AND T4.PET_LOG_NO = T1.PET_LOG_NO
+			  			    AND T4.RPTP_RSN_CD = #{rptpRsnCd}
+			  			  )		   
+			</if>
+			<choose>
+				<when test="regGb == 'nickNm'">
+					<if test="loginId != null and loginId != ''">
+					  AND UPPER(T1.NICK_NM) = UPPER(#{loginId })
+					</if>
+				</when>
+				<when test="regGb == 'loginId'">
+					<if test="loginId != null and loginId != ''">
+					  AND T1.LOGIN_ID = #{loginId }
+					</if>
+				</when>
+				<when test="regGb == 'mbrNo'">
+					<if test="loginId != null and loginId != ''">
+					  AND T1.MBR_NO = #{loginId }
+					</if>
+				</when>		
+			</choose>
+			<if test="petlogContsGb != null and petlogContsGb != ''">
+			  AND T1.PETLOG_CONTS_GB = #{petlogContsGb }
+			</if>
+			<if test="petLogChnlCd != null and petLogChnlCd != ''">
+			  AND T1.PET_LOG_CHNL_CD = #{petLogChnlCd} 
+			</if>
+			<if test="shareCntStrt != null">
+			  AND T1.SHARE_CNT &gt;= #{shareCntStrt }
+			</if>
+			<if test="shareCntEnd != null">
+			  AND T1.SHARE_CNT &lt;= #{shareCntEnd }
+			</if>
+			<if test="goodCntStrt != null">
+			  AND T1.GOOD_CNT &gt;= #{goodCntStrt }
+			</if>
+			<if test="goodCntEnd != null">
+			  AND T1.GOOD_CNT &lt;= #{goodCntEnd }
+			</if>
+	</sql>
+	
+	<select id="pagePetLogCount" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="java.lang.Integer">
+		<!--
+			Query Name	: petLogMgmt.pagePetLogCount
+			Description	: 펫로그 목록 count
+		-->
+		SELECT COUNT(*)
+		FROM /* QUERYID(petLog.pagePetLogCount) */
+		(
+			SELECT  
+				  T1.PET_LOG_NO			/* 펫로그 번호 */
+				, T1.DSCRT					/* 펫로그 내용 */
+				, T1.MBR_NO				/* 펫로그 등록자 */		
+				-- , FN_GET_USER_ID(T1.MBR_NO) AS LOGIN_ID 	/* 펫로그 등록자 id */	
+				, T1.HITS					/* 펫로그 조회수 */
+				, T1.CONTS_STAT_CD			/* 펫로그 전시여부 */
+				-- , (SELECT COUNT(*) FROM PET_LOG_INTEREST WHERE PET_LOG_NO = T1.PET_LOG_NO AND INTS_GB_CD = '10') AS GOOD_CNT 	/* 펫로그 좋아요 갯수 */
+				-- , (SELECT COUNT(*) FROM PET_LOG_RPTP WHERE PET_LOG_NO = T1.PET_LOG_NO AND PET_LOG_APLY_SEQ IS NULL) AS CLAIM_CNT 	/* 펫로그 신고 갯수 */				
+				-- , (SELECT NICK_NM FROM MEMBER_BASE WHERE MBR_NO = T1.MBR_NO) AS NICK_NM											/* 닉네임 */
+				, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */			
+				, T1.SRT_PATH				/* 단축경로 */	
+				, CASE WHEN T1.VD_THUM_PATH IS NULL OR T1.VD_THUM_PATH = '' THEN  T1.IMG_PATH1
+					   ELSE T1.VD_THUM_PATH END AS VD_THUM_PATH  
+				, CASE WHEN T1.VD_PATH IS NULL OR T1.VD_PATH = '' THEN '${@framework.common.constants.CommonConstants@PETLOG_CONTS_GB_20}' 
+					   ELSE '${@framework.common.constants.CommonConstants@PETLOG_CONTS_GB_10}' END AS PETLOG_CONTS_GB
+				, T1.PST_NM				/* 위치 */
+				-- , (SELECT COUNT(*) FROM PET_LOG_SHARE WHERE PET_LOG_NO = T1.PET_LOG_NO) AS SHARE_CNT	/* 공유수 */
+				, T1.GOODS_RCOM_YN			/* 펫로그 상품추천여부 */
+				, T1.PET_LOG_CHNL_CD		/* 펫로그 채널코드 */
+				, IFNULL(T2.GOOD_CNT,0 ) AS GOOD_CNT
+				, IFNULL(T3.CLAIM_CNT,0) AS CLAIM_CNT
+				, T4.NICK_NM
+				, IFNULL(T5.SHARE_CNT, 0) AS SHARE_CNT
+				, T4.LOGIN_ID
+			FROM
+				PET_LOG_BASE T1					
+				LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS GOOD_CNT FROM PET_LOG_INTEREST WHERE INTS_GB_CD = '10' GROUP BY PET_LOG_NO) T2 ON (T1.PET_LOG_NO = T2.PET_LOG_NO)
+				LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS CLAIM_CNT FROM PET_LOG_RPTP WHERE PET_LOG_APLY_SEQ IS NULL GROUP BY PET_LOG_NO) T3 ON (T1.PET_LOG_NO = T3.PET_LOG_NO)
+				LEFT OUTER JOIN (SELECT PET_LOG_NO, COUNT(*) AS SHARE_CNT FROM PET_LOG_SHARE GROUP BY PET_LOG_NO) T5 ON (T1.PET_LOG_NO = T5.PET_LOG_NO)
+				JOIN (SELECT MBR_NO, NICK_NM, LOGIN_ID FROM MEMBER_BASE WHERE MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}') T4 ON (T1.MBR_NO = T4.MBR_NO)
+				<if test="dispCallYn == @framework.common.constants.CommonConstants@COMM_YN_Y">
+				JOIN PET_LOG_GOODS_REVIEW_MAP RM ON (RM.PET_LOG_NO = T1.PET_LOG_NO)
+				JOIN GOODS_COMMENT CMT ON ( CMT.GOODS_ESTM_NO = RM.GOODS_ESTM_NO)
+				JOIN GOODS_COMMENT_LINK GCL ON (CMT.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO) 
+				JOIN ORDER_DETAIL OD ON (OD.GOODS_ESTM_NO = GCL.GOODS_ESTM_NO)
+				WHERE CMT.SYS_DEL_YN  = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				AND OD.GOODS_ESTM_REG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				</if>
+		) T1					
+		WHERE 1=1
+		<include refid="pagePetLogWhere" />
+		
+	</select>
+	
+	<update id="updatePetLogStat" parameterType="biz.app.contents.model.PetLogMgmtPO">
+		<!-- Query Name : petLogMgmt.updatePetLogStat Description : 펫로그 전시상태 수정 -->
+				
+		UPDATE PET_LOG_BASE SET
+		  CONTS_STAT_CD = #{contsStatCd }				/* 전시상태 */
+		, SYS_UPDR_NO			= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+	    , SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */  
+		<if test="snctYn != null and snctYn != ''">
+		, SNCT_YN = #{snctYn } 							/* 제재여부 */ 
+		</if>   
+		WHERE
+			PET_LOG_NO = #{petLogNo }
+
+	</update>
+	
+	<select id="pagePetLogReport" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="biz.app.contents.model.PetLogMgmtVO">
+		SELECT	/* QUERYID(petLogMgmt.pagePetLogReport) */
+			@ROWNUM := @ROWNUM+1 		AS ROW_INDEX
+			, T1.PET_LOG_RPTP_NO							/* 펫로그 신고번호 */
+			, T1.PET_LOG_NO									/* 펫로그 번호 */
+			, T1.PET_LOG_APLY_SEQ							/* 펫로그 댓글 순번 */
+			, T2.MBR_NO										/* 펫로그 등록자 */
+			, FN_GET_USER_ID(T1.MBR_NO) AS RPTP_LOGIN_ID	/* 펫로그 신고자 loginId */
+			, FN_GET_USER_ID(T2.MBR_NO) AS LOGIN_ID			/* 펫로그 등록자 loginId */
+			, T1.RPTP_CONTENT								/* 펫로그 신고 내용 */
+			, T1.RPTP_RSN_CD								/* 펫로그 신고사유 */
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@RPTP_RSN}' AND DTL_CD = RPTP_RSN_CD) AS RPTP_RSN_NM /* 펫로그 신고사유명 */
+			, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, DATE_FORMAT(T1.SYS_REG_DTM, '%Y.%m.%d') AS regModDtm
+			, T2.PET_LOG_CHNL_CD		/* 펫로그 채널코드 */
+		FROM
+			PET_LOG_RPTP T1 JOIN PET_LOG_BASE T2 ON (T1.PET_LOG_NO = T2.PET_LOG_NO)
+			, (SELECT @ROWNUM:=0) TMP
+		WHERE 
+		  T1.PET_LOG_APLY_SEQ IS NULL
+		<if test="petLogNo != null and petLogNo != ''">
+		  AND T1.PET_LOG_NO = #{petLogNo }
+		</if>
+		<if test="sysRegDtmStart != null">
+		  AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null"> 
+		  AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>		
+		<if test="loginId != null and loginId != ''">
+		  AND UPPER(FN_GET_USER_ID(T2.MBR_NO)) = UPPER(#{loginId })
+		</if>
+		<if test="rptpLoginId != null and rptpLoginId != ''">
+		  AND UPPER(FN_GET_USER_ID(T1.MBR_NO)) = UPPER(#{rptpLoginId })
+		</if>
+		<if test="rptpContent != null and rptpContent != ''">
+		  AND T1.RPTP_CONTENT LIKE CONCAT('%', #{rptpContent }, '%')
+		</if>
+		<if test="arrRptpRsnCd != null and arrRptpRsnCd.length > 0">
+		   AND T1.RPTP_RSN_CD IN (
+					    <foreach collection="arrRptpRsnCd" item="items" separator="," >
+					    #{items}
+					    </foreach>
+					    )
+		</if>
+		ORDER BY T1.SYS_REG_DTM DESC	
+		<include refid="bizCommon.pageSql" /> 
+				
+	
+	</select>
+	
+	<select id="pagePetLogReportCount" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="java.lang.Integer">
+		SELECT	/* QUERYID(petLogMgmt.pagePetLogReportCount) */  
+			  COUNT(*)
+		FROM
+			PET_LOG_RPTP T1 JOIN PET_LOG_BASE T2 ON (T1.PET_LOG_NO = T2.PET_LOG_NO)
+		WHERE 
+		  T1.PET_LOG_APLY_SEQ IS NULL
+		<if test="petLogNo != null and petLogNo != ''">
+		  AND T1.PET_LOG_NO = #{petLogNo }
+		</if>  
+		<if test="sysRegDtmStart != null">
+		  AND T1.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+		  AND T1.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>		
+		<if test="loginId != null and loginId != ''">
+		  AND UPPER(FN_GET_USER_ID(T2.MBR_NO)) = UPPER(#{loginId })
+		</if>
+		<if test="rptpLoginId != null and rptpLoginId != ''">
+		  AND UPPER(FN_GET_USER_ID(T1.MBR_NO)) = UPPER(#{rptpLoginId })
+		</if>
+		<if test="rptpContent != null and rptpContent != ''">
+		  AND T1.RPTP_CONTENT LIKE CONCAT('%', #{rptpContent }, '%')
+		</if>
+		<if test="arrRptpRsnCd != null and arrRptpRsnCd.length > 0"> 
+		   AND T1.RPTP_RSN_CD IN (
+					    <foreach collection="arrRptpRsnCd" item="items" separator="," >
+					    #{items}
+					    </foreach>
+					    )
+		</if>
+	</select>
+	
+	<select id="listPetSchoolCatch" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="biz.app.petlog.model.PetLogBaseVO">
+		<!--
+			Query Name	: petLogMgmt.listPetSchoolCatch
+			Description	: 펫스쿨 따라잡기 리스트
+		-->
+		
+		SELECT  
+			  T1.PET_LOG_NO			/* 펫로그 번호 */
+			, T1.DSCRT					/* 펫로그 내용 */
+			, T1.MBR_NO				/* 펫로그 등록자 */			
+			, T2.LOGIN_ID 				/* 펫로그 등록자 id */
+			, T1.HITS					/* 펫로그 조회수 */
+			, T1.CONTS_STAT_CD			/* 펫로그 전시여부 */
+			, T1.SNCT_YN				/* 펫로그 제재여부 */			
+			, T2.PRFL_IMG				/* 펫로그 등록자 프로필 이미지 */
+			, IFNULL(IFNULL(IFNULL(IFNULL(IFNULL(VD_THUM_PATH,IMG_PATH1), IMG_PATH2), IMG_PATH3), IMG_PATH4), IMG_PATH5) AS IMG_PATH1				
+			, T1.SRT_PATH				/* 단축경로 */
+			, T1.VD_PATH				/* 영상경로 */
+			, T2.NICK_NM				/* 닉네임 */ 
+			, T2.PET_LOG_URL			/* 펫로그_URL */
+		FROM
+			PET_LOG_BASE T1
+			JOIN MEMBER_BASE T2 ON (T2.MBR_NO = T1.MBR_NO) 			
+		WHERE IFNULL(SNCT_YN, 'N') = 'N'
+		  AND PET_LOG_NO IN (
+					    <foreach collection="petLogNos" item="items" separator="," >
+					    #{items}
+					    </foreach>
+					 	   )		
+		
+	</select>
+	
+	<select id="selectPetLogRegrInfo" parameterType="biz.app.contents.model.PetLogMgmtSO" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name	: petLogMgmt.selectPetLogRegrInfo
+			Description	: 펫로그 등록자 정보
+		-->
+		
+		SELECT  
+			  MBR_NO
+			  , ST_ID
+			  , POLICY_NO
+			  , LOGIN_ID
+			  , MBR_NM
+			  , NICK_NM
+			  , PET_LOG_URL
+			  , PET_LOG_SRT_URL
+			  , RCOM_URL
+			  , MBR_GB_CD
+			  , MBR_STAT_CD
+			  , MBR_GRD_CD
+			  , BIRTH
+			  , GD_GB_CD
+			  , NTN_GB_CD
+			  , JOIN_DTM
+			  , MOD_DTM
+			  , JOIN_PATH_CD
+			  , JOIN_ENV_CD
+			  , CTF_YN
+			  , CI_CTF_VAL
+			  , DI_CTF_VAL
+			  , GSPT_NO
+			  , GSPT_USE_YN
+			  , GSPT_STATE_CD
+			  , GSPT_START_DTM
+			  , GSPT_STOP_DTM
+			  , DEVICE_TOKEN
+			  , DEVICE_TP_CD
+			  , INFO_RCV_YN
+			  , MKNG_RCV_YN
+			  , PST_INFO_AGR_YN
+			  , ALM_RCV_YN
+			  , DFFC_MBR_YN
+			  , PET_SCHL_YN
+			  , PSWD, PSWD_INIT_YN
+			  , PSWD_CHG_DTM
+			  , LOGIN_FAIL_CNT
+			  , LAST_LOGIN_DTM
+			  , PSWD_CHG_SCD_DTM
+			  , TEL
+			  , MOBILE
+			  , MOBILE_CD
+			  , EMAIL
+			  , RCOM_LOGIN_ID
+			  , MBR_LEV_RSN_CD
+			  , MBR_LEV_CONTENT
+			  , MBR_LEV_DTM
+			  , RE_JOIN_PSB_DT
+			  , DORMANT_APL_DTM
+			  , DORMANT_RLS_DTM
+			  , PET_LOG_ITRDC
+			  , PRFL_IMG
+			  , MBR_STOP_DTM
+			  , DLGT_PET_GB_CD
+		FROM MEMBER_BASE
+		WHERE MBR_NO = (SELECT MBR_NO FROM PET_LOG_BASE WHERE PET_LOG_NO = #{petLogNo}) 
+	</select>
+
+	
+
+</mapper>

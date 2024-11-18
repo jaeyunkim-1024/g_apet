@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 상품 자세히 보기 -->
+		<article class="popLayer a popPdDetView" id="popPdDetView">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">상품 자세히 보기</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						<div class="btstop">
+							<button type="button" class="bt cpnall" onclick="ui.popBot.open('popOptPdSel',{'pop':true});">
+								<!-- 04.19 : 수정 -->
+								<span class="tit">상품 1</span>
+								<span class="con">특별 기획 아주 맛좋고 질좋은 춘천 닭고기</span>
+								<!-- // 04.19 : 수정 -->
+							</button>
+							<!-- 쿠폰상품선택 @@02.25 추가 수정 -->
+							<article class="popBot popOptPdSel" id="popOptPdSel">
+								<div class="pbd">
+									<div class="phd">
+										<div class="in">
+											<h1 class="tit">옵션 선택</h1>
+											<button type="button" class="btnPopInClose" onclick="ui.popBot.close('popOptPdSel');">닫기</button>
+										</div>
+									</div>
+									<div class="pct" style="height: 611px;">
+										<main class="poptents">
+											<div class="ugdoptlist">
+												<ul class="gdtlist">
+													<li>
+														<div class="unitSel">
+															<div class="box">
+																<div class="infs">
+																	<a href="javascript:;" class="lk">전체 상품 쿠폰</a>
+																</div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic soldOut"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic">
+																		<img class="img" src="../../_images/_temp/shop_pd_inf_img_1.png" alt="상품">
+																		<p class="txt">품절</p>
+																	</div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+										</main>
+									</div>
+								</div>
+							</article>
+							
+						</div>
+						<div class="html_editor mo">
+										
+							<p><img src="../../_images/_temp/img_mw.png" alt="설명"></p>
+
+						</div>
+					</main>
+				</div>
+			</div>
+		</article>
+
+		<script>
+			ui.popLayer.open("popPdDetView");
+		</script>
+
+</body>
+</html>

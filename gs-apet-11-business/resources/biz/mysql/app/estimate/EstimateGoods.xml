@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	견적서 상품
+	일자 : 2017. 02. 22.
+	작성자 : snw
+-->
+
+<mapper namespace="estimateGoods">
+
+	<select id="listEstimateGoods" resultType="biz.app.estimate.model.EstimateGoodsVO">
+		<!--
+			Query Name : estimateGoods.listEstimateGoods
+			Description : 견적서상품 리스트
+		-->
+		SELECT	/* estimateGoods.listEstimateGoods */
+					ESTM_NO
+					,GOODS_SEQ
+					,GOODS_NM
+					,SALE_AMT
+					,QTY
+					,GOODS_ID
+					,ITEM_NO
+					,ITEM_NM
+					,SYS_REGR_NO
+					,SYS_REG_DTM
+					,DLVR_CLSF_NM
+		FROM		ESTIMATE_GOODS
+		WHERE	ESTM_NO=#{estmNo}
+	</select>
+
+	
+</mapper>

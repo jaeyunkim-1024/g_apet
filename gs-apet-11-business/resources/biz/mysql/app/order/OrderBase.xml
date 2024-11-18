@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="orderBase">
+
+	<select id="getOrderNo" resultType="java.lang.String">
+		<!--
+			Query Name	: orderBase.getOrderNo
+			Description	: 주문 번호 생성
+		-->
+		SELECT	/* QUERYID(orderBase.getOrderNo) */
+			FN_GET_ORD_NO()
+		FROM DUAL
+	</select>
+
+
+	<insert id="insertOrderBase">
+		<!--
+			Query Name	: orderBase.insertOrderBase
+			Description	: 주문 기본 등록
+		-->
+		INSERT INTO ORDER_BASE	/* QUERYID(orderBase.insertOrderBase) */
+		(
+			  ORD_NO				/* 주문 번호 */
+			, ST_ID					/* 사이트 아이디 */
+			, MBR_NO				/* 회원 번호 */
+			, ORD_STAT_CD			/* 주문 상태 코드 */
+			, ORD_MDA_CD			/* 주문 매체 코드 */
+			, CHNL_ID				/* 채널 ID */
+			, MBR_GRD_CD			/* 회원 등급 코드 */
+			, ORD_NM				/* 주문자 명 */
+			, ORDR_ID				/* 주문자 ID */
+			, ORDR_EMAIL			/* 주문자 이메일 */
+			, ORDR_TEL				/* 주문자 전화 */
+			, ORDR_MOBILE			/* 주문자 휴대폰 */
+			, ORDR_IP				/* 주문자 IP */
+			, OUTSIDE_ORD_NO		/* 외부 주문 번호 */
+			, ORD_DTL_CNT			/* 주문 상세 수 */
+			, DATA_STAT_CD			/* 데이터 상태 코드 */
+			, DLVR_PRCS_TP_CD       /* 배송 처리 유형 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{ordNo}				/* 주문 번호 */
+			, #{stId}				/* 사이트 아이디 */
+			, #{mbrNo}				/* 회원 번호 */
+			, #{ordStatCd} 			/* 주문 상태 코드 */
+			, #{ordMdaCd}			/* 주문 매체 코드 */
+			, #{chnlId}				/* 채널ID */
+			, #{mbrGrdCd}			/* 회원 등급 코드 */
+			, #{ordNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}	/* 주문자 명 */
+			, #{ordrId, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 주문자 ID */
+			, #{ordrEmail, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 주문자 이메일 */
+			, #{ordrTel, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 주문자 전화 */
+			, #{ordrMobile, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 주문자 휴대폰 */
+			, #{ordrIp}				/* 주문자 IP */
+			, #{outsideOrdNo}		/* 외부 주문 번호 */
+			, #{ordDtlCnt}			/* 주문 상세 수 */
+			, #{dataStatCd}			/* 데이터 상태 코드 */
+			, #{dlvrPrcsTpCd}       /* 배송 처리 유형 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+	<resultMap type="biz.app.order.model.OrderBaseVO" id="getOrderBaseMap" >
+		<result property="mbrNm" column="MBR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<!-- <result property="ordrId" column="ORDR_ID" typeHandler="biz.common.typehandler.CryptoTypeHandler" /> -->
+	</resultMap>
+	
+	<select id="getOrderBase" resultMap="getOrderBaseMap">
+		<!--
+			Query Name	: orderBase.getOrderBase
+			Description	: 주문 기본 조회
+		-->
+		SELECT	/* QUERYID(orderBase.getOrderBase) */
+			  ORD_NO				/* 주문 번호 */
+			, ST_ID					/* 사이트 아이디 */
+			, (SELECT ST_NM FROM ST_STD_INFO WHERE ST_ID = OB.ST_ID) AS ST_NM 			/* 사이트 명 */
+			, MBR_NO				/* 회원 번호 */
+			, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = OB.MBR_NO) AS MBR_NM		/* 회원 이름 */
+			, ORD_STAT_CD			/* 주문 상태 코드 */
+			, ORD_MDA_CD			/* 주문 매체 코드 */
+			, CHNL_ID				/* 채널 ID */
+			, (SELECT CHNL_NM FROM CHNL_STD_INFO WHERE CHNL_ID = OB.CHNL_ID) AS CHNL_NM	/* 채널명 */
+			, MBR_GRD_CD			/* 회원 등급 코드 */
+			, ORD_NM				/* 주문자 명 */
+			, ORDR_ID				/* 주문자 ID */
+			, ORDR_EMAIL			/* 주문자 이메일 */
+			, ORDR_TEL				/* 주문자 전화 */
+			, ORDR_MOBILE			/* 주문자 휴대폰 */
+			, ORDR_IP				/* 주문자 IP */
+			, ORD_ACPT_DTM			/* 주문 접수 일시 */
+			, ORD_CPLT_DTM			/* 주문 완료 일시 */
+			, OUTSIDE_ORD_NO		/* 외부 주문 번호 */
+			, ORD_DTL_CNT			/* 주문 상세 수 */
+			, ORD_PRCS_RST_CD		/* 주문 처리 결과 코드 */
+			, ORD_PRCS_RST_MSG		/* 주문 처리 결과 메세지 */
+			, DATA_STAT_CD			/* 데이터 상태 코드 */
+			, DLVR_PRCS_TP_CD		/* 배송 처리 유형 */
+			, MP_LNK_HIST_NO
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_ORDER_PAY_MEANS_CD(ORD_NO) AS PAY_MEANS_CD							/* 주 결제 수단 */
+			, FN_GET_ORD_DLVR_CHANGE_PSB_YN(ORD_NO) AS DLVRA_CHG_PSB_YN					/* 배송지 변경 가능 여부 */
+			, FN_GET_ORDER_CANCEL_YN(ORD_NO) AS ORD_CANCEL_YN							/* 주문 취소 여부 */
+            , FN_GET_ORDER_CANCEL_PSB_YN(ORD_NO) AS ORD_CANCEL_PSB_YN					/* 취소 가능 여부 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM								/* 시스템 등록자 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM								/* 시스템 수정자 */
+			, FN_GET_ORDER_CLAIM_ING_RTN_YN(OB.ORD_NO, 0)  AS ALL_CLAIM_ING_RTN_YN		/* 반품 진행 중 여부 */
+		FROM
+			ORDER_BASE OB
+		WHERE	1 = 1
+			<if test="ordNo != null">
+			AND OB.ORD_NO = UPPER(#{ordNo})
+			</if>
+			<if test="ordrEmail != null and ordrEmail != ''">
+			AND OB.ORDR_EMAIL = #{ordrEmail}
+			</if>
+			<if test="mbrNo != null">
+	        AND OB.MBR_NO = #{mbrNo}
+	        </if>
+			<if test="stId != null">
+	        AND OB.ST_ID = #{stId}
+	        </if>
+			<if test="outsideOrdNo != null">
+			AND OB.OUTSIDE_ORD_NO = UPPER(#{outsideOrdNo})
+			</if>
+	</select>
+
+
+	<update id="updateOrderBase">
+		<!--
+			Query Name	: orderBase.updateOrderBase
+			Description	: 주문 기본 수정
+		-->
+		UPDATE ORDER_BASE	/* QUERYID(orderBase.updateOrderBase) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()						/* 시스템 수정 일시 */
+			<if test="ordNm != null and ordNm != ''">
+			, ORD_NM			= #{ordNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}	/* 주문자 명 */
+			</if>
+			<if test="ordrEmail != null and ordrEmail != ''">
+			, ORDR_EMAIL		= #{ordrEmail, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}	/* 주문자 이메일 */
+			</if>
+			<if test="ordrTel != null and ordrTel != ''">
+			, ORDR_TEL			= #{ordrTel, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 주문자 전화번호 */
+			</if>
+			<if test="ordrMobile != null and ordrMobile != ''">
+			, ORDR_MOBILE		= #{ordrMobile, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 주문자 휴대번호 */
+			</if>
+			<if test="ordStatCd != null and ordStatCd != ''">
+			, ORD_STAT_CD		= #{ordStatCd}				/* 주문 상태 코드 */
+			</if>
+			<if test="ordAcptDtmYn != null and ordAcptDtmYn != ''">
+			, ORD_ACPT_DTM 		= IFNULL(ORD_ACPT_DTM, NOW())
+			</if>
+			<if test="ordCpltDtmYn != null and ordCpltDtmYn != ''">
+			, ORD_CPLT_DTM 		= NOW()
+			</if>
+			<if test="ordPrcsRstCd != null and ordPrcsRstCd != ''">
+			, ORD_PRCS_RST_CD 	= #{ordPrcsRstCd}			/* 주문 처리결과 코드 */
+			</if>
+			<if test="ordPrcsRstMsg != null and ordPrcsRstMsg != ''">
+			, ORD_PRCS_RST_MSG 	= #{ordPrcsRstMsg}			/* 주문 처리결과 메세지 */
+			</if>
+			<if test="dataStatCd != null and dataStatCd != ''">
+			, DATA_STAT_CD 		= #{dataStatCd}				/* 데이터 상태 코드 */
+			</if>
+			<if test="dlvrPrcsTpCd != null and dlvrPrcsTpCd != ''">
+			, DLVR_PRCS_TP_CD 		= #{dlvrPrcsTpCd}				/* 배송 처리 유형 코드 */
+			</if>
+			<if test="mpLnkHistNo != null and mpLnkHistNo != ''">
+			, MP_LNK_HIST_NO 		= #{mpLnkHistNo}				/* MP 연동 이력 번호 */
+			</if>
+		WHERE
+			ORD_NO = #{ordNo}
+	</update>
+	
+	<update id="updateOrderBaseStatus">
+		<!--
+			Query Name	: orderBase.updateOrderBaseStatus
+			Description	: 주문 기본 수정
+		-->
+		UPDATE ORDER_BASE	/* QUERYID(orderBase.updateOrderBaseStatus) */
+		SET
+			  SYS_UPDR_NO		= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()						/* 시스템 수정 일시 */
+			, ORDR_SHOW_YN 		= 'N'
+		WHERE
+			ORD_NO = #{ordNo}
+			AND MBR_NO = #{mbrNo} 
+	</update>
+
+</mapper>
+

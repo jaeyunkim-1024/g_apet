@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userAuthHist">
+	<select id="userAuthHistGrid" resultType="biz.app.system.model.UserAuthHistVO">
+		<!-- 
+			Query Name : userAuthHist.userAuthHistGrid
+			Description : 접근 권한 이력 그리드
+		 -->
+		  SELECT
+		    @ROWNUM := @ROWNUM+1 	AS ROW_INDEX
+		 	, A.HIST_NO		
+            , B.LOGIN_ID
+		 	, FN_GET_USER_NAME(A.USR_NO) AS USR_NM 
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.AUTH_NO) AS AUTH_NM
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.BFR_AUTH_NO) AS BFR_AUTH_NO
+		 	, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+		 	, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM		/*등록자*/
+		 FROM USER_AUTH_HIST A LEFT JOIN USER_BASE B ON(A.USR_NO = B.USR_NO)
+		 , (SELECT @ROWNUM:=0) TMP 
+		 WHERE 1 = 1 
+		 <if test="usrNm != null and usrNm != ''">
+		 AND FN_GET_USER_NAME(A.USR_NO) = #{usrNm}
+		 </if>
+		 <if test="loginId != null and loginId != ''">
+		 AND B.LOGIN_ID = #{loginId}
+		 </if>
+		 <if test="sysRegrNm != null and sysRegrNm != ''">
+		 AND FN_GET_USER_NAME(A.SYS_REGR_NO) = #{sysRegrNm}
+		 </if>
+		 <if test="sysRegrId != null and sysRegrId != ''">
+		 AND FN_GET_USER_ID(A.SYS_REGR_NO) = #{sysRegrId}
+		 </if>
+		 ORDER BY ROW_INDEX DESC
+	</select>
+	
+	<select id="userAuthHistGridCount" resultType="java.lang.Integer">
+		<!-- 
+			Query Name : userAuthHist.userAuthHistGrid
+			Description : 접근 권한 이력 그리드
+		 -->
+		  SELECT
+		 	COUNT(*)
+		 FROM USER_AUTH_HIST A LEFT JOIN USER_BASE B ON(A.USR_NO = B.USR_NO) 
+		 WHERE 1 = 1 
+		  <if test="usrNm != null and usrNm != ''">
+		 AND FN_GET_USER_NAME(A.USR_NO) = #{usrNm}
+		 </if>
+		 <if test="loginId != null and loginId != ''">
+		 AND B.LOGIN_ID = #{loginId}
+		 </if>
+		 <if test="sysRegrNm != null and sysRegrNm != ''">
+		 AND FN_GET_USER_NAME(A.SYS_REGR_NO) = #{sysRegrNm}
+		 </if>
+		 <if test="sysRegrId != null and sysRegrId != ''">
+		 AND FN_GET_USER_ID(A.SYS_REGR_NO) = #{sysRegrId}
+		 </if>
+	</select>
+	
+	<select id="pageUserAuthHist" resultType="biz.app.system.model.UserAuthHistVO">
+		<!--
+			Query Name : banner.pageBanner
+			Description : 배너 페이지 목록
+		-->
+		SELECT
+			@ROWNUM := @ROWNUM+1 	AS ROW_INDEX
+		 	, A.HIST_NO		
+            , B.LOGIN_ID
+		 	, FN_GET_USER_NAME(A.USR_NO) AS USR_NM 
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.AUTH_NO) AS AUTH_NM
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.BFR_AUTH_NO) AS BFR_AUTH_NO
+		 	, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+		 	, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM		/*등록자*/
+		FROM USER_AUTH_HIST A LEFT JOIN USER_BASE B ON(A.USR_NO = B.USR_NO)
+		WHERE 1 = 1 
+		  <if test="usrNm != null and usrNm != ''">
+		 AND FN_GET_USER_NAME(A.USR_NO) = #{usrNm}
+		 </if>
+		 <if test="loginId != null and loginId != ''">
+		 AND B.LOGIN_ID = #{loginId}
+		 </if>
+		 <if test="sysRegrNm != null and sysRegrNm != ''">
+		 AND FN_GET_USER_NAME(A.SYS_REGR_NO) = #{sysRegrNm}
+		 </if>
+		 <if test="sysRegrId != null and sysRegrId != ''">
+		 AND FN_GET_USER_ID(A.SYS_REGR_NO) = #{sysRegrId}
+		 </if>
+		ORDER BY A.HIST_NO DESC
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageUserAuthHistCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : banner.pageBannerCount
+			Description : 배너 페이지 목록 카운트
+		-->
+		SELECT COUNT(*)
+		FROM 
+		(
+			SELECT
+			@ROWNUM := @ROWNUM+1 	AS ROW_INDEX
+		 	, A.HIST_NO		
+            , B.LOGIN_ID
+		 	, FN_GET_USER_NAME(A.USR_NO) AS USR_NM 
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.AUTH_NO) AS AUTH_NM
+		 	, (SELECT C.AUTH_NM FROM AUTHORITY C WHERE C.AUTH_NO = A.BFR_AUTH_NO) AS BFR_AUTH_NO
+		 	, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+		 	, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM		/*등록자*/
+		FROM USER_AUTH_HIST A LEFT JOIN USER_BASE B ON(A.USR_NO = B.USR_NO)
+		WHERE 1 = 1 
+		  <if test="usrNm != null and usrNm != ''">
+		 AND FN_GET_USER_NAME(A.USR_NO) = #{usrNm}
+		 </if>
+		 <if test="loginId != null and loginId != ''">
+		 AND B.LOGIN_ID = #{loginId}
+		 </if>
+		 <if test="sysRegrNm != null and sysRegrNm != ''">
+		 AND FN_GET_USER_NAME(A.SYS_REGR_NO) = #{sysRegrNm}
+		 </if>
+		 <if test="sysRegrId != null and sysRegrId != ''">
+		 AND FN_GET_USER_ID(A.SYS_REGR_NO) = #{sysRegrId}
+		 </if>
+		ORDER BY A.HIST_NO DESC
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+		) CNT
+	</select>
+</mapper>

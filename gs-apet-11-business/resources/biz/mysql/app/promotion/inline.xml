@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="inline">
+
+	<select id="inline.getStStdInfoPrmtById" parameterType="java.util.Map" resultType="biz.app.st.model.StStdInfoVO">
+		SELECT /* inline.getStStdInfoPrmtById */
+			M.ST_ID, S.ST_NM 
+		FROM 
+			ST_STD_INFO S INNER JOIN ST_PRMT_MAP M ON S.ST_ID = M.ST_ID
+		WHERE
+			M.APL_NO = #{aplNo}
+			AND M.PRMT_APL_GB_CD = #{prmtAplGbCd}
+			<if test="stUseYn != null and stUseYn != ''">
+			AND S.USE_YN = #{stUseYn}
+			</if>
+	</select>
+
+	<select id="inline.getStStdInfoGoodsById" resultType="biz.app.st.model.StStdInfoVO">
+		SELECT /* inline.getStStdInfoGoodsById */
+			M.ST_ID, S.ST_NM 
+		FROM 
+			ST_STD_INFO S INNER JOIN ST_GOODS_MAP M ON S.ST_ID = M.ST_ID
+		WHERE
+			M.GOODS_ID = #{goodsId}
+			<if test="stUseYn != null and stUseYn != ''">
+            AND S.USE_YN = #{stUseYn}
+            </if>
+	</select>
+	
+</mapper>

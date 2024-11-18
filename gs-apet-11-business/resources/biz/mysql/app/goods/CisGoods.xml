@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 CIS
+	작성자  	valueFactory
+	작성일자  2021.2.18
+-->
+<mapper namespace="cisGoods">
+
+	<!-- 단품 CIS resultMap -->
+	<resultMap id="skuInfoMap" type="biz.app.goods.model.SkuInfoVO">
+		<collection property="ntfcList" column="GOODS_ID"
+		            javaType="java.util.ArrayList" ofType="biz.app.goods.model.SkuInfoVO$Ntfc"
+		            select="selectSkuInfoNtfcById" />
+	</resultMap>
+	
+	<!-- 상품 CIS resultMap -->
+	<resultMap id="prdtInfoIMap" type="biz.app.goods.model.SkuInfoVO">
+		<collection property="ntfcList" column="GOODS_ID"
+		            javaType="java.util.ArrayList" ofType="biz.app.goods.model.SkuInfoVO$Ntfc"
+		            select="selectSkuInfoNtfcById" />
+		<collection property="skuList" column="GOODS_ID"
+		            javaType="java.util.ArrayList" ofType="biz.app.goods.model.SkuInfoVO$Sku"
+		            select="selectSkuInfoSkuById" />
+	</resultMap>
+
+	<!-- 고시 정보 조회 -->
+	<select id="selectSkuInfoNtfcById" resultType="biz.app.goods.model.SkuInfoVO$Ntfc">
+		SELECT NI.CIS_NTF_DTL_CD AS NTFC_NO
+			 , ITEM_VAL AS NTFC_TXT
+		FROM GOODS_NOTIFY GN
+			     JOIN NOTIFY_ITEM NI
+			          ON (GN.NTF_ITEM_ID = NI.NTF_ITEM_ID)
+		WHERE GOODS_ID = #{GOODS_ID}
+	</select>
+	
+	<!-- SKU list 조회 -->
+	<select id="selectSkuInfoSkuById" resultType="biz.app.goods.model.SkuInfoVO$Sku">
+		SELECT
+			<!-- I.SKU_CD --> 
+			CP.SUB_GOODS_ID AS SKU_CD 
+		FROM GOODS_BASE B
+		JOIN GOODS_CSTRT_PAK CP ON (CP.GOODS_ID = B.GOODS_ID)
+		JOIN ITEM I ON (I.GOODS_ID = CP.SUB_GOODS_ID)    
+		WHERE 1=1
+		AND B.GOODS_ID = #{GOODS_ID}
+	</select>
+
+	<select id="selectStuInfoListForSend" resultMap="skuInfoMap">
+		<!--
+			Query Name : GoodsCis.selectStuInfoListForSend
+			Description : 단품 연동 목록
+		-->
+		<include refid="cisGoods.selectInfoList" />
+	</select>
+	
+	
+	<select id="selectPrdtInfoListForSend" resultMap="prdtInfoIMap">
+		<!--
+			Query Name : GoodsCis.selectPrdtListForSend
+			Description : 상품 연동 목록
+		-->
+		<include refid="cisGoods.selectInfoList" />
+	</select>
+	
+	<sql id="selectInfoList">
+		SELECT GOODS_ID
+		    , GOODS_PRC_NO
+			, DATE_FORMAT(CIS_DTM, '%i') AS CIS_MINUTE
+			, DATE_FORMAT(CIS_DTM,'%Y%m%d%H%i') AS CIS_DTM
+			, GOODS_ID AS PRDT_CD		/** 상품 코드 */
+			, GOODS_NM AS PRDT_NM		/** 상품 이름 */
+			, GOODS_ID AS SKU_CD		/** 단품 코드 */
+			, GOODS_NM AS SKU_NM		/** 단품 이름 */
+			, GOODS_STAT_CD AS STAT_CD	/**	상태코드 */
+			, PRD_STD_CD AS STRD_CD 	/** 표준코드 */
+			, COMP_NO AS COMP_CD		/** 자체코드 */
+			, CAT_CDS
+			, CAT_CDS_IDX
+			, CASE WHEN CAT_CDS_IDX IS NOT NULL THEN SUBSTRING_INDEX(CAT_CDS, ';', 1) ELSE '' END AS CATE_CD_L
+			, CASE WHEN CAT_CDS_IDX IS NOT NULL THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(CAT_CDS, ';', 1)) ELSE '' END AS CATE_NM_L
+			, CASE WHEN CAT_CDS_IDX > 0 THEN SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 2), ';', -1) ELSE '' END AS CATE_CD_M
+			, CASE WHEN CAT_CDS_IDX > 0 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 2), ';', -1)) ELSE '' END AS CATE_NM_M
+			, CASE WHEN CAT_CDS_IDX > 1 THEN SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 3), ';', -1) ELSE '' END AS CATE_CD_S
+			, CASE WHEN CAT_CDS_IDX > 1 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 3), ';', -1)) ELSE '' END AS CATE_NM_S
+			, '' AS CATE_CD_D
+			, '' AS CATE_NM_D
+			, EXP_MNG_YN AS EXP_DD_CTR_YN	/** 유통기한 관리여부 */
+			, EXP_DD 						/**	유통기간(월) */
+			, 'EA' AS UNIT_NM 				/**	단위 */
+			, '' AS SPCFNM 					/**	규격 */
+			, SALE_AMT AS PRICE 			/** 판매가격 */
+			, ORG_SALE_AMT AS CONSUMER_PRICE /** 정상가격 */
+			, SPL_AMT AS SUPPLY_PRICE 		/** 공급가격 */
+			<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+				, (SELECT CIS_REG_NO FROM COMPANY_BASE SCB WHERE SCB.COMP_NO = PHS_COMP_NO ) AS VNDR_CD 		/** 매입사코드  */
+			</if>
+			, MMFT AS MNFT_NM				/** 제조사 */
+			, IMPORTER AS IMPT_NM			/** 수입사 */
+			, CTR_ORG AS ORGN_NM			/** 원산지 */
+			, MDL_NM as MODL_NM				/** 모델 */
+			, DLV_CHRG_TP_CD				/** 배송비 유형 */
+			, DLV_CHRG 						/**	배송비 */
+			, TAX_GB_CD AS TAX_TP_CD		/** 과세 유형 코드 */
+			, PET_TP_NM 					/**	반려동물 유형 */
+			, IMG_SRC						/** TODO 프로토콜 포함 대표 이미지 경로 */
+			, (SELECT CONTENT FROM GOODS_DESC WHERE GOODS_ID= T.GOODS_ID AND SVC_GB_CD= T.SVC_GB_CD ) AS DTL_TXT  /** 상세내용 */
+			, CIS_NTF_CLSF_CD as NTFC_CD		/** 정보고시 분류코드 */
+			, SHOPLINKER_SND_YN AS CLLT_SEND_YN	/** 수집처 전송 여부 */
+			, IGDT_INFO_LNK_YN AS TWC_SEND_YN	/** TWC 전송 여부 */
+			, GOODS_CSTRT_TP_CD					/** 상품 구성 유형 */
+			, BRND_NO							/** 브랜드 번호 */
+		FROM (
+			SELECT B.GOODS_ID
+				, B.CIS_DTM
+				, B.GOODS_NM
+				, B.GOODS_STAT_CD
+				, B.COMP_NO
+				, B.PRD_STD_CD
+				, FN_GET_DISP_CTG_NO_PATH(DG.DISP_CLSF_NO) AS CAT_CDS
+				, LENGTH(FN_GET_DISP_CTG_NO_PATH(DISP_CLSF_NO)) - LENGTH(REPLACE(FN_GET_DISP_CTG_NO_PATH(DISP_CLSF_NO), ';', '')) AS CAT_CDS_IDX
+				, CASE WHEN B.EXP_MNG_YN IS NULL THEN 'N' ELSE B.EXP_MNG_YN END EXP_MNG_YN
+				, CASE WHEN B.EXP_MNG_YN  = 'Y' THEN B.EXP_MONTH ELSE '' END AS EXP_DD
+			    , B.GOODS_PRC_NO
+				, B.SALE_AMT
+				, B.ORG_SALE_AMT
+				, B.SPL_AMT
+				<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+					, CASE WHEN SB.PHS_COMP_NO IS NULL THEN B.COMP_NO ELSE SB.PHS_COMP_NO END PHS_COMP_NO
+				</if>
+				, B.MMFT
+				, B.IMPORTER
+				, B.CTR_ORG
+				, B.MDL_NM
+			  	, CASE
+					WHEN B.FREE_DLVR_YN = 'Y' THEN '001'
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_10}' THEN '001'
+					/** 007 : 10만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 100000 THEN '007'
+					/** 006 : 7만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 70000 AND BUY_PRC <![CDATA[<]]> 100000 THEN '006'
+					/** 011 : 6만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 60000 AND BUY_PRC <![CDATA[<]]> 70000 THEN '011'
+					/** 005 : 5만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 50000 AND BUY_PRC <![CDATA[<]]> 60000  THEN '005'
+					/** 008 : 4만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 40000 AND BUY_PRC <![CDATA[<]]> 50000  THEN '008'
+					/** 004 : 3만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 30000 AND BUY_PRC <![CDATA[<]]> 40000  THEN '004'
+					/** 010 : 2만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 20000 AND BUY_PRC <![CDATA[<]]> 30000  THEN '010'
+					/** 009 : 9800원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 9800 AND BUY_PRC <![CDATA[<]]> 20000  THEN '009'
+					/** 선불 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND  DLVRC_CDT_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_CDT_STD_10}' THEN '003'
+					/** 착불 */
+				ELSE '002' END DLV_CHRG_TP_CD
+				, P.DLVR_AMT AS DLV_CHRG
+				, B.CIS_TAX_GB_CD AS TAX_GB_CD
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND USR_DFN2_VAL = 'Y' AND DTL_CD = B.PET_GB_CD) AS PET_TP_NM
+				, (SELECT IMG_PATH FROM GOODS_IMG I WHERE GOODS_ID = B.GOODS_ID AND DLGT_YN = 'Y' ) AS IMG_SRC
+				, CASE WHEN B.WEB_MOBILE_GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'
+				         THEN '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'
+				     ELSE '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+				END SVC_GB_CD
+				, (SELECT CIS_NTF_CLSF_CD FROM NOTIFY_INFO WHERE NTF_ID = B.NTF_ID) AS CIS_NTF_CLSF_CD
+				, B.SHOPLINKER_SND_YN
+				, B.TWC_SND_YN
+				, B.IGDT_INFO_LNK_YN
+				, B.GOODS_CSTRT_TP_CD
+				, B.BND_NO AS BRND_NO
+			FROM (
+				SELECT A.GOODS_PRC_NO
+				    , A.SALE_AMT
+					, A.ORG_SALE_AMT
+					, A.SPL_AMT
+					, A.SALE_STRT_DTM AS CIS_DTM
+				    , TAX.CIS_TAX_GB_CD
+					, CB.COMP_GB_CD
+					, B.*
+				FROM GOODS_BASE B
+				JOIN COMPANY_BASE CB ON CB.COMP_NO = B.COMP_NO
+				INNER JOIN LATERAL ( SELECT USR_DFN1_VAL AS CIS_TAX_GB_CD FROM CODE_DETAIL CD WHERE GRP_CD = '${@framework.common.constants.CommonConstants@TAX_GB}' AND DTL_CD = B.TAX_GB_CD ) TAX ON (TRUE)
+				LEFT OUTER JOIN GOODS_PRICE A
+				ON (A.GOODS_ID = B.GOODS_ID
+					AND NOW() BETWEEN A.SALE_STRT_DTM AND A.SALE_END_DTM
+				    AND A.DEL_YN= '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				)
+				WHERE B.GOODS_CSTRT_TP_CD = #{goodsCstrtTpCd}
+				AND NOW() BETWEEN B.SALE_STRT_DTM AND B.SALE_END_DTM
+				<if test="batchYn.equals(@framework.common.constants.CommonConstants@COMM_YN_Y)" >
+					AND A.SALE_STRT_DTM <![CDATA[<=]]> DATE_FORMAT(#{sendDtm},'%Y-%m-%d %H:%i:%s')
+				  	AND A.CIS_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+				  	AND B.CIS_NO IS NOT NULL
+				</if>
+				<if test="goodsId != null and goodsId != ''" >
+					AND B.GOODS_ID = #{goodsId}
+				</if>
+				<if test='batchYn eq "M"'>
+					AND IFNULL(B.CIS_NO, 0) = 0
+					AND GOODS_STAT_CD IN  ('${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+					    , '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+	                    , '${@framework.common.constants.CommonConstants@GOODS_STAT_60}' )
+				</if>
+			) B
+			<if test="goodsCstrtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM)">
+				JOIN ITEM I
+				ON (B.GOODS_ID = I.GOODS_ID)
+				LEFT OUTER JOIN SKU_BASE SB
+				ON (I.SKU_CD = SB.SKU_CD)
+			</if>
+			LEFT OUTER JOIN DELIVERY_CHARGE_POLICY P
+			ON (B.COMP_NO = P.COMP_NO AND B.DLVRC_PLC_NO = P.DLVRC_PLC_NO )
+			LEFT OUTER JOIN DISPLAY_GOODS DG
+			ON B.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		) T
+	</sql>
+	
+	<!-- 상품 일괄 등록 CIS용 조회 -->
+	<select id="getInfoForBulkCisSend" resultType="biz.app.goods.model.SkuInfoVO">
+		SELECT 
+				CASE
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_10}' THEN '001'
+					/** 007 : 10만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 100000 THEN '007'
+					/** 006 : 7만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 70000 AND BUY_PRC <![CDATA[<]]> 100000 THEN '006'
+					/** 011 : 6만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 60000 AND BUY_PRC <![CDATA[<]]> 70000 THEN '011'
+					/** 005 : 5만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 50000 AND BUY_PRC <![CDATA[<]]> 60000  THEN '005'
+					/** 008 : 4만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 40000 AND BUY_PRC <![CDATA[<]]> 50000  THEN '008'
+					/** 004 : 3만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 30000 AND BUY_PRC <![CDATA[<]]> 40000  THEN '004'
+					/** 010 : 2만원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 20000 AND BUY_PRC <![CDATA[<]]> 30000  THEN '010'
+					/** 009 : 9800원 이상 무료 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND BUY_PRC <![CDATA[>=]]> 9800 AND BUY_PRC <![CDATA[<]]> 20000  THEN '009'
+					/** 선불 */
+					WHEN DLVRC_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_STD_20}' AND DLVRC_PAY_MTD_CD = '${@framework.common.constants.CommonConstants@DLVR_MTD_10}' AND  DLVRC_CDT_STD_CD = '${@framework.common.constants.CommonConstants@DLVRC_CDT_STD_10}' THEN '003'
+					/** 착불 */
+				ELSE '002' END DLV_CHRG_TP_CD
+				, DLVR_AMT AS DLV_CHRG
+				, (SELECT USR_DFN1_VAL FROM CODE_DETAIL CD WHERE GRP_CD = 'TAX_GB' AND DTL_NM =#{taxGbNm} limit 1) AS TAX_TP_CD
+				, (SELECT CIS_NTF_CLSF_CD FROM NOTIFY_INFO WHERE NTF_ID = #{ntfId} limit 1) AS NTFC_CD
+				, (SELECT CIS_REG_NO FROM COMPANY_BASE WHERE COMP_NO = #{compNo} limit 1) AS VNDR_CD
+		FROM (
+				SELECT DLVRC_STD_CD, DLVR_AMT, DLVRC_PAY_MTD_CD, BUY_PRC, DLVRC_CDT_STD_CD FROM DELIVERY_CHARGE_POLICY
+				WHERE DLVRC_PLC_NO = #{dlvrcPlcNo}
+				)T1
+	</select>
+</mapper>

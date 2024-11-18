@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명
+	작성자
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsPrice">
+
+	<insert id="insertGoodsPrice" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.insertGoodsPrice
+			Description : 상품 가격 등록
+		-->
+		<selectKey keyProperty="goodsPrcNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_PRICE_SEQ }') FROM DUAL
+		</selectKey>
+		INSERT /* QUERYID(goodsPrice.insertGoodsPrice) */ INTO GOODS_PRICE (
+			  GOODS_PRC_NO
+			, ST_ID
+			, GOODS_AMT_TP_CD
+			, ORG_SALE_AMT
+			, SALE_AMT				/* 판매 금액 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, GOODS_ID				/* 상품 아이디 */
+			, SALE_STRT_DTM			/* 판매 시작 일시 */
+			, SALE_END_DTM			/* 판매 종료 일시 */
+		 	<if test="fvrAplMethCd != null and fvrAplMethCd != ''" >
+			, FVR_APL_METH_CD		/* 혜택 적용 방식 코드 */
+			</if>
+		 	<if test="fvrVal != null" >
+			, FVR_VAL				/* 혜택 값 */
+			</if>
+			<if test="expDt != null and goodsAmtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_AMT_TP_40)" >
+				, EXP_DT			/* 유통기한 일자 */
+			</if>
+			<if test="rsvBuyQty != null and goodsAmtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_AMT_TP_60)" >
+				, RSV_BUY_QTY		/* 사전예약 구매 수량 */
+			</if>
+			, DEL_YN
+			, SPL_AMT
+			, CMS_RATE
+			, CIS_YN
+		) VALUES (
+			#{goodsPrcNo }
+			, #{stId }
+			, #{goodsAmtTpCd }
+			, #{orgSaleAmt }
+			, #{saleAmt }			/* 판매 금액 */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+			, #{goodsId }			/* 상품 아이디 */
+			, #{saleStrtDtm }		/* 판매 시작 일시 */
+			, #{saleEndDtm }		/* 판매 종료 일시 */
+		 	<if test="fvrAplMethCd != null and fvrAplMethCd != ''" >
+			, #{fvrAplMethCd }		/* 혜택 적용 방식 코드 */
+			</if>
+		 	<if test="fvrVal != null" >
+			, #{fvrVal }	/* 혜택 값 */
+			</if>
+			<if test="expDt != null and goodsAmtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_AMT_TP_40)" >
+				, DATE_FORMAT(#{expDt }, '%Y-%m-%d')	/* 유통기한 일자 */
+			</if>
+			<if test="rsvBuyQty != null and goodsAmtTpCd.equals(@framework.common.constants.CommonConstants@GOODS_AMT_TP_60)" >
+				, #{rsvBuyQty }		/* 사전예약 구매 수량 */
+			</if>
+			, '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+            ,#{splAmt } /* 공급가 */
+			,#{cmsRate } /* 수수료 율 */
+			,#{cisYn} /* 전송 여부*/
+		)
+	</insert>
+
+	<select id="getCurrentGoodsPriceNew" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.getCurrentGoodsPriceNEW
+			Description : 상품 현재 판매가 정보
+			Deprecated.
+		-->
+		SELECT
+			 P.GOODS_PRC_NO /* 상품 가격 번호 */
+			, P.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, P.SALE_END_DTM		/* 판매 종료 일시 */
+
+			, P.GOODS_AMT_TP_CD
+			, P.ORG_SALE_AMT
+			, P.SALE_AMT			/* 판매 금액 */
+			, P.SPL_AMT			/* 공급 금액 */
+			, P.CMS_RATE			/* 수수료 율 */
+			, P.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, P.FVR_VAL			/* 혜택 값 */
+			, P.EXP_DT			/* 유통기한 일자 */
+			, P.RSV_BUY_QTY		/* 사전예약 구매 수량 */
+			, SALE.SALE_STRT_DTM AS SALE_SALE_STRT_DTM		/* 판매 시작 일시 */
+			, SALE.SALE_END_DTM	AS SALE_SALE_END_DTM	/* 판매 종료 일시 */
+
+			, SALE.GOODS_AMT_TP_CD AS SALE_GOODS_AMT_TP_CD
+			, SALE.ORG_SALE_AMT AS SALE_ORG_SALE_AMT
+			, SALE.SALE_AMT	AS SALE_SALE_AMT		/* 판매 금액 */
+			, SALE.SPL_AMT AS SALE_SPL_AMT		/* 공급 금액 */
+			, SALE.CMS_RATE AS SALE_CMS_RATE	/* 수수료 율 */
+			, SALE.SALE_YN
+			, FUTR.GOODS_PRC_NO AS FUTR_GOODS_PRC_NO /* 미래 상품가격 번호 */
+			, FUTR.SALE_STRT_DTM AS FUTR_SALE_STRT_DTM		/* 판매 시작 일시 */
+			, FUTR.SALE_END_DTM	AS FUTR_SALE_END_DTM	/* 판매 종료 일시 */
+
+			, FUTR.GOODS_AMT_TP_CD AS FUTR_GOODS_AMT_TP_CD
+			, FUTR.ORG_SALE_AMT AS FUTR_ORG_SALE_AMT
+			, FUTR.SALE_AMT	AS FUTR_SALE_AMT		/* 판매 금액 */
+			, FUTR.SPL_AMT AS FUTR_SPL_AMT		/* 공급 금액 */
+			, FUTR.CMS_RATE AS FUTR_CMS_RATE	/* 수수료 율 */
+			, FUTR.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, FUTR.FVR_VAL			/* 혜택 값 */
+		FROM (
+		SELECT
+			P.GOODS_PRC_NO
+			, P.GOODS_ID
+			, P.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, P.SALE_END_DTM		/* 판매 종료 일시 */
+
+			, P.GOODS_AMT_TP_CD
+			, P.ORG_SALE_AMT
+			, P.SALE_AMT			/* 판매 금액 */
+			, P.SPL_AMT			/* 공급 금액 */
+			, P.CMS_RATE			/* 수수료 율 */
+			, P.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, P.FVR_VAL			/* 혜택 값 */
+			, P.EXP_DT			/* 유통기한 일자 */
+			, P.RSV_BUY_QTY		/* 사전예약 구매 수량 */
+		FROM GOODS_PRICE P
+		WHERE 1 = 1
+		AND P.GOODS_ID = #{goodsId }
+		AND NOW() BETWEEN P.SALE_STRT_DTM AND P.SALE_END_DTM
+		AND P.DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		) P
+		LEFT OUTER JOIN (
+		SELECT
+			SALE.GOODS_PRC_NO
+			, SALE.GOODS_ID
+			, SALE.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, SALE.SALE_END_DTM		/* 판매 종료 일시 */
+
+			, SALE.GOODS_AMT_TP_CD
+			, SALE.ORG_SALE_AMT
+			, SALE.SALE_AMT			/* 판매 금액 */
+			, SALE.SPL_AMT			/* 공급 금액 */
+			, SALE.CMS_RATE			/* 수수료 율 */
+		    , CASE WHEN NOW() BETWEEN SALE.SALE_STRT_DTM AND SALE.SALE_END_DTM THEN 'Y'
+		      ELSE 'N' END AS SALE_YN
+		FROM GOODS_PRICE SALE
+		WHERE 1 = 1
+		AND SALE.GOODS_ID = #{goodsId }
+		AND SALE.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20 }'
+		AND SALE.SALE_STRT_DTM &gt;= NOW()
+		AND SALE.DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		LIMIT 1
+		) SALE ON (P.GOODS_ID = SALE.GOODS_ID )
+		LEFT OUTER JOIN (
+		SELECT
+			FUTR.GOODS_PRC_NO
+			, FUTR.GOODS_ID
+			, FUTR.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, FUTR.SALE_END_DTM		/* 판매 종료 일시 */
+
+			, FUTR.GOODS_AMT_TP_CD
+			, FUTR.ORG_SALE_AMT
+			, FUTR.SALE_AMT			/* 판매 금액 */
+			, FUTR.SPL_AMT			/* 공급 금액 */
+			, FUTR.CMS_RATE			/* 수수료 율 */
+		FROM GOODS_PRICE TO_PRC, GOODS_PRICE FUTR
+		WHERE 1 = 1
+		AND TO_PRC.GOODS_ID = #{goodsId }
+		AND NOW() BETWEEN TO_PRC.SALE_STRT_DTM AND TO_PRC.SALE_END_DTM
+		AND TO_PRC.GOODS_ID = FUTR.GOODS_ID
+		AND FUTR.SALE_STRT_DTM &gt; NOW()
+		AND FUTR.GOODS_AMT_TP_CD &lt;&gt; '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20 }'
+		AND (
+			CASE WHEN TO_PRC.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_30 }' THEN TO_PRC.SALE_AMT ELSE TO_PRC.ORG_SALE_AMT END) &lt;&gt; FUTR.SALE_AMT
+		AND FUTR.DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		LIMIT 1
+		) FUTR ON (P.GOODS_ID = FUTR.GOODS_ID )
+	</select>
+
+<select id="getCurrentGoodsPrice" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.getCurrentGoodsPrice
+			Description : 상품 현재 판매가 정보
+		-->
+		SELECT /* QUERYID(goodsPrice.getCurrentGoodsPrice) */
+            P.GOODS_ID
+		    , (SELECT GOODS_CSTRT_TP_CD FROM GOODS_BASE WHERE GOODS_ID = P.GOODS_ID ) AS GOODS_CSTRT_TP_CD
+			, P.GOODS_PRC_NO AS GOODS_PRC_NO
+			, P.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, P.SALE_END_DTM		/* 판매 종료 일시 */
+
+			, P.GOODS_AMT_TP_CD
+			, P.ORG_SALE_AMT
+			, P.SALE_AMT			/* 판매 금액 */
+			, P.SPL_AMT			/* 공급 금액 */
+			, P.CMS_RATE			/* 수수료 율 */
+			, P.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, P.FVR_VAL			/* 혜택 값 */
+			, P.DEL_YN
+			, P.EXP_DT			/* 유통기한 일자 */
+			, P.RSV_BUY_QTY		/* 사전예약 구매 수량 */
+			, SALE.GOODS_PRC_NO AS SALE_GOODS_PRC_NO
+			, SALE.SALE_STRT_DTM AS SALE_SALE_STRT_DTM		/* 판매 시작 일시 */
+			, SALE.SALE_END_DTM	AS SALE_SALE_END_DTM	/* 판매 종료 일시 */
+
+			, SALE.GOODS_AMT_TP_CD AS SALE_GOODS_AMT_TP_CD
+			, SALE.ORG_SALE_AMT AS SALE_ORG_SALE_AMT
+			, SALE.SALE_AMT	AS SALE_SALE_AMT		/* 판매 금액 */
+			, SALE.SPL_AMT AS SALE_SPL_AMT		/* 공급 금액 */
+			, SALE.CMS_RATE AS SALE_CMS_RATE	/* 수수료 율 */
+			, SALE.FVR_APL_METH_CD AS SALE_FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, SALE.FVR_VAL AS SALE_FVR_VAL		/* 혜택 값 */
+			, SALE.SALE_YN AS SALE_SALE_YN
+			, SALE.DEL_YN AS SALE_DEL_YN
+			, FUTR.GOODS_PRC_NO AS FUTR_GOODS_PRC_NO
+			, FUTR.SALE_STRT_DTM AS FUTR_SALE_STRT_DTM		/* 판매 시작 일시 */
+			, FUTR.SALE_END_DTM	AS FUTR_SALE_END_DTM	/* 판매 종료 일시 */
+
+			, FUTR.GOODS_AMT_TP_CD AS FUTR_GOODS_AMT_TP_CD
+			, FUTR.ORG_SALE_AMT AS FUTR_ORG_SALE_AMT
+			, FUTR.SALE_AMT	AS FUTR_SALE_AMT		/* 판매 금액 */
+			, FUTR.SPL_AMT AS FUTR_SPL_AMT		/* 공급 금액 */
+			, FUTR.CMS_RATE AS FUTR_CMS_RATE	/* 수수료 율 */
+			, FUTR.FVR_APL_METH_CD AS FUTR_FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+			, FUTR.FVR_VAL AS FUTR_FVR_VAL		/* 혜택 값 */
+			, FUTR.DEL_YN AS FUTR_DEL_YN
+		FROM (
+			SELECT
+				  P.GOODS_ID
+				, P.GOODS_PRC_NO
+				, P.SALE_STRT_DTM		/* 판매 시작 일시 */
+				, P.SALE_END_DTM		/* 판매 종료 일시 */
+
+				, P.GOODS_AMT_TP_CD
+				, P.ORG_SALE_AMT
+				, P.SALE_AMT			/* 판매 금액 */
+				, P.SPL_AMT			/* 공급 금액 */
+				, P.CMS_RATE			/* 수수료 율 */
+				, P.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+				, P.FVR_VAL			/* 혜택 값 */
+				, P.DEL_YN
+				, P.EXP_DT			/* 유통기한 일자 */
+				, P.RSV_BUY_QTY		/* 사전예약 구매 수량 */
+			FROM GOODS_PRICE P
+			WHERE 1 = 1
+				AND P.GOODS_ID = #{goodsId }
+				AND NOW() BETWEEN P.SALE_STRT_DTM AND P.SALE_END_DTM
+				AND P.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+		) P
+		LEFT OUTER JOIN (
+			SELECT
+				  SALE.GOODS_ID
+				, SALE.GOODS_PRC_NO
+				, SALE.SALE_STRT_DTM		/* 판매 시작 일시 */
+				, SALE.SALE_END_DTM		/* 판매 종료 일시 */
+
+				, SALE.GOODS_AMT_TP_CD
+				, SALE.ORG_SALE_AMT
+				, SALE.SALE_AMT			/* 판매 금액 */
+				, SALE.SPL_AMT			/* 공급 금액 */
+				, SALE.CMS_RATE			/* 수수료 율 */
+				, SALE.FVR_APL_METH_CD	/* 혜택 적용 방식 코드 */
+				, SALE.FVR_VAL			/* 혜택 값 */
+			    , CASE WHEN NOW() BETWEEN SALE.SALE_STRT_DTM AND SALE.SALE_END_DTM THEN 'Y'
+			      ELSE 'N' END AS SALE_YN
+			    , SALE.DEL_YN
+			FROM GOODS_PRICE SALE
+			WHERE 1 = 1
+				AND SALE.GOODS_ID = #{goodsId }
+				AND SALE.GOODS_AMT_TP_CD IN ('${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20 }', '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_30 }')
+				AND SALE.SALE_STRT_DTM &gt;= NOW()
+				AND SALE.DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+			LIMIT 1
+		) SALE ON (P.GOODS_ID = SALE.GOODS_ID )
+		LEFT OUTER JOIN (
+			SELECT
+				  FUTR.GOODS_ID
+				, FUTR.GOODS_PRC_NO
+				, FUTR.SALE_STRT_DTM		/* 판매 시작 일시 */
+				, FUTR.SALE_END_DTM		/* 판매 종료 일시 */
+
+				, FUTR.GOODS_AMT_TP_CD
+				, FUTR.ORG_SALE_AMT
+				, FUTR.SALE_AMT			/* 판매 금액 */
+				, FUTR.SPL_AMT			/* 공급 금액 */
+				, FUTR.CMS_RATE			/* 수수료 율 */
+				, FUTR.FVR_APL_METH_CD 	/* 혜택 적용 방식 코드 */
+				, FUTR.FVR_VAL 		/* 혜택 값 */
+				, FUTR.DEL_YN
+			FROM GOODS_PRICE TO_PRC, GOODS_PRICE FUTR
+			WHERE 1 = 1
+			AND TO_PRC.GOODS_ID = #{goodsId }
+			AND NOW() BETWEEN TO_PRC.SALE_STRT_DTM AND TO_PRC.SALE_END_DTM
+			AND TO_PRC.GOODS_ID = FUTR.GOODS_ID
+			AND FUTR.SALE_STRT_DTM &gt; NOW()
+			AND FUTR.GOODS_AMT_TP_CD &lt;&gt; '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20 }'
+			AND FUTR.DEL_YN !='${@framework.common.constants.CommonConstants@COMM_YN_Y }'
+			AND (
+				CASE WHEN TO_PRC.GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20 }' THEN TO_PRC.SALE_AMT ELSE TO_PRC.ORG_SALE_AMT END) &lt;&gt; FUTR.SALE_AMT
+			LIMIT 1
+		) FUTR ON (P.GOODS_ID = FUTR.GOODS_ID )
+	</select>
+
+	<select id="checkGoodsPriceHistory" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.checkGoodsPriceHistory
+			Description : 상품가격이력체크(현재 가격)
+		-->
+		SELECT	/* QUERYID(goodsPrice.checkGoodsPriceHistory ) */
+				GOODS_PRC_NO	 /* 상품 가격 일련번호 */
+				,  CMS_RATE				/* 수수료 율 */
+				, FVR_APL_METH_CD		/* 혜택 적용 방식 코드 */
+				, FVR_VAL				/* 혜택 값 */
+				, GOODS_AMT_TP_CD		/* 상품 금액 유형 코드 */
+				, GOODS_ID				/* 상품 아이디 */
+				, ORG_SALE_AMT			/* 원 판매 금액 */
+				, SALE_AMT				/* 판매 금액 */
+				, SALE_STRT_DTM			/* 판매 시작 일시 */
+				, SALE_END_DTM			/* 판매 종료 일시 */
+				, SPL_AMT				/* 공급 금액 */
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM	GOODS_PRICE
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND		#{sysDatetime } BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+		AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+    <select id="getGoodsPromotionPrice" resultType="biz.app.goods.model.GoodsPriceVO" >
+        SELECT R.*, S.ST_NM
+        FROM
+        (
+			SELECT
+			    R.ST_ID ST_ID,
+			    #{goodsId} AS GOODS_ID,
+			    MAX(IF(R.GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10 }', R.GB_CD, '0')) WEB_MOBILE_GB_PC,
+			    MAX(CAST(FN_SPLIT(R.PRC, '|', 1) AS UNSIGNED)) WEB_MOBILE_GB_PC_PRC,
+			    MAX(IF(R.GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10 }', CAST(FN_SPLIT(R.PRC, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(R.PRC, '|', 3) AS UNSIGNED), 0)) WEB_MOBILE_GB_PC_PRMT_PRC,
+			    MAX(IF(R.GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20 }', GB_CD, '0')) WEB_MOBILE_GB_MO,
+			    MAX(CAST(FN_SPLIT(R.PRC, '|', 1) AS UNSIGNED)) WEB_MOBILE_GB_MO_PRC,
+			    MAX(IF(R.GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20 }', CAST(FN_SPLIT(R.PRC, '|', 1) AS UNSIGNED) - CAST(FN_SPLIT(R.PRC, '|', 3) AS UNSIGNED), 0)) WEB_MOBILE_GB_MO_PRMT_PRC,
+			    (SELECT CONCAT(FN_GET_USER_NAME(P.SYS_REGR_NO), '(', FN_GET_USER_ID(P.SYS_REGR_NO), ')') FROM PROMOTION_BASE P WHERE P.PRMT_NO = MAX(CAST(FN_SPLIT(R.PRC, '|', 2) AS UNSIGNED))) PRMT_SYS_REGR_NM
+			FROM (
+			    SELECT
+			        SG.ST_ID, SG.GB_CD, FN_GET_GOODS_PRICE(#{goodsId}, SG.ST_ID, SG.GB_CD) AS PRC
+			    FROM (
+			        SELECT
+			            A.ST_ID, B.GB_CD
+			        FROM (
+			            SELECT
+			                ST_ID
+			            FROM
+			                ST_GOODS_MAP
+			            WHERE
+			                GOODS_ID = #{goodsId}
+			        ) A
+			        CROSS JOIN (
+			        SELECT
+			            '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10 }' AS GB_CD
+			        UNION
+			        SELECT
+			            '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20 }' AS GB_CD
+			        ) B
+			    ) SG
+			) R
+			GROUP BY R.ST_ID
+		) R JOIN ST_STD_INFO S ON (R.ST_ID = S.ST_ID)
+    </select>
+
+	<update id="deleteGoodsPriceHistory" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.deleteGoodsPriceHistory
+			Description : 미래 상품가격이력 삭제여부 업데이트 hjko
+		-->
+		UPDATE /*QUERYID(goodsPrice.deleteGoodsPriceHistory) */ GOODS_PRICE SET
+			 DEL_YN= #{delYn}
+			 , SYS_UPDR_NO		= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			 , SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId}
+		 <if test="sysDatetime != null" >
+		   AND SALE_STRT_DTM &gt; #{sysDatetime}
+		 </if>
+		 <if test="goodsPrcNo != null and goodsPrcNo != ''">
+		   AND GOODS_PRC_NO = #{goodsPrcNo}
+		 </if>
+	</update>
+
+	<delete id="deleteGoodsPriceHistoryOld" parameterType="biz.app.goods.model.GoodsPriceSO" >
+		<!--
+			Query Name : goodsPrice.deleteGoodsPriceHistoryOld
+			Description : 미래 상품가격이력 삭제
+		-->
+		DELETE FROM GOODS_PRICE
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId}
+		<if test="sysDatetime != null and sysDatetime != ''" >
+		   AND SALE_STRT_DTM &gt; #{sysDatetime}
+		</if>
+	</delete>
+
+
+	<update id="updateNowSale" parameterType="biz.app.goods.model.GoodsPriceSO" >
+		<!--
+			Query Name : goodsPrice.updateNowSale
+			Description : 상품가격이력 현재가의 종료일시 수정. hjko
+		-->
+		UPDATE /*QUERYID(goodsPrice.updateNowSale) */ GOODS_PRICE
+		   SET SYS_UPDR_NO		= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			   , SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+			   , SALE_END_DTM 	= #{saleEndDtm }
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId }
+		   AND GOODS_PRC_NO	= #{goodsPrcNo}
+		   AND #{sysDatetime } BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+	</update>
+
+	<update id="updateNowSaleOld" parameterType="biz.app.goods.model.GoodsPriceSO" >
+		<!--
+			Query Name : goodsPrice.updateNowSaleOld
+			Description : 상품가격이력 현재가의 종료일시 수정
+		-->
+		UPDATE GOODS_PRICE
+		   SET SYS_UPDR_NO		= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			   , SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+			   , SALE_END_DTM 	= #{saleEndDtm }
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId }
+		   AND #{sysDatetime } BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+	</update>
+
+
+	<update id="updateGoodsPriceHisEndDateTime" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.updateGoodsPriceHisEndDateTime
+			Description : 상품가격이력 현재가의 종료일시 수정
+		-->
+		UPDATE /*QUERYID(goodsPrice.updateGoodsPriceHisEndDateTime) */ GOODS_PRICE
+		   SET SYS_UPDR_NO		= #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			   , SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+			   , SALE_END_DTM 	= #{saleEndDtm }
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId }
+		   AND #{sysDatetime } BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+		   AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</update>
+	
+	<update id="updateGoodsPrice" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.updateGoodsPrice
+			Description : 상품 가격 수정
+		-->
+		UPDATE /*QUERYID(goodsPrice.updateGoodsPrice) */ 
+			GOODS_PRICE 
+		SET
+			GOODS_PRC_NO = COALESCE(#{goodsPrcNo} , GOODS_PRC_NO )
+			, GOODS_ID = COALESCE(#{goodsId} , GOODS_ID )
+			, ST_ID = COALESCE(#{stId} , ST_ID )
+			, SALE_STRT_DTM = COALESCE(#{saleStrtDtm} , SALE_STRT_DTM )
+			, SALE_END_DTM = COALESCE(#{saleEndDtm} , SALE_END_DTM )
+			, GOODS_AMT_TP_CD = COALESCE(#{goodsAmtTpCd} , GOODS_AMT_TP_CD )
+			, ORG_SALE_AMT = COALESCE(#{orgSaleAmt} , ORG_SALE_AMT )
+			, SALE_AMT = COALESCE(#{saleAmt} , SALE_AMT )
+			, FVR_APL_METH_CD = #{fvrAplMethCd}
+			, FVR_VAL = #{fvrVal}
+			, SPL_AMT = COALESCE(#{splAmt} , SPL_AMT )
+			, CMS_RATE = COALESCE(#{cmsRate} , CMS_RATE )
+			, DEL_YN = COALESCE(#{delYn} , DEL_YN )
+			, CIS_YN = #{cisYn}
+		WHERE 1 = 1
+			AND GOODS_PRC_NO = #{goodsPrcNo}
+	</update>
+
+	<select id="doublePriceCheck" resultType="java.lang.Integer" >
+		<!--
+			Query Name : goodsPrice.doublePriceCheck
+			Description : 상품가격이력 등록시 이중가체크
+		-->
+		SELECT COUNT(*)
+		  FROM GOODS_PRICE
+		 WHERE 1 = 1
+		   AND GOODS_ID			= #{goodsId }
+		   AND DATE_ADD(#{saleStrtDtm }, INTERVAL -1 SECOND) BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+		   AND DATEDIFF(DATE_ADD(#{saleStrtDtm }, INTERVAL -1 SECOND), SALE_STRT_DTM ) >= 20
+		   AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+
+	<select id="listFutureGoodsPriceHistory" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.listFutureGoodsPriceHistory
+			Description : 상품가격이력체크(현재미래날짜연속성)
+		-->
+		SELECT	/* QUERYID(goodsPrice.listFutureGoodsPriceHistory ) */
+				 GOODS_PRC_NO
+				, GOODS_AMT_TP_CD		/* 상품 금액 유형 코드 */
+				, ORG_SALE_AMT			/* 원 판매 금액 */
+				, SALE_AMT				/* 판매 금액 */
+				, SPL_AMT				/* 공급 금액 */
+				, DEL_YN
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, GOODS_ID				/* 상품 아이디 */
+				, SALE_STRT_DTM			/* 판매 시작 일시 */
+				, SALE_END_DTM			/* 판매 종료 일시 */
+				, CMS_RATE				/* 수수료 율 */
+				, FVR_APL_METH_CD		/* 혜택 적용 방식 코드 */
+				, FVR_VAL				/* 혜택 값 */
+		FROM	GOODS_PRICE
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND		(#{sysDatetime } BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+				OR #{sysDatetime } &lt; SALE_STRT_DTM
+		) AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+
+	</select>
+
+
+	<select id="getbeforeGoodsPriceHistory" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.getbeforeGoodsPriceHistory
+			Description : 이전 가격 이력 조회
+		-->
+		SELECT	/* QUERYID(goodsPrice.getbeforeGoodsPriceHistory ) */
+				 GOODS_AMT_TP_CD		/* 상품 금액 유형 코드 */
+				, ORG_SALE_AMT			/* 원 판매 금액 */
+				, SALE_AMT				/* 판매 금액 */
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, GOODS_ID				/* 상품 아이디 */
+				, SALE_STRT_DTM			/* 판매 시작 일시 */
+				, SALE_END_DTM			/* 판매 종료 일시 */
+				, FVR_APL_METH_CD		/* 혜택 적용 방식 코드 */
+				, FVR_VAL				/* 혜택 값 */
+		FROM	GOODS_PRICE
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		AND		SALE_END_DTM 		= #{sysDatetime }
+		AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+	
+	<select id="listApplyCoupon" resultType="biz.app.promotion.model.CouponBaseVO" >
+		<!--
+			Query Name : goodsPrice.listApplyCoupon
+			Description : 상품에 현재 적용된 쿠폰 리스트 조회
+		-->
+		SELECT CP.CP_NO
+			 , CP.CP_NM
+			 , CP.CP_APL_CD
+			 , CP.CP_TG_CD
+			 , CP.APL_VAL
+			 , CP.MIN_BUY_AMT
+			 , CP.MAX_DC_AMT
+		 <choose>
+		 	<when test='mbrNo != null and mbrNo != ""'>
+			 , IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON WHERE CP_NO = CP.CP_NO AND MBR_NO = #{mbrNo} ) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS CP_DW_YN
+			 , IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON WHERE CP_NO = CP.CP_NO AND USE_YN = 'N'  AND MBR_NO = #{mbrNo} ) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_N}','${@framework.common.constants.CommonConstants@COMM_YN_Y}') AS CP_USE_YN
+			</when>
+			<otherwise>
+			 , 'N' AS CP_DW_YN
+			</otherwise>
+		</choose>
+		FROM (
+			SELECT CB.CP_NO
+				 , CB.CP_NM
+				 , CB.CP_APL_CD
+				 , CB.CP_TG_CD
+				 , CB.APL_VAL
+				 , IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+				 , IFNULL(CB.MAX_DC_AMT, 0) AS MAX_DC_AMT
+			FROM COUPON_BASE CB
+			WHERE 1 = 1
+			AND CB.CP_KIND_CD IN ('${@framework.common.constants.CommonConstants@CP_KIND_10 }', '${@framework.common.constants.CommonConstants@CP_KIND_20 }' ) /* 상품, 장바구니 */
+			AND CB.CP_TG_CD = '${@framework.common.constants.CommonConstants@CP_TG_10 }' /* 전체 대상 */
+			AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20 }' /* 진행중 인것만 */
+			AND CB.APL_STRT_DTM &lt;= NOW()
+			AND CB.APL_END_DTM &gt; NOW()
+			<if test="(goodsId != null and goodsId != '') or dispClsfNos != null ">
+			UNION
+			SELECT CB.CP_NO
+				 , CB.CP_NM
+				 , CB.CP_APL_CD
+				 , CB.CP_TG_CD
+				 , CB.APL_VAL
+				 , IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+				 , IFNULL(CB.MAX_DC_AMT, 0) AS MAX_DC_AMT
+			FROM COUPON_BASE CB
+			JOIN (
+				SELECT CT.CP_NO, CT.CP_TG_CD
+				FROM (
+				<if test="goodsId != null and goodsId != ''" >
+					SELECT CT.CP_NO, '${@framework.common.constants.CommonConstants@CP_TG_20 }' AS CP_TG_CD /* 상품 */
+					FROM COUPON_TARGET CT
+					WHERE CT.GOODS_ID = #{goodsId }
+					UNION
+					SELECT CT.CP_NO, '${@framework.common.constants.CommonConstants@CP_TG_30 }' AS CP_TG_CD /* 전시카테고리 */
+					FROM COUPON_TARGET CT
+					JOIN DISPLAY_GOODS DG ON (DG.DISP_CLSF_NO = CT.DISP_CLSF_NO )
+					WHERE 1 = 1
+					AND DG.GOODS_ID = #{goodsId }
+				</if>
+				<if test="dispClsfNos != null" >
+					SELECT CT.CP_NO, '${@framework.common.constants.CommonConstants@CP_TG_30 }' AS CP_TG_CD /* 전시카테고리 */
+					FROM COUPON_TARGET CT
+					WHERE 1 = 1
+					<foreach collection="dispClsfNos" item="item" separator="," open="AND CT.DISP_CLSF_CD IN (" close=")" >
+						#{item }
+					</foreach>
+				</if>
+				) CT
+			) CT ON (CB.CP_NO = CT.CP_NO)
+			WHERE 1 = 1
+			AND CB.CP_KIND_CD IN ('${@framework.common.constants.CommonConstants@CP_KIND_10 }', '${@framework.common.constants.CommonConstants@CP_KIND_20 }' ) /* 상품, 장바구니 */
+			AND CB.CP_TG_CD &lt;&gt; '${@framework.common.constants.CommonConstants@CP_TG_10 }' /* 전체 대상 */
+			AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20 }' /* 진행중 인것만 */
+			AND CB.APL_STRT_DTM &lt;= NOW()
+			AND CB.APL_END_DTM &gt; NOW()
+			</if>
+		) CP
+	</select>
+
+
+	<select id="listGoodsPriceHistory" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.listGoodsPriceHistory
+			Description : 상품 가격 이력 조회
+		-->
+		SELECT	/* QUERYID(GoodsPrice.listGoodsPriceHistory) */
+				A.GOODS_PRC_NO
+				, A.GOODS_ID				/* 상품 아이디 */
+				, A.SALE_STRT_DTM			/* 판매 시작 일시 */
+				, A.SALE_END_DTM			/* 판매 종료 일시 */
+				, A.SPL_AMT					/* 공급 금액 */
+				, A.GOODS_AMT_TP_CD			/* 상품 금액 유형 코드 */
+				, A.SALE_AMT				/* 판매 금액 */
+				, A.CMS_RATE				/* 수수료 율 */
+				, A.DEL_YN 					/* 삭제 여부 */
+				, A.SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM				/* 시스템 등록 일시 */
+				, B.USR_NM AS SYS_REGR_NM	/* 시스템 등록자 */
+				, A.FVR_APL_METH_CD		/* 혜택 적용 방식 코드 */
+				, A.FVR_VAL				/* 혜택 값 */
+				, A.EXP_DT 				/* 유통기한 일자 */
+				, A.RSV_BUY_QTY		/*예약 구매 수량 */ 
+		FROM	GOODS_PRICE A
+		LEFT 	OUTER JOIN USER_BASE B ON (B.USR_NO = A.SYS_REGR_NO)
+		WHERE	1 = 1
+		AND		A.GOODS_ID			= #{goodsId }
+		ORDER BY DEL_YN ASC, A.SALE_STRT_DTM DESC
+	</select>
+
+	<select id="getNextPrice" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.getNextPrice
+			Description : 세일 상품의 다음 가격 조회
+		-->
+		SELECT	/* QUERYID(goodsPrice.getNextPrice) */
+			  	A.GOODS_ID				/* 상품 아이디 */
+				, A.SALE_STRT_DTM			/* 판매 시작 일시 */
+				, A.SALE_END_DTM			/* 판매 종료 일시 */
+				, A.SPL_AMT					/* 공급 금액 */
+				, A.GOODS_AMT_TP_CD			/* 상품 금액 유형 코드 */
+				, A.SALE_AMT				/* 판매 금액 */
+				, A.CMS_RATE				/* 수수료 율 */
+				, A.SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM				/* 시스템 등록 일시 */
+		FROM	GOODS_PRICE A
+		WHERE	1 = 1
+			AND		A.GOODS_ID			= #{goodsId }
+			AND SALE_STRT_DTM <![CDATA[>]]> #{saleStrtDtm}
+			AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			ORDER BY SALE_STRT_DTM ASC
+	</select>
+
+	<update id="updateSalePriceEndDtm" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.updateSalePriceEndDtm
+			Description : 상품가격 현재가의 종료일시 수정
+		-->
+		UPDATE /* QUERYID(goodsPrice.updateSalePriceEndDtm) */ GOODS_PRICE SET
+			SALE_END_DTM = #{saleEndDtm}
+		WHERE 1=1
+			AND GOODS_ID= #{goodsId}
+			AND  NOW() BETWEEN SALE_STRT_DTM AND SALE_END_DTM
+			AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND GOODS_AMT_TP_CD='${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20}' /* 세일 */
+	</update>
+
+	<update id="updateNextSalePriceStrtDtm" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.updateNextSalePriceStrtDtm
+			Description : 상품가격 시작일시 수정
+		-->
+		UPDATE /* QUERYID(goodsPrice.updateNextSalePriceStrtDtm) */
+			GOODS_PRICE SET
+			SALE_STRT_DTM = #{saleStrtDtm }
+		WHERE 1=1
+			AND GOODS_ID= #{goodsId}
+			AND SALE_STRT_DTM <![CDATA[>=]]> #{saleStrtDtm}
+			AND GOODS_AMT_TP_CD='${@framework.common.constants.CommonConstants@GOODS_AMT_TP_10}' /* 일반 */
+			AND DEL_YN !=  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</update>
+
+	<select id="listDownCoupon" resultType="biz.app.promotion.model.CouponBaseVO" >
+		<!--
+			Query Name : goodsPrice.listDownCoupon
+			Description : 상품에 현재 적용된 다운로드 가능 쿠폰 리스트 조회
+		-->
+		SELECT CP.CP_NO
+			 , CP.CP_NM
+			 , CP.CP_APL_CD
+			 , CP.CP_TG_CD
+			 , CP.APL_VAL
+			 , CP.VLD_PRD_CD
+             , CP.VLD_PRD_DAY
+             , CP.VLD_PRD_STRT_DTM
+             , CP.VLD_PRD_END_DTM
+			 , CP.MIN_BUY_AMT
+			 , CP.MAX_DC_AMT
+		FROM (
+			SELECT CB.CP_NO
+				 , CB.CP_NM
+				 , CB.CP_APL_CD
+				 , CB.CP_TG_CD
+				 , CB.APL_VAL
+				 , CB.VLD_PRD_CD
+                 , CB.VLD_PRD_DAY
+                 , CB.VLD_PRD_STRT_DTM
+                 , CB.VLD_PRD_END_DTM
+				 , IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+				 , IFNULL(CB.MAX_DC_AMT, 0) AS MAX_DC_AMT
+			<choose>
+		 		<when test='mbrNo != null and mbrNo != ""'>
+			 	 , IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON WHERE CP_NO = CB.CP_NO AND MBR_NO = #{mbrNo} ) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS CP_DW_YN
+				</when>
+				<otherwise>
+			 	 , 'N' AS CP_DW_YN
+				</otherwise>
+			</choose>
+			FROM COUPON_BASE CB
+			WHERE 1 = 1
+			AND CB.CP_KIND_CD IN ('${@framework.common.constants.CommonConstants@CP_KIND_10 }', '${@framework.common.constants.CommonConstants@CP_KIND_20 }' ) /* 상품, 장바구니 */
+			AND CB.CP_TG_CD = '${@framework.common.constants.CommonConstants@CP_TG_10 }' /* 전체 대상 */
+			AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20 }' /* 진행중 인것만 */
+			AND CB.APL_STRT_DTM &lt;= NOW()
+			AND CB.APL_END_DTM &gt; NOW()
+			AND CB.CP_PVD_MTH_CD = '${@framework.common.constants.CommonConstants@CP_PVD_MTH_10 }' /* 다운로드방식 */
+			<if test="goodsId != null and goodsId != ''">
+			UNION
+			SELECT CB.CP_NO
+				 , CB.CP_NM
+				 , CB.CP_APL_CD
+				 , CB.CP_TG_CD
+				 , CB.APL_VAL
+				 , CB.VLD_PRD_CD
+                 , CB.VLD_PRD_DAY
+                 , CB.VLD_PRD_STRT_DTM
+                 , CB.VLD_PRD_END_DTM
+				 , IFNULL(CB.MIN_BUY_AMT, 0) AS MIN_BUY_AMT
+				 , IFNULL(CB.MAX_DC_AMT, 0) AS MAX_DC_AMT
+			<choose>
+		 		<when test='mbrNo != null and mbrNo != ""'>
+			 	 , IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON WHERE CP_NO = CB.CP_NO AND MBR_NO = #{mbrNo} ) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','${@framework.common.constants.CommonConstants@COMM_YN_N}') AS CP_DW_YN
+				</when>
+				<otherwise>
+			 	 , 'N' AS CP_DW_YN
+				</otherwise>
+			</choose>
+			FROM COUPON_BASE CB
+			JOIN (
+				SELECT CT.CP_NO, CT.CP_TG_CD
+				FROM (
+				<if test="goodsId != null and goodsId != ''" >
+					SELECT CT.CP_NO, '${@framework.common.constants.CommonConstants@CP_TG_20 }' AS CP_TG_CD /* 상품 */
+					FROM COUPON_TARGET CT
+					WHERE CT.GOODS_ID = #{goodsId }
+					UNION
+					SELECT CT.CP_NO, '${@framework.common.constants.CommonConstants@CP_TG_30 }' AS CP_TG_CD /* 전시카테고리 */
+					FROM COUPON_TARGET CT
+					JOIN DISPLAY_GOODS DG ON (DG.DISP_CLSF_NO = CT.DISP_CLSF_NO )
+					WHERE 1 = 1
+					AND DG.GOODS_ID = #{goodsId }
+				</if>
+				) CT
+			) CT ON (CB.CP_NO = CT.CP_NO)
+			WHERE 1 = 1
+			AND CB.CP_KIND_CD IN ('${@framework.common.constants.CommonConstants@CP_KIND_10 }', '${@framework.common.constants.CommonConstants@CP_KIND_20 }' ) /* 상품, 장바구니 */
+			AND CB.CP_TG_CD &lt;&gt; '${@framework.common.constants.CommonConstants@CP_TG_10 }' /* 전체 대상 */
+			AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20 }' /* 진행중 인것만 */
+			AND CB.APL_STRT_DTM &lt;= NOW()
+			AND CB.APL_END_DTM &gt; NOW()
+			AND CB.CP_PVD_MTH_CD = '${@framework.common.constants.CommonConstants@CP_PVD_MTH_10 }' /* 다운로드방식 */
+			</if>
+		) CP
+		WHERE CP.CP_DW_YN = 'N'
+	</select>
+	
+	<delete id="deleteGoodsPrice" parameterType="biz.app.goods.model.GoodsPricePO" >
+		<!--
+			Query Name : goodsPrice.deleteGoodsPrice
+			Description : 상품 가격 삭제
+		-->
+		/*QUERYID(goodsPrice.deleteGoodsPrice) */
+		UPDATE GOODS_PRICE 
+		SET DEl_YN = #{delYn}
+		WHERE GOODS_PRC_NO = #{goodsPrcNo}
+	</delete>
+	
+	<select id="listGoodsPrice" resultType="biz.app.goods.model.GoodsPriceVO" >
+		<!--
+			Query Name : goodsPrice.listGoodsPrice
+			Description : 상품 가격 리스트 조회
+		-->
+		SELECT	/* QUERYID(GoodsPrice.listGoodsPrice) */
+				GOODS_PRC_NO
+				, GOODS_ID
+				, ST_ID
+				, SALE_STRT_DTM
+				, SALE_END_DTM
+				, GOODS_AMT_TP_CD
+				, ORG_SALE_AMT
+				, SALE_AMT
+				, FVR_APL_METH_CD
+				, FVR_VAL
+				, SPL_AMT
+				, CMS_RATE
+				, DEL_YN
+				, SYS_REGR_NO /* 시스템 등록자 번호 */
+			    , FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+			    , SYS_REG_DTM /* 시스템 등록 일시 */
+	            , SYS_UPDR_NO /* 시스템 수정자 번호 */
+	            , FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM
+	            , SYS_UPD_DTM /* 시스템 수정 일시 */
+		FROM	GOODS_PRICE
+		WHERE	1 = 1
+		AND		GOODS_ID			= #{goodsId }
+		<if test="delYn != null and delYn != ''">
+			AND DEL_YN = #{delYn}
+		</if>
+		  ORDER BY DEL_YN ASC, SALE_STRT_DTM DESC
+	</select>
+
+	<update id="updateGoodsPriceCisYn">
+		UPDATE GOODS_PRICE SET CIS_YN = #{cisYn} WHERE GOODS_PRC_NO = #{goodsPrcNo}
+	</update>
+
+</mapper>

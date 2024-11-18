@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 아이콘 관리
+	작성자  	valueFactory
+	작성일자  	2020.12.21
+-->
+<mapper namespace="goodsIcon">
+
+	<insert id="insertGoodsIcon" parameterType="biz.app.goods.model.GoodsIconPO">
+		<!--
+			Query Name : goodsIcon.insertGoodsIcon
+			Description : 상품 아이콘 등록
+		-->
+		/* QUERYID(goodsIcon.insertGoodsIcon) */
+		INSERT INTO GOODS_ICON (
+			GOODS_ID, GOODS_ICON_CD, SYS_REGR_NO, SYS_REG_DTM
+			, STRT_DTM
+			, END_DTM
+		)
+		VALUES
+		<foreach collection="codes" item="code" separator=",">
+		(
+		 #{goodsId} /* 상품 ID */
+		 , #{code} /* 아이콘 코드 */
+		 , #{sysRegrNo} /* 시스템 등록자 번호 */
+		 , NOW() /* 시스템 등록 일시 */
+		 <if test='strtDtm == null or strtDtm == ""'>
+			 , DATE_FORMAT('1970-01-01 00:00:00','%Y%m%d%H%i%s' ) /* 기간 시작 일시 */
+		 </if>
+ 		 <if test='endDtm == null or endDtm == ""'>
+		     , DATE_FORMAT('9999-12-31 23:59:59','%Y%m%d%H%i%s' ) /* 기간 시작 일시 */
+ 		 </if>
+		 <if test='strtDtm != null and strtDtm != ""'>
+			, DATE_FORMAT(#{strtDtm},'%Y%m%d%H%i%s' ) /* 기간 시작 일시 */
+		 </if>
+		 <if test='endDtm != null and endDtm != ""'>
+			, DATE_FORMAT(#{endDtm}, '%Y%m%d%H%i%s') /* 기간 종료 일시 */
+		 </if>
+		)
+		</foreach>
+	</insert>
+
+	<delete id="deleteGoodsIcon">
+		<!--
+			Query Name : goodsIcon.deleteGoodsIcon
+			Description : 상품 아이콘 삭제
+		-->
+		/* QUERYID(goodsIcon.deleteGoodsIcon) */
+		DELETE FROM GOODS_ICON
+		WHERE GOODS_ID IN
+		<foreach collection="goodsIds" item="goodsId" separator="," open="(" close=")">
+			#{goodsId}
+		</foreach>
+		<if test="usrDfn1Val != null or usrDfn2Val != null">
+			AND GOODS_ICON_CD in (
+			SELECT DTL_CD FROM CODE_DETAIL CD WHERE GRP_CD = '${@framework.common.constants.CommonConstants@GOODS_ICON}'
+			<if test="usrDfn1Val != null">AND USR_DFN1_VAL = #{usrDfn1Val} </if>
+			<if test="usrDfn2Val != null">AND USR_DFN2_VAL = #{usrDfn2Val} </if>
+			)
+		</if>
+	</delete>
+	
+	<select id="listGoodsIcon" resultType="biz.app.goods.model.GoodsIconVO">
+		<!--
+			Query Name : goodsIcon.listGoodsIcon
+			Description : 상품 아이콘 리스트
+		-->
+		/* QUERYID(goodsIcon.listGoodsIcon) */
+		SELECT 
+			GOODS_ID
+			, GOODS_ICON_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SUBSTRING(STRT_DTM, 1, 10) as STRT_DTM
+			, SUBSTRING(END_DTM, 1, 10) as END_DTM
+		FROM GOODS_ICON
+		WHERE GOODS_ID = #{goodsId}
+	</select>
+
+	<select id="listGoodsIconByGoodsId" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : goodsIcon.listGoodsIconByGoodsId
+			Description : 상품 상세에서 아이콘 리스트 조회
+		-->
+		/* QUERYID(goodsIcon.listGoodsIconByGoodsId) */
+		SELECT * FROM
+		(
+			/* 대표 전시 카테고리 */
+			SELECT DC.DISP_CLSF_NO DTL_CD
+				, GROUP_CONCAT(DC.DISP_CLSF_NM SEPARATOR '&amp;') DTL_NM
+				, GROUP_CONCAT(DC.DISP_CLSF_NM SEPARATOR '&amp;') DTL_SHT_NM
+				, (CASE WHEN DC.DISP_CLSF_NO IS NULL THEN NULL ELSE 0 END) AS SORT_SEQ
+				, 0 AS GB_TYPE
+			FROM DISPLAY_CATEGORY DC
+			WHERE dc.DISP_CLSF_NO IN (
+				SELECT FN_SPLIT(FN_GET_DISP_CTG_NO_PATH(dg.DISP_CLSF_NO), ';', 1)
+				FROM DISPLAY_GOODS DG
+				WHERE DG.GOODS_ID = #{goodsId}
+			)
+			UNION ALL
+			SELECT DTL_CD, DTL_NM , DTL_SHT_NM , SORT_SEQ
+				, (CASE WHEN B.GOODS_ICON_CD IS NOT NULL THEN 1 ELSE 2 END) GB_TYPE
+			FROM
+			(
+				SELECT DISTINCT
+					DTL_CD
+					, DTL_NM
+					, DTL_SHT_NM
+					, SORT_SEQ
+					, GI.GOODS_ID
+					, GI.COMP_NO
+					, GI.COMP_DLVR_YN /* 업체배송 여부 */
+					, (CASE WHEN GI.FREE_DLVR_YN = 'Y' AND DTL_CD = 'FREE' THEN 'Y' ELSE '' END) FREE_DLVR_YN	/* 배송비 무료 여부	*/
+					, (CASE WHEN GI.MD_RCOM_YN 	 = 'Y' AND DTL_CD = 'MDRC' THEN 'Y' ELSE '' END) MD_RCOM_YN		/* MD 추천 여부	*/
+					, (CASE WHEN GI.PROMOTION_YN = 'Y' AND DTL_CD = 'GIFT' THEN 'Y' ELSE '' END) PROMOTION_YN	/* 사은품 여부 		*/
+					, (CASE WHEN GI.TIME_SALE_YN = 'Y' AND DTL_CD = 'TIME' THEN 'Y' ELSE '' END) TIME_SALE_YN	/* 타임 세일 여부	*/
+					, (CASE WHEN DTL_CD = 'NEW' AND NOW() BETWEEN GI.STRT_DTM AND GI.END_DTM THEN 'Y' ELSE '' END) NEW_YN	/* NEW(시작/종료일) 여부	*/
+				FROM code_detail cd,
+				(
+					SELECT GB.*
+						, PT.GOODS_ID PRO_GOODS_ID, (CASE WHEN PT.GOODS_ID IS NOT NULL THEN 'Y' ELSE 'N' END) PROMOTION_YN
+						, (CASE WHEN CB.COMP_TP_CD = '${@framework.common.constants.CommonConstants@COMP_TP_20}' THEN 'Y' ELSE '' END) COMP_DLVR_YN
+						, (SELECT GOODS_ID FROM GOODS_PRICE WHERE GOODS_ID = GB.GOODS_ID AND GOODS_AMT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_AMT_TP_20}' AND NOW() BETWEEN SALE_STRT_DTM AND SALE_END_DTM AND DEL_YN = 'N') AS TIME_SALE_YN  /* 타임 세일 */
+						, GI.STRT_DTM
+						, GI.END_DTM
+					FROM goods_icon gi
+					LEFT JOIN goods_base gb
+					ON GI.GOODS_ID = GB.GOODS_ID
+					LEFT JOIN code_detail cd
+					ON GI.GOODS_ICON_CD = CD.DTL_CD
+					LEFT JOIN promotion_target pt
+					ON GI.GOODS_ID = PT.GOODS_ID
+					LEFT JOIN company_base cb
+					ON GB.COMP_NO = CB.COMP_NO
+					WHERE 1=1
+					AND GI.GOODS_ID = #{goodsId}
+				) GI
+				WHERE CD.GRP_CD = '${@framework.common.constants.CommonConstants@GOODS_ICON}'
+				AND CD.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				ORDER BY SORT_SEQ
+			) A
+			LEFT JOIN
+			(
+				SELECT GI.GOODS_ICON_CD
+				FROM goods_icon gi
+				LEFT JOIN goods_base gb
+				ON GI.GOODS_ID = GB.GOODS_ID
+				WHERE 1=1
+				AND GI.GOODS_ICON_CD != 'NEW'
+				AND GI.GOODS_ID = #{goodsId}
+			) B
+			ON A.DTL_CD = B.GOODS_ICON_CD
+			WHERE 1=1
+			AND (COMP_DLVR_YN 	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}' 	/* 업체배송 여부 */
+				OR FREE_DLVR_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' 	/* 무료배송 여부 */
+-- 				OR MD_RCOM_YN 	= '${@framework.common.constants.CommonConstants@COMM_YN_Y}' 	/* MD 추천 여부(수동 변경으로 주석처리함20200205.) */
+				OR PROMOTION_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/* 사은품 여부	*/
+				OR TIME_SALE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/* 타임 세일 여부 */
+				OR NEW_YN 		= '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/* T*/
+				OR B.GOODS_ICON_CD IS NOT NULL)	/* 수동 등록 ICON */
+			LIMIT 5 /* 기획에 맞게 5개만. */
+		) A
+		WHERE A.DTL_CD IS NOT NULL
+
+	</select>
+</mapper>

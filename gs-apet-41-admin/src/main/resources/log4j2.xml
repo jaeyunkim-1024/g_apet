@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+	<Properties>
+		<Property name="logName">apet_admin</Property>
+		<Property name="layoutPattern">%d [%t] %-5level %c(%M:%L) - %m%n</Property>
+	</Properties>
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8"/>
+		</Console>
+		<RollingFile name="logfileDaily"
+			fileName="/applogs/${logName}.log"
+			filePattern="/applogs/${logName}.log.%d{yyyy-MM-dd}-%i">
+			<PatternLayout pattern="${layoutPattern}" charset="UTF-8"/>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="100"
+				fileIndex="min" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<logger name="org.springframework.jdbc.datasource"
+			level="debug" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfileDaily" />
+		</logger>
+		<logger name="jdbc.sqltiming" level="error" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+		<logger name="jdbc.audit" level="error" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+		<logger name="log4jdbc.debug" level="error" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+		<logger name="jdbc.resultset" level="error" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+		<logger name="framework" level="debug" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfileDaily" />
+		</logger>
+		<logger name="biz" level="debug" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfileDaily" />
+		</logger>
+		<logger name="admin" level="debug" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfileDaily" />
+		</logger>
+		<Root level="info" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfileDaily" />
+		</Root>
+	</Loggers>
+</Configuration>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	회원 	Mapper
+	작성자  	valueFactory
+	작성일자 2021.02.26
+-->
+
+<mapper namespace="ioAlarm">
+
+	<insert id="insertIoAlarm">
+		<!--
+			Query Name : ioAlram.insertIoAlram
+			Description : 입고 알림 등록
+		-->
+		<selectKey keyProperty="goodsIoAlmNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_IO_ALARM_SEQ}') FROM DUAL
+		</selectKey>
+
+		/* QUERYID(ioAlram.insertIoAlram) */
+		INSERT INTO goods_io_alarm(goods_io_alm_no, mbr_no, goods_id, pak_goods_id, alm_yn, alm_snd_dtm, del_yn, sys_del_yn, sys_regr_no, sys_reg_dtm)
+		VALUES(#{goodsIoAlmNo}, #{mbrNo}, #{goodsId}, #{pakGoodsId}, IFNULL(#{almYn}, 'N'), #{almSndDtm}, IFNULL(#{delYn}, 'N'), IFNULL(#{sysDelYn}, 'N'), #{sysRegrNo},  NOW());
+	</insert>
+
+	<update id="updateIoAlarm">
+		<!--
+			Query Name : ioAlram.updateIoAlarm
+			Description : 입고 알림 수정
+		-->
+		/* QUERYID(ioAlram.updateIoAlarm) */
+		UPDATE	goods_io_alarm SET
+		  sys_updr_no 	= #{sysUpdrNo}
+		, sys_upd_dtm 	= NOW()
+		<if test='almYn != null'>
+			, alm_yn 		= #{almYn}
+		</if>
+		<if test='almSndDtm != null'>
+			, alm_snd_dtm 	= #{almSndDtm}
+		</if>
+		<if test='delYn != null'>
+			, del_yn 		= #{delYn}
+		</if>
+		<if test='sysDelYn != null'>
+			, sys_del_yn 		= #{sysDelYn}
+		</if>
+		<if test='noticeSendNo != null'>
+			, NOTICE_SEND_NO = #{noticeSendNo}
+		</if>
+		WHERE	1=1
+		AND goods_io_alm_no = #{goodsIoAlmNo}
+
+	</update>
+
+	<select id="getIoAlarm" resultType="biz.app.member.model.MemberIoAlarmVO">
+		<!--
+			Query Name : ioAlram.getIoAlarm
+			Description : 입고 알림 단일 조회
+		-->
+		/* QUERYID(ioAlram.getIoAlarm) */
+		SELECT	goods_io_alm_no /* 입고 알림 번호 */
+			, mbr_no		/* 회원 번호 */
+			, goods_id		/* 상품 아이디 */
+		    , pak_goods_id /* 묵음 상품 아이디 */
+			, alm_yn		/* 알림 여부 */
+			, alm_snd_dtm	/* 전송 여부 */
+			, del_yn		/* 회원 삭제 여부 */
+		    , notice_send_no /* 이력 통지 번호 */
+			, sys_regr_no	/* 등록자 번호 */
+			, sys_del_yn	/* 관리자 삭제 여부 */
+			, sys_reg_dtm
+			, sys_updr_no
+			, sys_upd_dtm
+			, sys_del_dtm
+			, sys_delr_no
+		FROM	goods_io_alarm
+		WHERE 1=1
+		and sys_reg_dtm > DATE_ADD(NOW(), interval -3 MONTH)
+		<if test='mbrNo != null'>
+ 		AND	mbr_no = #{mbrNo}
+		</if>
+		<if test='goodsIoAlmNo != null'>
+		  AND goods_io_alm_no = #{goodsIoAlmNo}
+		</if>
+		<if test='goodsId != null'>
+			AND	goods_id = #{goodsId}
+		</if>
+		<if test='pakGoodsId != null'>
+		AND pak_goods_id = #{pakGoodsId}
+		</if>
+		<if test='sysDelYn != null'>
+			AND   SYS_DEL_YN = #{sysDelYn}
+		</if>
+		<if test='delYn != null'>
+			AND   DEL_YN = #{delYn}
+		</if>
+		<if test='almYn != null'>
+			AND   ALM_YN = #{almYn}
+		</if>
+	</select>
+
+	<delete id="deleteIoAlarm">
+		<!--
+			Query Name : ioAlram.deleteIoAlarm
+			Description : 입고 알림 삭제
+		-->
+		/* QUERYID(ioAlram.deleteIoAlarm) */
+		UPDATE	goods_io_alarm SET
+		  sys_del_dtm = NOW()
+		, sys_delr_no = #{sysDelrNo}
+		<if test='delYn != null'>
+			, del_yn 		= #{delYn}
+		</if>
+		<if test='sysDelYn != null'>
+			, sys_del_yn 	= #{sysDelYn}
+		</if>
+		WHERE	1=1
+		AND goods_io_alm_no = #{goodsIoAlmNo}
+
+	</delete>
+
+	<select id="selectIoAlarmListTotalCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM goods_io_alarm io
+		WHERE 1=1
+		and sys_reg_dtm > DATE_ADD(NOW(), interval -3 MONTH)
+		<if test='sysDelYn != null'>
+			AND   SYS_DEL_YN = #{sysDelYn}
+		</if>
+		<if test='delYn != null'>
+			AND   DEL_YN = #{delYn}
+		</if>
+		<if test='mbrNo != null'>
+			AND   mbr_no = #{mbrNo}
+		</if>
+		<if test='goodsId != null'>
+			AND	goods_id = #{goodsId}
+		</if>
+		<if test='pakGoodsId != null'>
+			AND pak_goods_id = #{pakGoodsId}
+		</if>
+	</select>
+
+	<select id="selectIoAlarmList" resultType="biz.app.goods.model.GoodsBaseVO">
+		SELECT
+			io.GOODS_IO_ALM_NO,
+			io.GOODS_ID,
+			io.PAK_GOODS_ID,
+			io.MBR_NO,
+			io.ALM_YN,
+			io.ALM_SND_DTM,
+			io.DEL_YN,
+			io.NOTICE_SEND_NO,
+			io.SYS_REGR_NO,
+			io.SYS_REG_DTM,
+			io.SYS_UPDR_NO,
+			io.SYS_UPD_DTM,
+			io.SYS_DEL_YN,
+			io.SYS_DEL_DTM,
+			io.SYS_DELR_NO,
+
+		    IF(io.PAK_GOODS_ID IS NULL, gb.GOODS_NM, gbp.GOODS_NM) AS GOODS_NM,
+
+			 ATTR1_NO, ATTR1_NM, ATTR1_VAL, ATTR1_VAL_NO
+			, ATTR2_NO, ATTR2_NM, ATTR2_VAL, ATTR2_VAL_NO
+			, ATTR3_NO, ATTR3_NM, ATTR3_VAL, ATTR3_VAL_NO
+			, ATTR4_NO, ATTR4_NM, ATTR4_VAL, ATTR4_VAL_NO
+			, ATTR5_NO, ATTR5_NM, ATTR5_VAL, ATTR5_VAL_NO,
+
+			 gi.IMG_SEQ,
+			 gi.IMG_PATH,
+
+		    gb.GOODS_STAT_CD,
+			CASE WHEN FN_GET_GOODS_STOCK(gb.GOODS_ID,i.ITEM_NO) <![CDATA[<=]]> 0 THEN '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ELSE '${@framework.common.constants.CommonConstants@COMM_YN_N}' END SOLD_OUT_YN,
+			CASE
+			WHEN gb.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'		/* 상품 판매 중지 : 판매중지 */
+			WHEN gb.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+			WHEN gb.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR gb.SALE_END_DTM <![CDATA[<]]> SYSDATE()
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+			WHEN gb.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+			WHEN FN_GET_GOODS_STOCK(gb.GOODS_ID, i.ITEM_NO)  <![CDATA[<=]]> 0
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_30}'		/* 단품 재고 오류 ; 품절 */
+			ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' 		/* 정상 */
+			END AS SALE_PSB_CD						/* 판매가능상태코드 */ ,
+
+		    iah.*
+
+		FROM goods_io_alarm io
+		LEFT OUTER JOIN GOODS_BASE gb
+		ON io.GOODS_ID = gb.GOODS_ID
+
+		LEFT OUTER JOIN GOODS_CSTRT_PAK gcp
+		ON io.PAK_GOODS_ID = gcp.GOODS_ID
+		AND io.GOODS_ID = gcp.GOODS_ID
+
+		LEFT OUTER JOIN GOODS_BASE gbp
+		ON gcp.GOODS_ID = gbp.GOODS_ID
+
+		LEFT OUTER JOIN ITEM i
+		ON gb.GOODS_ID = i.GOODS_ID
+
+		LEFT OUTER JOIN item_attr_hist iah
+		ON i.ITEM_NO = iah.ITEM_NO
+		AND ITEM_ATTR_HIST_NO  = (
+			SELECT MAX(ITEM_ATTR_HIST_NO) AS ITEM_ATTR_HIST_NO
+			FROM item_attr_hist
+			WHERE ITEM_NO = i.ITEM_NO
+			AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			LIMIT 1
+		)
+
+		LEFT OUTER JOIN GOODS_IMG gi
+		ON gi.GOODS_ID = gb.GOODS_ID
+		AND gi.DLGT_YN = 'Y'
+
+		WHERE 1=1
+		and io.sys_reg_dtm > DATE_ADD(NOW(), interval -3 MONTH)
+		<if test='sysDelYn != null'>
+			AND   SYS_DEL_YN = #{sysDelYn}
+		</if>
+		<if test='delYn != null'>
+			AND   DEL_YN = #{delYn}
+		</if>
+		<if test='mbrNo != null'>
+			AND   mbr_no = #{mbrNo}
+		</if>
+		<if test='goodsId != null'>
+			AND	goods_id = #{goodsId}
+		</if>
+		<if test='pakGoodsId != null'>
+			AND pak_goods_id = #{pakGoodsId}
+		</if>
+		ORDER BY io.SYS_REG_DTM DESC
+
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+
+	<resultMap type="biz.app.member.model.MemberIoAlarmVO" id="ioAlarmTargetMap" >
+		<result property="mbrNm" column="mbrNm" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+	</resultMap>
+
+	<select id="selectIoAlmCntByGoods" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS CNT
+		FROM goods_io_alarm
+		WHERE 1=1
+		  AND alm_yn = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		  AND del_yn != '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		  AND sys_del_yn != '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		  AND goods_id = #{goodsId}
+	</select>
+
+</mapper>

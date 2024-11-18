@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 04.29 */
+			if(ui.check_brw.mo()){
+				setTimeout(function(){
+					$("[data-sid = 'ui-datepickers'], .ui-datepicker-trigger, .select-pop").click(function(){
+						ui.lock.using(true);
+						setTimeout(function(){
+							$(".ui-datepicker-close, .ui-state-default").click(function(){
+								console.log("unlock!!")
+								ui.lock.using(false);
+							});
+							$(".ui-datepicker").click(function(){
+								$(".ui-state-default").click(function(){
+								console.log("unlock!!")
+								ui.lock.using(false);
+							});
+							});
+						},500)
+					});
+				},500);
+			}
+		})
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-btn-lname="취소" data-btn-rname="등록" data-include-opt='{"header":"set16","tit":"<b class=e></b>투약 기록"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login lnb my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="pc-tit">
+						<h2>투약 기록</h2>
+					</div>
+					<div class="fake-pop newDn">
+						<div class="pct">
+							<div class="poptents">
+								<!-- 회원 정보 입력 -->
+								
+								<div class="member-input po-reSet-layer">
+									<div class="check_mark_legend"><span>*</span>필수 입력 정보</div>
+									<ul class="list">
+										<li>
+											<strong class="tit requied">종류</strong>
+											<div style="position: relative;">
+												<span class="select-pop w100">
+													<select class="sList" name="select_pop_1" data-select-title="기초접종 종류 선택">
+														<option value="value_1" selected>종합백신 1차</option>
+														<option value="value_2" selected>종합백신 2차</option>
+														<option value="value_3" selected>종합백신 3차</option>
+														<option value="value_4" selected>종합백신 4차</option>
+														<option value="value_5" selected>종합백신 5차</option>
+														<option value="value_6">코로나 장염</option>
+													</select>
+												</span>
+												
+											</div>
+										</li>
+										<li>
+											<strong class="tit requied">투약일</strong>
+											<section class="sect" data-sid="ui-datepickers">
+												<span class="uiDate"><input type="text"  value="2021-02-27" placeholder="YYYY-MM-DD" class="datepicker" title="캘린더타이틀" id="datepick_2"></span>
+											</section>
+										</li>
+										<li>
+											<strong class="tit">진료병원</strong>
+											<div class="input">
+												<input type="text" placeholder="병원명을 입력해 주세요">
+											</div>
+										</li>
+										<li>
+											<strong class="tit pc-pSet-t1">특이사항 메모</strong>
+											<div class="textarea"><textarea placeholder="접종 시 마이펫의 증상이나 부작용 등 접종에 대한 기록을 남겨주세요" style="height:180px;"></textarea></div>
+										</li>
+									</ul>
+								</div>
+								<!-- // 회원 정보 입력 -->
+								
+							</div>
+						</div>
+					</div>
+					<div class="exchange-area mt40">
+						<div class="btnSet space pc-reposition pc-no-border">
+							<a href="javascript:;" class="btn lg d  onWeb_if">취소</a>
+							<a href="javascript:;" class="btn lg a">등록</a>
+						</div>
+					</div>
+					
+				</div>
+
+			</div>
+		</main>
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

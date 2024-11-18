@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="privacy">
+
+	<select id="getPrivacy" resultType="biz.app.privacy.model.PrivacyPolicyVO">
+		SELECT POLICY_NO						/* 처리 방침 번호 */
+				, VER_INFO						/* 버전 정보 */
+				, CONTENT						/* 내용 */
+				, ST_ID						/* 사이트 ID */
+				, USE_YN					/* 사용 여부 */
+				, SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, SYS_REG_DTM			/* 시스템 등록 일시 */
+				, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM	PRIVACY_POLICY
+		WHERE	1 = 1
+		<if test="policyNo != null" >
+			AND POLICY_NO = #{policyNo}
+		</if>
+		AND	USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	</select>
+
+	<insert id="insertPrivacyPolicy" parameterType="biz.app.privacy.model.PrivacyPolicyPO" >
+		<!--
+			Query Name : privacy.insertPrivacyPolicy
+			Description : 개인정보처리방침 등록
+		-->
+		INSERT INTO PRIVACY_POLICY (
+			  POLICY_NO						/* 처리 방침 번호 */
+			, VER_INFO						/* 버전 정보 */
+			, CONTENT						/* 내용 */
+			, USE_YN					/* 사용 여부 */
+			, ST_ID						/* 사이트 ID */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{policyNo}						/* 처리 방침 번호 */
+			, #{verInfo}					/* 버전 정보 */
+			, #{content }					/* 내용 */
+			, #{useYn }					/* 사용 여부 */
+			, #{stId }						/* 사이트 ID */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+			, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			, NOW()						/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<select id="getPrivacyPolicy" resultType="biz.app.privacy.model.PrivacyPolicyVO" >
+		<!--
+			Query Name : privacy.getPrivacyPolicy
+			Description : 개인정보처리방침 조회
+		-->
+		SELECT /* QUERYID(privacy.getPrivacyPolicy) */
+				 A.POLICY_NO						/* 처리 방침 번호 */
+				, A.VER_INFO					/* 버전 정보 */
+				, A.CONTENT							/* 내용 */
+				, A.USE_YN							/* 사용 여부 */
+				, A.SYS_REGR_NO						/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM						/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO						/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM						/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				<!-- , B.ST_ID							/* 사이트 ID */
+				, B.ST_NM							/* 사이트 명 */ -->
+		FROM	PRIVACY_POLICY  A
+	  	<!-- INNER JOIN ST_STD_INFO B ON (B.ST_ID = A.ST_ID) -->
+		WHERE	A.POLICY_NO = #{policyNo}
+	</select>
+
+	<select id="getNewPrivacyPolicy" resultType="biz.app.privacy.model.PrivacyPolicyVO" >
+		<!--
+			Query Name : privacy.getNewPrivacyPolicy
+			Description : 최신 개인정보처리방침 단건 조회
+		-->
+		SELECT /* QUERYID(privacy.getNewPrivacyPolicy) */
+				 A.POLICY_NO						/* 처리 방침 번호 */
+				, A.VER_INFO						/* 버전 정보 */
+				, A.CONTENT							/* 내용 */
+				, A.PLCY_NM							/* 제목*/
+				, A.USE_YN							/* 사용 여부 */
+				, A.SYS_REGR_NO						/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM						/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO						/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM						/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				<!-- , B.ST_ID							/* 사이트 ID */
+				, B.ST_NM							/* 사이트 명 */ -->
+		FROM	PRIVACY_POLICY  A
+	  	<!-- INNER JOIN ST_STD_INFO B ON (B.ST_ID = A.ST_ID) 주석처리 210112 leejh-->
+		WHERE	A.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	    ORDER BY SYS_REG_DTM DESC
+	    LIMIT 1
+	</select>
+
+	<select id="pagePrivacyPolicy" resultType="biz.app.privacy.model.PrivacyPolicyVO" >
+		<!--
+			Query Name : privacy.pagePrivacyPolicy
+			Description : 개인정보처리방침 리스트 조회
+		-->
+		SELECT A.POLICY_NO
+			 , A.VER_INFO
+			 , A.CONTENT
+			 , A.USE_YN
+			 , A.SYS_REGR_NO
+			 , FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			 , A.SYS_REG_DTM
+			 , A.SYS_UPDR_NO
+			 , FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			 , A.SYS_UPD_DTM
+			 <!-- , B.ST_ID										/* 사이트 ID */
+			 , B.ST_NM										/* 사이트 명 */ -->
+		  FROM PRIVACY_POLICY A
+		  <!-- INNER JOIN ST_STD_INFO B ON (B.ST_ID = A.ST_ID
+		  	<if test="stId != null" >
+			AND B.ST_ID = #{stId}
+			</if>
+		  ) -->
+		 WHERE 1 = 1
+		<if test="policyNo != null" >
+		  AND A.POLICY_NO = #{policyNo}
+		</if>
+		<if test="policyNos != null" >
+			<foreach collection="policyNos" item="item" separator="," open="AND A.POLICY_NO IN (" close=")" >
+				#{item}
+			</foreach>
+		</if>
+		<if test="verInfo != null and verInfo != ''" >
+		  AND A.VER_INFO LIKE CONCAT('%', #{verInfo}, '%')
+		</if>
+		<if test="versionInfos != null" >
+			<foreach collection="versionInfos" item="item" separator="OR" open="AND (" close=")" >
+				A.VER_INFO LIKE CONCAT('%', #{item}, '%')
+			</foreach>
+		</if>
+		<if test="useYn != null and useYn != ''" >
+			AND A.USE_YN = #{useYn}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pagePrivacyPolicyCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : privacy.pagePrivacyPolicyCount
+			Description : 개인정보처리방침 리스트 조회
+		-->
+		SELECT COUNT(*)
+		  FROM PRIVACY_POLICY A
+		 <!--  INNER JOIN ST_STD_INFO B ON (B.ST_ID = A.ST_ID
+		  	<if test="stId != null" >
+			AND B.ST_ID = #{stId}
+			</if>
+		  ) -->
+		 WHERE 1 = 1
+		<if test="policyNo != null" >
+		  AND A.POLICY_NO = #{policyNo}
+		</if>
+		<if test="policyNos != null" >
+			<foreach collection="policyNos" item="item" separator="," open="AND A.POLICY_NO IN (" close=")" >
+				#{item}
+			</foreach>
+		</if>
+		<if test="verInfo != null and verInfo != ''" >
+		  AND A.VER_INFO LIKE CONCAT('%', #{verInfo}, '%')
+		</if>
+		<if test="versionInfos != null" >
+			<foreach collection="versionInfos" item="item" separator="OR" open="AND (" close=")" >
+				A.VER_INFO LIKE CONCAT('%', #{item}, '%')
+			</foreach>
+		</if>
+	</select>
+
+
+	<update id="updatePrivacyPolicy" parameterType="biz.app.privacy.model.PrivacyPolicyPO" >
+		<!--
+			Query Name : privacy.updatePrivacyPolicy
+			Description : 개인정보처리방침 수정
+		-->
+		UPDATE	PRIVACY_POLICY SET
+				  SYS_UPDR_NO				= #{sysUpdrNo }				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				= NOW()				/* 시스템 수정 일시 */
+				, VER_INFO							= #{verInfo }						/* 버전 정보 */
+				, CONTENT							= #{content }						/* 내용 */
+				, ST_ID						= #{stId }				/* 사이트 ID */
+				, USE_YN						= #{useYn }					/* 사용 여부 */
+		WHERE	1 = 1
+		AND		POLICY_NO					= #{policyNo }
+	</update>
+	
+</mapper>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set9","tit":"<b class=e>설정</b>"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page sett" id="container">
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>로그인</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- 설정 컨텐츠 영역 -->
+					<div class="setlist">
+						<dl>
+							<dt class="mb0">로그인</dt><!-- 2021.04.08 클래스 mb0 추가 -->
+							<dd>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">
+											어바웃펫
+											<span class="nickname">nickname</span><!-- 2021.04.08 클래스 HTML 추가 -->
+										</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+							</dd>
+						</dl>
+						<dl>
+							<dt>메인설정</dt>
+							<dd>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">메인 설정하기</span>
+										<span class="strong">TV</span>	<!-- APET-1250 210721 lju02 - 샵 서비스명 변경 -->
+										<span class="r next"></span>
+									</a>
+								</div>
+							</dd>
+						</dl>
+						<dl>
+							<dt>알림설정</dt>
+							<dd>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">정보수신동의</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">이벤트성 알림 동의</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+							</dd>
+						</dl>
+						<dl>
+							<dt>동영상 플레이어 설정</dt>
+							<dd>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">동영상 플레이어 설정</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+							</dd>
+						</dl>
+						<dl>
+							<dt>이용약관</dt>
+							<dd>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">서비스 이용약관</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">개인정보 취급방침</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+								<div class="link">
+									<a href="javascript:;">
+										<span class="ti">위치정보 동의</span>
+										<span class="r next"></span>
+									</a>
+								</div>
+							</dd>
+						</dl>
+						<dl>
+							<dt>버전정보</dt>
+							<dd>
+								<ul>
+									<li class="ti">현재 버전 <i>V2.0.0</i></li>
+									<li class="r">
+										<em style="display:none;">최신 버전입니다.</em>
+										<a href="javascript:;" class="btn sm">업데이트</a>
+									</li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+					<!-- // 설정 컨텐츠 영역 -->
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+		<!-- 21.06.14 APETQA-4561 : 하단메뉴, 푸터 비노출처리 lcm01  -->
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<!-- //21.06.14 APETQA-4561 : 하단메뉴, 푸터 비노출처리 lcm01  -->
+
+	</div>
+</body>
+</html>

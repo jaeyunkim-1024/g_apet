@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cashReceipt">
+
+	<insert id="insertCashReceipt">
+		<!--
+			Query Name : cashReceipt.insertCashReceipt
+			Description : 현금영수증 등록
+		-->
+		INSERT INTO CASH_RECEIPT (
+			CASH_RCT_NO			/* 현금 영수증 번호 */
+			, ORG_CASH_RCT_NO	/* 원 현금 영수증 번호 */
+			, CR_TP_CD			/* 발행 유형 코드 */
+			, CASH_RCT_STAT_CD	/* 현금 영수증 상태 코드 */
+			, USE_GB_CD			/* 사용 구분 코드 */
+			, ISU_MEANS_CD		/* 발급 수단 코드 */
+			, ISU_MEANS_NO		/* 발급 수단 번호 */
+			, ISU_GB_CD			/* 발행 구분 코드 */
+			, PAY_AMT			/* 결제 금액 */
+			, SPL_AMT			/* 공급 금액 */
+			, STAX_AMT			/* 부가세 금액 */
+			, SRVC_AMT			/* 봉사료 금액 */
+			, LNK_DTM			/* 연동 일시 */
+			, STR_ID				/* 상점 ID */
+			, LNK_DEAL_NO		/* 연동 거래 번호 */
+			, LNK_RST_MSG		/* 요청 결과 JSON STR */
+			, CFM_RST_MSG		/* 요청 결과 메세지 */
+			, CFM_RST_CD			/* 요청 결과 코드 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			#{cashRctNo}			/* 현금 영수증 번호 */
+			, #{orgCashRctNo}	/* 원 현금 영수증 번호 */
+			, #{crTpCd}			/* 발행 유형 코드 */
+			, #{cashRctStatCd}	/* 현금 영수증 상태 코드 */
+			, #{useGbCd}			/* 사용 구분 코드 */
+			, #{isuMeansCd}		/* 발급 수단 코드 */
+			, #{isuMeansNo, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}		/* 발급 수단 번호 */
+			, #{isuGbCd}			/* 발행 구분 코드 */
+			, #{payAmt}			/* 결제 금액 */
+			, #{splAmt}			/* 공급 금액 */
+			, #{staxAmt}			/* 부가세 금액 */
+			, #{srvcAmt}			/* 봉사료 금액 */
+			, #{lnkDtm}			/* 연동 일시 */
+			, #{strId}				/* 상점 ID */
+			, #{lnkDealNo}			/* 연동 거래 번호 */
+			, #{lnkRstMsg}		/* 요청 결과 JSON STR */
+			, #{cfmRstMsg}		/* 요청 결과 메세지 */
+			, #{cfmRstCd}			/* 요청 결과 코드 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<insert id="insertCashReceiptGoodsMap">
+		<!--
+			Query Name : cashReceipt.insertCashReceiptGoodsMap
+			Description : 현금영수증 상품 매핑 등록
+		-->
+		INSERT INTO CASH_RECEIPT_GOODS_MAP (
+			CASH_RCT_NO			/* 현금 영수증 번호 */
+			, ORD_CLM_NO	/* 주문 / 클레임 번호 */
+			, ORD_CLM_DTL_SEQ	/* 주문 / 클레임 상세 순번 */
+			, APL_QTY /* 적용 수량 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			#{cashRctNo}		/* 현금 영수증 번호 */
+			, #{ordClmNo}	/* 주문 / 클레임 번호 */
+			, #{ordClmDtlSeq}	/* 주문 / 클레임 상세 순번 */
+			, #{aplQty} /* 적용 수량 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<resultMap type="biz.app.receipt.model.CashReceiptVO" id="orderListMap">
+		<id		property="cashRctNo"		column="CASH_RCT_NO"/>			<!-- 현금 영수증 번호 -->
+		<result property="orgCashRctNo"		column="ORG_CASH_RCT_NO"/>		<!-- 원 현금 영수증 번호 -->
+		<result property="clmNo"			column="CLM_NO"/>				<!-- 클레임 번호 -->
+		<result property="crTpCd"		column="CR_TP_CD"/>			<!-- 발행 유형 코드 -->
+		<result property="cashRctStatCd"	column="CASH_RCT_STAT_CD"/>		<!-- 현금 영수증 상태 코드 -->
+		<result property="useGbCd"			column="USE_GB_CD"/>			<!-- 사용 구분 코드 -->
+		<result property="isuMeansCd"		column="ISU_MEANS_CD"/>			<!-- 발급 수단 코드 -->
+		<result property="isuMeansNo"		column="ISU_MEANS_NO"/>			<!-- 발급 수단 번호 -->
+		<result property="isuGbCd"			column="ISU_GB_CD"/>			<!-- 발행 구분 코드 -->
+		<result property="taxSplAmt"		column="TAX_SPL_AMT"/>			<!-- 공급 금액 -->
+		<result property="staxAmt"			column="STAX_AMT"/>				<!-- 부가세 금액 -->
+		<result property="srvcAmt"			column="SRVC_AMT"/>				<!-- 봉사료 금액 -->
+		<result property="lnkDtm"			column="LNK_DTM"/>				<!-- 연동 일시 -->
+		<result property="lnkDealNo"		column="LNK_DEAL_NO"/>			<!-- 연동 거래 번호 -->
+		<result property="lnkRstMsg"		column="LNK_RST_MSG"/>			<!-- 연동 결과 메세지 -->
+
+		<result property="ordNo"			column="ORD_NO"/>			<!-- 주문 번호 -->
+		<result property="ordStatCd"		column="ORD_STAT_CD"/>		<!-- 주문 상태 코드 -->
+		<result property="ordMdaCd"			column="ORD_MDA_CD"/>		<!-- 주문 매체 코드 -->
+		<result property="pageGbCd"			column="PAGE_GB_CD"/>		<!-- 페이지 구분 코드 -->
+		<result property="mbrNo"			column="MBR_NO"/>			<!-- 회원 번호 -->
+		<!-- <result property="mbrNm"			column="MBR_NM"/>			회원 명 -->
+		<result property="mbrNm" column="MBR_NM" typeHandler="biz.common.typehandler.CryptoTypeHandler" />
+		<result property="mbrGrdCd"			column="MBR_GRD_CD"/>		<!-- 회원 등급 코드 -->
+		<result property="ordNm"			column="ORD_NM"/>			<!-- 주문자 명 -->
+		<result property="adrsNm"			column="ADRS_NM"/>			<!-- 수령인 명 -->
+		<result property="ordrId"			column="ORDR_ID"/>			<!-- 주문자 ID -->
+		<result property="ordrEmail"		column="ORDR_EMAIL"/>		<!-- 주문자 이메일 -->
+		<result property="ordrTel"			column="ORDR_TEL"/>			<!-- 주문자 전화 -->
+		<result property="ordrMobile"		column="ORDR_MOBILE"/>		<!-- 주문자 휴대폰 -->
+		<result property="ordrIp"			column="ORDR_IP"/>			<!-- 주문자 IP -->
+		<result property="ordAcptDtm"		column="ORD_ACPT_DTM"/>		<!-- 주문 접수 일시 -->
+		<result property="ordCpltDtm"		column="ORD_CPLT_DTM"/>		<!-- 주문 완료 일시 -->
+		<result property="ordCncDtm"		column="ORD_CNC_DTM"/>		<!-- 주문 취소 일시 -->
+		<result property="payMeansCd"		column="PAY_MEANS_CD"/>		<!-- 결제 수단 코드 -->
+		<result property="ordDtlCnt"		column="ORD_DTL_CNT"/>		<!-- 주문 상세 카운트 -->
+		<result property="payAmtTotal"		column="PAY_AMT_TOTAL"/>	<!-- 결제 금액 합계 -->
+
+		<collection property="orderDetailListVO" ofType="biz.app.order.model.OrderDetailVO">
+			<id		property="ordDtlSeq"		column="ORD_DTL_SEQ"/>			<!-- 주문 상세 순번 -->
+			<result property="ordDtlStatCd"		column="ORD_DTL_STAT_CD"/>		<!-- 주문 상세 상태 코드 -->
+			<result property="goodsId"			column="GOODS_ID"/>				<!-- 상품 아이디 -->
+			<result property="goodsNm"			column="GOODS_NM"/>				<!-- 상품 명 -->
+			<result property="itemNo"			column="ITEM_NO"/>				<!-- 단품 번호 -->
+			<result property="itemNm"			column="ITEM_NM"/>				<!-- 단품 명 -->
+			<result property="dealGoodsId"		column="DEAL_GOODS_ID"/>		<!-- 딜 상품 아이디 -->
+			<result property="dispClsfNo"		column="DISP_CLSF_NO"/>			<!-- 전시 분류 번호 -->
+			<result property="compGoodsNo"		column="COMP_GOODS_NO"/>		<!-- 업체 상품 번호 -->
+			<result property="compItemNo"		column="COMP_ITEM_NO"/>			<!-- 업체 단품 번호 -->
+			<result property="saleAmt"			column="SALE_AMT"/>				<!-- 판매 금액 -->
+			<result property="ordQty"			column="ORD_QTY"/>				<!-- 주문 수량 -->
+			<result property="payAmt"			column="PAY_AMT"/>				<!-- 결제 금액 -->
+			<result property="splAmt"			column="SPL_AMT"/>				<!-- 공급 금액 -->
+			<result property="goodsCmsnRt"		column="GOODS_CMSN_RT"/>		<!-- 상품수수료율 -->
+			<result property="goodsCpDcAmt"		column="GOODS_CP_DC_AMT"/>		<!-- 상품 쿠폰 할인 금액 -->
+			<result property="dlvrcCpDcAmt"		column="DLVRC_CP_DC_AMT"/>		<!-- 배송비 쿠폰 할인 금액 -->
+			<result property="asbcCpDcAmt"		column="ASBC_CP_DC_AMT"/>		<!-- 조립비 쿠폰 할인 금액 -->
+			<result property="cartCpDcAmt"		column="CART_CP_DC_AMT"/>		<!-- 장바구니 쿠폰 할인 금액 -->
+			<result property="svmnDcAmt"		column="SVMN_DC_AMT"/>			<!-- 적립금 할인 금액 -->
+			<result property="payNo"			column="PAY_NO"/>				<!-- 결제 번호 -->
+			<result property="dlvrcNo"			column="DLVRC_NO"/>				<!-- 배송비 번호 -->
+			<result property="asbcNo"			column="ASBC_NO"/>				<!-- 조립비 번호 -->
+			<result property="compNo"			column="COMP_NO"/>				<!-- 업체 번호 -->
+			<result property="compNm"			column="COMP_NM"/>				<!-- 업체 명 -->
+			<result property="compContrNo"		column="COMP_CONTR_NO"/>		<!-- 업체 계약 번호 -->
+			<result property="dlvrHopeDt"		column="DLVR_HOPE_DT"/>			<!-- 배송 희망 일자 -->
+			<result property="goodsPrpDtm"		column="GOODS_PRP_DTM"/>		<!-- 상품 준비 일시 -->
+			<result property="ooCmdDtm"			column="OO_CMD_DTM"/>			<!-- 출고 지시 일시 -->
+			<result property="ooCpltDtm"		column="OO_CPLT_DTM"/>			<!-- 출고 완료 일시 -->
+			<result property="dlvrCpltDtm"		column="DLVR_CPLT_DTM"/>		<!-- 배송 완료 일시 -->
+			<result property="goodsEstmRegYn"	column="GOODS_ESTM_REG_YN"/>	<!-- 상품 평가 등록 여부 -->
+			<result property="sysRegrNo"		column="SYS_REGR_NO"/>			<!-- 시스템 등록자 번호 -->
+			<result property="sysRegDtm"		column="SYS_REG_DTM"/>			<!-- 시스템 등록 일시 -->
+			<result property="sysUpdrNo"		column="SYS_UPDR_NO"/>			<!-- 시스템 수정자 번호 -->
+			<result property="sysUpdDtm"		column="SYS_UPD_DTM"/>			<!-- 시스템 수정 일시 -->
+			<result property="sysRegrNm"		column="SYS_REGR_NM"/>			<!-- 시스템 등록자 -->
+			<result property="sysUpdrNm"		column="SYS_UPDR_NM"/>			<!-- 시스템 수정자 -->
+			<result property="aplQty"				column="APL_QTY"/>	<!-- 적용 수량 -->
+		</collection>
+	</resultMap>
+
+	<select id="pageCashReceipList" resultMap="orderListMap">
+		<!--
+			Query Name : cashReceipt.pageCashReceipList
+			Description : 현금영수증 리스트(페이지)
+		-->
+		SELECT	/* QUERYID(cashReceipt.pageCashReceipList) */
+					OD.ORD_DTL_SEQ				/* 주문 상세 순번 */
+					, OD.ORD_DTL_STAT_CD		/* 주문 상세 상태 코드 */
+					,(SELECT CD.DTL_NM AS ORD_DTL_STAT_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'ORD_DTL_STAT' AND CD.DTL_CD = OD.ORD_DTL_STAT_CD)  ORD_DTL_STAT_NM /* 주문 상태 코드명 */
+					, OD.GOODS_ID				/* 상품 아이디 */
+					, OD.GOODS_NM				/* 상품 명 */
+					, OD.ITEM_NO				/* 단품 번호 */
+					, OD.ITEM_NM				/* 단품 명 */
+					, OD.DISP_CLSF_NO			/* 전시 분류 번호 */
+					, OD.SALE_AMT				/* 판매 금액 */
+					, OD.ORD_QTY				/* 주문 수량 */
+					, OD.PAY_AMT				/* 결제 금액 */
+					, OD.GOODS_CMSN_RT			/* 상품수수료율 */
+					, OD.DLVRC_NO				/* 배송비 번호 */
+					, OD.DLVR_NO				/* 배송 번호 */
+					, OD.COMP_NO				/* 업체 번호 */
+					, ( SELECT FN_GET_COMPANY_NAME(OD.COMP_NO) ) AS COMP_NM				/* 업체 명 */
+					, OD.GOODS_ESTM_REG_YN		/* 상품 평가 등록 여부 */
+					, OD.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, OD.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, OD.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, OD.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, OD.RMN_ORD_QTY	        /* 주문 잔여수량 */
+					, FN_GET_USER_NAME(OD.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(OD.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, (SELECT BND_NM_KO FROM BRAND_BASE WHERE BND_NO = (SELECT BND_NO FROM GOODS_BASE WHERE GOODS_ID = OD.GOODS_ID)) AS BND_NM_KO	/* 브랜드명 국문 */
+					, OD.CMS					/* 수수료 */
+					, (SELECT COMP_GB_CD FROM COMPANY_BASE WHERE COMP_NO = OD.COMP_NO) AS COMP_GB_CD  /* 업체 구분 코드 */
+					, IFNULL( (SELECT DC.REAL_DLVR_AMT
+						FROM DELIVERY_CHARGE DC
+						WHERE DC.DLVRC_NO = OD.DLVRC_NO  ),0) AS REAL_DLVR_AMT  /*실 배송비*/
+					, IFNULL(CR1.CASH_RCT_NO, CR.CASH_RCT_NO) AS CASH_RCT_NO				/* 현금 영수증 번호 */
+					, IFNULL(CR1.ORG_CASH_RCT_NO, CR.ORG_CASH_RCT_NO) AS ORG_CASH_RCT_NO 		/* 원 현금 영수증 번호 */
+					, IFNULL(CLD1.CLM_NO, CLD.CLM_NO) AS CLM_NO					/* 클레임 번호 */
+					, IFNULL(CR1.CR_TP_CD, CR.CR_TP_CD) AS CR_TP_CD			/* 발행 유형 코드 */
+					, IFNULL(CR1.CASH_RCT_STAT_CD, CR.CASH_RCT_STAT_CD) AS CASH_RCT_STAT_CD 		/* 현금 영수증 상태 코드 */
+					, IFNULL(CR1.USE_GB_CD, CR.USE_GB_CD) AS USE_GB_CD				/* 사용 구분 코드 */
+					, IFNULL(CR1.ISU_MEANS_CD, CR.ISU_MEANS_CD) AS ISU_MEANS_CD			/* 발급 수단 코드 */
+					, IFNULL(CR1.ISU_MEANS_NO, CR.ISU_MEANS_NO) AS ISU_MEANS_NO 			/* 발급 수단 번호 */
+					, IFNULL(CR1.ISU_GB_CD, CR.ISU_GB_CD) AS ISU_GB_CD				/* 발행 구분 코드 */
+					, IFNULL(CR1.SPL_AMT, CR.SPL_AMT) AS TAX_SPL_AMT 	/* 공급 금액 */
+					, IFNULL(CR1.STAX_AMT, CR.STAX_AMT) AS STAX_AMT				/* 부가세 금액 */
+					, IFNULL(CR1.SRVC_AMT, CR.SRVC_AMT) AS SRVC_AMT				/* 봉사료 금액 */
+					, IFNULL(CR1.LNK_DTM, CR.LNK_DTM) AS LNK_DTM				/* 연동 일시 */
+					, IFNULL(CR1.LNK_DEAL_NO, CR.LNK_DEAL_NO) AS LNK_DEAL_NO 			/* 연동 거래 번호 */
+					, IFNULL(CR1.LNK_RST_MSG, CR.LNK_RST_MSG) AS LNK_RST_MSG 			/* 연동 결과 메세지 */
+					, FN_GET_USER_NAME(IFNULL(CR1.SYS_REGR_NO, CR.SYS_REGR_NO)) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(IFNULL(CR1.SYS_UPDR_NO, CR.SYS_UPDR_NO)) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, CRGM.APL_QTY /* 적용 수량 */
+					, OB_PB.*
+		<include refid="pageCashReceipListFrom" />
+		ORDER BY OD.ORD_NO DESC, OD.ORD_DTL_SEQ ASC, IFNULL(CR1.CASH_RCT_NO, CR.CASH_RCT_NO) DESC
+		<include refid="bizCommon.pageSql" />
+
+	</select>
+
+	<select id="pageCashReceipListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : cashReceipt.pageCashReceipListCount
+			Description : 현금영수증 리스트 count
+		-->
+		SELECT	COUNT(*)
+		<include refid="pageCashReceipListFrom" />
+	</select>
+
+	<sql id="pageCashReceipListFrom">
+		FROM	(
+				SELECT
+						OB.ORD_NO			/* 주문 번호 */
+						, OB.ORD_STAT_CD	/* 주문 상태 코드 */
+						, OB.ORD_MDA_CD		/* 주문 매체 코드 */
+						, OB.MBR_NO			/* 회원 번호 */
+						, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = OB.MBR_NO) AS MBR_NM /* 회원 이름 */
+						, ( SELECT LOGIN_ID FROM MEMBER_BASE WHERE OB.MBR_NO = MBR_NO ) AS LOGIN_ID
+						, ODL.ADRS_NM		/* 수령인 */
+						, OB.MBR_GRD_CD		/* 회원 등급 코드 */
+						, OB.ORD_DTL_CNT    /* 주문상세 갯수 */
+						, OB.ORD_NM			/* 주문자 명 */
+						, OB.ORDR_EMAIL		/* 주문자 이메일 */
+						, OB.ORDR_TEL		/* 주문자 전화 */
+						, OB.ORDR_MOBILE	/* 주문자 휴대폰 */
+						, OB.ORDR_IP		/* 주문자 IP */
+						, OB.ORD_ACPT_DTM	/* 주문 접수 일시 */
+						, OB.ORD_CPLT_DTM	/* 주문 완료 일시 */
+						, OB.ORDR_ID		/* 주문자 ID */
+						, PB.PAY_MEANS_CD		/* 결제 수단 코드 */
+						, PB.PAY_AMT AS PAY_AMT_TOTAL		/* 결제 금액 */
+				FROM	ORDER_BASE OB		/* 주문기본 */
+						, PAY_BASE PB
+						, ORDER_DLVRA ODL
+				WHERE	1 = 1
+				AND 		OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+
+				AND		OB.ORD_NO = PB.ORD_NO
+				AND OB.ORD_NO = ODL.ORD_NO
+				<if test="stId != null and stId != ''">
+				AND OB.ST_ID = #{stId}
+				</if>
+				/* 결제 상태 코드 */
+				AND		PB.PAY_STAT_CD IN (
+							'${@framework.common.constants.CommonConstants@PAY_STAT_00}'
+							, '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+				)
+
+<!-- 				/* 결제 수단 코드 */ -->
+<!-- 				AND		PB.PAY_MEANS_CD IN ( -->
+<!-- 							'${@framework.common.constants.CommonConstants@PAY_MEANS_10}' -->
+<!-- 							, '${@framework.common.constants.CommonConstants@PAY_MEANS_20}' -->
+<!-- 				) -->
+
+				/* 주문 클레임 구분 코드 */
+				AND		PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+
+				<if test="payMeansCd != null and payMeansCd != ''">
+				/* 결제 수단 코드 : PAY_MEANS_CD */
+				AND		PB.PAY_MEANS_CD = #{payMeansCd}
+				</if>
+
+				/* 주문접수일시 : ORD_ACPT_DTM */
+				AND		OB.ORD_ACPT_DTM BETWEEN #{ordAcptDtmStart} AND DATE_ADD(#{ordAcptDtmEnd}, INTERVAL 1 DAY)
+
+				<if test="searchValueOrder != null and searchValueOrder != ''">
+					<choose>
+						<when test="searchKeyOrder == 'type01'">
+						/* 주문번호 : ORD_NO */
+						AND		OB.ORD_NO = #{searchValueOrder}
+						</when>
+						<when test="searchKeyOrder == 'type02'">
+						/* 주문자명 : ORD_NM */
+						AND		OB.ORD_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+						</when>
+						<when test="searchKeyOrder == 'type03'">
+						/* 주문자ID : ORDR_ID */
+						AND		OB.ORDR_ID IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+						</when>
+						<when test="searchKeyOrder == 'type04'">
+						/* 수령인 : ADRS_NM */
+						AND		ODL.ADRS_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+						</when>
+					</choose>
+				</if>
+
+				<if test="pageGbCd != null and pageGbCd != ''">
+				/* 페이지 구분 코드 : PAGE_GB_CD */
+				AND		OB.PAGE_GB_CD = #{pageGbCd}
+				</if>
+
+				<if test="ordMdaCd != null and ordMdaCd != ''">
+				/* 주문매체 : ORD_MDA_CD */
+				AND		OB.ORD_MDA_CD LIKE CONCAT( '%', #{ordMdaCd}, '%' )
+				</if>
+
+				AND	EXISTS (
+							SELECT	1
+							FROM	ORDER_DETAIL OD
+							WHERE	OB.ORD_NO = OD.ORD_NO
+
+
+							<if test="ordDtlStatCd != null and ordDtlStatCd != ''">
+							/* 주문 상세 상태 코드 */
+							AND		OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+							</if>
+
+							<if test="arrOrdDtlStatCd != null">
+								/* 주문상세 상태코드 : ORD_DTL_STAT_CD */
+								<foreach collection="arrOrdDtlStatCd" item="item" separator="," open="AND OD.ORD_DTL_STAT_CD IN (" close=")" >
+									#{item }
+								</foreach>
+							</if>
+
+							<if test="searchValueGoods != null and searchValueGoods != ''">
+								<choose>
+									<when test="searchKeyGoods == 'type00'">
+									/* 전체 검색 : 상품명 + 상품 ID */
+									AND		(OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+											     OR 		OD.GOODS_ID = #{searchValueGoods})
+									</when>
+									<when test="searchKeyGoods == 'type01'">
+									/* 상품명 : GOODS_NM */
+									AND		OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+									</when>
+									<when test="searchKeyGoods == 'type02'">
+									/* 상품아이디 : GOODS_ID */
+									AND		OD.GOODS_ID = #{searchValueGoods}
+									</when>
+									<when test="searchKeyGoods == 'type03'">
+									/* 단품명 : ITEM_NM */
+									AND		OD.ITEM_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+									</when>
+									<when test="searchKeyGoods == 'type04'">
+									/* 단품번호 : ITEM_NO */
+									AND		OD.ITEM_NO = #{searchValueGoods}
+									</when>
+								</choose>
+							</if>
+
+							<if test="compNo != null">
+							/* 업체 번호 */
+							AND		OD.COMP_NO = #{compNo}
+							</if>
+				)
+
+				ORDER BY OB.ORD_NO DESC
+
+
+		) OB_PB
+		, ORDER_DETAIL OD	/* 주문상세 */
+		INNER JOIN CASH_RECEIPT_GOODS_MAP CRGM ON (CRGM.ORD_CLM_NO = OD.ORD_NO AND CRGM.ORD_CLM_DTL_SEQ = OD.ORD_DTL_SEQ)
+		LEFT OUTER JOIN CLAIM_DETAIL CLD ON (CLD.CLM_NO = CRGM.ORD_CLM_NO AND CLD.CLM_DTL_SEQ = CRGM.ORD_CLM_DTL_SEQ)
+		INNER JOIN CASH_RECEIPT CR ON (
+			CR.CASH_RCT_NO = CRGM.CASH_RCT_NO
+			<!-- AND CR.CR_TP_CD = '${@framework.common.constants.CommonConstants@CR_TP_10}'	/* 발행요청 */ -->
+		)
+		LEFT OUTER JOIN CASH_RECEIPT CR1 ON (
+			CR1.ORG_CASH_RCT_NO = CR.CASH_RCT_NO
+			AND CR1.CR_TP_CD = '${@framework.common.constants.CommonConstants@CR_TP_20}'	/* 발행취소 */
+		)
+		LEFT OUTER JOIN CASH_RECEIPT_GOODS_MAP CRGM1 ON CRGM1.CASH_RCT_NO = CR1.CASH_RCT_NO
+		LEFT OUTER JOIN CLAIM_DETAIL CLD1 ON (CLD1.CLM_NO = CRGM1.ORD_CLM_NO AND CLD1.CLM_DTL_SEQ = CRGM1.ORD_CLM_DTL_SEQ)
+		WHERE	1 = 1
+		AND		OB_PB.ORD_NO = OD.ORD_NO
+
+		<if test="arrCrTpCd != null and arrCrTpCd.length > 0">
+			/* 현금영수증 발급 유형 코드 : CR_TP_CD */
+			<foreach collection="arrCrTpCd" item="item" separator="," open="AND IFNULL(CR1.CR_TP_CD, CR.CR_TP_CD) IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="arrCashRctStatCd != null and arrCashRctStatCd.length > 0">
+			/* 현금영수증 상태코드 : CASH_RCT_STAT_CD */
+			<foreach collection="arrCashRctStatCd" item="item" separator="," open="AND IFNULL(CR1.CASH_RCT_STAT_CD, CR.CASH_RCT_STAT_CD) IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="ordDtlStatCd != null and ordDtlStatCd != ''">
+		/* 주문상세 상태코드 : ORD_DTL_STAT_CD */
+		AND		OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+		</if>
+
+		<if test="arrOrdDtlStatCd != null">
+			<foreach collection="arrOrdDtlStatCd" item="item" separator="," open="AND OD.ORD_DTL_STAT_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+
+		<if test="searchValueGoods != null and searchValueGoods != ''">
+			<choose>
+				<when test="searchKeyGoods == 'type01'">
+					/* 상품명 : GOODS_NM */
+					AND		OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+				</when>
+				<when test="searchKeyGoods == 'type02'">
+					/* 상품아이디 : GOODS_ID */
+					AND		OD.GOODS_ID = #{searchValueGoods}
+				</when>
+				<when test="searchKeyGoods == 'type03'">
+					/* 단품명 : ITEM_NM */
+					AND		OD.ITEM_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+				</when>
+				<when test="searchKeyGoods == 'type04'">
+					/* 단품번호 : ITEM_NO */
+					AND		OD.ITEM_NO = #{searchValueGoods}
+				</when>
+			</choose>
+		</if>
+
+		<if test="compNo != null">
+		/* 업체 번호 */
+		AND		OD.COMP_NO = #{compNo}
+		</if>
+	</sql>
+
+
+
+
+
+	<select id="listCashReceiptGoodsMap" resultType="biz.app.receipt.model.CashReceiptGoodsMapVO" >
+		<!--
+			Query Name : orderCommon.listCashReceiptGoodsMap
+			Description : 현금영수증 상품 매핑(리스트)
+		-->
+		SELECT	/* QUERYID(orderCommon.listCashReceiptGoodsMap) */
+					CRGM.CASH_RCT_NO				/* 현금 영수증 번호 */
+					, CRGM.ORD_CLM_NO	/* 주문 / 클레임 번호 */
+					, CRGM.ORD_CLM_DTL_SEQ	/* 주문 / 클레임 상세 순번 */
+					, CRGM.APL_QTY /* 적용 수량 */
+					, FN_GET_USER_NAME(CRGM.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(CRGM.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, CASE WHEN OD.GOODS_NM IS NOT NULL THEN OD.GOODS_NM
+			               ELSE CD.GOODS_NM
+			          END AS GOODS_NM
+		FROM		CASH_RECEIPT_GOODS_MAP CRGM
+		          	LEFT OUTER JOIN ORDER_DETAIL OD ON OD.ORD_NO = CRGM.ORD_CLM_NO AND OD.ORD_DTL_SEQ = CRGM.ORD_CLM_DTL_SEQ
+		          	LEFT OUTER JOIN CLAIM_DETAIL CD ON CD.CLM_NO = CRGM.ORD_CLM_NO AND CD.CLM_DTL_SEQ = CRGM.ORD_CLM_DTL_SEQ
+		WHERE	1 = 1
+		AND		CASH_RCT_NO 			= #{cashRctNo}
+	</select>
+
+	<update id="updateCashReceipt">
+		<!--
+			Query Name : cashReceipt.updateCashReceipt
+			Description : 현금영수증 변경
+		-->
+		UPDATE	CASH_RECEIPT
+		SET		SYS_UPDR_NO				= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+			<if test="crTpCd != null and crTpCd != ''">
+				, CR_TP_CD		= #{crTpCd}		/* 발행 유형 코드 */
+			</if>
+			<if test="cashRctStatCd != null and cashRctStatCd != ''">
+				, CASH_RCT_STAT_CD		= #{cashRctStatCd}		/* 현금 영수증 상태 코드 */
+			</if>
+			<if test="useGbCd != null and useGbCd != ''">
+				, USE_GB_CD				= #{useGbCd}			/* 사용 구분 코드 */
+			</if>
+			<if test="isuMeansCd != null and isuMeansCd != ''">
+				, ISU_MEANS_CD			= #{isuMeansCd}			/* 발급 수단 코드 */
+			</if>
+			<if test="isuMeansNo != null and isuMeansNo != ''">
+				, ISU_MEANS_NO			= #{isuMeansNo, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}			/* 발급 수단 번호 */
+			</if>
+			<if test="isuGbCd != null">
+				, ISU_GB_CD				=  #{isuGbCd}			/* 발행 구분 코드 */
+			</if>
+			<if test="splAmt != null">
+				, SPL_AMT				= #{splAmt}				/* 공급 금액 */
+			</if>
+			<if test="staxAmt != null">
+				, STAX_AMT				= #{staxAmt}			/* 부가세 금액 */
+			</if>
+			<if test="srvcAmt != null">
+				, SRVC_AMT				= #{srvcAmt}			/* 봉사료 금액 */
+			</if>
+			<if test="lnkDtm != null">
+				, LNK_DTM				= #{lnkDtm}				/* 연동 일시 */
+			</if>
+			<if test="lnkDealNo != null and lnkDealNo != ''">
+				, LNK_DEAL_NO			= #{lnkDealNo}			/* 연동 거래 번호 */
+			</if>
+			<if test="lnkRstMsg != null and lnkRstMsg != ''">
+				, LNK_RST_MSG			= #{lnkRstMsg}			/* 연동 결과 메세지 */
+			</if>
+		WHERE	1 = 1
+		AND		CASH_RCT_NO	= #{cashRctNo}
+	</update>
+
+	<select id="listCashReceipt" resultType="biz.app.receipt.model.CashReceiptVO" >
+		<!--
+			Query Name : cashReceipt.listCashReceipt
+			Description : 현금영수증 추출(리스트)
+		-->
+		SELECT	/* QUERYID(cashReceipt.listCashReceipt) */
+				CR.CASH_RCT_NO				/* 현금 영수증 번호 */
+				, CR.ORG_CASH_RCT_NO		/* 원 현금 영수증 번호 */
+				, OD.ORD_NO				/* 주문 번호 */
+				, CLD.CLM_NO				/* 클레임 번호 */
+				, CR.CR_TP_CD			/* 발행 유형 코드 */
+				, CR.CASH_RCT_STAT_CD		/* 현금 영수증 상태 코드 */
+				, CR.USE_GB_CD				/* 사용 구분 코드 */
+				, CR.ISU_MEANS_CD			/* 발급 수단 코드 */
+				, CR.ISU_MEANS_NO			/* 발급 수단 번호 */
+				, CR.ISU_GB_CD				/* 발행 구분 코드 */
+				, CR.SPL_AMT				/* 공급 금액 */
+				, CR.STAX_AMT				/* 부가세 금액 */
+				, CR.SRVC_AMT				/* 봉사료 금액 */
+				, CR.LNK_DTM				/* 연동 일시 */
+				, CR.LNK_DEAL_NO			/* 연동 거래 번호 */
+				, CR.LNK_RST_MSG			/* 연동 결과 메세지 */
+				, CR.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, CR.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, CR.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, CR.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CASH_RECEIPT CR
+		INNER JOIN CASH_RECEIPT_GOODS_MAP CRGM ON CRGM.CASH_RCT_NO = CR.CASH_RCT_NO
+		INNER JOIN ORDER_DETAIL OD ON (OD.ORD_NO = CRGM.ORD_CLM_NO AND OD.ORD_DTL_SEQ = CRGM.ORD_CLM_DTL_SEQ)
+		LEFT OUTER JOIN CLAIM_DETAIL CLD ON (CLD.CLM_NO = CRGM.ORD_CLM_NO AND CLD.CLM_DTL_SEQ = CRGM.ORD_CLM_DTL_SEQ)
+		WHERE	1 = 1
+		AND		OD.ORD_NO 			= #{ordNo}
+		<if test="isuGbCd != null">
+		AND		CR.ISU_GB_CD		= #{isuGbCd}	/* 발행 구분 코드 */
+		</if>
+		<if test="arrCashRctStatCd != null">
+			<foreach collection="arrCashRctStatCd" item="item" separator="," open="AND CR.CASH_RCT_STAT_CD IN (" close=")" >
+				#{item }
+			</foreach>
+		</if>
+	</select>
+
+
+	<select id="getCashReceipt" resultType="biz.app.receipt.model.CashReceiptVO" >
+		<!--
+			Query Name : cashReceipt.getCashReceipt
+			Description : 현금영수증 추출
+		-->
+		SELECT	/* QUERYID(cashReceipt.getCashReceipt) */
+					CRM.CASH_RCT_NO				/* 현금 영수증 번호 */
+					, CRM.ORG_CASH_RCT_NO	/* 원 현금 영수증 번호 */
+					, CASE WHEN (SELECT ORD_NO FROM ORDER_BASE WHERE ORD_NO = CRM.ORD_CLM_NO) IS NULL THEN (SELECT ORD_NO FROM CLAIM_BASE WHERE CLM_NO = CRM.ORD_CLM_NO)
+					         ELSE CRM.ORD_CLM_NO
+					 END ORD_NO
+					, CASE WHEN (SELECT ORD_NO FROM ORDER_BASE WHERE ORD_NO = CRM.ORD_CLM_NO) IS NULL THEN CRM.ORD_CLM_NO
+					         ELSE NULL
+					  END CLM_NO
+					, CRM.CR_TP_CD			 		/* 발행 유형 코드 */
+					, CRM.CASH_RCT_STAT_CD	/* 현금 영수증 상태 코드 */
+					, CRM.USE_GB_CD				/* 사용 구분 코드 */
+					, CRM.ISU_MEANS_CD			/* 발급 수단 코드 */
+					, CRM.ISU_MEANS_NO			/* 발급 수단 번호 */
+					, CRM.ISU_GB_CD				/* 발행 구분 코드 */
+					, CRM.PAY_AMT					/* 결제 금액 */
+					, CRM.SPL_AMT					/* 공급 금액 */
+					, CRM.STAX_AMT				/* 부가세 금액 */
+					, CRM.SRVC_AMT				/* 봉사료 금액 */
+					, CRM.STR_ID					/* 상점 ID */
+					, CRM.LNK_DTM					/* 연동 일시 */
+					, CRM.LNK_DEAL_NO			/* 연동 거래 번호 */
+					, CRM.LNK_RST_MSG			/* 연동 결과 메세지 */
+					, CRM.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, CRM.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, CRM.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, CRM.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, CRM.SYS_REGR_NM	    	/* 시스템 등록자 */
+					, CRM.SYS_UPDR_NM	   	 	/* 시스템 수정자 */
+		FROM    (
+		    		SELECT
+		              			CR.CASH_RCT_NO			/* 현금 영수증 번호 */
+		    					, CR.ORG_CASH_RCT_NO	/* 원 현금 영수증 번호 */
+		              			, (SELECT ORD_CLM_NO FROM CASH_RECEIPT_GOODS_MAP WHERE CASH_RCT_NO = CR.CASH_RCT_NO GROUP BY ORD_CLM_NO) AS ORD_CLM_NO
+		    					, CR.CR_TP_CD			    /* 발행 유형 코드 */
+		    					, CR.CASH_RCT_STAT_CD	/* 현금 영수증 상태 코드 */
+		    					, CR.USE_GB_CD				/* 사용 구분 코드 */
+		    					, CR.ISU_MEANS_CD		/* 발급 수단 코드 */
+		    					, CR.ISU_MEANS_NO		/* 발급 수단 번호 */
+		    					, CR.ISU_GB_CD				/* 발행 구분 코드 */
+		    					, CR.PAY_AMT				/* 결제 금액 */
+		    					, CR.SPL_AMT				/* 공급 금액 */
+		    					, CR.STAX_AMT				/* 부가세 금액 */
+		    					, CR.SRVC_AMT				/* 봉사료 금액 */
+		    					, CR.STR_ID					/* 상점 ID */
+		    					, CR.LNK_DTM				/* 연동 일시 */
+		    					, CR.LNK_DEAL_NO			/* 연동 거래 번호 */
+		    					, CR.LNK_RST_MSG			/* 연동 결과 메세지 */
+		    					, CR.SYS_REGR_NO			/* 시스템 등록자 번호 */
+		    					, CR.SYS_REG_DTM			/* 시스템 등록 일시 */
+		    					, CR.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+		    					, CR.SYS_UPD_DTM			/* 시스템 수정 일시 */
+		    					, FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM		/* 시스템 등록자 */
+		    					, FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		    		FROM		CASH_RECEIPT CR
+		    		WHERE	1 = 1
+					<if test="ordNo != null and ordNo != ''">
+					AND		CR.CASH_RCT_NO IN (SELECT MAX(CASH_RCT_NO) FROM CASH_RECEIPT_GOODS_MAP WHERE ORD_CLM_NO = #{ordNo})
+					</if>
+					<if test="cashRctNo != null">
+					AND		CR.CASH_RCT_NO 			= #{cashRctNo}
+					</if>
+					<if test="cashRctNo == null">
+					AND		CR.CASH_RCT_STAT_CD IN (
+																'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'		/* 접수 */
+																, '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'	/* 승인 */
+																)
+					</if>
+		        ) CRM
+	</select>
+
+	<select id="getCashReceiptSum" resultType="biz.app.receipt.model.CashReceiptVO" >
+		<!--
+			Query Name : cashReceiptgetCashReceiptSum
+			Description : 현금영수증 추출(Sum)
+		-->
+		SELECT /* QUERYID(cashReceiptgetCashReceiptSum) */
+				CR.CASH_RCT_NO					/* 현금 영수증 번호 */
+				, CR.ORG_CASH_RCT_NO			/* 원 현금 영수증 번호 */
+				, CR.ORD_NO						/* 주문 번호 */
+				, CR.CLM_NO						/* 클레임 번호 */
+				, CR_TP_CD			/* 발행 유형 코드 */
+				, CR.CASH_RCT_STAT_CD			/* 현금 영수증 상태 코드 */
+				, CR.USE_GB_CD					/* 사용 구분 코드 */
+				, CR.ISU_MEANS_CD				/* 발급 수단 코드 */
+				, CR.ISU_MEANS_NO				/* 발급 수단 번호 */
+				, CR.ISU_GB_CD					/* 발행 구분 코드 */
+				, CR_SUM.SPL_AMT AS SPL_AMT 	/* 공급 금액 */
+				, CR_SUM.STAX_AMT AS STAX_AMT	/* 부가세 금액 */
+				, CR_SUM.SRVC_AMT AS SRVC_AMT	/* 봉사료 금액 */
+				, CR.LNK_DTM					/* 연동 일시 */
+				, CR.LNK_DEAL_NO				/* 연동 거래 번호 */
+				, CR.LNK_RST_MSG				/* 연동 결과 메세지 */
+				, CR.SYS_REGR_NO				/* 시스템 등록자 번호 */
+				, CR.SYS_REG_DTM				/* 시스템 등록 일시 */
+				, CR.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+				, CR.SYS_UPD_DTM				/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, CR_SUM.*
+				FROM	(
+						SELECT  A.ORD_NO
+								, SUM(A.SPL_AMT) AS SPL_AMT 	/* 공급 금액 */
+								, SUM(A.STAX_AMT) AS STAX_AMT	/* 부가세 금액 */
+								, SUM(A.SRVC_AMT) AS SRVC_AMT	/* 봉사료 금액 */
+						FROM    CASH_RECEIPT A
+						WHERE   1 = 1
+						AND		A.ORD_NO = #{ordNo}
+						AND	A.CASH_RCT_STAT_CD  /* 현금영수증 상태코드 */ IN (
+								'${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'  /* 접수 */ , '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'	/* 발행 */ 	)
+				) CR_SUM
+		, CASH_RECEIPT CR
+		WHERE	1 = 1
+		AND		CR_SUM.ORD_NO = CR.ORD_NO
+            AND (   (    CR.CASH_RCT_STAT_CD IN ('${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'                 /* 접수 */
+                                                     , '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_20}'           /* 승인 */
+                                                           ))
+                 OR (    CR.CASH_RCT_STAT_CD IN ('${@framework.common.constants.CommonConstants@CASH_RCT_STAT_30}'                 /* 취소 */
+                                                     )))
+		LIMIT 1
+	</select>
+
+	<select id="getCashReceiptExistsCheck" resultType="java.lang.Integer">
+		<!--
+			Query Name : cashReceiptgetCashReceiptExistsCheck
+			Description : 현금영수증 기 접수/승인 건 체크
+		-->
+		SELECT /* QUERYID(cashreceipt.getCashReceiptExistsCheck) */ COUNT(*)
+		FROM	CASH_RECEIPT CR
+		INNER JOIN CASH_RECEIPT_GOODS_MAP CRGM ON CRGM.CASH_RCT_NO = CR.CASH_RCT_NO
+		WHERE	1 = 1
+		<if test="cashRctNo != null">
+		AND		CR.CASH_RCT_NO = #{cashRctNo}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND		CRGM.ORD_CLM_NO 			= #{ordNo}
+		</if>
+		AND		CR.CR_TP_CD = '${@framework.common.constants.CommonConstants@CR_TP_10}'	/* 발행요청 */
+		AND		CR.CASH_RCT_STAT_CD != '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_30}'
+	</select>
+
+	<select id="listBatchCashReceipt" resultType="biz.app.receipt.model.CashReceiptVO">
+		SELECT	/* QUERYID(cashReceipt.listBatchCashReceipt) */
+				  CASH_RCT_NO			/* 현금 영수증 번호 */
+				, ORG_CASH_RCT_NO		/* 원 현금 영수증 번호 */
+				, T1.ORD_NO				/* 주문 번호 */
+				, T1.CLM_NO				/* 클레임 번호 */
+				, CR_TP_CD			/* 발행 유형 코드 */
+				, CASH_RCT_STAT_CD		/* 현금 영수증 상태 코드 */
+				, USE_GB_CD				/* 사용 구분 코드 */
+				, ISU_MEANS_CD			/* 발급 수단 코드 */
+				, ISU_MEANS_NO			/* 발급 수단 번호 */
+				, ISU_GB_CD				/* 발행 구분 코드 */
+				, SPL_AMT				/* 공급 금액 */
+				, STAX_AMT				/* 부가세 금액 */
+				, SRVC_AMT				/* 봉사료 금액 */
+				, LNK_DTM				/* 연동 일시 */
+				, LNK_DEAL_NO			/* 연동 거래 번호 */
+				, LNK_RST_MSG			/* 연동 결과 메세지 */
+				, T1.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, T1.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, T1.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, T1.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	CASH_RECEIPT T1, PAY_BASE T2
+		WHERE	CASH_RCT_STAT_CD = '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'	/** 현금 영수증 상태 코드 : 접수 */
+		AND T1.ORD_NO = T2.ORD_NO
+	    AND T2.PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+	</select>
+
+	<select id="listBatchCashReceiptAppr" resultType="biz.app.receipt.model.CashReceiptVO">
+		<!--
+			Query Name : cashReceipt.listBatchCashReceiptAppr
+			Description : 현금영수증 승인 요청 목록
+		-->
+		SELECT /* QUERYID(cashReceipt.listBatchCashReceiptAppr) */
+		    CR.CASH_RCT_NO,
+		    CR.ORG_CASH_RCT_NO,
+		    OB.ORD_NO,
+		    OB.MBR_NO,
+		    OB.ORD_NM,
+		    OB.ORDR_EMAIL,
+		    OB.ORDR_TEL,
+		    OB.ORDR_MOBILE,
+		    CR.CR_TP_CD,
+		    CR.CASH_RCT_STAT_CD,
+		    CR.USE_GB_CD,
+		    CR.ISU_MEANS_CD,
+		    CR.ISU_MEANS_NO,
+		    CR.ISU_GB_CD,
+		    CR.PAY_AMT,
+		    CR.SPL_AMT,
+		    CR.STAX_AMT,
+		    CR.SRVC_AMT,
+		    CR.STR_ID,
+		    CR.LNK_DTM,
+		    CR.LNK_DEAL_NO,
+		    CR.LNK_RST_MSG,
+		    CR.SYS_REGR_NO,
+		    CR.SYS_REG_DTM,
+		    CR.SYS_UPDR_NO,
+		    CR.SYS_UPD_DTM,
+		    FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM,
+		    FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM
+		FROM
+		    cash_receipt cr,
+		    cash_receipt_goods_map crgm,
+		    order_base ob
+		WHERE
+		    cr_tp_cd = '${@framework.common.constants.CommonConstants@CR_TP_10}'
+		        AND cash_rct_stat_cd = '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'
+		        AND PAY_AMT &gt; 0
+		        AND lnk_dtm IS NULL
+		        AND cr.cash_rct_no = crgm.cash_rct_no
+		        AND crgm.ord_clm_no = ob.ord_no
+		        AND ob.data_stat_cd = '${@framework.common.constants.CommonConstants@DATA_STAT_01}'
+		        AND ob.ord_stat_cd = '${@framework.common.constants.CommonConstants@ORD_STAT_20}'
+		GROUP BY ob.ord_no , ob.mbr_no , cr.cash_rct_no , cr.use_gb_cd , cr.isu_means_no , cr.pay_amt , cr.spl_amt , cr.stax_amt , cr.srvc_amt
+	</select>
+
+	<select id="listBatchCashReceiptCncl" resultType="biz.app.receipt.model.CashReceiptVO">
+		<!--
+			Query Name : cashReceipt.listBatchCashReceiptCncl
+			Description : 현금영수증 승인 취소 목록
+		-->
+		SELECT /* QUERYID(cashReceipt.listBatchCashReceiptCncl) */
+		    CR.CASH_RCT_NO,
+		    CR.ORG_CASH_RCT_NO,
+		    CB.CLM_NO,
+		    OB.MBR_NO,
+		    OB.ORDR_EMAIL,
+		    CR.CR_TP_CD,
+		    CR.CASH_RCT_STAT_CD,
+		    CR.USE_GB_CD,
+		    CR.ISU_MEANS_CD,
+		    CR.ISU_MEANS_NO,
+		    CR.ISU_GB_CD,
+		    CR.STR_ID,
+		    CR.PAY_AMT,
+		    CR.SPL_AMT,
+		    CR.STAX_AMT,
+		    CR.SRVC_AMT,
+		    CR.LNK_DTM,
+		    OCR.LNK_DEAL_NO,
+		    CR.LNK_RST_MSG,
+		    CR.SYS_REGR_NO,
+		    CR.SYS_REG_DTM,
+		    CR.SYS_UPDR_NO,
+		    CR.SYS_UPD_DTM,
+		    FN_GET_USER_NAME(CR.SYS_REGR_NO) AS SYS_REGR_NM,
+		    FN_GET_USER_NAME(CR.SYS_UPDR_NO) AS SYS_UPDR_NM
+		FROM
+		    cash_receipt cr,
+		    cash_receipt ocr,
+		    cash_receipt_goods_map crgm,
+		    claim_base cb,
+		    order_base ob
+		WHERE
+		    cr.cr_tp_cd = '${@framework.common.constants.CommonConstants@CR_TP_20}'
+		        AND cr.cash_rct_stat_cd = '${@framework.common.constants.CommonConstants@CASH_RCT_STAT_10}'
+		        AND cr.lnk_dtm IS NULL
+		        AND cr.org_cash_rct_no = ocr.cash_rct_no
+		        AND cr.cash_rct_no = crgm.cash_rct_no
+		        AND crgm.ord_clm_no = cb.clm_no
+		        AND cb.clm_stat_cd = '${@framework.common.constants.CommonConstants@CLM_STAT_30}'
+		        AND cb.ord_no = ob.ord_no
+		GROUP BY cb.clm_no , cb.mbr_no , cr.cash_rct_no , cr.use_gb_cd , cr.isu_means_no , cr.pay_amt , cr.spl_amt,  cr.spl_amt , cr.stax_amt , cr.srvc_amt
+	</select>
+
+</mapper>

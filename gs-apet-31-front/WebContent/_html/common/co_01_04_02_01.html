@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 PC-->
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+		
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container login srch" id="container">
+
+			<div class="inr">
+				<div class="complete-area">
+					<div class="complete">
+						<p class="txt">
+							축하합니다! <br>
+							회원가입이 완료되었습니다.
+							<span class="sub">이제 새로워진 어바웃펫을 시작해보세요!</span><!-- 03.16 수정 -->
+						</p>
+						
+						<div class="btn-area">
+							<a href="javascript:;" class="btn round">홈 바로가기<span class="arrow"></span></a><!-- 03.16 수정 -->
+						</div>
+					</div>
+					<div class="bottom">
+						<div class="item">
+							<div class="box">
+								<p class="big-txt">
+									강아지와<br>
+									함께하고 계신가요?
+								</p>
+								<button class="btn add">마이펫 등록하기</button> <!-- 03.16 수정 -->
+							</div>
+							<p class="sub-txt">펫 정보를 등록하시면<br> 딱 맞는 콘텐츠와 상품을 추천해드릴게요.</p>
+						</div>
+					</div>
+					<!-- 고양이 03.16 수정 <div class="bottom t02">
+						<div class="item">
+							<div class="box">
+								<p class="big-txt">
+									고양이와<br>
+									함께 하고 있나요?
+								</p>
+								<button class="btn add">마이펫 등록하기</button>
+							</div>
+							<p class="sub-txt">펫 정보를 등록하시면 딱 맞는 콘텐츠와 상품을 추천해드릴게요.</p>
+						</div>
+					</div> -->
+
+				</div>
+			</div>
+		</main>
+
+	
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+	</div>
+</body>
+</html>

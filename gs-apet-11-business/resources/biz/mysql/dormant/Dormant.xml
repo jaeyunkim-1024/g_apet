@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dormant">
+	<select id="selectDormantMemberBase" resultType="biz.app.member.model.MemberBasePO">
+		<!--
+			Query Name : memberBase.selectDormantMemberBase
+			Description : 분리보관 된 휴면회원 정보 조회
+			Writer : 이지희
+			Date : 2021.02.04.
+ 		-->
+		SELECT	MBR_NO
+				, ST_ID
+				, POLICY_NO
+				, login_id
+				, MBR_NM
+				, NICK_NM
+				, PET_LOG_URL
+				, PET_LOG_SRT_URL
+				, RCOM_CD
+				, RCOM_URL
+				, MBR_GB_CD
+				, MBR_STAT_CD
+				, MBR_GRD_CD
+				, BIRTH
+				, GD_GB_CD
+				, NTN_GB_CD
+				, JOIN_DTM
+				, MOD_DTM
+				, JOIN_PATH_CD
+				, JOIN_ENV_CD
+				, CTF_YN
+				, CI_CTF_VAL
+				, DI_CTF_VAL
+				, GSPT_NO
+				, GSPT_USE_YN
+				, GSPT_STATE_CD
+				, GSPT_START_DTM
+				, GSPT_STOP_DTM
+				, DEVICE_TOKEN
+				, DEVICE_TP_CD
+				, INFO_RCV_YN
+				, MKNG_RCV_YN
+				, PST_INFO_AGR_YN
+				, ALM_RCV_YN
+				, DFFC_MBR_YN
+				, PET_SCHL_YN
+				, PSWD
+				, PSWD_INIT_YN
+				, PSWD_CHG_DTM
+				, LOGIN_FAIL_CNT
+				, LAST_LOGIN_DTM
+				, PSWD_CHG_SCD_DTM
+				, SIMP_SCR_NO
+				, BILL_INPUT_FAIL_CNT
+				, TEL
+				, MOBILE
+				, MOBILE_CD
+				, EMAIL
+				, RCOM_LOGIN_ID
+				, MBR_LEV_RSN_CD
+				, MBR_LEV_CONTENT
+				, MBR_LEV_DTM
+				, RE_JOIN_PSB_DT
+				, DORMANT_APL_DTM
+				, DORMANT_RLS_DTM
+				, PET_LOG_ITRDC
+				, PRFL_IMG
+				, MBR_STOP_DTM
+				, DLGT_PET_GB_CD
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, UPDR_IP
+				, BUY_CNT
+		 FROM 	DORMANT_MEMBER_BASE
+		 WHERE 	MBR_NO = #{mbrNo}
+	</select>
+	
+	<select id="selectDormantMemberBizInfo" resultType="biz.app.member.model.MemberBizInfoPO">
+		<!--
+			Query Name : memberBase.selectDormantMemberBizInfo
+			Description : 분리보관 된 휴면회원 회사정보 조회
+ 		-->
+		SELECT	MBR_NO
+				, BIZ_NO
+				, BIZ_ID
+				, BIZ_NM
+				, POST_NO_OLD
+				, POST_NO_NEW
+				, ROAD_ADDR
+				, ROAD_DTL_ADDR
+				, PRCL_ADDR
+				, PRCL_DTL_ADDR
+				, EMAIL
+				, PTN_DATE
+				, STAT_CD
+				, CEO_NM
+				, BIZ_LIC_NO
+				, BIZ_LIC_IMG_PATH
+				, BIZ_CDTS
+				, BIZ_TP
+				, DLGT_NO
+				, REL_POST_NO_OLD
+				, REL_POST_NO_NEW
+				, REL_ROAD_ADDR
+				, REL_ROAD_DTL_ADDR
+				, REL_PRCL_ADDR
+				, REL_PRCL_DTL_ADDR
+				, RE_POST_NO_OLD
+				, RE_POST_NO_NEW
+				, RE_ROAD_ADDR
+				, RE_ROAD_DTL_ADDR
+				, RE_PRCL_ADDR
+				, RE_PRCL_DTL_ADDR
+				, CHRG_PART
+				, CHRG_NM
+				, CHRG_TEL
+				, CHRG_MOBILE
+				, CHRG_EMAIL
+				, BANK_CD
+				, ACCT_NO
+				, OOA_NM
+				, MEMO
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		 FROM 	DORMANT_MEMBER_BIZ_INFO
+		 WHERE 	MBR_NO = #{mbrNo} 
+	</select>
+	
+	<delete id="deleteDormantMemberBase">
+		<!--
+			Query Name : memberBase.deleteDormantMemberBase
+			Description : 분리보관 된 휴면회원 정보 삭제
+			Writer : 이지희
+			Date : 2021.02.04.
+ 		-->
+		DELETE FROM DORMANT_MEMBER_BASE
+		WHERE MBR_NO = #{mbrNo}
+	</delete>
+	
+	<delete id="deleteDormantMemberBizInfo">
+		<!--
+			Query Name : memberBase.deleteDormantMemberBizInfo
+			Description : 분리보관 된 휴면회원 회사정보 삭제
+ 		-->
+		DELETE FROM DORMANT_MEMBER_BIZ_INFO
+		WHERE MBR_NO = #{mbrNo}
+	</delete>
+	
+	<insert id="insertDormantMemberBaseForBatch" parameterType="biz.app.member.model.MemberBasePO">
+		INSERT INTO DORMANT_MEMBER_BASE
+		(
+			MBR_NO
+			, ST_ID
+			, POLICY_NO
+			, LOGIN_ID
+			, MBR_NM
+			, NICK_NM
+			, PET_LOG_URL
+			, PET_LOG_SRT_URL
+			, RCOM_CD
+			, RCOM_URL
+			, MBR_GB_CD
+			, MBR_STAT_CD
+			, MBR_GRD_CD
+			, BIRTH
+			, GD_GB_CD
+			, NTN_GB_CD
+			, JOIN_DTM
+			, MOD_DTM
+			, JOIN_PATH_CD
+			, JOIN_ENV_CD
+			, CTF_YN
+			, CI_CTF_VAL
+			, DI_CTF_VAL
+			, GSPT_NO
+			, GSPT_USE_YN
+			, GSPT_STATE_CD
+			, GSPT_START_DTM
+			, GSPT_STOP_DTM
+			, DEVICE_TOKEN
+			, DEVICE_TP_CD
+			, INFO_RCV_YN
+			, MKNG_RCV_YN
+			, PST_INFO_AGR_YN
+			, ALM_RCV_YN
+			, DFFC_MBR_YN
+			, PET_SCHL_YN
+			, PSWD
+			, PSWD_INIT_YN
+			, PSWD_CHG_DTM
+			, LOGIN_FAIL_CNT
+			, LAST_LOGIN_DTM
+			, PSWD_CHG_SCD_DTM
+			, SIMP_SCR_NO
+			, BILL_INPUT_FAIL_CNT
+			, TEL
+			, MOBILE
+			, MOBILE_CD
+			, EMAIL
+			, RCOM_LOGIN_ID
+			, MBR_LEV_RSN_CD
+			, MBR_LEV_CONTENT
+			, MBR_LEV_DTM
+			, RE_JOIN_PSB_DT
+			, DORMANT_APL_DTM
+			, DORMANT_RLS_DTM
+			, PET_LOG_ITRDC
+			, PRFL_IMG
+			, MBR_STOP_DTM
+			, DLGT_PET_GB_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, UPDR_IP
+			, BUY_CNT
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.mbrNo}
+			, #{item.stId}
+			, #{item.policyNo}
+			, #{item.loginId}
+			, #{item.mbrNm}
+			, #{item.nickNm}
+			, #{item.petLogUrl}
+			, #{item.petLogSrtUrl}
+			, #{item.rcomCd}
+			, #{item.rcomUrl}
+			, #{item.mbrGbCd}
+			, #{item.mbrStatCd}
+			, #{item.mbrGrdCd}
+			, #{item.birth}
+			, #{item.gdGbCd}
+			, #{item.ntnGbCd}
+			, #{item.joinDtm}
+			, #{item.modDtm}
+			, #{item.joinPathCd}
+			, #{item.joinEnvCd}
+			, #{item.ctfYn}
+			, #{item.ciCtfVal}
+			, #{item.diCtfVal}
+			, #{item.gsptNo}
+			, #{item.gsptUseYn}
+			, #{item.gsptStateCd}
+			, #{item.gsptStartDtm}
+			, #{item.gsptStopDtm}
+			, #{item.deviceToken}
+			, #{item.deviceTpCd}
+			, #{item.infoRcvYn}
+			, #{item.mkngRcvYn}
+			, #{item.pstInfoAgrYn}
+			, #{item.almRcvYn}
+			, #{item.dffcMbrYn}
+			, #{item.petSchlYn}
+			, #{item.pswd}
+			, #{item.pswdInitYn}
+			, #{item.pswdChgDtm}
+			, #{item.loginFailCnt}
+			, #{item.lastLoginDtm}
+			, #{item.pswdChgScdDtm}
+			, #{item.simpScrNo}
+			, #{item.billInputFailCnt}
+			, #{item.tel}
+			, #{item.mobile}
+			, #{item.mobileCd}
+			, #{item.email}
+			, #{item.rcomLoginId}
+			, #{item.mbrLevRsnCd}
+			, #{item.mbrLevContent}
+			, #{item.mbrLevDtm}
+			, #{item.reJoinPsbDt}
+			, #{item.dormantAplDtm}
+			, #{item.dormantRlsDtm}
+			, #{item.petLogItrdc}
+			, #{item.prflImg}
+			, #{item.mbrStopDtm}
+			, #{item.dlgtPetGbCd}
+			, #{item.sysRegrNo}
+			, #{item.sysRegDtm}
+			, #{item.sysUpdrNo}
+			, #{item.sysUpdDtm}
+			, #{item.updrIp}
+			, #{item.buyCnt}
+		)		
+		</foreach>
+	</insert>
+	
+	<insert id="insertDormantMemberBizInfoForBatch" parameterType="biz.app.member.model.MemberBizInfoPO">
+		INSERT INTO DORMANT_MEMBER_BIZ_INFO
+		(
+			MBR_NO
+			, BIZ_NO
+			, BIZ_ID
+			, BIZ_NM
+			, POST_NO_OLD
+			, POST_NO_NEW
+			, ROAD_ADDR
+			, ROAD_DTL_ADDR
+			, PRCL_ADDR
+			, PRCL_DTL_ADDR
+			, EMAIL
+			, PTN_DATE
+			, STAT_CD
+			, CEO_NM
+			, BIZ_LIC_NO
+			, BIZ_LIC_IMG_PATH
+			, BIZ_CDTS
+			, BIZ_TP
+			, DLGT_NO
+			, REL_POST_NO_OLD
+			, REL_POST_NO_NEW
+			, REL_ROAD_ADDR
+			, REL_ROAD_DTL_ADDR
+			, REL_PRCL_ADDR
+			, REL_PRCL_DTL_ADDR
+			, RE_POST_NO_OLD
+			, RE_POST_NO_NEW
+			, RE_ROAD_ADDR
+			, RE_ROAD_DTL_ADDR
+			, RE_PRCL_ADDR
+			, RE_PRCL_DTL_ADDR
+			, CHRG_PART
+			, CHRG_NM
+			, CHRG_TEL
+			, CHRG_MOBILE
+			, CHRG_EMAIL
+			, BANK_CD
+			, ACCT_NO
+			, OOA_NM
+			, MEMO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.mbrNo}
+			, #{item.bizNo}
+			, #{item.bizId}
+			, #{item.bizNm}
+			, #{item.postNoOld}
+			, #{item.postNoNew}
+			, #{item.roadAddr}
+			, #{item.roadDtlAddr}
+			, #{item.prclAddr}
+			, #{item.prclDtlAddr}
+			, #{item.email}
+			, #{item.ptnDate}
+			, #{item.statCd}
+			, #{item.ceoNm}
+			, #{item.bizLicNo}
+			, #{item.bizLicImgPath}
+			, #{item.bizCdts}
+			, #{item.bizTp}
+			, #{item.dlgtNo}
+			, #{item.relPostNoOld}
+			, #{item.relPostNoNew}
+			, #{item.relRoadAddr}
+			, #{item.relRoadDtlAddr}
+			, #{item.relPrclAddr}
+			, #{item.relPrclDtlAddr}
+			, #{item.rePostNoOld}
+			, #{item.rePostNoNew}
+			, #{item.reRoadAddr}
+			, #{item.reRoadDtlAddr}
+			, #{item.rePrclAddr}
+			, #{item.rePrclDtlAddr}
+			, #{item.chrgPart}
+			, #{item.chrgNm}
+			, #{item.chrgTel}
+			, #{item.chrgMobile}
+			, #{item.chrgEmail}
+			, #{item.bankCd}
+			, #{item.acctNo}
+			, #{item.ooaNm}
+			, #{item.memo}
+			, #{item.sysRegrNo}
+			, #{item.sysRegDtm}
+			, #{item.sysUpdrNo}
+			, #{item.sysUpdDtm}
+		)
+		</foreach>
+	</insert>
+	
+	<insert id="insertDormantMemberAddressForBatch" parameterType="biz.app.member.model.MemberAddressPO">
+		INSERT INTO DORMANT_MEMBER_ADDRESS
+		(
+			MBR_DLVRA_NO
+			, MBR_NO
+			, GB_NM
+			, ADRS_NM
+			, TEL
+			, MOBILE
+			, POST_NO_OLD
+			, POST_NO_NEW
+			, ROAD_ADDR
+			, ROAD_DTL_ADDR
+			, PRCL_ADDR
+			, PRCL_DTL_ADDR
+			, DFT_YN
+			, DLVR_DEMAND_YN
+			, GOODS_RCV_PST_CD
+			, GOODS_RCV_PST_ETC
+			, PBL_GATE_ENT_MTD_CD
+			, PBL_GATE_PSWD
+			, DLVR_DEMAND
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.mbrDlvraNo}
+			, #{item.mbrNo}
+			, #{item.gbNm}
+			, #{item.adrsNm}
+			, #{item.tel}
+			, #{item.mobile}
+			, #{item.postNoOld}
+			, #{item.postNoNew}
+			, #{item.roadAddr}
+			, #{item.roadDtlAddr}
+			, #{item.prclAddr}
+			, #{item.prclDtlAddr}
+			, #{item.dftYn}
+			, #{item.dlvrDemandYn}
+			, #{item.goodsRcvPstCd}
+			, #{item.goodsRcvPstEtc}
+			, #{item.pblGateEntMtdCd}
+			, #{item.pblGatePswd}
+			, #{item.dlvrDemand}
+			, #{item.sysRegrNo}
+			, #{item.sysRegDtm}
+			, #{item.sysUpdrNo}
+			, #{item.sysUpdDtm}
+		)
+		</foreach>
+	</insert>
+</mapper>

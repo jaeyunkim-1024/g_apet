@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 네이버 EP 정보
+	작성자  	valueFactory
+	작성일자  	2020.01.15
+-->
+<mapper namespace="goodsNaverEpInfo">
+
+	<select id="getGoodsNaverEpInfo" resultType="biz.app.goods.model.GoodsNaverEpInfoVO" >
+		<!--
+			Query Name : goodsNaverEpInfo.getGoodsNaverEpInfo
+			Description : 상품 네이버 EP 정보
+		-->
+		/* QUERYID(GoodsNaverEpInfo.getGoodsNaverEpInfo) */
+		
+		SELECT
+			T1.GOODS_ID  
+			, T1.SND_YN
+			, T1.GOODS_SRC_CD
+			, T1.SALE_TP_CD
+			, T1.STP_USE_AGE_CD
+			, T1.STP_USE_GD_CD
+			, T1.ATTR_INFO
+			, T1.SRCH_TAG
+			, T1.NAVER_CTG_ID
+			, T1.PRC_CMPR_PAGE_ID
+			, T1.SYS_REG_DTM
+            , T1.SYS_UPD_DTM
+            , T1.SYS_REGR_NO
+            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+	        , T1.SYS_UPDR_NO
+            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+		FROM GOODS_NAVER_EP_INFO T1
+		WHERE 1 = 1
+		AND T1.GOODS_ID = #{goodsId}
+	</select>
+	
+	<insert id="insertGoodsNaverEpInfo" parameterType="biz.app.goods.model.GoodsNaverEpInfoPO" >
+		<!--
+			Query Name : goodsNaverEpInfo.insertGoodsNaverEpInfo
+			Description : 상품 네이버 EP 정보 등록
+		-->
+		/* QUERYID(GoodsNaverEpInfo.insertGoodsNaverEpInfo) */
+		
+		INSERT INTO GOODS_NAVER_EP_INFO (
+			GOODS_ID  
+			, SND_YN
+			, GOODS_SRC_CD
+			, SALE_TP_CD
+			, STP_USE_AGE_CD
+			, STP_USE_GD_CD
+			, ATTR_INFO
+			, SRCH_TAG
+			, NAVER_CTG_ID
+			, PRC_CMPR_PAGE_ID
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{goodsId}
+			, #{sndYn}
+			, #{goodsSrcCd}
+			, #{saleTpCd}
+			, #{stpUseAgeCd}
+			, #{stpUseGdCd}
+			, #{attrInfo}
+			, #{srchTag}
+			, #{naverCtgId}
+			, #{prcCmprPageId}
+			, #{sysRegrNo}
+			, now() 
+			, #{sysUpdrNo}
+			, now() 
+		)
+	</insert>
+	
+	<update id="updateGoodsNaverEpInfo" parameterType="biz.app.goods.model.GoodsNaverEpInfoPO" >
+		<!--
+			Query Name : goodsNaverEpInfo.updateGoodsNaverEpInfo
+			Description : 상품 네이버 EP 정보 수정
+		-->
+		/* QUERYID(GoodsNaverEpInfo.updateGoodsNaverEpInfo) */
+		
+		UPDATE GOODS_NAVER_EP_INFO
+		SET	
+			SND_YN 				= #{sndYn}
+			, GOODS_SRC_CD 		= #{goodsSrcCd}
+			, SALE_TP_CD 		= #{saleTpCd}
+			, STP_USE_AGE_CD 	= #{stpUseAgeCd}
+			, STP_USE_GD_CD 	= #{stpUseGdCd}
+			, ATTR_INFO 		= #{attrInfo}
+			, SRCH_TAG 			= #{srchTag}
+			, NAVER_CTG_ID 		= #{naverCtgId}
+			, PRC_CMPR_PAGE_ID 	= #{prcCmprPageId}
+		WHERE 
+			GOODS_ID			= #{goodsId}
+	</update>
+	
+</mapper>

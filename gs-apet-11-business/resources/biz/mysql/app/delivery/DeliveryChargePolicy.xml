@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	배송비 정책
+	작성자  	snw
+	작성일자  	2017.01.25
+-->
+
+<mapper namespace="deliveryChargePolicy">
+
+	<select id="getDeliveryChargePolicy" resultType="biz.app.delivery.model.DeliveryChargePolicyVO">
+		<!--
+			Query Name : deliveryChargePolicy.getDeliveryChargePolicy
+			Description : 배송비 정책 단건 조회
+		-->	
+		SELECT	/* QUERYID(deliveryChargePolicy.getDeliveryChargePolicy) */
+					  COMP_NO					/* 업체 번호 */
+					, DLVRC_PLC_NO				/* 배송비 정책 번호 */
+					, PLC_NM					/* 정책 명 */
+					, DLVRC_STD_CD				/* 배송비 기준 코드 */
+					, DLVR_AMT					/* 배송 금액 */
+					, ADD_DLVR_AMT              /* 추가 배송 금액 */
+					, DLVRC_CDT_CD				/* 배송비 조건 코드 */
+					, DLVRC_CDT_STD_CD			/* 배송비 조건 기준 코드 */
+					, DLVRC_PAY_MTD_CD			/* 배송비 결제 방법 코드 */
+					, RTNA_POST_NO_OLD			/* 반품/교환 우편 번호 구 */
+					, RTNA_POST_NO_NEW			/* 반품/교환 우편 번호 신 */
+					, RTNA_ROAD_ADDR			/* 반품/교환 도로 주소 */
+					, RTNA_ROAD_DTL_ADDR		/* 반품/교환 도로 상세 주소 */
+					, RTNA_PRCL_ADDR			/* 반품/교환 지번 주소 */
+					, RTNA_PRCL_DTL_ADDR		/* 반품/교환 지번 상세 주소 */
+					, RLSA_POST_NO_OLD			/* 출고지 우편 번호 구 */
+					, RLSA_POST_NO_NEW			/* 출고지 우편 번호 신 */
+					, RLSA_ROAD_ADDR			/* 출고지 도로 주소 */
+					, RLSA_ROAD_DTL_ADDR		/* 출고지 도로 상세 주소 */
+					, RLSA_PRCL_ADDR			/* 출고지 지번 주소 */
+					, RLSA_PRCL_DTL_ADDR		/* 출고지 지번 상세 주소 */
+					, RTN_EXC_MAN				/* 반품/교환 담당자 */
+					, RTN_EXC_TEL				/* 반품/교환 연락처 */
+					, RTN_DLVRC					/* 반품 배송비 */
+					, EXC_DLVRC					/* 교환 배송비 */
+					, DLVR_MIN_SMLDD			/* 배송 최소 소요일 */
+					, DLVR_MAX_SMLDD			/* 배송 최대 소요일 */
+					, COMP_DLVR_PSB_AREA_CD		/* 배송가능 지역 코드 */
+					, COMP_DLVR_MTD_CD			/* 배송방법 코드 */
+					, DFT_HDC_CD                /* 기본택배사 코드 */
+					, AREA_GB_CD				/* 지역 구분 코드 */
+					, BUY_QTY					/* 구매 수량 */
+					, BUY_PRC					/* 구매 가격 */
+					, SYS_REGR_NO				/* 시스템 등록자 번호 */
+					, SYS_REG_DTM				/* 시스템 등록 일시 */
+					, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM				/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, RTN_EXC_INFO		/* 반품/교환 안내 문구 */
+					, RFD_INFO			/* 환불 안내 문구 */
+					, AS_INFO 			/* AS 안내 문구 */
+		FROM 	DELIVERY_CHARGE_POLICY
+		WHERE 	1=1
+		<if test="dlvrcPlcNo != null">
+		AND		DLVRC_PLC_NO = #{dlvrcPlcNo}
+		</if>
+		<if test="compNo != null">
+		AND		COMP_NO = #{compNo}
+		</if>
+		<if test="dlvrcNo != null">
+		AND		DLVRC_PLC_NO = (SELECT DLVRC_PLC_NO FROM DELIVERY_CHARGE WHERE DLVRC_NO = #{dlvrcNo})
+		</if>		
+	</select>
+
+	<select id="listDeliveryChargePolicy" resultType="biz.app.delivery.model.DeliveryChargePolicyVO">
+		<!--
+			Query Name : deliveryChargePolicy.listDeliveryChargePolicy
+			Description : 배송비 정책 목록 조회
+		-->
+		SELECT	/* QUERYID(deliveryChargePolicy.listDeliveryChargePolicy) */
+					  COMP_NO						/* 업체 번호 */
+					, DLVRC_PLC_NO				/* 배송비 정책 번호 */
+					, PLC_NM							/* 정책 명 */
+					, DLVRC_STD_CD					/* 배송비 기준 코드 */
+					, DLVR_AMT						/* 배송 금액 */
+					, ADD_DLVR_AMT              /* 추가 배송 금액 */
+					, DLVRC_CDT_CD				/* 배송비 조건 코드 */
+					, DLVRC_CDT_STD_CD			/* 배송비 조건 기준 코드 */
+					, DLVRC_PAY_MTD_CD			/* 배송비 결제 방법 코드 */
+					, RTNA_POST_NO_OLD			/* 반품/교환 우편 번호 구 */
+					, RTNA_POST_NO_NEW		/* 반품/교환 우편 번호 신 */
+					, RTNA_ROAD_ADDR			/* 반품/교환 도로 주소 */
+					, RTNA_ROAD_DTL_ADDR		/* 반품/교환 도로 상세 주소 */
+					, RTNA_PRCL_ADDR				/* 반품/교환 지번 주소 */
+					, RTNA_PRCL_DTL_ADDR		/* 반품/교환 지번 상세 주소 */
+					, RLSA_POST_NO_OLD			/* 출고지 우편 번호 구 */
+					, RLSA_POST_NO_NEW			/* 출고지 우편 번호 신 */
+					, RLSA_ROAD_ADDR			/* 출고지 도로 주소 */
+					, RLSA_ROAD_DTL_ADDR		/* 출고지 도로 상세 주소 */
+					, RLSA_PRCL_ADDR				/* 출고지 지번 주소 */
+					, RLSA_PRCL_DTL_ADDR		/* 출고지 지번 상세 주소 */
+					, RTN_EXC_MAN					/* 반품/교환 담당자 */
+					, RTN_EXC_TEL					/* 반품/교환 연락처 */
+					, RTN_DLVRC						/* 반품 배송비 */
+					, EXC_DLVRC						/* 교환 배송비 */
+					, DLVR_MIN_SMLDD			/* 배송 최소 소요일 */
+					, DLVR_MAX_SMLDD			/* 배송 최대 소요일 */
+					, COMP_DLVR_PSB_AREA_CD	/* 배송가능 지역 코드 */
+					, COMP_DLVR_MTD_CD			/* 배송방법 코드 */
+					, DFT_HDC_CD                /* 기본 택배사 코드 */
+					, AREA_GB_CD					/* 지역 구분 코드 */
+					, BUY_QTY						/* 구매 수량 */
+					, BUY_PRC						/* 구매 가격 */
+					, DEL_YN
+					, SYS_REGR_NO					/* 시스템 등록자 번호 */
+					, SYS_REG_DTM					/* 시스템 등록 일시 */
+					, SYS_UPDR_NO					/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM					/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, RTN_EXC_INFO		/* 반품/교환 안내 문구 */
+					, RFD_INFO			/* 환불 안내 문구 */
+					, AS_INFO 			/* AS 안내 문구 */
+		FROM		DELIVERY_CHARGE_POLICY
+		WHERE	DEL_YN != '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test="compNo != null">
+		AND		COMP_NO = #{compNo}
+		</if>
+		ORDER BY DLVRC_PLC_NO DESC
+	</select>
+
+	<insert id="insertDeliveryChargePolicyHistory">
+		<!--
+			Query Name : deliveryChargePolicy.insertDeliveryChargePolicyHistory
+			Description : 배송비 정책 등록 - 승인전
+		-->
+		<selectKey keyProperty="dlvrcPlcNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DELIVERY_CHARGE_POLICY_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO DELIVERY_CHARGE_POLICY_HISTORY (
+		    DLVRC_PLC_NO              /* 배송비 정책 번호 */
+		    , HIST_STRT_DTM             /* 이력 시작 일시 - NEW */
+			, COMP_NO					/* 업체 번호 */
+			, PLC_NM					/* 정책 명 */
+			, DLVRC_STD_CD				/* 배송비 기준 코드 */
+			, DLVRC_PAY_MTD_CD          /* 배송비 결제 방법 코드 */
+			, DLVRC_CDT_CD				/* 배송비 조건 코드 */
+			, DLVRC_CDT_STD_CD			/* 배송비 조건 기준 코드 */
+            , DLVR_AMT                  /* 배송 금액 */			
+            , ADD_DLVR_AMT              /* 추가 배송 금액_도서산간 - NEW */
+			, RTNA_POST_NO_OLD			/* 반품/교환 우편 번호 구 */
+			, RTNA_POST_NO_NEW			/* 반품/교환 우편 번호 신 */
+			, RTNA_ROAD_ADDR			/* 반품/교환 도로 주소 */
+			, RTNA_ROAD_DTL_ADDR		/* 반품/교환 도로 상세 주소 */
+			, RTNA_PRCL_ADDR			/* 반품/교환 지번 주소 */
+			, RTNA_PRCL_DTL_ADDR		/* 반품/교환 지번 상세 주소 */
+			, RLSA_POST_NO_OLD			/* 출고지 우편 번호 구 */
+			, RLSA_POST_NO_NEW			/* 출고지 우편 번호 신 */
+			, RLSA_ROAD_ADDR			/* 출고지 도로 주소 */
+			, RLSA_ROAD_DTL_ADDR		/* 출고지 도로 상세 주소 */
+			, RLSA_PRCL_ADDR			/* 출고지 지번 주소 */
+			, RLSA_PRCL_DTL_ADDR		/* 출고지 지번 상세 주소 */
+			, RTN_EXC_MAN				/* 반품/교환 담당자 */
+			, RTN_EXC_TEL				/* 반품/교환 연락처 */
+			, RTN_DLVRC					/* 반품 배송비 */
+			, EXC_DLVRC					/* 교환 배송비 */
+			, DLVR_MIN_SMLDD			/* 배송 최소 소요일 */
+			, DLVR_MAX_SMLDD			/* 배송 최대 소요일 */
+			, COMP_DLVR_PSB_AREA_CD		/* 업체 배송가능 지역 코드 */
+			, COMP_DLVR_MTD_CD			/* 업체 배송방법 코드 */
+			, DFT_HDC_CD                /* 기본 택배사 코드 */
+			, AREA_GB_CD				/* 지역 구분 코드 */
+			, BUY_QTY					/* 구매 수량 */
+			, BUY_PRC					/* 구매 가격 */
+			, DEL_YN                    /* 삭제 여부 */
+			, CFM_YN                    /* 승인 여부 - NEW */
+			, CFM_USR_NO                /* 승인 사용자 번호 - NEW */
+			, CFM_PRCS_DTM              /* 승인 처리 일시  - NEW */
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+			, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM				/* 시스템 수정 일시 */
+			, RTN_EXC_INFO				/* 반품/교환 안내 문구 */
+			, RFD_INFO					/* 환불 안내 문구 */
+			, AS_INFO 					/* AS 안내 문구 */
+		) VALUES (
+		    #{dlvrcPlcNo}               /* 배송비 정책 번호 */
+            , NOW()                     /* 이력 시작 일시 - NEW */
+			, #{compNo}					/* 업체 번호 */
+			, #{plcNm}					/* 정책 명 */
+			, #{dlvrcStdCd}				/* 배송비 기준 코드 */
+			, #{dlvrcPayMtdCd}          /* 배송비 결제 방법 코드 */
+			, #{dlvrcCdtCd}				/* 배송비 조건 코드 */
+			, #{dlvrcCdtStdCd}			/* 배송비 조건 기준 코드 */
+            , #{dlvrAmt}                /* 배송 금액 */
+            , #{addDlvrAmt}             /* 추가 배송 금액_도서산간 - NEW */
+			, #{rtnaPostNoOld}			/* 반품/교환 우편 번호 구 */
+			, #{rtnaPostNoNew}			/* 반품/교환 우편 번호 신 */
+			, #{rtnaRoadAddr}			/* 반품/교환 도로 주소 */
+			, #{rtnaRoadDtlAddr}		/* 반품/교환 도로 상세 주소 */
+			, #{rtnaPrclAddr}			/* 반품/교환 지번 주소 */
+			, #{rtnaPrclDtlAddr}		/* 반품/교환 지번 상세 주소 */
+			, #{rlsaPostNoOld}			/* 출고지 우편 번호 구 */
+			, #{rlsaPostNoNew}			/* 출고지 우편 번호 신 */
+			, #{rlsaRoadAddr}			/* 출고지 도로 주소 */
+			, #{rlsaRoadDtlAddr}		/* 출고지 도로 상세 주소 */
+			, #{rlsaPrclAddr}			/* 출고지 지번 주소 */
+			, #{rlsaPrclDtlAddr}		/* 출고지 지번 상세 주소 */
+			, #{rtnExcMan}				/* 반품/교환 담당자 */
+			, #{rtnExcTel}				/* 반품/교환 연락처 */
+			, #{rtnDlvrc}				/* 반품 배송비 */
+			, #{excDlvrc}				/* 교환 배송비 */
+			, #{dlvrMinSmldd}			/* 배송 최소 소요일 */
+			, #{dlvrMaxSmldd}			/* 배송 최대 소요일 */
+			, #{compDlvrPsbAreaCd}		/* 업체 배송가능 지역 코드 */
+			, #{compDlvrMtdCd}			/* 업체 배송방법 코드 */
+			, #{dftHdcCd}               /* 기본 택배사 코드 */
+			, #{areaGbCd}				/* 지역 구분 코드 */
+			, #{buyQty}					/* 구매 수량 */
+			, #{buyPrc}					/* 구매 가격 */
+			, '${@framework.common.constants.CommonConstants@COMM_YN_N}' /* 삭제 여부 */
+			, #{cfmYn}                  /* 승인 여부 - NEW */
+			, #{cfmUsrNo}               /* 승인 사용자 번호 - NEW */
+			<if test='usrGrpCd == "10"'>
+			, NOW()                     /* 승인 처리 일시  - NEW */
+            </if>
+            <if test='usrGrpCd != "10"'>
+            , NULL                      /* 승인 처리 일시  - NEW */
+            </if>
+			, #{sysRegrNo}				/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+			, #{sysUpdrNo}				/* 시스템 수정자 번호 */
+			, NOW()						/* 시스템 수정 일시 */
+			, #{rtnExcInfo}
+			, #{rfdInfo}
+			, #{asInfo}
+		)
+	</insert>
+	
+    <insert id="insertDeliveryChargePolicy">
+        <!--
+            Query Name : deliveryChargePolicy.insertDeliveryChargePolicy
+            Description : 배송비 정책 등록 - 승인완료
+        -->
+        INSERT INTO DELIVERY_CHARGE_POLICY (
+            SELECT 
+	            DLVRC_PLC_NO              /* 배송비 정책 번호 */
+	            , COMP_NO                   /* 업체 번호 */
+	            , PLC_NM                    /* 정책 명 */
+	            , DLVRC_STD_CD              /* 배송비 기준 코드 */
+	            , DLVRC_PAY_MTD_CD          /* 배송비 결제 방법 코드 */
+	            , DLVRC_CDT_CD              /* 배송비 조건 코드 */
+	            , DLVRC_CDT_STD_CD          /* 배송비 조건 기준 코드 */
+	            , DLVR_AMT                  /* 배송 금액 */         
+	            , IFNULL(ADD_DLVR_AMT, 0)              /* 추가 배송 금액_도서산간 - NEW */
+	            , RTNA_POST_NO_OLD          /* 반품/교환 우편 번호 구 */
+	            , RTNA_POST_NO_NEW          /* 반품/교환 우편 번호 신 */
+	            , RTNA_ROAD_ADDR            /* 반품/교환 도로 주소 */
+	            , RTNA_ROAD_DTL_ADDR        /* 반품/교환 도로 상세 주소 */
+	            , RTNA_PRCL_ADDR            /* 반품/교환 지번 주소 */
+	            , RTNA_PRCL_DTL_ADDR        /* 반품/교환 지번 상세 주소 */
+	            , RLSA_POST_NO_OLD          /* 출고지 우편 번호 구 */
+	            , RLSA_POST_NO_NEW          /* 출고지 우편 번호 신 */
+	            , RLSA_ROAD_ADDR            /* 출고지 도로 주소 */
+	            , RLSA_ROAD_DTL_ADDR        /* 출고지 도로 상세 주소 */
+	            , RLSA_PRCL_ADDR            /* 출고지 지번 주소 */
+	            , RLSA_PRCL_DTL_ADDR        /* 출고지 지번 상세 주소 */
+				, RTN_EXC_INFO				/* 반품/교환 안내 문구 */
+				, RFD_INFO					/* 환불 안내 문구 */
+				, AS_INFO 					/* AS 안내 문구 */
+	            , RTN_EXC_MAN               /* 반품/교환 담당자 */
+	            , RTN_EXC_TEL               /* 반품/교환 연락처 */
+	            , RTN_DLVRC                 /* 반품 배송비 */
+	            , EXC_DLVRC                 /* 교환 배송비 */
+	            , DLVR_MIN_SMLDD            /* 배송 최소 소요일 */
+	            , DLVR_MAX_SMLDD            /* 배송 최대 소요일 */
+	            , COMP_DLVR_PSB_AREA_CD     /* 업체 배송가능 지역 코드 */
+	            , COMP_DLVR_MTD_CD          /* 업체 배송방법 코드 */
+	            , DFT_HDC_CD                /* 기본 택배사 코드 */
+	            , AREA_GB_CD                /* 지역 구분 코드 */
+	            , BUY_QTY                   /* 구매 수량 */
+	            , BUY_PRC                   /* 구매 가격 */
+	            , DEL_YN                    /* 삭제 여부 */
+	            , SYS_REGR_NO               /* 시스템 등록자 번호 */
+	            , SYS_REG_DTM               /* 시스템 등록 일시 */
+	            , SYS_UPDR_NO               /* 시스템 수정자 번호 */
+	            , SYS_UPD_DTM               /* 시스템 수정 일시 */
+	            , NULL
+	        FROM
+	            DELIVERY_CHARGE_POLICY_HISTORY
+	        WHERE
+	            DLVRC_PLC_NO = #{dlvrcPlcNo} AND COMP_NO = #{compNo}
+	    )
+    </insert>
+
+	<update id="updateDeliveryChargePolicy">
+		<!--
+			Query Name : deliveryChargePolicy.updateDeliveryChargePolicy
+			Description : 배송비 정책 수정
+		-->
+		UPDATE	DELIVERY_CHARGE_POLICY SET
+				  PLC_NM					= #{plcNm}					/* 정책 명 */
+				, DLVRC_STD_CD				= #{dlvrcStdCd}				/* 배송비 기준 코드 */
+				, DLVRC_PAY_MTD_CD          = #{dlvrcPayMtdCd}          /* 배송비 결제 방법 코드 */
+				, DLVRC_CDT_CD				= #{dlvrcCdtCd}				/* 배송비 조건 코드 */
+				, DLVRC_CDT_STD_CD			= #{dlvrcCdtStdCd}			/* 배송비 조건 기준 코드 */
+				, DLVR_AMT                  = #{dlvrAmt}                /* 배송 금액 */
+				, ADD_DLVR_AMT              = #{addDlvrAmt}                /* 추가 배송 금액 */
+				, RTNA_POST_NO_OLD			= #{rtnaPostNoOld}			/* 반품/교환 우편 번호 구 */
+				, RTNA_POST_NO_NEW			= #{rtnaPostNoNew}			/* 반품/교환 우편 번호 신 */
+				, RTNA_ROAD_ADDR			= #{rtnaRoadAddr}			/* 반품/교환 도로 주소 */
+				, RTNA_ROAD_DTL_ADDR		= #{rtnaRoadDtlAddr}		/* 반품/교환 도로 상세 주소 */
+				, RTNA_PRCL_ADDR			= #{rtnaPrclAddr}			/* 반품/교환 지번 주소 */
+				, RTNA_PRCL_DTL_ADDR		= #{rtnaPrclDtlAddr}		/* 반품/교환 지번 상세 주소 */
+				, RLSA_POST_NO_OLD			= #{rlsaPostNoOld}			/* 출고지 우편 번호 구 */
+				, RLSA_POST_NO_NEW			= #{rlsaPostNoNew}			/* 출고지 우편 번호 신 */
+				, RLSA_ROAD_ADDR			= #{rlsaRoadAddr}			/* 출고지 도로 주소 */
+				, RLSA_ROAD_DTL_ADDR		= #{rlsaRoadDtlAddr}		/* 출고지 도로 상세 주소 */
+				, RLSA_PRCL_ADDR			= #{rlsaPrclAddr}			/* 출고지 지번 주소 */
+				, RLSA_PRCL_DTL_ADDR		= #{rlsaPrclDtlAddr}		/* 출고지 지번 상세 주소 */
+				, RTN_EXC_MAN				= #{rtnExcMan}				/* 반품/교환 담당자 */
+				, RTN_EXC_TEL				= #{rtnExcTel}				/* 반품/교환 연락처 */
+				, RTN_DLVRC					= #{rtnDlvrc}				/* 반품 배송비 */
+				, EXC_DLVRC					= #{excDlvrc}				/* 교환 배송비 */
+				, DLVR_MIN_SMLDD			= #{dlvrMinSmldd}			/* 배송 최소 소요일 */
+				, DLVR_MAX_SMLDD			= #{dlvrMaxSmldd}			/* 배송 최대 소요일 */
+				, COMP_DLVR_PSB_AREA_CD		= #{compDlvrPsbAreaCd}		/* 배송가능 지역 코드 */
+				, COMP_DLVR_MTD_CD			= #{compDlvrMtdCd}			/* 배송방법 코드 */
+				, DFT_HDC_CD                = #{dftHdcCd}               /* 기본 택배사 코드 */
+				, AREA_GB_CD				= #{areaGbCd}				/* 지역 구분 코드 */
+				, BUY_QTY					= #{buyQty}					/* 구매 수량 */
+				, BUY_PRC					= #{buyPrc}					/* 구매 가격 */
+				, DEL_YN                    = '${@framework.common.constants.CommonConstants@COMM_YN_N}' /* 삭제 여부 */
+				, SYS_UPDR_NO				= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				= NOW()						/* 시스템 수정 일시 */
+				, RTN_EXC_INFO				= #{rtnExcInfo}				/* 반품/교환 안내 문구 */
+				, RFD_INFO					= #{rfdInfo}				/* 환불 안내 문구 */
+				, AS_INFO 					= #{asInfo}					/* AS 안내 문구 */
+		WHERE	COMP_NO						= #{compNo}
+		AND		DLVRC_PLC_NO				= #{dlvrcPlcNo}
+	</update>
+
+	<update id="deleteDeliveryChargePolicy">
+		<!--
+			Query Name : deliveryChargePolicy.deleteDeliveryChargePolicy
+			Description : 배송 정책 승인 전 삭제처리
+		-->
+		UPDATE	DELIVERY_CHARGE_POLICY_HISTORY 
+		SET		
+		    DEL_YN =  '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		    , SYS_UPDR_NO = #{sysUpdrNo}              /* 시스템 수정자 번호 */
+            , SYS_UPD_DTM = NOW()                     /* 시스템 수정 일시 */
+		WHERE 	DLVRC_PLC_NO = #{dlvrcPlcNo}
+	</update>
+	
+    <update id="deleteDeliveryChargePolicyHistory">
+        <!--
+            Query Name : deliveryChargePolicy.updateDeliveryChargePolicyHistory
+            Description : 배송비 정책 히스토리 삭제(업데이트)
+        -->
+        UPDATE  DELIVERY_CHARGE_POLICY_HISTORY H 
+            JOIN DELIVERY_CHARGE_POLICY P ON (H.DLVRC_PLC_NO = P.DLVRC_PLC_NO) 
+        SET
+            H.DEL_YN = P.DEL_YN
+            , H.SYS_UPDR_NO = P.SYS_UPDR_NO /* 시스템 수정자 번호 */
+            , H.SYS_UPD_DTM  = P.SYS_UPD_DTM /* 시스템 수정 일시 */
+        WHERE
+            H.DLVRC_PLC_NO = #{dlvrcPlcNo}
+    </update>	
+	
+	
+	<select id="pageDeliveryChargePolicyHistory" resultType="biz.app.delivery.model.DeliveryChargePolicyVO">
+		<!--
+			Query Name : deliveryChargePolicy.pageDeliveryChargePolicyHistory
+			Description : 배송비 정책 목록 조회
+		-->
+		SELECT	/* QUERYID(deliveryChargePolicy.pageDeliveryChargePolicyHistory) */
+					  DCPH.COMP_NO						/* 업체 번호 */
+					, CB.COMP_NM
+					, DCPH.DLVRC_PLC_NO				/* 배송비 정책 번호 */
+					, DCPH.PLC_NM							/* 정책 명 */
+					, DCPH.DLVRC_STD_CD					/* 배송비 기준 코드 */
+					, DCPH.DLVR_AMT						/* 배송 금액 */
+					, DCPH.DLVRC_CDT_CD				/* 배송비 조건 코드 */
+					, DCPH.DLVRC_CDT_STD_CD			/* 배송비 조건 기준 코드 */
+					, DCPH.DLVRC_PAY_MTD_CD			/* 배송비 결제 방법 코드 */
+					, DCPH.RTNA_POST_NO_OLD			/* 반품/교환 우편 번호 구 */
+					, DCPH.RTNA_POST_NO_NEW		/* 반품/교환 우편 번호 신 */
+					, DCPH.RTNA_ROAD_ADDR			/* 반품/교환 도로 주소 */
+					, DCPH.RTNA_ROAD_DTL_ADDR		/* 반품/교환 도로 상세 주소 */
+					, DCPH.RTNA_PRCL_ADDR				/* 반품/교환 지번 주소 */
+					, DCPH.RTNA_PRCL_DTL_ADDR		/* 반품/교환 지번 상세 주소 */
+					, DCPH.RLSA_POST_NO_OLD			/* 출고지 우편 번호 구 */
+					, DCPH.RLSA_POST_NO_NEW			/* 출고지 우편 번호 신 */
+					, DCPH.RLSA_ROAD_ADDR			/* 출고지 도로 주소 */
+					, DCPH.RLSA_ROAD_DTL_ADDR		/* 출고지 도로 상세 주소 */
+					, DCPH.RLSA_PRCL_ADDR				/* 출고지 지번 주소 */
+					, DCPH.RLSA_PRCL_DTL_ADDR		/* 출고지 지번 상세 주소 */
+					, DCPH.RTN_EXC_MAN					/* 반품/교환 담당자 */
+					, DCPH.RTN_EXC_TEL					/* 반품/교환 연락처 */
+					, DCPH.RTN_DLVRC						/* 반품 배송비 */
+					, DCPH.EXC_DLVRC						/* 교환 배송비 */
+					, DCPH.DLVR_MIN_SMLDD			/* 배송 최소 소요일 */
+					, DCPH.DLVR_MAX_SMLDD			/* 배송 최대 소요일 */
+					, DCPH.COMP_DLVR_PSB_AREA_CD	/* 배송가능 지역 코드 */
+					, DCPH.COMP_DLVR_MTD_CD			/* 배송방법 코드 */
+					, DCPH.DFT_HDC_CD                /* 기본 택배사 코드 */
+					, DCPH.AREA_GB_CD					/* 지역 구분 코드 */
+					, DCPH.BUY_QTY						/* 구매 수량 */
+					, DCPH.BUY_PRC						/* 구매 가격 */
+					, DCPH.DEL_YN                      /* 삭제 여부 */
+					, DCPH.CFM_YN	/*승인 여부*/
+					, DCPH.HIST_STRT_DTM	/*이력 시작 일시*/
+					, DCPH.CFM_USR_NO	/*승인 사용자 번호*/
+					, FN_GET_USER_NAME(DCPH.CFM_USR_NO) AS CFM_USR_NM	/*승인 사용자 번호*/
+					, DCPH.CFM_PRCS_DTM	/*승인 처리 일시*/
+					, DCPH.SYS_REGR_NO					/* 시스템 등록자 번호 */
+					, DCPH.SYS_REG_DTM					/* 시스템 등록 일시 */
+					, DCPH.SYS_UPDR_NO					/* 시스템 수정자 번호 */
+					, DCPH.SYS_UPD_DTM					/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(DCPH.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(DCPH.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, DCPH.RTN_EXC_INFO		/* 반품/교환 안내 문구 */
+					, DCPH.RFD_INFO			/* 환불 안내 문구 */
+					, DCPH.AS_INFO 			/* AS 안내 문구 */
+		FROM		DELIVERY_CHARGE_POLICY_HISTORY DCPH
+		INNER JOIN (SELECT C.COMP_NO, C.COMP_NM, C.COMP_STAT_CD, C.COMP_TP_CD, C.COMP_GB_CD, 
+                    CASE WHEN C.MD_USR_NO IS NULL THEN (SELECT B.MD_USR_NO FROM COMPANY_BASE B WHERE B.COMP_NO = C.UP_COMP_NO) ELSE C.MD_USR_NO END AS MD_USR_NO
+                    FROM COMPANY_BASE C) CB ON (CB.COMP_NO = DCPH.COMP_NO )		
+		WHERE 
+		    1 = 1
+		  <if test="adminYn != @framework.common.constants.CommonConstants@COMM_YN_Y and usrGrpCd != 20">
+		    AND CB.MD_USR_NO  = #{mdUsrNo}
+		  </if>
+		  <if test="compStatCd != null and compStatCd != ''">
+          AND     CB.COMP_STAT_CD = #{compStatCd}
+          </if>
+          <if test="compTpCd != null and compTpCd != ''">
+          AND     CB.COMP_TP_CD = #{compTpCd}
+          </if>
+          <if test="compGbCd != null and compGbCd != ''">
+          AND     CB.COMP_GB_CD = #{compGbCd}
+          </if>
+          <if test="cfmYn != null and cfmYn != ''">
+          AND     DCPH.CFM_YN = #{cfmYn}
+          </if>
+          <if test="usrGrpCd == '20'">
+          AND     DCPH.COMP_NO = #{compNo}
+          </if>
+          AND     DCPH.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'          
+        ORDER BY DCPH.DLVRC_PLC_NO DESC
+        <include refid="bizCommon.pageSql" />
+          
+	</select>	
+	
+	<select id="pageDeliveryChargePolicyHistoryCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : deliveryChargePolicy.pageDeliveryChargePolicyHistoryCount
+			Description : 배송비 정책 목록 조회 카운트
+		-->
+		SELECT	/* QUERYID(deliveryChargePolicy.pageDeliveryChargePolicyHistoryCount) */
+				COUNT(*)
+		  FROM  DELIVERY_CHARGE_POLICY_HISTORY DCPH
+		        INNER JOIN (SELECT C.COMP_NO, C.COMP_NM, C.COMP_STAT_CD, C.COMP_TP_CD, C.COMP_GB_CD, 
+                    CASE WHEN C.MD_USR_NO IS NULL THEN (SELECT B.MD_USR_NO FROM COMPANY_BASE B WHERE B.COMP_NO = C.UP_COMP_NO) ELSE C.MD_USR_NO END AS MD_USR_NO
+                    FROM COMPANY_BASE C) CB ON (CB.COMP_NO = DCPH.COMP_NO )
+		 WHERE
+		    1 = 1
+		  <if test="adminYn != @framework.common.constants.CommonConstants@COMM_YN_Y and usrGrpCd != 20">
+		    AND CB.MD_USR_NO  = #{mdUsrNo}
+		  </if>
+		  <if test="compStatCd != null and compStatCd != ''">
+          AND     CB.COMP_STAT_CD = #{compStatCd}
+          </if>
+          <if test="compTpCd != null and compTpCd != ''">
+          AND     CB.COMP_TP_CD = #{compTpCd}
+          </if>
+          <if test="compGbCd != null and compGbCd != ''">
+          AND     CB.COMP_GB_CD = #{compGbCd}
+          </if>
+          <if test="cfmYn != null and cfmYn != ''">
+          AND     DCPH.CFM_YN = #{cfmYn}
+          </if>
+          <if test="usrGrpCd == '20'">
+          AND     DCPH.COMP_NO = #{compNo}
+          </if>
+          AND     DCPH.DEL_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+    </select>
+    
+    <select id="getDeliveryChargePolicyHistory" resultType="biz.app.delivery.model.DeliveryChargePolicyVO">
+		<!--
+			Query Name : deliveryChargePolicy.getDeliveryChargePolicyHistory
+			Description : 배송비 정책 단건 조회
+		-->	
+		SELECT	/* QUERYID(deliveryChargePolicy.getDeliveryChargePolicyHistory) */
+					  COMP_NO					/* 업체 번호 */
+					, DLVRC_PLC_NO				/* 배송비 정책 번호 */
+					, PLC_NM					/* 정책 명 */
+					, DLVRC_STD_CD				/* 배송비 기준 코드 */
+					, DLVR_AMT					/* 배송 금액 */
+					, ADD_DLVR_AMT              /* 추가 배송 금액 */
+					, DLVRC_CDT_CD				/* 배송비 조건 코드 */
+					, DLVRC_CDT_STD_CD			/* 배송비 조건 기준 코드 */
+					, DLVRC_PAY_MTD_CD			/* 배송비 결제 방법 코드 */
+					, RTNA_POST_NO_OLD			/* 반품/교환 우편 번호 구 */
+					, RTNA_POST_NO_NEW			/* 반품/교환 우편 번호 신 */
+					, RTNA_ROAD_ADDR			/* 반품/교환 도로 주소 */
+					, RTNA_ROAD_DTL_ADDR		/* 반품/교환 도로 상세 주소 */
+					, RTNA_PRCL_ADDR			/* 반품/교환 지번 주소 */
+					, RTNA_PRCL_DTL_ADDR		/* 반품/교환 지번 상세 주소 */
+					, RLSA_POST_NO_OLD			/* 출고지 우편 번호 구 */
+					, RLSA_POST_NO_NEW			/* 출고지 우편 번호 신 */
+					, RLSA_ROAD_ADDR			/* 출고지 도로 주소 */
+					, RLSA_ROAD_DTL_ADDR		/* 출고지 도로 상세 주소 */
+					, RLSA_PRCL_ADDR			/* 출고지 지번 주소 */
+					, RLSA_PRCL_DTL_ADDR		/* 출고지 지번 상세 주소 */
+					, RTN_EXC_MAN				/* 반품/교환 담당자 */
+					, RTN_EXC_TEL				/* 반품/교환 연락처 */
+					, RTN_DLVRC					/* 반품 배송비 */
+					, EXC_DLVRC					/* 교환 배송비 */
+					, DLVR_MIN_SMLDD			/* 배송 최소 소요일 */
+					, DLVR_MAX_SMLDD			/* 배송 최대 소요일 */
+					, COMP_DLVR_PSB_AREA_CD		/* 배송가능 지역 코드 */
+					, COMP_DLVR_MTD_CD			/* 배송방법 코드 */
+					, DFT_HDC_CD                /* 기본택배사 코드 */
+					, AREA_GB_CD				/* 지역 구분 코드 */
+					, BUY_QTY					/* 구매 수량 */
+					, BUY_PRC					/* 구매 가격 */
+					, SYS_REGR_NO				/* 시스템 등록자 번호 */
+					, SYS_REG_DTM				/* 시스템 등록 일시 */
+					, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM				/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, HIST_STRT_DTM	/*이력 시작 일시*/
+					, CFM_YN	/*승인 여부*/
+					, CFM_USR_NO	/*승인 사용자 번호*/
+					, FN_GET_USER_NAME(CFM_USR_NO) AS CFM_USR_NM	/*승인 사용자 번호*/
+					, CFM_PRCS_DTM	/*승인 처리 일시*/
+					, DEL_YN   /*삭제 여부*/
+					, RTN_EXC_INFO		/* 반품/교환 안내 문구 */
+					, RFD_INFO			/* 환불 안내 문구 */
+					, AS_INFO 			/* AS 안내 문구 */
+		FROM 	DELIVERY_CHARGE_POLICY_HISTORY
+		WHERE 	1=1
+		<if test="dlvrcPlcNo != null">
+		AND		DLVRC_PLC_NO = #{dlvrcPlcNo}
+		</if>
+		<if test="compNo != null">
+		AND		COMP_NO = #{compNo}
+		</if>
+		<if test="dlvrcNo != null">
+		AND		DLVRC_PLC_NO = (SELECT DLVRC_PLC_NO FROM DELIVERY_CHARGE WHERE DLVRC_NO = #{dlvrcNo})
+		</if>		
+	</select>
+	
+	
+	<update id="updateDeliveryChargePolicyHistory">
+		<!--
+			Query Name : deliveryChargePolicy.updateDeliveryChargePolicyHistory
+			Description : 배송비 정책 히스토리 승인
+		-->
+		UPDATE	DELIVERY_CHARGE_POLICY_HISTORY SET
+				  CFM_YN	    = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/*승인 여부*/
+				, CFM_USR_NO	= #{sysUpdrNo}	/*승인 사용자 번호*/
+				, CFM_PRCS_DTM	= NOW()	/*승인 처리 일시*/
+				, SYS_UPDR_NO				= #{sysUpdrNo}				/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				= NOW()						/* 시스템 수정 일시 */
+		WHERE	COMP_NO						= #{compNo}
+		AND		DLVRC_PLC_NO				= #{dlvrcPlcNo}
+	</update>
+	
+</mapper>

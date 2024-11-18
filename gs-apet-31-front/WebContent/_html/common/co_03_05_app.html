@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set9","tit":"<b class=e>서비스 이용약관</b>"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login agree" id="container">
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+
+					<!-- 팝업레이어 A 전체 덮는크기 -->
+					<article class="popLayer a popSample1" id="popSample1">
+						<div class="pbd width562">
+							<div class="phd">
+								<div class="in">
+									<h1 class="tit">이용약관</h1>
+									<button type="button" class="btnPopClose">닫기</button>
+								</div>
+							</div>
+							<div class="pct">
+								<main class="container page sett" id="container">
+
+			<header class="header pc cu mode7" data-header="set9" style="height:0px;">
+					<div class="hdr">
+						<div class="inr">
+							<div class="hdt">
+								<button class="mo-header-backNtn" onclick="history.go(-1);" data-content="" data-url="history.go(-1);">뒤로 </button>
+								<div class="mo-heade-tit"><span class="tit">서비스 이용약관</span></div>
+							</div>
+						</div>
+					</div>
+				</header>
+			<div class="inr" style="min-height: 640px;">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>서비스 이용약관</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					
+					<!-- 설정 컨텐츠 영역 -->
+					<div class="setlist subTtl">		<!-- APET-1175 210628 lju02 -->
+						<dl style="padding-top: 0px;">
+							<dd>
+								<ul onclick="openTermsSetting('2001', 'Y');return false;">
+											<li class="ti">[필수] 서비스 이용약관</li>
+											<li class="r">
+												<a class="next" data-content="" data-url=""></a>
+											</li>
+										</ul>	
+									<ul onclick="openTermsSetting('2002', 'Y');return false;">
+											<li class="ti">[필수] 개인정보 처리 방침</li>
+											<li class="r">
+												<a class="next" data-content="" data-url=""></a>
+											</li>
+										</ul>	
+									<ul onclick="openTermsSetting('1001', 'Y');return false;">
+											<li class="ti">[필수] 서비스 이용약관</li>
+											<li class="r">
+												<a class="next" data-content="" data-url=""></a>
+											</li>
+										</ul>	
+									<ul onclick="openTermsSetting('1004', 'Y');return false;">
+											<li class="ti">[필수] 개인정보 제 3자제공동의(어바웃펫/GS리테일)</li>
+											<li class="r">
+												<a class="next" data-content="" data-url=""></a>
+											</li>
+										</ul>	
+									</dd>
+						</dl>
+					</div>
+					<!-- // 설정 컨텐츠 영역 -->
+				</div>
+			</div>
+		</main>
+							</div>
+							
+						
+							
+							
+						</div>
+					</article>
+
+					
+				
+				</div>
+			</div>
+		</main>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+	</div>
+	<script>
+		ui.popLayer.open("popSample1");
+	</script>
+
+</body>
+</html>

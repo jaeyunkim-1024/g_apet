@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="brandCnts">
+
+	<select id="pageBrandCnts" resultType="biz.app.brand.model.BrandCntsVO">
+		<!--
+			Query Name : brandCnts.pageBrandCnts
+			Description : 브랜드 콘텐츠 페이지 리스트
+		-->
+		SELECT	/* QUERYID(brandCnts.pageBrandCnts) */
+				BC.BND_CNTS_NO			/* 브랜드 콘텐츠 번호 */
+				, BC.BND_NO			/* 브랜드 번호 */
+				, BB.BND_NM_KO			/* 브랜드 명 국문 */
+				, BB.BND_NM_EN			/* 브랜드 명 영문 */
+				, BC.CNTS_GB_CD			/* 콘텐츠 구분 코드 */
+				, BC.CNTS_TTL			/* 콘텐츠 타이틀 */
+				, BC.CNTS_DSCRT			/* 콘텐츠 설명 */
+				, BC.CNTS_IMG_PATH			/* 코너 이미지 경로 */
+				, BC.CNTS_MO_IMG_PATH			/* 코너 모바일 이미지 경로 */
+				, BC.TN_IMG_PATH			/* 썸네일 이미지 경로 */
+				, BC.TN_MO_IMG_PATH			/* 썸네일 모바일 이미지 경로 */
+				, BC.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, BC.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, BC.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, BC.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(BC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(BC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	BRAND_CNTS BC
+		INNER JOIN BRAND_BASE BB ON BB.BND_NO = BC.BND_NO
+		WHERE	1 = 1
+		<include refid="brandCnts.pageBrandCntsWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageBrandCntsCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : brandCnts.pageBrandCntsCount
+			Description : 브랜드 콘텐츠 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(brandCnts.pageBrandCntsCount) */
+				COUNT(*)
+		FROM	BRAND_CNTS BC
+		INNER JOIN BRAND_BASE BB ON BB.BND_NO = BC.BND_NO
+		WHERE	1 = 1
+		<include refid="brandCnts.pageBrandCntsWhere" />
+	</select>
+
+	<sql id="pageBrandCntsWhere">
+		<if test='bndCntsNo != null'>
+		AND		BC.BND_CNTS_NO = #{bndCntsNo}
+		</if>
+		<if test='bndNo != null'>
+		AND		BC.BND_NO = #{bndNo}
+		</if>		
+		<if test="bndNm != null and bndNm != ''" >
+		 AND (
+			BB.BND_NM_KO LIKE CONCAT('%', #{bndNm }, '%')
+			OR BB.BND_NM_EN LIKE CONCAT('%', #{bndNm }, '%')
+		 )
+		</if>
+		<if test='cntsGbCd and cntsGbCd != ""'>
+		AND		BC.CNTS_GB_CD = #{cntsGbCd}
+		</if>
+		<if test='cntsTtl and cntsTtl != ""'>
+		AND		BC.CNTS_TTL = #{cntsTtl}
+		</if>
+		<if test="compNo != null and compNo != ''">
+		 AND EXISTS (SELECT 1 FROM COMPANY_BRAND CB WHERE CB.COMP_NO = #{compNo} AND BB.BND_NO = CB.BND_NO)
+		</if>
+	</sql>
+
+	<insert id="insertBrandCnts" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 	
+			Query Name : brandCnts.insertBrandCnts
+			Description : 브랜드 콘텐츠 등록
+	 	-->
+		INSERT INTO BRAND_CNTS (
+			BND_CNTS_NO			/* 브랜드 콘텐츠 번호 */
+			, BND_NO			/* 브랜드 번호 */
+			, CNTS_GB_CD			/* 콘텐츠 구분 코드 */
+			, CNTS_TTL			/* 콘텐츠 타이틀 */
+			, CNTS_DSCRT			/* 콘텐츠 설명 */
+			<if test="cntsImgPath != null and cntsImgPath != ''" >
+			, CNTS_IMG_PATH			/* 코너 이미지 경로 */
+			</if>
+			<if test="cntsMoImgPath != null and cntsMoImgPath != ''" >
+			, CNTS_MO_IMG_PATH			/* 코너 모바일 이미지 경로 */
+			</if>
+			<if test="tnImgPath != null and tnImgPath != ''" >
+			, TN_IMG_PATH			/* 썸네일 이미지 경로 */
+			</if>
+			<if test="tnMoImgPath != null and tnMoImgPath != ''" >
+			, TN_MO_IMG_PATH			/* 썸네일 모바일 이미지 경로 */
+			</if>
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES ( 
+			#{bndCntsNo}			/* 브랜드 콘텐츠 번호 */
+			, #{bndNo}			/* 브랜드 번호 */
+			, #{cntsGbCd}			/* 콘텐츠 구분 코드 */
+			, #{cntsTtl}			/* 콘텐츠 타이틀 */
+			, #{cntsDscrt}			/* 콘텐츠 설명 */
+			<if test="cntsImgPath != null and cntsImgPath != ''" >
+			, #{cntsImgPath}			/* 코너 이미지 경로 */
+			</if>
+			<if test="cntsMoImgPath != null and cntsMoImgPath != ''" >
+			, #{cntsMoImgPath}			/* 코너 모바일 이미지 경로 */
+			</if>
+			<if test="tnImgPath != null and tnImgPath != ''" >
+			, #{tnImgPath}				/* 썸네일 이미지 경로 */
+			</if>
+			<if test="tnMoImgPath != null and tnMoImgPath != ''" >
+			, #{tnMoImgPath}				/* 썸네일 모바일 이미지 경로 */
+			</if>
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateBrandCnts" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 	
+			Query Name : brandCnts.updateBrandCnts
+			Description : 브랜드 콘텐츠 수정
+		 -->
+		UPDATE	BRAND_CNTS SET
+			<if test="bndNo != null" >
+			BND_NO = #{bndNo}			/* 브랜드 번호 */
+			</if>
+			<if test="cntsGbCd != null and cntsGbCd != ''" >
+			, CNTS_GB_CD = #{cntsGbCd}			/* 콘텐츠 구분 코드 */
+			</if>
+			<if test="cntsTtl != null and cntsTtl != ''" >
+			, CNTS_TTL = #{cntsTtl}			/* 콘텐츠 타이틀 */
+			</if>
+			<if test="cntsDscrt != null and cntsDscrt != ''" >
+			, CNTS_DSCRT = #{cntsDscrt}				/* 콘텐츠 설명 */
+			</if>
+			<if test="cntsImgPath != null and cntsImgPath != ''" >
+			, CNTS_IMG_PATH = #{cntsImgPath}				/* 코너 이미지 경로 */
+			</if>
+			<if test="cntsMoImgPath != null and cntsMoImgPath != ''" >
+			, CNTS_MO_IMG_PATH = #{cntsMoImgPath}			/* 코너 모바일 이미지 경로 */
+			</if>
+			<if test="tnImgPath != null and tnImgPath != ''" >
+			, TN_IMG_PATH = #{tnImgPath}				/* 썸네일 이미지 경로 */
+			</if>
+			<if test="tnMoImgPath != null and tnMoImgPath != ''" >
+			, TN_MO_IMG_PATH = #{tnMoImgPath}			/* 썸네일 모바일 이미지 경로 */
+			</if>
+			, SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+		WHERE BND_CNTS_NO	 = #{bndCntsNo}
+	</update>
+
+	<delete id="deleteBrandCnts" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 		
+			Query Name : brandCnts.deleteBrandCnts
+			Description : 브랜드 콘텐츠 삭제
+	 	-->
+		DELETE
+		FROM	BRAND_CNTS
+		WHERE BND_CNTS_NO = #{bndCntsNo}
+	</delete>
+
+	<delete id="deleteBrandCntsItem" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 		
+			Query Name : brandCnts.deleteBrandCntsItem
+			Description : 브랜드 콘텐츠 아이템 삭제
+	 	-->
+		DELETE
+		FROM	BRAND_CNTS_ITEM
+		WHERE 1=1
+		<if test="bndCntsNo != null">
+		AND BND_CNTS_NO = #{bndCntsNo}
+		</if>
+		<if test="itemNo != null">
+		AND ITEM_NO = #{itemNo}
+		</if>
+	</delete>
+
+	<select id="pageBrandCntsItem" resultType="biz.app.brand.model.BrandCntsItemVO">
+		<!--
+			Query Name : brandCnts.pageBrandCntsItem
+			Description : 브랜드 콘텐츠 아이템 리스트
+		-->
+		SELECT	/* QUERYID(display.pageBrandCntsItem) */
+				BCI.ITEM_NO			/* 아이템 번호 */
+				, BCI.BND_CNTS_NO			/* 브랜드 콘텐츠 번호 */
+				, BCI.GOODS_ID			/* 상품 아이디 */
+				, GB.GOODS_NM					/* 상품명 */
+				, BCI.ITEM_IMG_PATH			/* 아이템 이미지 경로 */
+				, BCI.ITEM_MO_IMG_PATH			/* 아이템 모바일 이미지 경로 */
+		FROM BRAND_CNTS_ITEM BCI
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = BCI.GOODS_ID
+		WHERE 1=1
+		<if test="bndCntsNo != null">
+		AND BCI.BND_CNTS_NO = #{bndCntsNo}
+		</if>
+		<if test="itemNo != null">
+		AND BCI.ITEM_NO = #{itemNo}
+		</if>
+		<include refid="bizCommon.sortSql" />
+	</select>
+	
+	<select id="pageBrandCntsItemCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : brandCnts.pageBrandCntsItemCount
+			Description : 브랜드 콘텐츠 아이템 리스트 카운트
+		-->
+		SELECT /* QUERYID(display.pageBrandCntsItemCount) */
+				COUNT(*)
+		FROM BRAND_CNTS_ITEM BCI
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = BCI.GOODS_ID
+		WHERE BCI.BND_CNTS_NO = #{bndCntsNo}
+		<if test="itemNo != null">
+		AND ITEM_NO = #{itemNo}
+		</if>
+	</select>
+
+	<insert id="insertBrandCntsItem" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 	
+			Query Name : brandCnts.insertBrandCntsItem
+			Description : 브랜드 콘텐츠 아이템 등록
+	 	-->
+		INSERT INTO BRAND_CNTS_ITEM (
+			ITEM_NO			/* 아이템 번호 */
+			, BND_CNTS_NO			/* 브랜드 콘텐츠 번호 */
+			, GOODS_ID			/* 상품 아이디 */
+			<if test="itemImgPath != null and itemImgPath != ''" >
+			, ITEM_IMG_PATH			/* 아이템 이미지 경로 */
+			</if>
+			<if test="itemMoImgPath != null and itemMoImgPath != ''" >
+			, ITEM_MO_IMG_PATH			/* 아이템 모바일 이미지 경로 */
+			</if>
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES ( 
+			#{itemNo}			/* 아이템 번호 */
+			, #{bndCntsNo}			/* 브랜드 콘텐츠 번호 */
+			, #{goodsId}			/* 상품 아이디 */
+			<if test="itemImgPath != null and itemImgPath != ''" >
+			, #{itemImgPath}			/* 아이템 이미지 경로 */
+			</if>
+			<if test="itemMoImgPath != null and itemMoImgPath != ''" >
+			, #{itemMoImgPath}			/* 아이템 모바일 이미지 경로 */
+			</if>
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateBrandCntsItem" parameterType="biz.app.brand.model.BrandCntsPO">
+		<!-- 	
+			Query Name : brandCnts.updateBrandCntsItem
+			Description : 브랜드 콘텐츠 아이템 수정
+		 -->
+		UPDATE	BRAND_CNTS_ITEM SET
+			<if test="goodsId != null and goodsId != ''" >
+			GOODS_ID = #{goodsId}			/* 상품 아이디 */
+			</if>
+			<if test="itemImgPath != null and itemImgPath != ''" >
+			, ITEM_IMG_PATH = #{itemImgPath}				/* 아이템 이미지 경로 */
+			</if>
+			<if test="itemMoImgPath != null and itemMoImgPath != ''" >
+			, ITEM_MO_IMG_PATH = #{itemMoImgPath}			/* 아이템 모바일 이미지 경로 */
+			</if>
+			, SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+		WHERE ITEM_NO	 = #{itemNo}
+	</update>
+	
+	<select id="getTopBrandCnt" resultType="biz.app.brand.model.BrandCntsVO">
+		<!--
+			Query Name : brandCnts.getTopBrandCnt
+			Description : 브랜드 미니샵 노출 top 컨텐츠
+		-->
+		SELECT	/* QUERYID(brandCnts.getTopBrandCnt) */
+			 BC.BND_CNTS_NO				/* 브랜드 콘텐츠 번호 */
+		 	,BC.CNTS_TTL				/* 콘텐츠 타이틀 */
+    		,BC.CNTS_DSCRT				/* 콘텐츠 설명 */
+			,BC.CNTS_IMG_PATH			/* 코너 이미지 경로 */
+			,BC.CNTS_MO_IMG_PATH		/* 코너 모바일 이미지 경로 */
+			,CD.DTL_NM					/* 컨텐츠 구분 코드명 */
+		FROM
+			BRAND_CNTS BC
+			INNER JOIN CODE_DETAIL CD ON CD.DTL_CD = BC.CNTS_GB_CD
+		WHERE
+			BC.BND_NO = #{bndNo}
+			AND CD.GRP_CD = '${@framework.common.constants.CommonConstants@CNTS_GB}'
+		ORDER BY BC.SYS_REG_DTM DESC
+		limit 1;
+	</select>
+	
+	<select id="listBrandCnts" resultType="biz.app.brand.model.BrandCntsVO">
+		<!--
+			Query Name : brandCnts.listBrandCnts
+			Description : 브랜드 미니샵 노출 컨텐츠 리스트
+		-->
+		SELECT	/* QUERYID(brandCnts.listBrandCnts) */
+			 BC.BND_CNTS_NO 			/* 브랜드 콘텐츠 번호 */
+			,BC.CNTS_TTL				/* 콘텐츠 타이틀 */
+			,BC.CNTS_DSCRT				/* 콘텐츠 설명 */
+			,BC.CNTS_IMG_PATH			/* 코너 이미지 경로 */
+			,BC.CNTS_MO_IMG_PATH		/* 코너 모바일 이미지 경로 */
+			,BC.TN_IMG_PATH				/* 썸네일 이미지 경로 */
+			,BC.TN_MO_IMG_PATH			/* 썸네일 모바일 이미지 경로 */
+			,CD.DTL_NM					/* 컨텐츠 구분 코드명 */
+		FROM
+			BRAND_CNTS BC
+    		INNER JOIN CODE_DETAIL CD ON CD.DTL_CD = BC.CNTS_GB_CD
+		WHERE
+			BC.BND_NO = #{bndNo}
+			AND BC.CNTS_GB_CD = #{cntsGbCd}
+			AND CD.GRP_CD = '${@framework.common.constants.CommonConstants@CNTS_GB}'
+		ORDER BY BC.SYS_REG_DTM DESC
+		limit #{limitCnt};
+	</select>
+	
+	<select id="getBrandCnts" resultType="biz.app.brand.model.BrandCntsVO">
+		<!--
+			Query Name : brandCnts.getBrandCnts
+			Description : 브랜드 컨텐츠 조회
+		-->
+		SELECT	/* QUERYID(brandCnts.listBrandCnts) */
+			 BC.BND_CNTS_NO 			/* 브랜드 콘텐츠 번호 */
+			,BC.CNTS_TTL				/* 콘텐츠 타이틀 */
+			,BC.CNTS_DSCRT				/* 콘텐츠 설명 */
+			,BC.CNTS_IMG_PATH			/* 코너 이미지 경로 */
+			,BC.CNTS_MO_IMG_PATH		/* 코너 모바일 이미지 경로 */
+			,BC.TN_IMG_PATH				/* 썸네일 이미지 경로 */
+			,BC.TN_MO_IMG_PATH			/* 썸네일 모바일 이미지 경로 */
+			,CD.DTL_NM					/* 컨텐츠 구분 코드명 */
+		FROM
+			BRAND_CNTS BC
+    		INNER JOIN CODE_DETAIL CD ON CD.DTL_CD = BC.CNTS_GB_CD
+		WHERE
+			BC.BND_CNTS_NO = #{bndCntsNo}
+			AND CD.GRP_CD = '${@framework.common.constants.CommonConstants@CNTS_GB}'
+
+	</select>
+	
+	<select id="listBrandCntsItem" resultType="biz.app.brand.model.BrandCntsItemVO">
+		<!--
+			Query Name : brandCnts.listBrandCntsItem
+			Description : 브랜드 미니샵 노출 컨텐츠 아이템 리스트
+		-->
+		SELECT	/* QUERYID(brandCnts.listBrandCntsItem) */
+			 BCI.GOODS_ID 					/* 상품번호 */
+			,BCI.ITEM_IMG_PATH				/* 아이템 이미지 경로 */
+			,BCI.ITEM_MO_IMG_PATH			/* 아이템 모바일 이미지 경로 */
+			,GB.GOODS_NM					/* 상품명 */
+			,GI.IMG_SEQ AS GOODS_IMG_SEQ	/* 상품 이미지 순번 */
+			,GI.IMG_PATH AS GOODS_IMG_PATH	/* 상품 이미지 경로 */
+			<if test='mbrNo != null'>
+			,IF((SELECT COUNT(*) FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID = BCI.GOODS_ID AND MBR_NO = #{mbrNo}) > 0, 'Y','N') AS INTEREST_YN
+			</if>
+		FROM
+			BRAND_CNTS_ITEM BCI
+			,GOODS_BASE GB
+			,GOODS_IMG GI
+		WHERE
+			BND_CNTS_NO = #{bndCntsNo}
+			AND BCI.GOODS_ID = GB.GOODS_ID
+			AND GB.GOODS_ID = GI.GOODS_ID
+			AND GI.DLGT_YN = 'Y'
+	</select>
+</mapper>

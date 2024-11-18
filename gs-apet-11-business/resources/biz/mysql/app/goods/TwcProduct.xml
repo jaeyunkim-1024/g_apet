@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	TWC 성분 정보
+	작성자  	valueFactory
+	작성일자  	2020.01.15
+-->
+<mapper namespace="twcProduct">
+
+	<select id="getTwcProduct" resultType="biz.app.goods.model.TwcProductVO" >
+		<!--
+			Query Name : twcProduct.getTwcProduct
+			Description : TWC 성분 정보
+		-->
+		/* QUERYID(twcProduct.getTwcProduct) */
+		
+		SELECT
+			TP.ID 							
+			, TP.NAME 							
+			, TP.BRAND_NAME 						
+			, TP.PRODUCT_CODE 						
+			, TP.PETSBE_ID 						
+			, TP.APP_NAME 							
+			, TP.TYPE 								
+			, TP.SCENT 							
+			, TP.LIFE_STAGE 						
+			, TP.RECOMMEND_AGE 					
+			, TP.BREED_SIZE 						
+			, TP.MANUFACTURER 					
+			, TP.IMPORTER 						
+			, TP.COUNTRY_OF_ORIGIN 				
+			, TP.EXPIRY_TEXT 						
+			, TP.EXPIRY_DESC 						
+			, TP.PRODUCT_DIMENSIONS 				
+			, TP.CAPACITY_WEIGHT 					
+			, TP.SIZE 							
+			, TP.CALORIE 							
+			, TP.PACKAGING_TYPE 					
+			, TP.INNER_PACKING 					
+			, TP.HAIR_TYPE 						
+			, TP.COLOR 							
+			, TP.MATERIAL 						
+			, TP.QUANTITY 							
+			, TP.MAIN_NUTRITION 					
+			, TP.ANIMAL_INGREDIENT 				
+			, TP.VEGETABLE_INGREDIENT 			
+			, TP.PET_INDUCER 						
+			, TP.FEED_GRADE 						
+			, TP.GRAIN_FREE 						
+			, TP.AAFCO 							
+			, TP.EXISTENCE 						
+			, TP.REPACKAGING 						
+			, TP.COMMENT_OPERATOR 				
+			, TP.COMMENT_GSN 						
+			, TP.COMMENT_MD 						
+			, TP.FEEDING_GUIDELINE 				
+			, TP.STORAGE_INSTRUCTIONS 				
+			, TP.FEATURE 							
+			, TP.CREATE_DATE 			
+			, TP.CREATE_BY 				
+			, TP.MODIFY_DATE 			
+			, TP.STATUS 					
+			, TP.CAUTION_ADDITIVE 		
+			, TP.DESCRIPTION_ID 
+		FROM TWC_PRODUCT TP	
+		WHERE STATUS = 'COMPLETE'
+		AND ( 
+			TP.PRODUCT_CODE = #{productCode}
+			<if test="petsbeId != null and petsbeId !=''" >
+				OR TP.PETSBE_ID = #{petsbeId}
+			</if> 
+		)
+		ORDER BY CREATE_DATE
+		LIMIT 1
+	</select>
+
+	<insert id="replaceTwcProduct">
+		REPLACE INTO TWC_PRODUCT (
+			ID
+			, `NAME`
+			, BRAND_NAME
+			, PRODUCT_CODE
+			, PETSBE_ID
+			, APP_NAME
+			, `TYPE`
+			, SCENT
+			, LIFE_STAGE
+			, RECOMMEND_AGE
+			, BREED_SIZE
+			, MANUFACTURER
+			, IMPORTER
+			, COUNTRY_OF_ORIGIN
+			, EXPIRY_TEXT
+			, EXPIRY_DESC
+			, PRODUCT_DIMENSIONS
+			, CAPACITY_WEIGHT
+			, `SIZE`
+			, CALORIE
+			, PACKAGING_TYPE
+			, INNER_PACKING
+			, HAIR_TYPE
+			, COLOR
+			, MATERIAL
+			, QUANTITY
+			, MAIN_NUTRITION
+			, PET_INDUCER
+			, FEED_GRADE
+			, GRAIN_FREE
+			, AAFCO
+			, EXISTENCE
+			, REPACKAGING
+			, COMMENT_OPERATOR
+			, COMMENT_GSN
+			, COMMENT_MD
+			, FEEDING_GUIDELINE
+			, STORAGE_INSTRUCTIONS
+			, FEATURE
+			, CREATE_DATE
+			, CREATE_BY
+			, MODIFY_DATE
+			, STATUS
+			, CAUTION_ADDITIVE
+			, DESCRIPTION_ID
+			, CODE
+			, SUGGEST_AGE
+			, MODIFY_BY
+			, DESCRIPTION
+			, CATEGORY
+			, TAGS
+		) VALUES
+		<if test="product != null">
+			(
+			#{product.id}
+			, #{product.name}
+			, #{product.brandName}
+			, #{product.productCode}
+			, #{product.petsbeId}
+			, #{product.appName}
+			, #{product.type}
+			, #{product.scent}
+			, #{product.lifeStage}
+			, #{product.recommendAge}
+			, #{product.breedSize}
+			, #{product.manufacturer}
+			, #{product.importer}
+			, #{product.countryOfOrigin}
+			, #{product.expiryText}
+			, #{product.expiryDesc}
+			, #{product.productDimensions}
+			, #{product.capacityWeight}
+			, #{product.size}
+			, #{product.calorie}
+			, #{product.packagingType}
+			, #{product.innerPacking}
+			, #{product.hairType}
+			, #{product.color}
+			, #{product.material}
+			, #{product.quantity}
+			, #{product.mainNutrition}
+			, #{product.petInducer}
+			, #{product.feedGrade}
+			, #{product.grainFree}
+			, #{product.aafco}
+			, #{product.existence}
+			, #{product.repackaging}
+			, #{product.commentOperator}
+			, #{product.commentGsn}
+			, #{product.commentMd}
+			, #{product.feedingGuideline}
+			, #{product.storageInstructions}
+			, #{product.feature}
+			, #{product.createDate}
+			, #{product.createBy}
+			, #{product.modifyDate}
+			, #{product.status}
+			, #{product.cautionAdditive}
+			, #{product.descriptionId}
+			, #{product.code}
+			, #{product.suggestAge}
+			, #{product.modifyBy}
+			, #{product.description}
+			, #{product.category}
+			, #{product.tags}
+			)
+		</if>
+		<if test="list != null">
+			<foreach collection="list" item="product" open=" (" separator="),(" close=")">
+				#{product.id}
+				, #{product.name}
+				, #{product.brandName}
+				, #{product.productCode}
+				, #{product.petsbeId}
+				, #{product.appName}
+				, #{product.type}
+				, #{product.scent}
+				, #{product.lifeStage}
+				, #{product.recommendAge}
+				, #{product.breedSize}
+				, #{product.manufacturer}
+				, #{product.importer}
+				, #{product.countryOfOrigin}
+				, #{product.expiryText}
+				, #{product.expiryDesc}
+				, #{product.productDimensions}
+				, #{product.capacityWeight}
+				, #{product.size}
+				, #{product.calorie}
+				, #{product.packagingType}
+				, #{product.innerPacking}
+				, #{product.hairType}
+				, #{product.color}
+				, #{product.material}
+				, #{product.quantity}
+				, #{product.mainNutrition}
+				, #{product.petInducer}
+				, #{product.feedGrade}
+				, #{product.grainFree}
+				, #{product.aafco}
+				, #{product.existence}
+				, #{product.repackaging}
+				, #{product.commentOperator}
+				, #{product.commentGsn}
+				, #{product.commentMd}
+				, #{product.feedingGuideline}
+				, #{product.storageInstructions}
+				, #{product.feature}
+				, #{product.createDate}
+				, #{product.createBy}
+				, #{product.modifyDate}
+				, #{product.status}
+				, #{product.cautionAdditive}
+				, #{product.descriptionId}
+				, #{product.code}
+				, #{product.suggestAge}
+				, #{product.modifyBy}
+				, #{product.description}
+				, #{product.category}
+				, #{product.tags}
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insertTwcSyncFailLog">
+		INSERT INTO TWC_SYNC_LOG(`TABLE_NAME`, BATCH_STRT_DTM, `RESULT`, RESULT_MESSAGE, JSON, SYS_REG_DTM) VALUES (#{tableName}, #{batchStrtDtm}, #{result}, #{resultMessage}, #{json}, NOW())
+	</insert>
+</mapper>

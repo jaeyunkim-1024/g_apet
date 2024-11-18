@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="couponGoods">
+
+	<select id="listCouponTargetGoodsDetail" resultType="biz.app.promotion.model.CouponTargetGoodsVO">
+		<!--
+			Query Name : couponGoods.pageCouponTargetGoodsDetail
+			Description : 상품 상세 쿠폰 리스트
+		-->
+		/* QUERYID(couponGoods.pageCouponTargetGoodsDetail) */
+		SELECT * FROM
+		(
+		<include refid="couponTargetGoodsDetail" />
+		) A
+	</select>
+
+	<select id="pageCouponTargetGoodsDetail" resultType="biz.app.promotion.model.CouponTargetGoodsVO">
+		<!--
+			Query Name : couponGoods.pageCouponTargetGoodsDetail
+			Description : 상품 상세 쿠폰 리스트
+		-->
+		/* QUERYID(couponGoods.pageCouponTargetGoodsDetail) */
+		SELECT * FROM
+		(
+			<include refid="couponTargetGoodsDetail" />
+		) A
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCouponTargetGoodsDetailCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : couponGoods.pageCouponTargetGoodsDetailCount
+			Description : 상품 상세 쿠폰 개수
+		-->
+		/* QUERYID(couponGoods.pageCouponTargetGoodsDetailCount) */
+		SELECT COUNT(*) CNT FROM
+		(
+			<include refid="couponTargetGoodsDetail" />
+		) A
+	</select>
+
+	<!-- 상품 상세 쿠폰 리스트 호출 -->
+	<sql id="couponTargetGoodsDetail">
+		/* QUERYID(couponGoods.couponTargetGoodsDetail) */
+		SELECT CT.GOODS_ID				/* 상품 아이디 */
+			, CT.DISP_CLSF_NO			/* 전시 분류 번호 */
+			, CB.CP_NO					/* 쿠폰 번호 */
+			, CB.CP_NM					/* 쿠폰 명 */
+			, CB.CP_DSCRT				/* 쿠폰 설명 */
+			, CB.CP_KIND_CD				/* 쿠폰 종류 코드 */
+			, (CASE WHEN CP_KIND_CD = 10 THEN '상품'
+					WHEN CP_KIND_CD = 20 THEN '장바구니'
+					WHEN CP_KIND_CD = 30 THEN '배송비'
+				END) CP_KIND_CD_NM
+			, CB.CP_STAT_CD				/* 쿠폰 상태 코드 */
+			, CB.CP_APL_CD				/* 쿠폰 적용 코드 */
+			, CB.CP_TG_CD				/* 쿠폰 대상 코드 */
+			, CB.VLD_PRD_CD				/* 유효 기간 코드 */
+			, DATE_FORMAT(CB.VLD_PRD_STRT_DTM, '%Y-%m-%d %H:%i:%s') VLD_PRD_STRT_DTM 	/* 유효 기간 시작 일시 */
+			, DATE_FORMAT(CB.VLD_PRD_END_DTM, '%Y-%m-%d %H:%i:%s') VLD_PRD_END_DTM 	/* 유효 기간 종료 일시 */
+			, CB.VLD_PRD_DAY			/* 유효기간 일*/
+			, CB.CP_PVD_MTH_CD			/*쿠폰 지급 방식 코드 */
+			, CB.DUPLE_USE_YN			/*중복 사용 여부 */
+			, CB.SPL_COMP_DVD_RATE		/* 공급 업체 분담 율 */
+			, CB.ISU_HOST_CD			/* 발급 주체 코드 */
+			, CB.CP_ISU_CD				/* 쿠폰 발급 코드 */
+			, CB.CP_ISU_QTY				/* 쿠폰 발급 수량 */
+			, CB.APL_VAL				/* 적용 값 */
+			, CB.MIN_BUY_AMT			/* 최소 구매 금액 */
+			, CB.MAX_DC_AMT				/* 최대 할인 금액 */
+			, CB.RVS_MRG_PMT_YN			/* 역 마진 허용 여부 */
+			, CB.APL_STRT_DTM			/* 적용 시작 일시 */
+			, CB.APL_END_DTM			/* 적용 종료 일시 */
+			, CB.CP_IMG_FLNM			/* 쿠폰 이미지 파일명 */
+			, CB.CP_IMG_PATHNM			/* 쿠폰 이미지 경로명 */
+			, CB.OUTSIDE_CP_YN			/* 외부 쿠폰 여부 */
+			, CB.OUTSIDE_CP_CD			/* 외부 쿠폰 코드 */
+			, CB.NOTICE					/* 유의사항 */
+			, CB.MULTI_APL_YN			/* 복수 적용 여부 */
+			, CB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, CB.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, CB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, CB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(CB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(CB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, GB.WEB_MOBILE_GB_CD, GB.GOODS_STAT_CD
+	<choose>
+		<when test='mbrNo != null and mbrNo != ""'>
+			, IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON AS MC
+			WHERE MC.CP_NO = CB.CP_NO AND MC.MBR_NO = #{mbrNo} ) > 0, '${@framework.common.constants.CommonConstants@COMM_YN_Y}','N') AS CP_DW_YN /* 쿠폰다운여부 */
+			, IF((SELECT	IFNULL(COUNT(CP_NO), 0) AS MEMBER_CNT	FROM	MEMBER_COUPON
+			WHERE CP_NO = CB.CP_NO AND USE_YN = 'N'  AND MBR_NO = #{mbrNo} ) > 0, 'N','Y') AS CP_USE_YN /* 쿠폰사용여부 */
+		</when>
+		<otherwise>
+			, 'N' AS CP_DW_YN
+			, 'N' AS CP_USE_YN
+		</otherwise>
+	</choose>
+		FROM coupon_target CT
+		LEFT JOIN coupon_base CB
+		ON CT.CP_NO = CB.CP_NO
+		LEFT JOIN GOODS_BASE GB ON CT.GOODS_ID = GB.GOODS_ID
+		WHERE 1=1
+		<if test="goodsId != null">
+			AND CT.GOODS_ID = #{goodsId}
+		</if>
+		<if test="bndId != null">
+			AND CT.BND_NO = #{bndId}
+		</if>
+		<if test="compNo != null">
+			AND CT.COMP_NO = #{compNo}
+		</if>
+
+		<if test="webMobileGbCds != null">
+			<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+				#{code}
+			</foreach>
+		</if>
+		AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'	/* 상품 상태 코드 : 판매중(승인) */
+		AND GB.SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+		AND NOW() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM			/* 상품 이벤트 기간 일시 	*/
+		AND NOW() BETWEEN CB.VLD_PRD_STRT_DTM AND CB.VLD_PRD_END_DTM	/* 쿠폰 유효 기간 일시 	*/
+		AND NOT EXISTS (SELECT 1 FROM coupon_except_goods ceg WHERE CT.CP_NO = CEG.CP_NO AND CT.GOODS_ID = CEG.GOODS_ID )	/* 제외쿠폰 목록 */
+		<if test="cpNo != null">
+			AND CT.CP_NO = #{cpNo}
+		</if>
+		ORDER BY CB.CP_APL_CD DESC, CB.APL_VAL DESC, CB.APL_END_DTM, CB.CP_NO
+	</sql>
+
+</mapper>

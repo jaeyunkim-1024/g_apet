@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	스토리 글 Mapper 
+	작성자  	muel 
+	작성일자  	2016.04.15 
+-->
+
+<mapper namespace="storyLetterReply">
+
+	<sql id="pageStoryLetterReply-where">
+		AND 
+			STRY_LETT_NO = #{stryLettNo}
+	</sql> 
+
+	<!-- 스토리댓글 조회 -->
+	<select id="pageStoryLetterReply" resultType="biz.app.story.model.StoryLetterReplyVO">		
+		SELECT  
+			STRY_LETT_NO
+			,RPL_SEQ
+			,CONTENT
+			,SYS_REG_DTM
+			,SYS_REGR_NO
+		FROM	
+			STORY_LETTER_REPLY
+		WHERE
+		   1=1
+		<include refid="pageStoryLetterReply-where" />
+		ORDER BY 
+			${sidx} ${sord}
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<!-- 스토리 댓글 데이터 수 조회 -->
+	<select id="pageStoryLetterReplyCount" resultType="Integer">
+		SELECT
+			COUNT(*)
+		FROM	
+			STORY_LETTER_REPLY
+		WHERE
+			1=1
+		<include refid="pageStoryLetterReply-where" />
+	</select>
+</mapper>

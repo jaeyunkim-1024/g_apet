@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set8","tit":"마이펫 관리"}' data-btn-rname="등록하기"></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+		
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<!-- 페이지 헤더 -->
+			<!-- mobile -->
+			<!-- <div class="pageHead heightNone">
+				<div class="inr">
+					<div class="hdt">
+						<button class="back" type="button">뒤로가기</button>
+					</div>
+					<div class="cent t2"><h2 class="subtit">마이펫 관리</h2></div>
+					<div class="mdt">
+						<button type="button" class="bt txt a make font"><i class="ico"></i> 등록하기</button>
+					</div>
+				</div>
+			</div> -->
+			<!-- // mobile -->
+			<!-- // 페이지 헤더 -->
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<div class="mypet-admin t2">
+						<!-- PC 타이틀 모바일에서 제거 -->
+						<div class="pc-tit">
+							<h2>마이펫 관리</h2>
+							<div class="right-item">
+								<button class="btn sm new a">마이펫 등록하기</button>
+							</div>
+						</div>
+						<!-- // PC 타이틀 모바일에서 제거 -->
+						<!-- 마이펫 리스트 -->
+						<div class="mypet-list">
+							<ul class="list">
+								<li>
+									<p class="img">
+										<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+									</p>
+									<div class="box">
+										<p class="t1">mong2mom</p>
+										<p class="t2"><span>페르시안</span><span>여아</span><span>4세 5개월</span></p>
+										<a href="javascript:;" class="btn sm">건강수첩</a>
+									</div>
+									<a href="javascript:;" class="link">상세정보 이동</a>
+								</li>
+								<li>
+									<p class="img">
+										<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+									</p>
+									<div class="box">
+										<p class="t1">mong2mom</p>
+										<p class="t2"><span>페르시안</span><span>여아</span><span>4세 5개월</span></p>
+										<a href="javascript:;" class="btn sm">건강수첩</a>
+									</div>
+									<a href="javascript:;" class="link">상세정보 이동</a>
+								</li>
+								<li>
+									<p class="img">
+										<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+									</p>
+									<div class="box">
+										<p class="t1">mong2mom</p>
+										<p class="t2"><span>페르시안</span><span>여아</span><span>4세 5개월</span></p>
+										<a href="javascript:;" class="btn sm">건강수첩</a>
+									</div>
+									<a href="javascript:;" class="link">상세정보 이동</a>
+								</li>
+							
+							</ul>
+						</div>
+						<!-- // 마이펫 리스트 -->
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴 -->
+		<!-- 푸터
+        <include class="footer" data-include-html="../inc/footer.html"></include>
+		 -->
+	</div>
+</body>
+</html>

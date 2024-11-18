@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	주문 사은품
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="orderFreebie">
+
+	<insert id="insertOrderFreebie" parameterType="biz.app.order.model.OrderFreebiePO">
+		<!--
+			Query Name : orderFreebie.insertOrderFreebie
+			Description : 주문 사은품 등록
+		-->
+		INSERT INTO ORDER_FREEBIE (
+			FRB_NO				/* 사은품 번호 */
+			, ORD_CLM_GB_CD		/* 주문 클레임 구분 코드 */
+			, ORD_NO			/* 주문 번호 */
+			, ORD_DTL_SEQ		/* 주문 상세 순번 */
+			, CLM_NO			/* 클레임 번호 */
+			, CLM_DTL_SEQ		/* 클레임 상세 순번 */
+			, GOODS_ID			/* 상품 ID */
+			, APL_QTY			/* 적용 수량 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{frbNo}				/* 사은품 번호 */
+			, #{ordClmGbCd}		/* 주문 클레임 구분 코드 */
+			, #{ordNo}			/* 주문 번호 */
+			, #{ordDtlSeq}		/* 주문 상세 순번 */
+			, #{clmNo}			/* 클레임 번호 */
+			, #{clmDtlSeq}		/* 클레임 상세 순번 */
+			, #{goodsId}			/* 상품 ID */
+			, #{aplQty}			/* 적용 수량 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+</mapper>

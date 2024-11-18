@@ -1,0 +1,2006 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="settlement">
+
+	<select id="pageListSettlement" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.pageListSettlement
+			Description : 정산 대기
+		-->
+		SELECT 	A.STL_NO,
+		       	A.STL_MONTH,
+		       	A.STL_ORDER,
+		       	A.COMP_NO,
+		       	C.COMP_NM,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'COMP_GB' 
+		            AND DTL_CD = C.COMP_GB_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS COMP_GB_NM,
+		       	A.ST_ID,
+		       	FN_GET_SITE_NAME(A.ST_ID) AS ST_NM,
+		       	A.STL_STRT_DT,
+		       	A.STL_END_DT,
+		       	CONCAT(A.STL_STRT_DT,' ~ ',A.STL_END_DT) AS STL_TERM,	       	
+		       	A.MD_USR_NO,
+		       	A.SALE_AMT,
+		       	A.BRKR_CMS,
+		       	A.COMP_SALE_AMT,
+		       	A.DC_AMT,
+		       	A.BRKR_BDN_DC_AMT,
+		       	A.COMP_BDN_DC_AMT,
+		       	A.RFD_AMT,
+		       	A.BRKR_RFD_CMS,
+		       	A.COMP_RFD_AMT,
+		       	A.ORD_DLVRC,
+		       	A.CLM_DLVRC,
+		       	A.MRG_AMT,
+		       	A.COMP_STL_AMT,
+		       	A.RTN_RSRV_RATE,
+		       	A.RTN_RSRV_AMT,
+		       	A.REAL_STL_AMT,
+		       	A.STL_STAT_CD,
+		       	A.PVD_STAT_CD,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'STL_STAT' 
+		            AND DTL_CD = A.STL_STAT_CD
+		            AND SYS_DEL_YN = 'N'
+		       	) AS STL_STAT_NM,
+		       	FN_GET_USER_NAME(A.MD_USR_NO) AS MD_USR_NM,
+		       	FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM,
+		       	A.SYS_REG_DTM,
+		       	FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM,
+		       	A.SYS_UPD_DTM
+		  FROM 	COMPANY_SETTLE_BASE    A,
+		       	COMPANY_BASE           C
+		 WHERE	1=1
+	       AND 	A.COMP_NO = C.COMP_NO
+	       AND 	A.STL_STAT_CD = '10'
+	       AND  A.REAL_STL_AMT != 0
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND A.STL_MONTH = #{stlMonth}
+            </if>         		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND A.STL_ORDER = #{stlOrder}
+            </if>
+            <if test="mdUsrNo != null and mdUsrNo != ''">
+            	AND A.MD_USR_NO = #{mdUsrNo}
+            </if>  
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="compGbCd != null and compGbCd != ''">
+            	AND C.COMP_GB_CD = #{compGbCd}
+            </if> 
+	        
+		 ORDER BY A.STL_NO, 
+		          A.STL_MONTH, 
+		          A.STL_ORDER, 
+		          A.COMP_NO, 
+		          A.ST_ID
+
+		<include refid="bizCommon.pageSql" />
+		          
+	</select>
+
+	<select id="pageListSettlementCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageListSettlementCount
+			Description : 정산 대기
+		-->
+		SELECT 	COUNT(1)
+		  FROM 	COMPANY_SETTLE_BASE    A,
+		       	COMPANY_BASE           C
+		 WHERE	1=1
+	       AND 	A.COMP_NO = C.COMP_NO
+	       AND 	A.STL_STAT_CD = '10'
+	       AND 	A.REAL_STL_AMT != 0
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND A.STL_MONTH = #{stlMonth}
+            </if>         		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND A.STL_ORDER = #{stlOrder}
+            </if>
+            <if test="mdUsrNo != null and mdUsrNo != ''">
+            	AND A.MD_USR_NO = #{mdUsrNo}
+            </if>  
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="compGbCd != null and compGbCd != ''">
+            	AND C.COMP_GB_CD = #{compGbCd}
+            </if>
+
+	</select>
+
+	<select id="pageListSettlementDtl" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.pageListSettlementDtl
+			Description : 정산 대기 상세 내역
+		-->
+		SELECT	A.TOTAL_DT,
+		       	A.COMP_NO,
+		       	A.ORG_COMP_NO,
+	            CASE WHEN A.COMP_NO = A.ORG_COMP_NO
+	                 THEN C.COMP_NM
+	                 ELSE FN_GET_COMPANY_NAME(A.ORG_COMP_NO)
+	            END AS COMP_NM,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'COMP_GB' 
+		            AND DTL_CD = C.COMP_GB_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS COMP_GB_NM,
+		       	A.ST_ID,
+		       	FN_GET_SITE_NAME(A.ST_ID) AS ST_NM,
+		       	A.DTL_SEQ,
+		       	A.STL_NO,
+       			(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'STL_ORD_TP' 
+		            AND DTL_CD = A.STL_ORD_TP_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS STL_ORD_TP_NM,		       	
+		       	A.ORD_NO,
+		       	A.ORD_DTL_SEQ,
+		       	A.CLM_NO,
+		       	A.CLM_DTL_SEQ,
+		       	A.ORD_NM,
+		       	A.ORDR_ID,
+		       	A.ACPT_DTM,
+		       	A.GOODS_ID,
+		       	A.GOODS_NM,
+		       	A.ITEM_NO,
+		       	A.ITEM_NM,
+		       	A.STL_TG_QTY,
+		       	A.SALE_AMT,
+		        (A.SALE_AMT * A.STL_TG_QTY) AS SALE_TOT_AMT,
+		       	A.DC_AMT,
+		       	A.SVMN_USE_AMT,
+		       	A.DLVRC,
+		       	A.DLVRC_DC_AMT,
+		       	A.PAY_AMT,
+		        (SELECT DTL_NM
+		           FROM CODE_DETAIL
+		          WHERE GRP_CD = 'PAY_MEANS'
+		            AND DTL_CD = A.PAY_MEANS_CD
+		            AND SYS_DEL_YN = 'N'
+		        ) AS PAY_MEANS_NM,
+		        (A.PRMT_BRKR_BDN_DC_AMT + A.PRMT_COMP_BDN_DC_AMT) AS PRMT_BDN_DC_TOT_AMT,
+		       	A.PRMT_BRKR_BDN_DC_AMT,
+		       	A.PRMT_COMP_BDN_DC_AMT,
+		       	(A.GC_BRKR_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT) AS GC_BDN_DC_TOT_AMT,
+		       	A.GC_BRKR_BDN_DC_AMT,
+		       	A.GC_COMP_BDN_DC_AMT,
+		       	(A.CC_BRKR_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT) AS CC_BDN_DC_TOT_AMT,
+		       	A.CC_BRKR_BDN_DC_AMT,
+		       	A.CC_COMP_BDN_DC_AMT,
+		       	(A.DC_BRKR_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) AS DC_BDN_DC_TOT_AMT,
+		       	A.DC_BRKR_BDN_DC_AMT,
+		       	A.DC_COMP_BDN_DC_AMT,
+		       	(A.PRMT_BRKR_BDN_DC_AMT + A.GC_BRKR_BDN_DC_AMT + A.CC_BRKR_BDN_DC_AMT + A.DC_BRKR_BDN_DC_AMT) AS BRKR_DC_TOT_AMT,
+		       	(A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) AS COMP_DC_TOT_AMT,
+		       	A.CLM_DLVRC,
+		       	A.CMS_RATE,
+		       	A.SALE_MRG_AMT,
+		       	A.REAL_MRG_AMT,
+		       	(A.SALE_AMT * A.STL_TG_QTY - A.SALE_MRG_AMT) AS SALE_SET_AMT,
+		       	(A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT) AS COMP_SALE_DC_AMT,
+		       	(A.DLVRC + A.CLM_DLVRC) AS DLVRC_TOT_AMT,
+		       	A.DC_COMP_BDN_DC_AMT AS COMP_BDN_DLVRC_DC_AMT,
+		       	((A.SALE_AMT * A.STL_TG_QTY) - A.SALE_MRG_AMT - (A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) + A.DLVRC + A.CLM_DLVRC) AS SET_TOT_AMT,
+		       	FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM,
+		       	A.SYS_REG_DTM,
+		       	FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM,
+		       	A.SYS_UPD_DTM
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+       	   AND 	A.STL_NO = B.STL_NO
+           AND 	A.COMP_NO = B.COMP_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlNo != null and stlNo != ''">
+            	AND A.STL_NO = #{stlNo}
+            </if>
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>             
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>
+
+		 ORDER BY A.TOTAL_DT,
+		       	  A.COMP_NO,
+		       	  A.ST_ID,
+		       	  A.STL_NO,
+		       	  A.DTL_SEQ
+
+		<include refid="bizCommon.pageSql" />
+                                
+	</select>
+	
+	<select id="pageListSettlementDtlCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageListSettlementDtlCount
+			Description : 정산 대기 상세 내역
+		-->
+		SELECT	COUNT(1)
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+       	   AND 	A.STL_NO = B.STL_NO
+           AND 	A.COMP_NO = B.COMP_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlNo != null and stlNo != ''">
+            	AND A.STL_NO = #{stlNo}
+            </if>
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>
+                                
+	</select>	
+
+	<update id="updateSettlementListStlStatUpdate" parameterType="biz.app.settlement.model.SettlementPO">
+		<!--
+			Query Name : settlement.updateSettlementListStlStatUpdate
+			Description : updateSettlementListStlStatUpdate
+		-->
+		UPDATE	COMPANY_SETTLE_BASE 
+		   SET  STL_STAT_CD	= #{stlStatCd},
+				SYS_UPDR_NO	= #{sysUpdrNo},
+				SYS_UPD_DTM	= NOW()
+		 WHERE	1=1
+		   AND	STL_NO		= #{stlNo}
+	</update>
+
+	<select id="pageListSettlementComplete" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.pageListSettlementComplete
+			Description : 정산 완료
+		-->
+		SELECT 	A.STL_NO,
+		       	A.STL_MONTH,
+		       	A.STL_ORDER,
+		       	A.COMP_NO,
+		       	C.COMP_NM,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'COMP_GB' 
+		            AND DTL_CD = C.COMP_GB_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS COMP_GB_NM,
+		       	A.ST_ID,
+		       	FN_GET_SITE_NAME(A.ST_ID) AS ST_NM,
+		       	A.STL_STRT_DT,
+		       	A.STL_END_DT,
+		       	CONCAT(A.STL_STRT_DT,' ~ ',A.STL_END_DT) AS STL_TERM,	       	
+		       	A.MD_USR_NO,
+		       	A.SALE_AMT,
+		       	A.BRKR_CMS,
+		       	A.COMP_SALE_AMT,
+		       	A.DC_AMT,
+		       	A.BRKR_BDN_DC_AMT,
+		       	A.COMP_BDN_DC_AMT,
+		       	A.RFD_AMT,
+		       	A.BRKR_RFD_CMS,
+		       	A.COMP_RFD_AMT,
+		       	A.ORD_DLVRC,
+		       	A.CLM_DLVRC,
+		       	A.MRG_AMT,
+		       	A.COMP_STL_AMT,
+		       	A.RTN_RSRV_RATE,
+		       	A.RTN_RSRV_AMT,
+		       	A.REAL_STL_AMT,
+		       	A.STL_STAT_CD,
+		       	A.PVD_STAT_CD,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'PVD_STAT' 
+		            AND DTL_CD = A.PVD_STAT_CD
+		            AND SYS_DEL_YN = 'N'
+		       	) AS PVD_STAT_NM,
+		       	FN_GET_USER_NAME(A.MD_USR_NO) AS MD_USR_NM,
+		       	FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM,
+		       	A.SYS_REG_DTM,
+		       	FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM,
+		       	A.SYS_UPD_DTM	
+		  FROM 	COMPANY_SETTLE_BASE    A,
+		       	COMPANY_BASE           C
+		 WHERE	1=1
+	       AND 	A.COMP_NO = C.COMP_NO
+	       AND 	A.STL_STAT_CD = '20'
+	       AND 	A.REAL_STL_AMT != 0
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND A.STL_MONTH = #{stlMonth}
+            </if>         		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND A.STL_ORDER = #{stlOrder}
+            </if>
+            <if test="mdUsrNo != null and mdUsrNo != ''">
+            	AND A.MD_USR_NO = #{mdUsrNo}
+            </if>  
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="pvdStatCd != null and pvdStatCd != ''">
+            	AND A.PVD_STAT_CD = #{pvdStatCd}
+            </if> 
+            <if test="compGbCd != null and compGbCd != ''">
+            	AND C.COMP_GB_CD = #{compGbCd}
+            </if>
+
+		 ORDER BY A.STL_NO, 
+		          A.STL_MONTH, 
+		          A.STL_ORDER, 
+		          A.COMP_NO, 
+		          A.ST_ID
+
+		<include refid="bizCommon.pageSql" />
+	                    				   
+	</select>
+	
+	<select id="pageListSettlementCompleteCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageListSettlementCompleteCount
+			Description : 정산 완료
+		-->
+		SELECT 	COUNT(1)
+		  FROM 	COMPANY_SETTLE_BASE    A,
+		       	COMPANY_BASE           C
+		 WHERE	1=1
+	       AND 	A.COMP_NO = C.COMP_NO
+	       AND 	A.STL_STAT_CD = '20'
+	       AND 	A.REAL_STL_AMT != 0
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND A.STL_MONTH = #{stlMonth}
+            </if>         		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND A.STL_ORDER = #{stlOrder}
+            </if>
+            <if test="mdUsrNo != null and mdUsrNo != ''">
+            	AND A.MD_USR_NO = #{mdUsrNo}
+            </if>  
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="pvdStatCd != null and pvdStatCd != ''">
+            	AND A.PVD_STAT_CD = #{pvdStatCd}
+            </if> 
+            <if test="compGbCd != null and compGbCd != ''">
+            	AND C.COMP_GB_CD = #{compGbCd}
+            </if>
+	                    				   
+	</select>	
+
+
+	<select id="pageListSettlementCompleteDtl" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.pageListSettlementCompleteDtl
+			Description : 정산 완료 상세 내역
+		-->
+		SELECT	A.TOTAL_DT,
+		       	A.COMP_NO,
+		       	A.ORG_COMP_NO,
+	            CASE WHEN A.COMP_NO = A.ORG_COMP_NO
+	                 THEN C.COMP_NM
+	                 ELSE FN_GET_COMPANY_NAME(A.ORG_COMP_NO)
+	            END AS COMP_NM,
+		       	(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'COMP_GB' 
+		            AND DTL_CD = C.COMP_GB_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS COMP_GB_NM,
+		       	A.ST_ID,
+		       	FN_GET_SITE_NAME(A.ST_ID) AS ST_NM,
+		       	A.DTL_SEQ,
+		       	A.STL_NO,
+       			(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'STL_ORD_TP' 
+		            AND DTL_CD = A.STL_ORD_TP_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS STL_ORD_TP_NM,		       	
+		       	A.ORD_NO,
+		       	A.ORD_DTL_SEQ,
+		       	A.CLM_NO,
+		       	A.CLM_DTL_SEQ,
+		       	A.ORD_NM,
+		       	A.ORDR_ID,
+		       	A.ACPT_DTM,
+		       	A.GOODS_ID,
+		       	A.GOODS_NM,
+		       	A.ITEM_NO,
+		       	A.ITEM_NM,
+		       	A.STL_TG_QTY,
+		       	A.SALE_AMT,
+		        (A.SALE_AMT * A.STL_TG_QTY) AS SALE_TOT_AMT,
+		       	A.DC_AMT,
+		       	A.SVMN_USE_AMT,
+		       	A.DLVRC,
+		       	A.DLVRC_DC_AMT,
+		       	A.PAY_AMT,
+		        (SELECT DTL_NM
+		           FROM CODE_DETAIL
+		          WHERE GRP_CD = 'PAY_MEANS'
+		            AND DTL_CD = A.PAY_MEANS_CD
+		            AND SYS_DEL_YN = 'N'
+		        ) AS PAY_MEANS_NM,
+		        (A.PRMT_BRKR_BDN_DC_AMT + A.PRMT_COMP_BDN_DC_AMT) AS PRMT_BDN_DC_TOT_AMT,
+		       	A.PRMT_BRKR_BDN_DC_AMT,
+		       	A.PRMT_COMP_BDN_DC_AMT,
+		       	(A.GC_BRKR_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT) AS GC_BDN_DC_TOT_AMT,
+		       	A.GC_BRKR_BDN_DC_AMT,
+		       	A.GC_COMP_BDN_DC_AMT,
+		       	(A.CC_BRKR_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT) AS CC_BDN_DC_TOT_AMT,
+		       	A.CC_BRKR_BDN_DC_AMT,
+		       	A.CC_COMP_BDN_DC_AMT,
+		       	(A.DC_BRKR_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) AS DC_BDN_DC_TOT_AMT,
+		       	A.DC_BRKR_BDN_DC_AMT,
+		       	A.DC_COMP_BDN_DC_AMT,
+		       	(A.PRMT_BRKR_BDN_DC_AMT + A.GC_BRKR_BDN_DC_AMT + A.CC_BRKR_BDN_DC_AMT + A.DC_BRKR_BDN_DC_AMT) AS BRKR_DC_TOT_AMT,
+		       	(A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) AS COMP_DC_TOT_AMT,		       	
+		       	A.CLM_DLVRC,
+		       	A.CMS_RATE,
+		       	A.SALE_MRG_AMT,
+		       	A.REAL_MRG_AMT,
+		       	(A.SALE_AMT * A.STL_TG_QTY - A.SALE_MRG_AMT) AS SALE_SET_AMT,
+		       	(A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT) AS COMP_SALE_DC_AMT,
+		       	(A.DLVRC + A.CLM_DLVRC) AS DLVRC_TOT_AMT,
+		       	A.DC_COMP_BDN_DC_AMT AS COMP_BDN_DLVRC_DC_AMT,
+		       	((A.SALE_AMT * A.STL_TG_QTY) - A.SALE_MRG_AMT - (A.PRMT_COMP_BDN_DC_AMT + A.GC_COMP_BDN_DC_AMT + A.CC_COMP_BDN_DC_AMT + A.DC_COMP_BDN_DC_AMT) + A.DLVRC + A.CLM_DLVRC) AS SET_TOT_AMT,
+		       	FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM,
+		       	A.SYS_REG_DTM,
+		       	FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM,
+		       	A.SYS_UPD_DTM
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+       	   AND 	A.STL_NO = B.STL_NO
+           AND 	A.COMP_NO = B.COMP_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlNo != null and stlNo != ''">
+            	AND A.STL_NO = #{stlNo}
+            </if>
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>            
+		
+		 ORDER BY A.TOTAL_DT,
+		       	  A.COMP_NO,
+		       	  A.ST_ID,
+		       	  A.STL_NO,
+		       	  A.DTL_SEQ
+
+		<include refid="bizCommon.pageSql" />
+					
+	</select>
+	
+	<select id="pageListSettlementCompleteDtlCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageListSettlementCompleteDtlCount
+			Description : 정산 완료 상세 내역
+		-->
+		SELECT	COUNT(1)
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+       	   AND 	A.STL_NO = B.STL_NO
+           AND 	A.COMP_NO = B.COMP_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlNo != null and stlNo != ''">
+            	AND A.STL_NO = #{stlNo}
+            </if>		
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>  
+			
+	</select>
+
+	<select id="listSettlementCompleteTaxInvoice" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.listSettlementCompleteTaxInvoice
+			Description : 세금계산서 내역
+		-->
+		SELECT 	'01' AS TAX_TYPE,
+		       	A.STL_END_DT,
+	           	'4318800293' AS DCG_BIZ_NO,
+	           	'' AS DCG_BIZ_NO2,
+	           	'(주)디시지' AS DCG_COMP_NM,
+	           	'박선균, 유병석' AS DCG_CEO_NM,
+	           	'서울 중구 마장로 3, 8층(신당동, 맥스타일)' AS DCG_PRCL_ADDR,
+	           	'도소매' AS DCG_BIZ,
+	           	'전자상거래' AS DCG_BIZ_TP,
+	           	'dcg002@dcgworld.com' AS DCG_DLGT_EMAIL,	       
+		       	C.BIZ_NO,
+		       	'' AS COL1,
+		       	C.COMP_NM,
+		       	C.CEO_NM,
+		       	C.PRCL_ADDR,
+		       	C.BIZ_CDTS AS BIZ,
+		       	C.BIZ_TP,
+		       	C.DLGT_EMAIL,
+		       	'' AS COL2,
+            	ROUND(IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) / 1.1 AS UNSIGNED), 0), 0) AS PROV_AMT,
+		       	ROUND(IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) AS UNSIGNED), 0) - IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) / 1.1 AS UNSIGNED), 0), 0) AS PROV_TAX_AMT,
+		       	'' AS COL3,
+		       	SUBSTRING(LAST_DAY(A.STL_END_DT),9,2) AS STL_END_DAY,
+		       	'통합몰 수수료' AS ITEM,
+		       	'' AS COL4,
+		       	'' AS COL5,
+		       	'' AS COL6,
+            	ROUND(IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) / 1.1 AS UNSIGNED), 0), 0) AS PROV_AMT1,
+		       	ROUND(IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) AS UNSIGNED), 0) - IFNULL(CAST((A.MRG_AMT + A.BRKR_BDN_DC_AMT) / 1.1 AS UNSIGNED), 0), 0) AS PROV_TAX_AMT1,
+		       	'' AS COL7,
+		       	'' AS COL8,
+		       	'' AS COL9,
+		       	'' AS COL10,
+		       	'' AS COL11,
+		       	'' AS COL12,
+		       	'' AS COL13,
+		       	'' AS COL14,
+		       	'' AS COL15,
+		       	'' AS COL16,
+		       	'' AS COL17,
+		       	'' AS COL18,
+		       	'' AS COL19,
+		       	'' AS COL20,
+		       	'' AS COL21,
+		       	'' AS COL22,
+		       	'' AS COL23,
+		       	'' AS COL24,
+		       	'' AS COL25,
+		       	'' AS COL26,
+		       	'' AS COL27,
+		       	'' AS COL28,
+		       	'' AS COL29,
+		       	'' AS COL30,
+		       	'' AS COL31,
+		       	'' AS COL32,
+		       	'' AS COL33,
+		       	'' AS COL34,
+		       	'' AS COL35,
+		       	'01' AS RCPT_GB
+		  FROM 	COMPANY_SETTLE_BASE A,
+		       	COMPANY_BASE C
+		 WHERE 	1=1
+		   AND 	A.COMP_NO = C.COMP_NO
+		   AND 	A.REAL_STL_AMT != 0
+            <if test="stlNos != null">
+				<foreach collection="stlNos" item="item" separator="," open="AND A.STL_NO IN (" close=" ) " >
+					#{item }
+				</foreach>
+			</if>                   	   
+            <if test="compNos != null">
+				<foreach collection="compNos" item="item" separator="," open="AND C.COMP_NO IN (" close=" ) " >
+					#{item }
+				</foreach>
+			</if>
+            <if test="stIds != null">
+				<foreach collection="stIds" item="item" separator="," open="AND A.ST_ID IN (" close=" ) " >
+					#{item }
+				</foreach>
+			</if>
+            <if test="stlOrders != null">
+				<foreach collection="stlOrders" item="item" separator="," open="AND A.STL_ORDER IN (" close=" ) " >
+					#{item }
+				</foreach>
+			</if>
+								
+		 ORDER BY A.COMP_NO,
+		          A.STL_ORDER,
+		          A.ST_ID
+
+	</select>
+	
+	<update id="updateSettlementCompletePvdStatUpdate" parameterType="biz.app.settlement.model.SettlementPO">
+		<!--
+			Query Name : settlement.updateSettlementCompletePvdStatUpdate
+			Description : updateSettlementCompletePvdStatUpdate
+		-->
+		UPDATE	COMPANY_SETTLE_BASE 
+		   SET  PVD_STAT_CD	= #{pvdStatCd},
+				SYS_UPDR_NO	= #{sysUpdrNo},
+				SYS_UPD_DTM	= NOW()
+		 WHERE	1=1
+		   AND	STL_NO		= #{stlNo}
+	</update>
+
+	<select id="pageListSettlementInfo" resultType="biz.app.settlement.model.SettlementVO" >
+		<!--
+			Query Name : settlement.pageListSettlementInfo
+			Description : 매출 정보 내역
+		-->
+		SELECT	A.TOTAL_DT,
+				B.STL_ORDER,
+		       	A.COMP_NO,
+		       	C.COMP_NM,
+		       	A.ST_ID,
+		       	FN_GET_SITE_NAME(A.ST_ID) AS ST_NM,
+		       	A.DTL_SEQ,
+		       	A.STL_NO,
+       			(SELECT DTL_NM
+		           FROM CODE_DETAIL 
+		          WHERE GRP_CD = 'STL_ORD_TP' 
+		            AND DTL_CD = A.STL_ORD_TP_CD
+		            AND SYS_DEL_YN = 'N'
+		   		) AS STL_ORD_TP_NM,		       	
+		       	A.ORD_NO,
+		       	A.ORD_DTL_SEQ,
+		       	A.CLM_NO,
+		       	A.CLM_DTL_SEQ,
+		       	A.ORD_NM,
+		       	A.ORDR_ID,
+		       	A.ACPT_DTM,
+		       	A.GOODS_ID,
+		       	A.GOODS_NM,
+		       	A.ITEM_NO,
+		       	A.ITEM_NM,
+		       	A.STL_TG_QTY,
+		       	A.SALE_AMT,
+		        (A.SALE_AMT * A.STL_TG_QTY) AS SALE_TOT_AMT,
+		       	FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM,
+		       	A.SYS_REG_DTM,
+		       	FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM,
+		       	A.SYS_UPD_DTM
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+		   AND 	A.STL_NO = B.STL_NO
+       	   AND 	A.COMP_NO = B.COMP_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+		   AND  B.REAL_STL_AMT != 0
+		   <!-- AND  C.UP_COMP_NO != 0 -->
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>            
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+
+		 ORDER BY A.TOTAL_DT,
+				  B.STL_ORDER,
+		       	  A.COMP_NO,
+		       	  A.ST_ID,
+		       	  A.STL_NO,
+		       	  A.DTL_SEQ
+
+		<include refid="bizCommon.pageSql" />
+	       	  
+	</select>
+	
+	<select id="pageListSettlementInfoCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageListSettlementInfoCount
+			Description : 매출 정보 내역
+		-->
+		SELECT	COUNT(1)
+		  FROM 	COMPANY_SETTLE_TOTAL_DETAIL A,
+		        COMPANY_SETTLE_BASE B,
+		     	COMPANY_BASE C
+		 WHERE 	1=1
+		   AND 	A.STL_NO = B.STL_NO
+		   AND 	B.COMP_NO = C.COMP_NO
+		   AND  B.REAL_STL_AMT != 0
+		   AND  C.UP_COMP_NO != 0
+            <if test="stlMonth != null and stlMonth != ''">
+            	AND B.STL_MONTH = #{stlMonth}
+            </if>		   
+            <if test="stId != null and stId != ''">
+            	AND A.ST_ID = #{stId}
+            </if>
+            <if test="stlOrder != null and stlOrder != ''">
+            	AND B.STL_ORDER = #{stlOrder}
+            </if>            
+	        <if test='"Y" == showAllLowCompany'>
+	        	AND C.UP_COMP_NO = #{compNo}
+	        </if>			
+	        <if test='"Y" != showAllLowCompany'>
+	            <if test="lowCompNo != null and lowCompNo != ''">
+	            	AND A.COMP_NO = #{lowCompNo} AND C.UP_COMP_NO = #{compNo}
+	            </if>
+	            <if test="lowCompNo == null or lowCompNo == ''">
+	                <if test="compNo != null and compNo != ''">
+	            		AND A.COMP_NO = #{compNo}
+	                </if>
+	            </if>
+	        </if>
+	       	  
+	</select>	
+	
+	<select id="pageGsPntHist" resultType="biz.app.settlement.model.GsPntHistVO" >
+		<!--
+			Query Name : settlement.pageGsPntHist
+			Description : GS&포인트 내역
+		-->
+		SELECT	/* QUERYID(settlement.pageGsPntHist) */
+				A1.GS_PNT_HIST_NO 									/* No */
+				, A1.ORD_NO 										/* 원거래번호 */
+				, A1.DEAL_NO										/* 거래번호 */
+				, A1.DEAL_GB_CD 									/* 거래구분코드 */
+				, A1.SAVE_USE_GB_CD 								/* 적립사용구분코드 */
+				, A1.MBR_NO 										/* user-no */
+				, A1.GSPNT_NO 										/* 포인트 회원번호 */
+				, A1.DEAL_DTM 										/* 거래일시 */
+				, A1.PAY_AMT 										/* 총결제금액 */
+				, A1.SYS_REG_DTM 									/* 포인트 거래일시 */
+				, IF(A1.SAVE_USE_GB_CD = '30', PNT, NULL) AS PNT_USE 	/* 포인트 사용 */
+				, IF(A1.SAVE_USE_GB_CD = '10', PNT, NULL) AS PNT_SAVE 	/* 포인트 적립 */
+				, IF(A1.SAVE_USE_GB_CD = '20', PNT, NULL) AS PNT_CNCL 	/* 포인트 취소 */
+		FROM GS_PNT_HIST A1
+		WHERE 1=1
+		<if test="sysRegDtmStart != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[>=]]> #{sysRegDtmStart}							/* 포인트 거래일자 */
+		</if>
+		<if test="sysRegDtmEnd != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[<=]]> DATE_ADD(#{sysRegDtmEnd},INTERVAL 1 DAY) 	/* 포인트 거래일자 */
+		</if>
+		<choose>
+			<when test="ordNo != null and ordNo != '' and dealNo != null and dealNo != ''">
+				AND 	( A1.ORD_NO = #{ordNo} OR A1.DEAL_NO = #{dealNo} )
+			</when>
+			<when test="ordNo != null and ordNo != ''">
+				AND 	A1.ORD_NO = #{ordNo}		
+			</when>
+			<when test="dealNo != null and dealNo != ''">
+				AND 	A1.DEAL_NO = #{dealNo} 		
+			</when>
+		</choose>
+		<if test="dealGbCd != null and dealGbCd != ''">
+		AND 	A1.DEAL_GB_CD = #{dealGbCd} 											/* 거래구분 */
+		</if>
+		<if test="saveUseGbCd != null and saveUseGbCd != ''">
+		AND 	A1.SAVE_USE_GB_CD = #{saveUseGbCd}										/* 적립사용구분 */
+		</if>
+		<choose>
+			<when test="mbrNo != null and mbrNo != '' and gspntNo != null and gspntNo != ''">
+				AND 	( A1.MBR_NO = #{mbrNo} OR A1.GSPNT_NO = #{gspntNo} )
+			</when>
+			<when test="mbrNo != null and mbrNo != ''">
+				AND 	A1.MBR_NO = #{mbrNo} 	
+			</when>
+			<when test="gspntNo != null and gspntNo != ''">
+				AND 	A1.GSPNT_NO = #{gspntNo} 	
+			</when>
+		</choose>
+		<if test="pnt != null and pnt != ''">
+		AND 	A1.PNT = #{pnt} 														/* 포인트 금액 */
+		</if>
+		ORDER BY A1.GS_PNT_HIST_NO DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageGsPntHistCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name : settlement.pageGsPntHist
+			Description : GS&포인트 내역 카운트
+		-->
+		SELECT	COUNT(1)
+		FROM GS_PNT_HIST A1
+		WHERE 1=1
+		<if test="sysRegDtmStart != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[>=]]> #{sysRegDtmStart}							/* 포인트 거래일자 */
+		</if>
+		<if test="sysRegDtmEnd != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[<=]]> DATE_ADD(#{sysRegDtmEnd},INTERVAL 1 DAY) 	/* 포인트 거래일자 */
+		</if>
+		<choose>
+			<when test="ordNo != null and ordNo != '' and dealNo != null and dealNo != ''">
+				AND 	( A1.ORD_NO = #{ordNo} OR A1.DEAL_NO = #{dealNo} )
+			</when>
+			<when test="ordNo != null and ordNo != ''">
+				AND 	A1.ORD_NO = #{ordNo}		
+			</when>
+			<when test="dealNo != null and dealNo != ''">
+				AND 	A1.DEAL_NO = #{dealNo} 		
+			</when>
+		</choose>
+		<if test="dealGbCd != null and dealGbCd != ''">
+		AND 	A1.DEAL_GB_CD = #{dealGbCd} 											/* 거래구분 */
+		</if>
+		<if test="saveUseGbCd != null and saveUseGbCd != ''">
+		AND 	A1.SAVE_USE_GB_CD = #{saveUseGbCd}										/* 적립사용구분 */
+		</if>
+		<choose>
+			<when test="mbrNo != null and mbrNo != '' and gspntNo != null and gspntNo != ''">
+				AND 	( A1.MBR_NO = #{mbrNo} OR A1.GSPNT_NO = #{gspntNo} )
+			</when>
+			<when test="mbrNo != null and mbrNo != ''">
+				AND 	A1.MBR_NO = #{mbrNo} 	
+			</when>
+			<when test="gspntNo != null and gspntNo != ''">
+				AND 	A1.GSPNT_NO = #{gspntNo} 	
+			</when>
+		</choose>
+		<if test="pnt != null and pnt != ''">
+		AND 	A1.PNT = #{pnt} 														/* 포인트 금액 */
+		</if>
+	</select>
+	
+	<select id="getGsPntHistTotal" resultType="biz.app.settlement.model.GsPntHistVO" >
+		<!--
+			Query Name : settlement.getGsPntHistTotal
+			Description : GS&포인트 총금액 조회
+		-->
+		SELECT	/* QUERYID(settlement.getGsPntHistTotal) */
+				SUM(IF(A1.SAVE_USE_GB_CD = '30', PNT, 0)) AS TOTAL_PNT_USE 	/* 포인트 사용 */
+				, SUM(IF(A1.SAVE_USE_GB_CD = '10', PNT, 0)) AS TOTAL_PNT_SAVE 	/* 포인트 적립 */
+				, SUM(IF(A1.SAVE_USE_GB_CD = '20', PNT, 0)) AS TOTAL_PNT_CNCL 	/* 포인트 취소 */
+		FROM GS_PNT_HIST A1
+		WHERE 1=1
+		<if test="sysRegDtmStart != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[>=]]> #{sysRegDtmStart}							/* 포인트 거래일자 */
+		</if>
+		<if test="sysRegDtmEnd != null">
+		AND 	A1.SYS_REG_DTM <![CDATA[<=]]> DATE_ADD(#{sysRegDtmEnd},INTERVAL 1 DAY) 	/* 포인트 거래일자 */
+		</if>
+		<choose>
+			<when test="ordNo != null and ordNo != '' and dealNo != null and dealNo != ''">
+				AND 	( A1.ORD_NO = #{ordNo} OR A1.DEAL_NO = #{dealNo} )
+			</when>
+			<when test="ordNo != null and ordNo != ''">
+				AND 	A1.ORD_NO = #{ordNo}		
+			</when>
+			<when test="dealNo != null and dealNo != ''">
+				AND 	A1.DEAL_NO = #{dealNo} 		
+			</when>
+		</choose>
+		<if test="dealGbCd != null and dealGbCd != ''">
+		AND 	A1.DEAL_GB_CD = #{dealGbCd} 											/* 거래구분 */
+		</if>
+		<if test="saveUseGbCd != null and saveUseGbCd != ''">
+		AND 	A1.SAVE_USE_GB_CD = #{saveUseGbCd}										/* 적립사용구분 */
+		</if>
+		<choose>
+			<when test="mbrNo != null and mbrNo != '' and gspntNo != null and gspntNo != ''">
+				AND 	( A1.MBR_NO = #{mbrNo} OR A1.GSPNT_NO = #{gspntNo} )
+			</when>
+			<when test="mbrNo != null and mbrNo != ''">
+				AND 	A1.MBR_NO = #{mbrNo} 	
+			</when>
+			<when test="gspntNo != null and gspntNo != ''">
+				AND 	A1.GSPNT_NO = #{gspntNo} 	
+			</when>
+		</choose>
+		<if test="pnt != null and pnt != ''">
+		AND 	A1.PNT = #{pnt} 														/* 포인트 금액 */
+		</if>
+	</select>
+	
+	<resultMap type="biz.app.settlement.model.SettlementListVO" id="pageOrderOrgStlmMap">
+    	<result property="dlvrcNo" column="DLVRC_NO"/>
+    	
+    	<collection property="orderDetalListVO" ofType="biz.app.settlement.model.SettlementListVO">
+    		<result property="ordNo" column="ORD_NO"/>
+			<result property="ordDtlSeq" column="ORD_DTL_SEQ"/>
+    		<result property="stId" column="ST_ID"/>
+			<result property="stNm" column="ST_NM"/>
+			<result property="ordMdaCd" column="ORD_MDA_CD"/>
+			<result property="ordAcptDtm" column="ORD_ACPT_DTM"/>
+			<result property="ordCpltDtm" column="ORD_CPLT_DTM"/>
+			<result property="ordrId" column="ORDR_ID"/>
+			<result property="ordNm" column="ORD_NM"/>
+			<result property="ordrMobile" column="ORDR_MOBILE"/>
+			<result property="compGbCd" column="COMP_GB_CD"/>
+			<result property="compNm" column="COMP_NM"/>
+			<result property="bndNmKo" column="BND_NM_KO"/>
+			<result property="goodsNm" column="GOODS_NM"/>
+			<result property="goodsId" column="GOODS_ID"/>
+			<result property="itemNm" column="ITEM_NM"/>
+			<result property="ordDtlStatCd" column="ORD_DTL_STAT_CD"/>
+			<result property="purConfDtm" column="HIST_STRT_DTM"/>
+			<result property="ordCclStatCd" column="ORD_CCL_STAT_CD"/>
+			<result property="ordCclCpltDtm" column="ORD_CCL_CPLT_DTM"/>
+			<result property="ordDtlStatCdNm" column="ORD_DTL_STAT_CD_NM"/>
+			<result property="ordDtlStatNm" column="ORD_DTL_STAT_NM"/>
+			<result property="clmIngYn" column="CLM_ING_YN"/>
+			<result property="ordQty" column="ORD_QTY"/>
+			<result property="cncQty" column="CNC_QTY"/>
+			<result property="rmnOrdQty" column="RMN_ORD_QTY"/>
+			<result property="rtnQty" column="RTN_QTY"/>
+			<result property="rtnCpltQty" column="RTN_CPLT_QTY"/>
+			<result property="rtnIngQty" column="RTN_ING_QTY"/>
+			<result property="clmExcIngQty" column="CLM_EXC_ING_QTY"/>
+			<result property="saleAmt" column="SALE_AMT"/>
+			<result property="prmtDcAmt" column="PRMT_DC_AMT"/>
+			<result property="cpDcAmt" column="CP_DC_AMT"/>
+			<result property="paySumAmt" column="PAY_SUM_AMT"/>
+			<result property="adrsNm" column="ADRS_NM"/>
+			<result property="mobile" column="MOBILE"/>
+			<result property="roadAddr" column="ROAD_ADDR"/>
+			<result property="roadDtlAddr" column="ROAD_DTL_ADDR"/>
+			<result property="compNo" column="COMP_NO"/>
+			<result property="mbrNo" column="MBR_NO"/>
+			<result property="ordStatCd" column="ORD_STAT_CD"/>
+			<result property="chnlId" column="CHNL_ID"/>
+			<result property="chnlNm" column="CHNL_NM"/>
+			<result property="ordrTel" column="ORDR_TEL"/>
+			<result property="ordrEmail" column="ORDR_EMAIL"/>
+			<result property="outsideOrdNo" column="OUTSIDE_ORD_NO"/>
+			<result property="ordDtlCnt" column="ORD_DTL_CNT"/>
+			<result property="itemNo" column="ITEM_NO"/>
+			<result property="vldOrdQty" column="VLD_ORD_QTY"/>
+			<result property="payAmt" column="PAY_AMT"/>
+			<result property="compGoodsId" column="COMP_GOODS_ID"/>
+			<result property="compItemId" column="COMP_ITEM_ID"/>
+			<result property="dispClsfNo" column="DISP_CLSF_NO"/>
+			<result property="dlvrNo" column="DLVR_NO"/>
+			<result property="ordDlvraNo" column="ORD_DLVRA_NO"/>
+			<result property="tel" column="TEL"/>
+			<result property="realDlvrAmt" column="REAL_DLVR_AMT"/>
+			<result property="goodsCstrtTpCd" column="GOODS_CSTRT_TP_CD"/>
+			<result property="dlvrPrcsTpCd" column="DLVR_PRCS_TP_CD"/>
+			<result property="mkiGoodsYn" column="MKI_GOODS_YN"/>
+			<result property="rsvGoodsYn" column="RSV_GOODS_YN"/>
+			<result property="frbGoodsYn" column="FRB_GOODS_YN"/>
+			<result property="pakGoodsYn" column="PAK_GOODS_YN"/>
+			<result property="ordNoPayAmt" column="ORD_NO_PAY_AMT"/>
+			<result property="compTpCd" column="COMP_TP_CD"/>
+    	</collection>
+    </resultMap>
+
+    <select id="pageOrderOrgStlm" resultMap="pageOrderOrgStlmMap">
+		<!--
+			Query Name : settlement.pageOrderOrgStlm
+			Description : 정산 목록 페이징 조회
+		-->
+		SELECT		/* settlement.pageOrderOrgStlm */
+			ORD_INFO.*
+			, CONCAT(ORD_INFO.ORD_NO,' (', FORMAT((SELECT SUM(PAY_AMT) FROM PAY_BASE 
+													WHERE ORD_NO = ORD_INFO.ORD_NO 
+													  AND ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+													  AND PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}' ), 0),'원)' ) AS ORD_NO_PAY_AMT
+		FROM(
+			SELECT
+				ODM.ORD_NO
+				, ODM.ST_ID
+				, SSI.ST_NM
+				, ODM.MBR_NO
+				, ODM.ORD_STAT_CD
+				, ODM.ORD_MDA_CD
+				, ODM.CHNL_ID
+				, CSI.CHNL_NM
+				, ODM.ORD_NM
+				, ODM.ORDR_ID
+				, ODM.ORDR_TEL
+				, ODM.ORDR_MOBILE
+				, ODM.ORDR_EMAIL
+				, ODM.ORD_ACPT_DTM
+				, ODM.ORD_CPLT_DTM
+				, ODM.OUTSIDE_ORD_NO
+				, ODM.ORD_DTL_CNT
+				, ODM.ORD_DTL_SEQ
+				, ODM.ORD_DTL_STAT_CD
+				, ODM.HIST_STRT_DTM
+				, IF(ODM.RMN_ORD_QTY = 0, '주문취소', (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'ORD_DTL_STAT' AND DTL_CD = ODM.ORD_DTL_STAT_CD)) ORD_DTL_STAT_CD_NM
+				, IF(ODM.RMN_ORD_QTY = 0, '주문취소', (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'ORD_DTL_STAT' AND DTL_CD = ODM.ORD_DTL_STAT_CD)) ORD_DTL_STAT_NM
+				, ODM.GOODS_ID
+				, ODM.GOODS_NM
+				, ODM.ITEM_NO
+				, ODM.ITEM_NM
+				, ODM.ORD_QTY
+				, ODM.CNC_QTY
+				, ODM.RTN_QTY
+				, ODM.RMN_ORD_QTY
+				, FN_GET_ORD_CLM_RTN_CPLT_QTY(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS RTN_CPLT_QTY							/* 반품 완료 수량 */
+				, ODM.RTN_QTY - FN_GET_ORD_CLM_RTN_CPLT_QTY(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS RTN_ING_QTY									/* 반품 진행 수량 */
+				, FN_GET_ORDER_CLAIM_EXC_QTY(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS CLM_EXC_ING_QTY	/* 클레임 교환 진행 수량 */
+				, ODM.RMN_ORD_QTY - FN_GET_ORD_CLM_RTN_CPLT_QTY(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS VLD_ORD_QTY 							/* 유효 주문 수량 */
+				, FN_GET_ORDER_CLAIM_ING_YN(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS CLM_ING_YN 			/* 클레임 진행 여부 */
+				, ODM.SALE_AMT
+				, ODM.PAY_AMT
+				, ODM.RMN_ORD_QTY * ODM.PAY_AMT + ODM.RMN_PAY_AMT  AS PAY_SUM_AMT
+				, ODM.COMP_NO
+				, ODM.COMP_GB_CD
+				, ODM.COMP_NM
+				, ODM.COMP_GOODS_ID				/* 업체상품 아이디  */
+				, ODM.COMP_ITEM_ID				/* 업체단품 아이디 */
+				, ODM.DISP_CLSF_NO				/* 전시 분류 번호 */
+				, ODM.DLVR_NO					/* 배송 번호 */
+				, ODM.ORD_DLVRA_NO				/* 주문 배송지 번호 */
+				, ODM.ADRS_NM
+				, ODM.TEL
+				, ODM.MOBILE
+				, ODM.ROAD_ADDR
+				, ODM.ROAD_DTL_ADDR
+				, BB.BND_NM_KO
+				, FN_GET_ORDER_DTL_PRMT_DC_AMT(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS PRMT_DC_AMT		/* 프로모션 할인 금액 */
+				, FN_GET_ORDER_DTL_CP_DC_AMT(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS CP_DC_AMT			/* 쿠폰 할인 금액 */
+				, ODM.DLVRC_NO					/* 배송비 번호 */
+				, ODM.REAL_DLVR_AMT				/* 실배송비 */
+				, GB.GOODS_CSTRT_TP_CD
+				, ODM.DLVR_PRCS_TP_CD
+				, ODM.COMP_TP_CD
+				, IFNULL(ODM.MKI_GOODS_YN, 'N') AS MKI_GOODS_YN
+				, IFNULL(ODM.RSV_GOODS_YN, 'N') AS RSV_GOODS_YN
+				, IF(ODM.PAK_GOODS_ID IS NULL, 'N', 'Y') AS PAK_GOODS_YN
+				, (SELECT IF(COUNT(*) > 0, 'Y' , 'N' ) FROM ORD_DTL_CSTRT WHERE ORD_NO = ODM.ORD_NO AND ORD_DTL_SEQ = ODM.ORD_DTL_SEQ AND CSTRT_GOODS_GB_CD = '${@framework.common.constants.CommonConstants@CSTRT_GOODS_GB_30}') AS FRB_GOODS_YN
+				, ODM.ORD_CCL_STAT_CD 
+				, ODM.ORD_CCL_CPLT_DTM 
+			FROM	(
+				 SELECT	OB.ORD_NO
+					, OB.ST_ID
+					, OB.MBR_NO
+					, OB.ORD_STAT_CD
+					, OB.ORD_MDA_CD
+					, OB.CHNL_ID
+					, OB.ORD_NM
+					, OB.ORDR_ID
+					, OB.ORDR_TEL
+					, OB.ORDR_MOBILE
+					, OB.ORDR_EMAIL
+					, OB.ORD_ACPT_DTM
+					, OB.ORD_CPLT_DTM
+					, OB.OUTSIDE_ORD_NO
+					, OB.ORD_DTL_CNT
+					, OD.ORD_DTL_SEQ
+					, OD.ORD_DTL_STAT_CD
+					, OD.GOODS_ID
+					, IF(OD.PAK_GOODS_ID IS NOT NULL, GB.GOODS_NM, OD.GOODS_NM) AS GOODS_NM
+					, OD.ITEM_NO
+					, OD.ITEM_NM
+					, OD.ORD_QTY
+					, OD.CNC_QTY
+					, OD.RTN_QTY
+					, OD.RMN_ORD_QTY
+					, OD.SALE_AMT
+					, OD.PAY_AMT
+					, OD.RMN_PAY_AMT
+					, OD.COMP_NO
+					, CP.COMP_GB_CD
+					, CP.COMP_NM
+					, OD.COMP_GOODS_ID
+					, OD.COMP_ITEM_ID
+					, OD.DISP_CLSF_NO
+					, OD.DLVR_NO
+					, OD.DLVRC_NO
+					, OD.ORD_DLVRA_NO
+					, ODA.ADRS_NM
+					, ODA.TEL
+					, ODA.MOBILE
+					, ODA.ROAD_ADDR
+					, ODA.ROAD_DTL_ADDR
+					, DC.REAL_DLVR_AMT
+					, CASE WHEN CP.COMP_TP_CD = '${@framework.common.constants.CommonConstants@COMP_TP_20}' THEN '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}' ELSE OB.DLVR_PRCS_TP_CD END AS DLVR_PRCS_TP_CD
+					, OD.MKI_GOODS_YN
+					, OD.RSV_GOODS_YN
+					, OD.PAK_GOODS_ID
+					, CP.COMP_TP_CD
+					, ODH.HIST_STRT_DTM
+					, OD.ORD_CCL_STAT_CD 
+					, OD.ORD_CCL_CPLT_DTM 
+				FROM
+					 ORDER_BASE OB
+					, ORDER_DETAIL OD
+					LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+					, ORDER_DLVRA ODA
+					, COMPANY_BASE CP
+					, DELIVERY_CHARGE DC
+					, GOODS_BASE GB
+				WHERE	OB.ORD_NO = OD.ORD_NO
+				AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+				AND     OD.COMP_NO = CP.COMP_NO
+				AND     OD.DLVRC_NO = DC.DLVRC_NO
+				AND     OD.GOODS_ID = GB.GOODS_ID
+				<include refid="settlement.pageOrderOrgStlmWhere" />
+				ORDER BY OB.ORD_ACPT_DTM DESC, OB.ORD_NO, OD.ORD_DTL_SEQ ASC
+				<include refid="bizCommon.pageSql" />
+				) ODM
+				, ST_STD_INFO SSI
+				, CHNL_STD_INFO CSI
+				, GOODS_BASE GB
+				LEFT OUTER JOIN BRAND_BASE BB ON (BB.BND_NO = GB.BND_NO)
+			WHERE	ODM.ST_ID = SSI.ST_ID
+			AND		ODM.CHNL_ID = CSI.CHNL_ID
+			AND     GB.GOODS_ID = ODM.GOODS_ID
+			ORDER BY ODM.ORD_ACPT_DTM DESC, ODM.ORD_NO, ODM.ORD_DTL_SEQ ASC)
+		ORD_INFO
+    </select>
+
+	<resultMap type="biz.app.settlement.model.SettlementListExcelVO" id="orderOrgStlmExcelMap">
+    	<id property="dlvrcNo" column="DLVRC_NO"/>
+    	
+    	<collection property="orderDetalListVO" ofType="biz.app.settlement.model.SettlementListExcelVO">
+    		<result property="ordNo" column="ORD_NO"/>
+			<result property="ordDtlSeq" column="ORD_DTL_SEQ"/>
+    		<result property="mbrNo" column="MBR_NO"/>
+			<result property="ordNm" column="ORD_NM"/>
+			<result property="ordrEmail" column="ORDR_EMAIL"/>
+			<result property="ordrMobile" column="ORDR_MOBILE"/>
+			<result property="ordrId" column="ORDR_ID"/>
+			<result property="mbrGrdNm" column="MBR_GRD_NM"/>
+			<result property="compGbCd" column="COMP_GB_CD"/>
+			<result property="compGbNm" column="COMP_GB_NM"/>
+			<result property="phsCompNm" column="PHS_COMP_NM"/>
+			<result property="goodsId" column="GOODS_ID"/>
+			<result property="itemNo" column="ITEM_NO"/>
+			<result property="goodsCstrtTpCd" column="GOODS_CSTRT_TP_CD"/>
+			<result property="goodsCstrtTpNm" column="GOODS_CSTRT_TP_NM"/>
+			<result property="goodsNm" column="GOODS_NM"/>
+			<result property="itemNm" column="ITEM_NM"/>
+			<result property="ordDtlStatCd" column="ORD_DTL_STAT_CD"/>
+			<result property="purConfDtm" column="HIST_STRT_DTM"/>
+			<result property="ordCclStatCd" column="ORD_CCL_STAT_CD"/>
+			<result property="ordCclCpltDtm" column="ORD_CCL_CPLT_DTM"/>
+			<result property="ordDtlStatCdNm" column="ORD_DTL_STAT_CD_NM"/>
+			<result property="splAmt" column="SPL_AMT"/>
+			<result property="splAmtTot" column="SPL_AMT_TOT"/>
+			<result property="orgSaleAmt" column="ORG_SALE_AMT"/>
+			<result property="saleAmt" column="SALE_AMT"/>
+			<result property="prmtDcAmt" column="PRMT_DC_AMT"/>
+			<result property="cpDcAmt" column="CP_DC_AMT"/>
+			<result property="cartCpDcAmt" column="CART_CP_DC_AMT"/>
+			<result property="payAmt" column="PAY_AMT"/>
+			<result property="ordQty" column="ORD_QTY"/>
+			<result property="cncQty" column="CNC_QTY"/>
+			<result property="rtnQty" column="RTN_QTY"/>
+			<result property="excQty" column="EXC_QTY"/>
+			<result property="clmExcIngQty" column="CLM_EXC_ING_QTY"/>
+			<result property="prmtDcSumAmt" column="PRMT_DC_SUM_AMT"/>
+			<result property="cpSumAmt" column="CP_SUM_AMT"/>
+			<result property="cartCpSumAmt" column="CART_CP_SUM_AMT"/>
+			<result property="cpDcSumAmt" column="CP_DC_SUM_AMT"/>
+			<result property="paySumAmt" column="PAY_SUM_AMT"/>
+			<result property="orgDlvrAmt" column="ORG_DLVR_AMT"/>
+			<result property="dlvrcCpDcAmt" column="DLVRC_CP_DC_AMT"/>
+			<result property="realDlvrAmt" column="REAL_DLVR_AMT"/>
+			<result property="realDlvrAmtString" column="REAL_DLVR_AMT_STRING"/>
+			<result property="excDlvrAmt" column="EXC_DLVR_AMT"/>
+			<result property="rtnDlvrAmt" column="RTN_DLVR_AMT"/>
+			<result property="stlAmt" column="STL_AMT"/>
+			<result property="stlAmtTot" column="STL_AMT_TOT"/>
+			<result property="ooCpltDtm" column="OO_CPLT_DTM"/>
+			<result property="bizNo" column="BIZ_NO"/>
+			<result property="payMeansNm" column="PAY_MEANS_NM"/>
+			<result property="bankNm" column="BANK_NM"/>
+			<result property="acctNo" column="ACCT_NO"/>
+			<result property="ooaNm" column="OOA_NM"/>
+			<result property="cashRctNo" column="CASH_RCT_NO"/>
+			<result property="cfmRstCd" column="CFM_RST_CD"/>
+			<result property="dealNo" column="DEAL_NO"/>
+			<result property="cfmNo" column="CFM_NO"/>
+			<result property="ordAcptDtm" column="ORD_ACPT_DTM"/>
+			<result property="payCpltDtm" column="PAY_CPLT_DTM"/>
+			<result property="payCpltDtmVirtualAccount" column="PAY_CPLT_DTM_VIRTUAL_ACCOUNT"/>
+			<result property="adrsNm" column="ADRS_NM"/>
+			<result property="mobile" column="MOBILE"/>
+			<result property="postNoNew" column="POST_NO_NEW"/>
+			<result property="roadAddr" column="ROAD_ADDR"/>
+			<result property="roadDtlAddr" column="ROAD_DTL_ADDR"/>
+			<result property="rfdAmt" column="RFD_AMT"/>
+			<result property="cashRefundAmt" column="CASH_REFUND_AMT"/>
+			<result property="cardRefundAmt" column="CARD_REFUND_AMT"/>
+			<result property="payRefundAmt" column="PAY_REFUND_AMT"/>
+			<result property="clmDlvrcAmt" column="CLM_DLVRC_AMT"/>
+			<result property="clmRsnCd" column="CLM_RSN_CD"/>
+			<result property="clmRsnNm" column="CLM_RSN_NM"/>
+			<result property="clmRsnContent" column="CLM_RSN_CONTENT"/>
+			<result property="refundBankCd" column="REFUND_BANK_CD"/>
+			<result property="refundAcctNo" column="REFUND_ACCT_NO"/>
+			<result property="refundOoaNm" column="REFUND_OOA_NM"/>
+			<result property="clmAcptDtm" column="CLM_ACPT_DTM"/>
+			<result property="clmCpltDtm" column="CLM_CPLT_DTM"/>
+			<result property="mdlNm" column="MDL_NM"/>
+			<result property="category" column="CATEGORY"/>
+			<result property="bndNmKo" column="BND_NM_KO"/>
+			<result property="mmft" column="MMFT"/>
+			<result property="ctrOrg" column="CTR_ORG"/>
+			<result property="subGoodsNm" column="SUB_GOODS_NM"/>
+			<result property="dlvrPrcsTpNm" column="DLVR_PRCS_TP_NM"/>
+			<result property="dlvrNo" column="DLVR_NO"/>
+			<result property="hdcCd" column="HDC_CD"/>
+			<result property="hdcNm" column="HDC_NM"/>
+			<result property="invNo" column="INV_NO"/>
+			<result property="dlvrMemo" column="DLVR_MEMO"/>
+			<result property="dlvrDemand" column="DLVR_DEMAND"/>
+			<result property="dlvrCmdDtm" column="DLVR_CMD_DTM"/>
+			<result property="dlvrCpltDtm" column="DLVR_CPLT_DTM"/>
+			<result property="mkngRcvYn" column="MKNG_RCV_YN"/>
+			<result property="cpNm" column="CP_NM"/>
+    	</collection>
+    </resultMap>
+
+    <select id="orderOrgStlmExcel" resultMap="orderOrgStlmExcelMap">
+		<!--
+			Query Name : settlement.orderOrgStlmExcel
+			Description : 정산 목록 엑셀 쿼리 조회
+		-->
+        SELECT 	/* settlement.orderOrgStlmStlmExcel */
+        			ODM.ORD_NO
+        			, ODM.DLVRC_NO
+        			, ODM.ORD_DTL_SEQ
+	                , ODM.MBR_NO			/* 회원 번호 */
+	                , ODM.ORD_NM
+	                , ODM.ORDR_EMAIL
+	                , ODM.ORDR_MOBILE
+	                , ODM.ORDR_ID
+	                , (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@MBR_GRD_CD}' AND DTL_CD = MB.MBR_GRD_CD) AS MBR_GRD_NM /*회원 등급 명*/
+	                , ODM.COMP_GB_CD			/* 업체 구분 코드 10:자사 */
+		            ,(SELECT DTL_NM
+			           FROM CODE_DETAIL 
+			          WHERE GRP_CD = 'COMP_GB' 
+			            AND DTL_CD = ODM.COMP_GB_CD	
+			            AND SYS_DEL_YN = 'N'
+			   		) AS COMP_GB_NM
+	                , FN_GET_COMPANY_NAME(S.PHS_COMP_NO) AS PHS_COMP_NM	/* 매입 업체 이름 */
+	                , ODM.GOODS_ID
+	                , ODM.ITEM_NO
+	                , GB.GOODS_CSTRT_TP_CD	/* 상품 구성 유형 - ITEM:단품 ATTR:옵션 SET:세트 PAK:묶음 */
+	                , (SELECT DTL_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'GOODS_CSTRT_TP' AND DTL_CD = GB.GOODS_CSTRT_TP_CD and SYS_DEL_YN != 'Y' and USE_YN = 'Y' ) as GOODS_CSTRT_TP_NM /* 상품상태 */
+	                , ODM.GOODS_NM
+	                , ODM.ITEM_NM
+	                , ODM.ORD_DTL_STAT_CD
+	                , ODM.HIST_STRT_DTM
+					, IF(ODM.RMN_ORD_QTY = 0, '주문취소', (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'ORD_DTL_STAT' AND DTL_CD = ODM.ORD_DTL_STAT_CD)) ORD_DTL_STAT_CD_NM
+					, ODM.SPL_AMT	 		/* 매입가 */
+	                , ODM.ORG_SALE_AMT 		/* 정상가 */
+					, ODM.SALE_AMT /* 판매가 */
+					, FN_GET_ORDER_DTL_PRMT_DC_AMT(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS PRMT_DC_AMT		/* 프로모션 할인 금액 */
+	                , FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '20',  '210') AS CP_DC_AMT		/* 상품 쿠폰 할인 금액 */
+					, FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '20',  '220') AS CART_CP_DC_AMT	/* 장바구니 쿠폰 할인 금액 */
+	                , ODM.PAY_AMT AS PAY_AMT		/* 결제 금액 */
+	                , ODM.ORD_QTY
+					, ODM.CNC_QTY
+					, ODM.RTN_QTY
+					, FN_GET_ORDER_CLAIM_EXC_QTY(ODM.ORD_NO, ODM.ORD_DTL_SEQ) AS CLM_EXC_ING_QTY	/* 클레임 교환 진행 수량 */
+					, (IFNULL(ODM.ORG_SALE_AMT, 0) - IFNULL(ODM.SALE_AMT, 0)) * ODM.ORD_QTY AS PRMT_DC_SUM_AMT 		/*총 상품 할인 금액*/
+					, IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_210}'),0) * ODM.ORD_QTY AS CP_SUM_AMT
+					, IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_220}'),0) * ODM.ORD_QTY + ODM.CART_CP_DC_RMN_AMT AS CART_CP_SUM_AMT
+					, (IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_210}'),0) * ODM.ORD_QTY) + (IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_220}'),0) * ODM.ORD_QTY) + ODM.CART_CP_DC_RMN_AMT AS CP_DC_SUM_AMT
+					, (IFNULL(ODM.SALE_AMT, 0) - IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_210}'), 0) - IFNULL(FN_GET_ORDER_DTL_APL_BNFT(ODM.ORD_NO, ODM.ORD_DTL_SEQ, '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}',  '${@framework.common.constants.CommonConstants@APL_BNFT_TP_220}'), 0)) * ODM.ORD_QTY - ODM.CART_CP_DC_RMN_AMT AS PAY_SUM_AMT		/*총 결제 금액*/
+					, ODM.ORG_DLVR_AMT				/*원 배송비*/
+					, ODM.DLVRC_CP_DC_AMT			/* 배송비 쿠폰 할인 금액 */
+					, ODM.REAL_DLVR_AMT				/* 실배송비 */
+					, CONCAT(IFNULL(FN_GET_CODE_NAME('PAY_MEANS', PB.PAY_MEANS_CD,'Y'), ''), ' ',IFNULL(FN_GET_CODE_NAME('PAY_MEANS', GS_PNT.PAY_MEANS_CD,'Y'),''), ' ',IFNULL(FN_GET_CODE_NAME('PAY_MEANS', MP_PNT.PAY_MEANS_CD,'Y'),'')) AS PAY_MEANS_NM
+					, (SELECT DTL_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'BANK' AND DTL_CD = PB.BANK_CD and SYS_DEL_YN != 'Y' and USE_YN = 'Y' ) as BANK_NM /* 은행명 */
+					, PB.ACCT_NO				/* 계좌 번호 */
+					, PB.OOA_NM				/* 예금주 명 */
+					, CASE WHEN (SELECT MAX(CRGM.CASH_RCT_NO) FROM CASH_RECEIPT_GOODS_MAP CRGM
+		              INNER JOIN CASH_RECEIPT CR
+		              ON    CRGM.CASH_RCT_NO = CR.CASH_RCT_NO
+		              WHERE 1=1 AND CRGM.ORD_CLM_NO = ODM.ORD_NO) IS NOT NULL THEN 'Y' ELSE '' END AS CASH_RCT_NO /* 현금영수증 번호 */
+					, PB.CFM_RST_CD			/* 승인 결과 코드 */
+					, PB.DEAL_NO				/* 거래 번호 */
+					, PB.CFM_NO				/* 승인 번호 */
+					, ODM.ORD_ACPT_DTM
+					, ODM.ORD_CCL_STAT_CD 
+					, ODM.ORD_CCL_CPLT_DTM 
+					, CASE WHEN FN_GET_ORDER_PAY_MEANS_CD(ODM.ORD_NO) != '30' THEN PB.PAY_CPLT_DTM ELSE '' END AS PAY_CPLT_DTM		/* 결제 완료 일시 */
+					, CASE WHEN FN_GET_ORDER_PAY_MEANS_CD(ODM.ORD_NO) = '30' THEN PB.PAY_CPLT_DTM ELSE '' END AS PAY_CPLT_DTM_VIRTUAL_ACCOUNT		/* 가상계좌 결제 완료 일시 */
+					, ODM.ADRS_NM
+	                , ODM.MOBILE
+	                , ODM.POST_NO_NEW			/*수취인 우편번호 */
+	                , ODM.ROAD_ADDR
+	                , ODM.ROAD_DTL_ADDR
+					, PCR.RFD_AMT			/* 환불 금액 */
+					, CD.CASH_REFUND_AMT
+		            , CD.CARD_REFUND_AMT
+		            , CD.PAY_REFUND_AMT
+					, CD.CLM_DLVRC_AMT 		 /* 추가 배송비 */
+		            , CD.CLM_RSN_NM
+		            , CD.CLM_RSN_CONTENTS		/* 클레임 사유 내용 */
+					, PCR.BANK_CD			AS REFUND_BANK_CD			/* 환불 은행 코드 */
+					, PCR.ACCT_NO			AS REFUND_ACCT_NO			/* 환불 계좌 번호 */
+					, PCR.OOA_NM			AS REFUND_OOA_NM					/* 환불 예금주 명 */
+					, CB.ACPT_DTM			AS CLM_ACPT_DTM 		/*접수 일시		  */
+					, CB.CPLT_DTM			AS CLM_CPLT_DTM		/*완료 일시		  */
+					, GB.MDL_NM					/* 모델 명 */
+		            , FN_GET_DISP_CTG_PATH(DG.DISP_CLSF_NO) as CATEGORY /* 카테고리 */
+					, BB.BND_NM_KO					/* 노출 브랜드명 */
+					, GB.MMFT /* 제조사 */
+		            , GB.CTR_ORG /* 원산지 */
+		            ,(
+	        			 SELECT 
+						  	group_concat( if(GB.GOODS_NM='', null, GB.GOODS_NM), ',') 
+						  FROM GOODS_BASE GB    	
+						  	WHERE GB.GOODS_ID IN  
+						  	(					                   
+								SELECT ODC.CSTRT_GOODS_ID 
+								  FROM ORD_DTL_CSTRT ODC	       
+								 WHERE ODC.ORD_NO  = ODM.ORD_NO 
+								 AND ODC.ORD_DTL_SEQ = ODM.ORD_DTL_SEQ
+								 AND ODC.CSTRT_GOODS_GB_CD = '30'								
+							)	
+	        		) AS SUB_GOODS_NM		/*사은품명*/     
+	        		, FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@DLVR_PRCS_TP}', DV.DLVR_PRCS_TP_CD,'Y') AS DLVR_PRCS_TP_NM		/* 배송 처리 유형*/
+	        		, DV.DLVR_NO		/*배송 번호*/
+	        		, DV.HDC_CD		     /* 택배사 코드		    */
+	        		, (SELECT DTL_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'HDC' AND DTL_CD = DV.HDC_CD and SYS_DEL_YN != 'Y' and USE_YN = 'Y' ) as HDC_NM /* 택배사 명 */
+	        		, DV.INV_NO		     /* 송장 번호		    */
+	        		, ODM.DLVR_MEMO			/* 배송 매모 */
+	        		, ODM.DLVR_DEMAND			/* 배송 요청 사항 */
+	        		, DV.DLVR_CMD_DTM			/*배송 일자*/
+				    , DV.DLVR_CPLT_DTM		/*배송 완료 일자*/
+				    , MB.MKNG_RCV_YN		/* 회원 마케팅 수신동의 여부 */
+				    , AB.CP_NM					/*쿠폰명*/
+ 		FROM		(
+					 SELECT	OB.ORD_NO
+				                , OB.ST_ID
+				                , OB.MBR_NO
+				                , OB.ORD_STAT_CD
+				                , OB.ORD_MDA_CD
+				                , OB.CHNL_ID
+				                , OB.ORD_NM
+				                , OB.ORDR_ID
+				                , OB.ORDR_TEL
+				                , OB.ORDR_MOBILE
+				                , OB.ORDR_EMAIL
+				                , OB.ORD_ACPT_DTM
+				                , OB.ORD_CPLT_DTM
+				                , OB.OUTSIDE_ORD_NO
+				                , OB.ORD_DTL_CNT
+				                , OD.ORD_DTL_SEQ
+								, OD.ORD_DTL_STAT_CD
+								, OD.GOODS_ID
+								, IF(OD.PAK_GOODS_ID IS NOT NULL, GB.GOODS_NM, OD.GOODS_NM) AS GOODS_NM
+								, OD.ITEM_NO
+								, OD.ITEM_NM
+								, OD.ORD_QTY
+								, OD.CNC_QTY
+								, OD.RTN_QTY
+								, OD.RMN_ORD_QTY
+								, FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_CPLT_QTY /* 반품 완료 수량 */
+								, OD.SALE_AMT
+								, OD.PAY_AMT
+								, OD.COMP_NO
+								, CP.COMP_NM
+								, CP.COMP_TP_CD
+								, OD.COMP_GOODS_ID
+								, OD.COMP_ITEM_ID
+								, OD.DISP_CLSF_NO
+								, OD.DLVR_NO
+								, OD.DLVRC_NO
+								, OD.ORD_DLVRA_NO
+				                , ODA.ADRS_NM
+				                , ODA.TEL
+				                , ODA.MOBILE
+				                , ODA.ROAD_ADDR
+				                , ODA.ROAD_DTL_ADDR
+				                , ODA.POST_NO_NEW		/*수취인 우편번호*/
+				                , DC.REAL_DLVR_AMT
+				                , DC.ORG_DLVR_AMT
+				                , DC.CP_NO					/* 쿠폰 번호 */
+				                , DC.CP_DC_AMT AS DLVRC_CP_DC_AMT			/* 쿠폰 할인 금액 */
+				                , CASE WHEN CP.COMP_TP_CD = '${@framework.common.constants.CommonConstants@COMP_TP_20}' THEN '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}' ELSE OB.DLVR_PRCS_TP_CD END AS DLVR_PRCS_TP_CD
+				                , OD.MKI_GOODS_YN
+				                , OD.RSV_GOODS_YN
+				                , OD.PAK_GOODS_ID
+				                , ODA.DLVR_MEMO			/* 배송 매모 */
+				                , ODA.DLVR_DEMAND			/* 배송 요청사항 */
+				                , CP.COMP_GB_CD
+				                , (SELECT IFNULL(SUM(RMN_APL_AMT), 0) FROM APL_BNFT 
+									WHERE APL_BNFT_GB_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}' AND APL_BNFT_TP_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_TP_220}'
+									  AND ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+				 				) AS CART_CP_DC_RMN_AMT
+				 				, GP.SPL_AMT
+				 				, GP.ORG_SALE_AMT
+				 				, ODH.HIST_STRT_DTM
+				 				, OD.ORD_CCL_STAT_CD 
+								, OD.ORD_CCL_CPLT_DTM 
+					FROM		ORDER_BASE OB
+				                , ORDER_DETAIL OD
+				                LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+			                  	, ORDER_DLVRA ODA
+			                  	, COMPANY_BASE CP
+			                  	, DELIVERY_CHARGE DC
+			                  	, GOODS_BASE GB
+			                  	, GOODS_PRICE GP
+					WHERE	OB.ORD_NO = OD.ORD_NO
+			        AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+			        AND     OD.COMP_NO = CP.COMP_NO
+			        AND     OD.DLVRC_NO = DC.DLVRC_NO
+			        AND		OD.GOODS_PRC_NO = GP.GOODS_PRC_NO
+			        AND     OD.GOODS_ID = GB.GOODS_ID
+					<include refid="settlement.pageOrderOrgStlmWhere" />
+			        ORDER BY OB.ORD_ACPT_DTM DESC, OB.ORD_NO, OD.ORD_DTL_SEQ ASC
+			        <include refid="bizCommon.pageSql" />
+					) ODM
+					INNER JOIN (SELECT ORD_DTL_CSTRT_NO, ORD_NO, ORD_DTL_SEQ FROM ORD_DTL_CSTRT  GROUP BY ORD_NO, ORD_DTL_SEQ) ODC ON ODC.ORD_NO = ODM.ORD_NO AND ODC.ORD_DTL_SEQ = ODM.ORD_DTL_SEQ
+        			INNER JOIN ST_STD_INFO SSI ON ODM.ST_ID = SSI.ST_ID
+        			INNER JOIN CHNL_STD_INFO CSI ON ODM.CHNL_ID = CSI.CHNL_ID
+        			INNER JOIN (
+						SELECT GB.*, 
+									CAST(FN_SPLIT(FN_GET_GOODS_PRICE(GB.GOODS_ID, '1', '00'), '|', 1) AS UNSIGNED) AS SALE_AMT,
+									CAST(FN_SPLIT(FN_GET_GOODS_PRICE(GB.GOODS_ID, '1', '00'), '|', 7) AS UNSIGNED) AS ORG_SALE_AMT,
+									CAST(FN_SPLIT(FN_GET_GOODS_PRICE(GB.GOODS_ID, '1', '00'), '|', 8) AS UNSIGNED) AS SPL_AMT
+						FROM GOODS_BASE GB
+					) GB ON GB.GOODS_ID = ODM.GOODS_ID
+        			LEFT OUTER JOIN BRAND_BASE BB ON BB.BND_NO   =GB.BND_NO
+        			LEFT OUTER JOIN ORD_DTL_CSTRT_DLVR_MAP ODCDM ON ODC.ORD_DTL_CSTRT_NO = ODCDM.ORD_DTL_CSTRT_NO AND DLGT_YN = 'Y'
+        			LEFT OUTER JOIN MEMBER_BASE MB ON (MB.MBR_NO != 0 AND MB.MBR_NO = ODM.MBR_NO) 
+        			LEFT OUTER JOIN ITEM I ON (GB.GOODS_ID = I.GOODS_ID)
+        			LEFT OUTER JOIN SKU_BASE S ON (I.SKU_CD = S.SKU_CD)
+        			LEFT OUTER JOIN PAY_BASE PB ON (
+                 			ODM.ORD_NO = PB.ORD_NO
+                 			AND PB.PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}'
+                 			AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+                 			AND PB.PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+                 			AND PB.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                 			AND PB.PAY_MEANS_CD != '${@framework.common.constants.CommonConstants@PAY_MEANS_80}'
+                 			AND PB.PAY_MEANS_CD != '${@framework.common.constants.CommonConstants@PAY_MEANS_81}'
+	                )
+	                LEFT OUTER JOIN PAY_BASE GS_PNT ON (
+                 			ODM.ORD_NO = GS_PNT.ORD_NO
+                 			AND GS_PNT.PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}'
+                 			AND GS_PNT.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+                 			AND GS_PNT.PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+                 			AND GS_PNT.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                 			AND GS_PNT.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_80}'
+	                )
+	                LEFT OUTER JOIN PAY_BASE MP_PNT ON (
+                 			ODM.ORD_NO = MP_PNT.ORD_NO
+                 			AND MP_PNT.PAY_GB_CD = '${@framework.common.constants.CommonConstants@PAY_GB_10}'
+                 			AND MP_PNT.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'
+                 			AND MP_PNT.PAY_STAT_CD = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'
+                 			AND MP_PNT.CNC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+                 			AND MP_PNT.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_81}'
+	                )
+	                LEFT OUTER JOIN PAY_CASH_REFUND PCR ON PCR.PAY_NO = PB.PAY_NO		/* 현금 환불 */
+	                LEFT OUTER JOIN (
+	                	SELECT CD.*
+	                			, SUM(CASE WHEN FN_GET_ORDER_PAY_MEANS_CD(CD.ORD_NO) IN ('20', '30', '80') THEN ((CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT) ELSE 0 END) AS CASH_REFUND_AMT
+					            , SUM(CASE WHEN FN_GET_ORDER_PAY_MEANS_CD(CD.ORD_NO) IN ('10') THEN ((CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT) ELSE 0 END) AS CARD_REFUND_AMT
+					            , SUM(CASE WHEN FN_GET_ORDER_PAY_MEANS_CD(CD.ORD_NO) IN ('70', '71', '72') THEN ((CD.PAY_AMT * CD.CLM_QTY) + CD.RMN_PAY_AMT) ELSE 0 END) AS PAY_REFUND_AMT
+								, (SELECT IFNULL(SUM(REAL_DLVR_AMT), 0) 
+					               FROM DELIVERY_CHARGE
+						           WHERE DLVRC_NO IN (SELECT DLVRC_NO FROM CLAIM_DETAIL WHERE ORD_NO = CD.ORD_NO AND ORD_DTL_SEQ = CD.ORD_DTL_SEQ)
+						          ) AS CLM_DLVRC_AMT 		 /* 추가 배송비 */
+					            , GROUP_CONCAT(CONCAT((SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'CLM_RSN' AND DTL_CD =  CD.CLM_RSN_CD AND SYS_DEL_YN = 'N'), '(' , CASE WHEN (SELECT USR_DFN2_VAL FROM CODE_DETAIL WHERE GRP_CD = 'CLM_RSN' AND DTL_CD = 'CD.CLM_RSN_CD')='20' THEN '업체' ELSE '고객' END , ')' )) AS CLM_RSN_NM
+					            , GROUP_CONCAT(CD.CLM_RSN_CONTENT) AS CLM_RSN_CONTENTS		/* 클레임 사유 내용 */
+					     FROM CLAIM_DETAIL CD
+					     GROUP BY ORD_NO , ORD_DTL_SEQ 
+	                ) CD ON ODM.ORD_NO = CD.ORD_NO AND ODM.ORD_DTL_SEQ = CD.ORD_DTL_SEQ 
+	                LEFT OUTER JOIN CLAIM_BASE CB ON CD.CLM_NO = CB.CLM_NO
+	                LEFT OUTER JOIN DISPLAY_GOODS DG ON GB.GOODS_ID = DG.GOODS_ID AND DG.DLGT_DISP_YN = 'Y'
+	                LEFT OUTER JOIN DELIVERY DV ON ODCDM.DLVR_NO = DV.DLVR_NO
+	                LEFT OUTER JOIN (
+                    	SELECT AB.ORD_NO,  AB.ORD_DTL_SEQ, GROUP_CONCAT(CB.CP_NM) CP_NM 
+				        FROM APL_BNFT AB 
+				        LEFT JOIN COUPON_BASE CB  ON AB.APL_NO = CB.CP_NO 
+				        WHERE AB.CNC_YN = 'N'
+				        GROUP BY AB.ORD_NO,  AB.ORD_DTL_SEQ 
+				     ) AB ON ODM.ORD_NO = AB.ORD_NO AND ODM.ORD_DTL_SEQ = AB.ORD_DTL_SEQ         
+        ORDER BY ODM.ORD_ACPT_DTM DESC, ODM.ORD_NO, ODM.ORD_DTL_SEQ ASC
+    </select>
+
+    <select id="pageOrderOrgStlmCount"     resultType="java.lang.Integer">
+		<!--
+			Query Name : settlement.pageOrderOrgStlmCount
+			Description : 정산 목록 Count 조회
+		-->
+		SELECT	COUNT(*)
+		FROM		ORDER_BASE OB
+	                , ORDER_DETAIL OD
+	                LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+                  	, ORDER_DLVRA ODA
+                  	, COMPANY_BASE CP
+                  	, DELIVERY_CHARGE DC
+		WHERE	OB.ORD_NO = OD.ORD_NO
+        AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+        AND     OD.COMP_NO = CP.COMP_NO
+        AND     OD.DLVRC_NO = DC.DLVRC_NO
+		<include refid="settlement.pageOrderOrgStlmWhere" />
+    </select>
+    
+     <select id="orderOrgStlmExcelCount"     resultType="java.lang.Integer">
+		<!--
+			Query Name : settlement.orderOrgStlmExcelCount
+			Description : 정산 엑셀 Count 조회
+		-->
+		SELECT	COUNT(*)
+		FROM		ORDER_BASE OB
+	                , ORDER_DETAIL OD
+	                LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+                  	, ORDER_DLVRA ODA
+                  	, COMPANY_BASE CP
+		WHERE	OB.ORD_NO = OD.ORD_NO
+        AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+        AND     OD.COMP_NO = CP.COMP_NO
+		<include refid="settlement.pageOrderOrgStlmWhere" />
+    </select>
+    
+    <select id="settlementAdjustExcel" resultMap="orderOrgStlmExcelMap">
+		<!--
+			Query Name : settlement.settlementAdjustExcel
+			Description : 원 주문 목록 엑셀 쿼리 조회
+		-->
+        SELECT 	/* settlement.settlementAdjustExcel */
+        			ODM.MBR_NO			/* 회원 번호 */
+        			, ODM.ORD_NO
+        			, ODM.ORD_DTL_SEQ
+	                , ODM.GOODS_ID
+	                , ODM.GOODS_NM
+	                , (SELECT DTL_NM FROM CODE_DETAIL CD WHERE GRP_CD = 'GOODS_CSTRT_TP' AND DTL_CD = GB.GOODS_CSTRT_TP_CD and SYS_DEL_YN != 'Y' and USE_YN = 'Y' ) as GOODS_CSTRT_TP_NM /* 상품상태 */
+	                , GB.SALE_AMT /* 판매가 */
+	                , ODM.ORD_QTY
+	                , (ODM.PAY_AMT * ODM.ORD_QTY) + ODM.RMN_PAY_AMT AS PAY_AMT		/* 결제 금액 */
+	                , ODM.REAL_DLVR_AMT	AS		REAL_DLVR_AMT_STRING		/* 실배송비 */
+	                , GB.SPL_AMT /* 매입가 */
+	                , GB.SPL_AMT * ODM.ORD_QTY AS SPL_AMT_TOT
+	                , ODM.CNC_QTY
+	                , IFNULL(CD.EXC_QTY, 0) AS EXC_QTY
+	                , 0 AS EXC_DLVR_AMT 
+	                , ODM.RTN_QTY
+	                , IFNULL(DC.RTN_DLVR_AMT,0)     AS RTN_DLVR_AMT  
+	                , GB.SPL_AMT * (ODM.ORD_QTY - ODM.RTN_QTY) AS STL_AMT /* 정산금액 */
+	                , GB.SPL_AMT * (ODM.ORD_QTY - ODM.RTN_QTY) - IFNULL(DC.RTN_DLVR_AMT,0) AS STL_AMT_TOT 		 /* 소계 */
+	                , ODM.COMP_NM AS PHS_COMP_NM
+	                , DV.OO_CPLT_DTM
+	                , ODM.BIZ_NO
+	                , ODM.HIST_STRT_DTM
+	 				, ODM.ORD_CCL_STAT_CD 
+					, ODM.ORD_CCL_CPLT_DTM
+ 		FROM		(
+					 SELECT	OB.ORD_NO
+				                , OB.ST_ID
+				                , OB.MBR_NO
+				                , OB.ORD_STAT_CD
+				                , OB.ORD_MDA_CD
+				                , OB.CHNL_ID
+				                , OB.ORD_NM
+				                , OB.ORDR_ID
+				                , OB.ORDR_TEL
+				                , OB.ORDR_MOBILE
+				                , OB.ORDR_EMAIL
+				                , OB.ORD_ACPT_DTM
+				                , OB.ORD_CPLT_DTM
+				                , OB.OUTSIDE_ORD_NO
+				                , OB.ORD_DTL_CNT
+				                , OD.ORD_DTL_SEQ
+								, OD.ORD_DTL_STAT_CD
+								, OD.GOODS_ID
+								, IF(OD.PAK_GOODS_ID IS NOT NULL, GB.GOODS_NM, OD.GOODS_NM) AS GOODS_NM
+								, OD.ITEM_NO
+								, OD.ITEM_NM
+								, OD.ORD_QTY
+								, OD.CNC_QTY
+								, OD.RTN_QTY
+								, OD.RMN_ORD_QTY
+								, FN_GET_ORD_CLM_RTN_CPLT_QTY(OD.ORD_NO, OD.ORD_DTL_SEQ) AS RTN_CPLT_QTY /* 반품 완료 수량 */
+								, OD.SALE_AMT
+								, OD.PAY_AMT
+								, OD.COMP_NO
+								, CP.COMP_NM
+								, CP.COMP_TP_CD
+								, CP.BIZ_NO
+								, OD.COMP_GOODS_ID
+								, OD.COMP_ITEM_ID
+								, OD.DISP_CLSF_NO
+								, OD.DLVR_NO
+								, OD.DLVRC_NO
+								, OD.ORD_DLVRA_NO
+								, OD.RMN_PAY_AMT
+				                , ODA.ADRS_NM
+				                , ODA.TEL
+				                , ODA.MOBILE
+				                , ODA.ROAD_ADDR
+				                , ODA.ROAD_DTL_ADDR
+				                , ODA.POST_NO_NEW		/*수취인 우편번호*/
+				                , CASE 
+				                	WHEN ( DC.DLVRC_CDT_CD='20' AND OD.ORD_DTL_SEQ > 1 ) THEN '0'
+				                	WHEN ( DC.DLVRC_STD_CD='10'  OR DC.REAL_DLVR_AMT = 0 ) THEN '' 
+				                	ELSE DC.REAL_DLVR_AMT 
+				                  END AS REAL_DLVR_AMT
+				                , DC.ORG_DLVR_AMT
+				                , DC.CP_NO					/* 쿠폰 번호 */
+				                , DC.CP_DC_AMT AS DLVRC_CP_DC_AMT			/* 쿠폰 할인 금액 */
+				                , DC.DLVRC_STD_CD			/* 배송비 기준 코드 - 10:무료 20:배송비 추가*/
+				                , DC.DLVRC_CDT_CD		/* 배송비 조건 코드 - 10:개당 20: 주문당*/
+				                , DC.DLVRC_CDT_STD_CD	/* 배송비 조건 기준 코드 - 10:유료 20:조건부무료(가격) 30:조건부무료(개당) */
+				                , CASE WHEN CP.COMP_TP_CD = '${@framework.common.constants.CommonConstants@COMP_TP_20}' THEN '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}' ELSE OB.DLVR_PRCS_TP_CD END AS DLVR_PRCS_TP_CD
+				                , OD.MKI_GOODS_YN
+				                , OD.RSV_GOODS_YN
+				                , OD.PAK_GOODS_ID
+				                , ODA.DLVR_MEMO			/* 배송 매모 */
+				                , ODA.DLVR_DEMAND			/* 배송 요청사항 */
+				                , CP.COMP_GB_CD
+				                , (SELECT IFNULL(SUM(RMN_APL_AMT), 0) FROM APL_BNFT 
+									WHERE APL_BNFT_GB_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_GB_20}' AND APL_BNFT_TP_CD = '${@framework.common.constants.CommonConstants@APL_BNFT_TP_220}'
+									  AND ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+				 				) AS CART_CP_DC_RMN_AMT
+				 				, ODH.HIST_STRT_DTM
+				 				, OD.ORD_CCL_STAT_CD 
+								, OD.ORD_CCL_CPLT_DTM
+					FROM		ORDER_BASE OB
+				                , ORDER_DETAIL OD
+				                LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+			                  	, ORDER_DLVRA ODA
+			                  	, COMPANY_BASE CP
+			                  	, DELIVERY_CHARGE DC
+			                  	, GOODS_BASE GB
+					WHERE	OB.ORD_NO = OD.ORD_NO
+			        AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+			        AND     OD.COMP_NO = CP.COMP_NO
+			        AND     OD.DLVRC_NO = DC.DLVRC_NO
+			        AND     OD.GOODS_ID = GB.GOODS_ID
+			        AND     OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+			        AND     OD.ORD_QTY - CNC_QTY > 0 
+					<include refid="settlement.pageOrderOrgStlmWhere" />
+			        ORDER BY OB.ORD_ACPT_DTM DESC, OB.ORD_NO, OD.ORD_DTL_SEQ ASC
+			        <include refid="bizCommon.pageSql" />
+					) ODM
+					INNER JOIN (SELECT ORD_DTL_CSTRT_NO, ORD_NO, ORD_DTL_SEQ FROM ORD_DTL_CSTRT  GROUP BY ORD_NO, ORD_DTL_SEQ) ODC ON ODC.ORD_NO = ODM.ORD_NO AND ODC.ORD_DTL_SEQ = ODM.ORD_DTL_SEQ
+        			INNER JOIN ST_STD_INFO SSI ON ODM.ST_ID = SSI.ST_ID
+        			INNER JOIN CHNL_STD_INFO CSI ON ODM.CHNL_ID = CSI.CHNL_ID
+        			INNER JOIN (
+						SELECT GP.*, GB.GOODS_CSTRT_TP_CD
+						FROM GOODS_PRICE GP
+							JOIN GOODS_BASE GB ON GP.GOODS_ID = GB.GOODS_ID
+						WHERE GP.DEL_YN = 'N'		
+					) GB ON (GB.GOODS_ID = ODM.GOODS_ID AND ODM.ORD_ACPT_DTM BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM)
+        			LEFT OUTER JOIN ORD_DTL_CSTRT_DLVR_MAP ODCDM ON ODC.ORD_DTL_CSTRT_NO = ODCDM.ORD_DTL_CSTRT_NO AND DLGT_YN = 'Y'
+	                LEFT OUTER JOIN DELIVERY DV ON ODCDM.DLVR_NO = DV.DLVR_NO
+	                LEFT JOIN (
+	                	SELECT SUM(REAL_DLVR_AMT) AS RTN_DLVR_AMT, CD.ORD_NO, CD.ORD_DTL_SEQ
+						FROM DELIVERY_CHARGE DC
+							JOIN (SELECT * FROM CLAIM_DETAIL
+									   WHERE CLM_RSN_CD IN (SELECT DTL_CD FROM CODE_DETAIL WHERE GRP_CD = 'CLM_RSN' AND USR_DFN2_VAL = '20')) CD ON (CD.DLVRC_NO = DC.DLVRC_NO OR CD.RTN_DLVRC_NO = DC.DLVRC_NO)
+						WHERE  CLM_DTL_TP_CD = '20'
+						GROUP BY CD.ORD_NO, CD.ORD_DTL_SEQ
+	                ) DC ON DC.ORD_NO = ODM.ORD_NO AND DC.ORD_DTL_SEQ = ODM.ORD_DTL_SEQ
+	                LEFT JOIN (
+	                	SELECT SUM(CLM_QTY) EXC_QTY, CD.ORD_NO, CD.ORD_DTL_SEQ
+	                	FROM CLAIM_DETAIL CD
+	                	WHERE CLM_DTL_TP_CD = '40'
+	                	GROUP BY CD.ORD_NO, CD.ORD_DTL_SEQ
+	                ) CD ON CD.ORD_NO = ODM.ORD_NO AND CD.ORD_DTL_SEQ = ODM.ORD_DTL_SEQ
+        ORDER BY ODM.ORD_ACPT_DTM DESC, ODM.ORD_NO, ODM.ORD_DTL_SEQ ASC
+    </select>
+    
+    <select id="settlementAdjustExcelCount"     resultType="java.lang.Integer">
+		<!--
+			Query Name : settlement.settlementAdjustExcelCount
+			Description : 주문 엑셀 Count 조회
+		-->
+		SELECT	COUNT(*)
+		FROM		ORDER_BASE OB
+	                , ORDER_DETAIL OD
+	                LEFT OUTER JOIN (SELECT ORD_NO , ORD_DTL_SEQ, MAX(SYS_REG_DTM) AS SYS_REG_DTM, MAX(HIST_STRT_DTM) AS HIST_STRT_DTM, ORD_DTL_STAT_CD FROM ORDER_DETAIL_STATUS_HIST ODSH GROUP BY ORD_NO , ORD_DTL_SEQ, ORD_DTL_STAT_CD) ODH on 	OD.ORD_NO = ODH.ORD_NO 				AND 	OD.ORD_DTL_SEQ = ODH.ORD_DTL_SEQ 				AND 	OD.ORD_DTL_STAT_CD = ODH.ORD_DTL_STAT_CD
+                  	, ORDER_DLVRA ODA
+                  	, COMPANY_BASE CP
+		WHERE	OB.ORD_NO = OD.ORD_NO
+        AND    	OD.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO
+        AND     OD.COMP_NO = CP.COMP_NO
+		<include refid="settlement.pageOrderOrgStlmWhere" />
+    </select>
+    
+    <sql id="pageOrderOrgStlmWhere">
+        AND     	OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		<if test="payMeansCd != null and payMeansCd != ''">
+		AND EXISTS (
+					SELECT 	1
+					  FROM 	PAY_BASE PB 
+					 WHERE 	PB.ORD_NO = OB.ORD_NO
+					 AND		PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'	/* 주문 결제 정보*/ 
+					   AND PB.PAY_MEANS_CD = #{payMeansCd} 
+					)
+		</if>
+		<if test="searchValueOrder == null or searchValueOrder == ''">
+			<include refid="settlement.pageOrderOrgStlmAnd" />
+		</if>
+		<if test="searchValueOrder != null and searchValueOrder != ''">
+		    <choose>
+		        <when test="searchKeyOrder == 'type01'">
+		AND		OB.ORD_NO = #{searchValueOrder}
+		        </when>
+		        <when test="searchKeyOrder == 'type02'">
+		        	<include refid="settlement.pageOrderOrgStlmAnd" />
+		AND 		OB.ORD_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		        <when test="searchKeyOrder == 'type03'">
+		        	<include refid="settlement.pageOrderOrgStlmAnd" />
+		AND 		OB.ORDR_ID IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		        <when test="searchKeyOrder == 'type04'">
+		        	<include refid="settlement.pageOrderOrgStlmAnd" />
+		AND 		ODA.ADRS_NM IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder})
+		        </when>
+		        <when test="searchKeyOrder == 'type05'">
+		        	<include refid="settlement.pageOrderOrgStlmAnd" />
+		AND 		OB.MBR_NO LIKE CONCAT( '%', #{searchValueOrder}, '%' )
+		        </when>
+		        <when test="searchKeyOrder == 'type06'">
+		        	<include refid="settlement.pageOrderOrgStlmAnd" />
+		AND 		(OB.ORDR_MOBILE IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder}) OR OB.ORDR_TEL  IN (#{searchValueOrder, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}, #{searchValueOrder}))
+		        </when>
+		    </choose>
+		</if>
+	</sql>
+	
+	<sql id="pageOrderOrgStlmAnd">
+		<if test="ordAcptDtmStart != null">
+		AND 		OB.ORD_ACPT_DTM <![CDATA[>=]]> #{ordAcptDtmStart}
+		</if>
+		<if test="ordAcptDtmEnd != null">
+		AND 		OB.ORD_ACPT_DTM <![CDATA[<=]]> DATE_ADD(#{ordAcptDtmEnd},INTERVAL 1 DAY)
+		</if>
+		<if test="purConfDtmStart != null">
+		AND CASE WHEN ODH.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}' THEN ODH.HIST_STRT_DTM ELSE NULL END <![CDATA[>=]]> #{purConfDtmStart}
+		</if>
+		<if test="purConfDtmEnd != null">
+		AND CASE WHEN ODH.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}' THEN ODH.HIST_STRT_DTM ELSE NULL END <![CDATA[<=]]> DATE_ADD(#{purConfDtmEnd},INTERVAL 1 DAY)
+		</if>
+		<if test="ordCclCpltDtmStart != null">
+		AND 		OD.ORD_CCL_CPLT_DTM <![CDATA[>=]]> #{ordCclCpltDtmStart}
+		</if>
+		<if test="ordCclCpltDtmEnd != null">
+		AND 		OD.ORD_CCL_CPLT_DTM <![CDATA[<=]]> DATE_ADD(#{ordCclCpltDtmEnd},INTERVAL 1 DAY)
+		</if>
+		<if test="stId != null and stId != ''">
+		AND 		OB.ST_ID = #{stId}
+		</if>
+		<if test="ordMdaCd != null and ordMdaCd != ''">
+		AND 		OB.ORD_MDA_CD = #{ordMdaCd}
+		</if>
+		<if test="arrOrdDtlStatCd != null and arrOrdDtlStatCd.length > 0">
+		AND		OD.ORD_DTL_STAT_CD IN (
+				    <foreach collection="arrOrdDtlStatCd" item="ordDtlStatCd" separator="," >
+				    #{ordDtlStatCd}
+				    </foreach>
+				    )
+		</if>
+		<if test="arrOrdListStatCd != null and arrOrdListStatCd.length > 0">
+		AND		OD.ORD_CCL_STAT_CD IN (
+				    <foreach collection="arrOrdListStatCd" item="ordListStatCd" separator="," >
+				    #{ordListStatCd}
+				    </foreach>
+				    )
+		</if>
+		<if test="arrPayMeansCd != null and arrPayMeansCd.length > 0">
+		AND EXISTS (
+					SELECT 	1
+					  FROM 	PAY_BASE PB 
+					 WHERE 	PB.ORD_NO = OB.ORD_NO
+					 AND		PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}'	/* 주문 결제 정보*/ 
+					 AND PB.PAY_MEANS_CD IN(
+						<foreach collection="arrPayMeansCd" item="payMeansCd" separator="," >
+					   		#{payMeansCd}
+					    </foreach>
+					 	) 
+					)
+		</if>
+		<if test='exOrdCancelYn != null and exOrdCancelYn.equals("Y")'>
+		AND		OD.RMN_ORD_QTY > 0
+		</if>
+		<if test='preReserveYn != null and preReserveYn.equals("Y")'>
+		AND		OD.RSV_GOODS_YN = 'Y'
+		</if>
+		<if test="searchValueGoods != null and searchValueGoods != ''">
+		    <choose>
+		        <when test="searchKeyGoods == 'type01'">
+		AND	OD.GOODS_NM LIKE CONCAT( '%', #{searchValueGoods}, '%' )
+		        </when>
+		        <when test="searchKeyGoods == 'type02'">
+		AND 	OD.GOODS_ID = #{searchValueGoods}
+		        </when>
+		    </choose>
+		</if>
+		<if test="arrDlvrPrcsTpCd != null and arrDlvrPrcsTpCd.length > 0">
+			<foreach collection="arrDlvrPrcsTpCd" item="dlvrPrcsTpCd" separator="," open="AND (CASE WHEN CP.COMP_TP_CD = '20' THEN '10' ELSE OB.DLVR_PRCS_TP_CD END) IN (" close=" ) " >
+			    #{dlvrPrcsTpCd}
+		    </foreach>
+		</if>
+		<if test="arrCompTpCd != null and arrCompTpCd.length > 0">
+			<foreach collection="arrCompTpCd" item="compTpCd" separator="," open="AND	CP.COMP_TP_CD IN (" close=" ) " >
+				#{compTpCd}
+			</foreach>
+		</if>
+		<if test='"Y" == showAllLowCompany'>
+        AND CP.UP_COMP_NO = #{compNo}
+        </if>
+		<if test='"Y" != showAllLowCompany'>
+		    <if test="lowCompNo != null and lowCompNo != ''">
+		AND OD.COMP_NO = #{lowCompNo} AND CP.UP_COMP_NO = #{compNo}
+		    </if>
+		    <if test="lowCompNo == null or lowCompNo == ''">
+		        <if test="compNo != null and compNo != ''">
+		AND 	OD.COMP_NO = #{compNo}
+		        </if>
+		    </if>
+		</if>
+		
+		<!-- 회원정보 > 거래내역에서 사용 -->
+		<!-- 회원번호 -->
+		<if test='mbrNo != null'>
+		AND OB.MBR_NO = #{mbrNo}
+		</if>
+		<!-- 주문번호 -->
+		<if test='ordNo != null and ordNo !=""'>
+		AND OB.ORD_NO = #{ordNo}
+		</if>
+		<!-- 송장번호 -->
+		<if test='invNo != null and invNo !=""'>
+		AND OB.ORD_NO IN (
+			SELECT
+				OD.ORD_NO
+			FROM
+				DELIVERY D
+			INNER JOIN ORDER_DLVRA OD ON
+				D.ORD_DLVRA_NO = OD.ORD_DLVRA_NO
+			WHERE
+				INV_NO = #{invNo}
+		)
+		</if>
+		<!-- 거래상태 / 주문상세상태 -->
+		<if test='ordDtlStatCd != null and ordDtlStatCd !=""'>
+		AND OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+		</if>
+		<!-- 주문목록 정산상태 -->
+		<if test='ordListStatCd != null and ordListStatCd !=""'>
+		AND OD.ORD_CCL_STAT_CD = #{ordListStatCd}
+		</if>
+		<!-- 할인쿠폰 사용한 내역 -->
+		<if test='(useCoupon != null and useCoupon !="") and mbrNo != null'>
+		AND OB.ORD_NO IN (
+			SELECT 
+				AB.ORD_NO
+			FROM APL_BNFT AB
+			INNER JOIN MEMBER_COUPON MC ON AB.MBR_CP_NO = MC.MBR_CP_NO 
+			WHERE MC.MBR_NO = #{mbrNo}
+		)
+		</if>
+	</sql>
+	
+	<update id="batchUpdateStat" parameterType="biz.app.order.model.OrderDetailPO">
+		<!-- Query Name : settlement.batchUpdateStat
+			Description : 정산상태 일괄수정
+		 -->
+		UPDATE ORDER_DETAIL SET /* QUERYID(settlement.batchUpdateStat) */
+		ORD_CCL_STAT_CD	= '${@framework.common.constants.CommonConstants@ORD_LST_STL_STT_20}'  /* 정산 완료 */
+		, ORD_CCL_CPLT_DTM	= NOW()				/* 정산 완료 일시 */
+		, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE
+			ORD_NO = #{ordNo}
+		AND ORD_DTL_SEQ = #{ordDtlSeq}	
+	</update>
+</mapper>

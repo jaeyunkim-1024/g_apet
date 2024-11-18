@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2021. 02. 15.
+	작성자 : kek01
+-->
+
+<mapper namespace="clmDtlCstrtDlvrMap">
+
+	<insert id="insertClmDtlCstrtDlvrMap" parameterType="biz.app.claim.model.ClmDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMap
+			Description : 클레임 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO CLM_DTL_CSTRT_DLVR_MAP	/*QUERYID(clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMap) */
+		(
+			  CLM_DTL_CSTRT_NO			/* 클레임 상세 구성 번호 */
+			, DLVR_NO					/* 배송 번호 */
+			, CIS_OO_QTY				/* CIS 출고 수량 */
+			, DLGT_YN					/* 대표 여부 */
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+		) VALUES (
+			  #{clmDtlCstrtNo}			/* 클레임 상세 구성 번호 */
+			, #{dlvrNo}					/* 배송 번호 */
+			, #{cisOoQty}				/* CIS 출고 수량 */
+			, #{DlgtYn}					/* 대표 여부 */
+			, #{sysRegrNo}				/* 시스템 등록자 번호 */
+			, NOW()						/* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<insert id="insertClmDtlCstrtDlvrMapByClmNo" parameterType="biz.app.claim.model.ClmDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMapByClmNo
+			Description : 클레임 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO CLM_DTL_CSTRT_DLVR_MAP	/*QUERYID(clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMapByClmNo) */
+		(
+			  CLM_DTL_CSTRT_NO			/* 클레임 상세 구성 번호 */
+			, DLVR_NO					/* 배송 번호 */
+			, DLGT_YN					/* 대표 여부 */
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+		) 
+		SELECT  CDC.CLM_DTL_CSTRT_NO
+				, #{dlvrNo}					/* 배송 번호 */
+				, 'Y'						/* 대표 여부 */
+				, #{sysRegrNo}				/* 시스템 등록자 번호 */
+				, NOW()						/* 시스템 등록 일시 */
+		FROM	CLM_DTL_CSTRT CDC 
+				INNER JOIN CLAIM_DETAIL CD ON CDC.CLM_NO = CD.CLM_NO 
+				                          AND CDC.CLM_DTL_SEQ = CD.CLM_DTL_SEQ 
+		        INNER JOIN COMPANY_BASE CB ON CB.COMP_NO = CD.COMP_NO
+										<if test="compGbCd != null and compGbCd != ''">
+		                                  AND CB.COMP_GB_CD = #{compGbCd}  /* 업체유형코드*/
+										</if>
+		WHERE	CDC.CLM_NO = #{clmNo}
+		<if test="clmDtlSeq != null and clmDtlSeq != ''">
+		  AND   CD.CLM_DTL_SEQ = #{clmDtlSeq}
+		</if>
+		<if test="compNo != null and compNo != ''">
+		  AND   CD.COMP_NO = #{compNo}
+		</if>
+		<if test="dlvrcNo != null and dlvrcNo != ''">
+		  AND   CD.DLVRC_NO = #{dlvrcNo}
+		</if>
+	</insert>
+
+	<insert id="insertClmDtlCstrtDlvrMapByDlvrNo" parameterType="biz.app.claim.model.ClmDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMapByDlvrNo
+			Description : 클레임 상세 구성 배송 매핑 등록
+		-->
+		INSERT INTO CLM_DTL_CSTRT_DLVR_MAP  /*QUERYID(clmDtlCstrtDlvrMap.insertClmDtlCstrtDlvrMapByDlvrNo) */
+		       (
+		 			 CLM_DTL_CSTRT_NO				/* 클레임 상세 구성 번호 */
+		 			,DLVR_NO						/* 배송 번호 */
+		 			,DLGT_YN						/* 대표 여부 */
+		 			,SYS_REGR_NO
+		 			,SYS_REG_DTM
+		 			,SYS_UPDR_NO
+		 			,SYS_UPD_DTM      
+		       )
+		SELECT   CDCDM.CLM_DTL_CSTRT_NO 			/* 주문 상세 구성 번호 */
+		        ,#{newDlvrNo}		AS DLVR_NO		/* 신규 배송 번호 */
+		        ,'N'				AS DLGT_YN		/* 대표 여부 */
+		        ,#{sysRegrNo}		AS SYS_REGR_NO
+		        ,NOW()				AS SYS_REG_DTM
+		        ,#{sysRegrNo}		AS SYS_UPDR_NO
+		        ,NOW()				AS SYS_UPD_DTM
+		  FROM  CLM_DTL_CSTRT_DLVR_MAP CDCDM 
+		 WHERE  CDCDM.DLVR_NO = #{dlvrNo}
+	</insert>
+
+	<update id="updateClmDtlCstrtDlvrMap" parameterType="biz.app.claim.model.ClmDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : clmDtlCstrtDlvrMap.updateClmDtlCstrtDlvrMap
+			Description : 클레임 상세 구성 배송 매핑 수정
+		-->
+		UPDATE	CLM_DTL_CSTRT_DLVR_MAP	/*QUERYID(clmDtlCstrtDlvrMap.updateClmDtlCstrtDlvrMap) */
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}					/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM	= NOW()							/* 시스템 수정 일시 */
+			<if test="newDlvrNo != null and newDlvrNo != ''">
+			  , DLVR_NO	= #{newDlvrNo}							/* 배송 번호 */
+			</if>
+			<if test="cisOoQty != null and cisOoQty != ''">
+			  , CIS_OO_QTY	= #{cisOoQty}					/* CIS 출고 수량 */
+			</if>
+			<if test="DlgtYn != null and DlgtYn != ''">
+			  , DLGT_YN	= #{DlgtYn}							/* 대표 여부 */
+			</if>
+		WHERE	CLM_DTL_CSTRT_NO = #{clmDtlCstrtNo}			/* 클레임 상세 구성 번호 */
+			<if test="dlvrNo != null and dlvrNo != ''">
+			  AND DLVR_NO	= #{dlvrNo}							/* 배송 번호 */
+			</if>
+	</update>
+	
+</mapper>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set19","tit":"알림"}'></include><!-- 2021.03.16 : noneAc 클래스 삭제 -->
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		
+		<!-- <include class="lnb" data-include-html="../inc/lnb.html"></include> -->
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container  page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2><span>강아지</span> 검색결과</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- tab -->
+					<section class="sect petTabContent mode_fixed leftTab hmode_auto"><!-- 2021.03.15 : mode_fixed, hmode_auto 클래스 추가 -->
+						<!-- tab header -->
+						<ul class="uiTab a line t2">
+						
+							<li class="active">
+								<a class="bt" href="javascript:;">
+									<div>
+										TV
+										<div class="both-txt">
+											444
+										</div>
+									</div>
+								</a>
+							</li>
+							<li>
+								<a class="bt" href="javascript:;">
+									<div>
+										로그
+										<div class="both-txt">
+											111
+										</div>
+									</div>
+								</a>
+							</li>
+							<li>
+								<a class="bt" href="javascript:;">
+									<div>
+										샵
+										<div class="both-txt">
+											999
+										</div>
+									</div>
+								</a>
+							</li>
+							
+						</ul>
+						<!-- // tab header -->
+						<!-- tab content -->
+						<div class="uiTab_content"><!-- 2021.03.15 : style 삭제 -->
+							<ul>
+								<li>
+									<!-- 컨텐츠가 없을 경우 주석 제거 -->
+									<div class="noneBoxPoint" style="display:none;">
+										<div>
+											<span class="noneBoxPoint_img"></span>
+											<div class="noneBoxPoint_infoTxt">
+												찜한 영상이 없습니다.<br />
+												반려동물과 함께하는 <strong>펫TV</strong>를 시청해 보세요.
+											</div>
+											<a href="javascript:;" class="btn lg a">위치서비스 설정</a>
+										</div>
+									</div>
+									<div class="tit-box">
+										<p class="tit">시리즈 <span>50</span></p>
+									</div>
+									<div class="series-list">
+										<ul>
+											<li>
+												<p class="img"><img src="../../_images/_temp/temp_logimg001.jpg" alt=""></p>
+												<div class="txt">
+													<p class="t1"><span>애니멀</span>네 이야기</p>
+													<p class="t2">시즌3</p>
+												</div> 
+											</li>
+											<li>
+												<p class="img"><img src="../../_images/_temp/temp_logimg001.jpg" alt=""></p>
+												<div class="txt">
+													<p class="t1"><span>애니멀</span>네 이야기</p>
+													<p class="t2">시즌3</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+
+									<div class="moreload ts2">
+										<button type="button" class="bt more">시리즈 더보기</button>
+									</div>
+									<div class="tit-box">
+										<p class="tit">동영상 <span>50</span></p>
+										<div class="right">
+											<nav class="uisort">
+												<button type="button" class="bt st"></button>
+												<div class="list">
+													<ul class="menu">
+														<li><button type="button" class="bt" value="v_1">인기순</button></li>
+														<li><button type="button" class="bt" value="v_2">조회순</button></li>
+													</ul>
+												</div>
+											</nav>
+										</div>
+									</div>
+									<div class="watch-movie t2">
+										<div class="item">
+											<div class="movie">
+												<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+												<div class="time">
+													10:08
+												</div>
+												<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+											</div>
+											<div class="text-box">
+												<!-- <p class="t1">시리즈명노출영역</p> -->
+												<p class="t2">행복해보이는 <span>친칠라</span> 자몽이의 숨겨진 …</p>
+												<div class="box">
+													<p class="play">86,000</p>
+													<p class="like">33</p>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<div class="movie">
+												<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+												<div class="time">
+													10:08
+												</div>
+												<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+											</div>
+											<div class="text-box">
+												<!-- <p class="t1">시리즈명노출영역</p> -->
+												<p class="t2">행복해보이는 친칠라 자몽이의 숨겨진 …</p>
+												<div class="box">
+													<p class="play">86,000</p>
+													<p class="like">33</p>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<div class="movie">
+												<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+												<div class="time">
+													10:08
+												</div>
+												<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+											</div>
+											<div class="text-box">
+												<!-- <p class="t1">시리즈명노출영역</p> -->
+												<p class="t2">행복해보이는 친칠라 자몽이의 숨겨진 …</p>
+												<div class="box">
+													<p class="play">86,000</p>
+													<p class="like">33</p>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<div class="movie">
+												<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+												<div class="time">
+													10:08
+												</div>
+												<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+											</div>
+											<div class="text-box">
+												<!-- <p class="t1">시리즈명노출영역</p> -->
+												<p class="t2">행복해보이 친칠라 자몽행복해보이는 친칠라 자몽이의 숨겨진 …</p>
+												<div class="box">
+													<p class="play">86,000</p>
+													<p class="like">33</p>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<div class="movie">
+												<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+												<div class="time">
+													10:08
+												</div>
+												<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+											</div>
+											<div class="text-box">
+												<!-- <p class="t1">시리즈명노출영역</p> -->
+												<p class="t2">행복해보이는 친칠라 자몽이의 숨겨진 …</p>
+												<div class="box">
+													<p class="play">86,000</p>
+													<p class="like">33</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="tit-box">
+										<p class="tit">사용자 <span>50</span></p>
+									</div>
+									<div class="series-list">
+										<ul>
+											<li>
+												<p class="img"><img src="../../_images/_temp/temp_logimg001.jpg" alt=""></p>
+												<div class="txt">
+													<p class="t1"><span>애니멀</span>네 이야기</p>
+													<p class="t2">
+														<span>게시물 3</span>
+														<span>팔로워 22</span>
+													</p>
+												</div> 
+											</li>
+											<li>
+												<p class="img"><img src="../../_images/_temp/temp_logimg001.jpg" alt=""></p>
+												<div class="txt">
+													<p class="t1"><span>애니멀</span>네 이야기</p>
+													<p class="t2">
+														<span>게시물 3</span>
+														<span>팔로워 22</span>
+													</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+
+									<div class="tit-box">
+										<p class="tit">동영상 <span>50</span></p>
+										<div class="right">
+											<nav class="uisort">
+												<button type="button" class="bt st"></button>
+												<div class="list">
+													<ul class="menu">
+														<li><button type="button" class="bt" value="v_1">인기순</button></li>
+														<li><button type="button" class="bt" value="v_2">조회순</button></li>
+													</ul>
+												</div>
+											</nav>
+										</div>
+									</div>
+									<div class="mylog-area">
+										<div class="logPicMetric t2">
+											<ul>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<span class="logIcon_pic i01"></span>
+														<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<span class="logIcon_pic i02"></span>
+														<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg004.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg005.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg006.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg007.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg008.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<span class="logIcon_pic i01"></span>
+														<img src="../../_images/_temp/temp_logimg001.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<span class="logIcon_pic i02"></span>
+														<img src="../../_images/_temp/temp_logimg003.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg004.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg005.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg006.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg007.jpg" alt="">
+													</a>
+												</li>
+												<li>
+													<a href="javascript:;" class="logPicBox">
+														<img src="../../_images/_temp/temp_logimg008.jpg" alt="">
+													</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="tit-box">
+										<p class="tit">브랜드 <span>50</span></p>
+									</div>
+
+									<div class="scroll-x tabTx"><!-- 2021.02.16 : tabTx 클래스 추가 // 스크롤 시 탭 이동 막기 -->
+										<div class="scroll">
+											<div class="mybrand-list t2">
+												<ul>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt">브랜드명</p>
+														</a>
+													</li>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt">브랜드명</p>
+														</a>
+													</li>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt">브랜드명</p>
+														</a>
+													</li>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt">브랜드명</p>
+														</a>
+													</li>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt">브랜드명브랜드명</p>
+														</a>
+													</li>
+													<li>
+														<a href="javascript:;">
+															<p class="img"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></p>
+															<p class="txt"><span>브랜드</span>명</p>
+														</a>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+
+
+									<div class="tit-box">
+										<p class="tit">상품 <span>50</span></p>
+										<div class="right">
+											<nav class="uisort">
+												<button type="button" class="bt st t1"></button>
+												<div class="list">
+													<ul class="menu">
+														<li><button type="button" class="bt" value="v_1">필터</button></li>
+														<li><button type="button" class="bt" value="v_2">조회순</button></li>
+													</ul>
+												</div>
+											</nav>
+											<nav class="uisort">
+												<button type="button" class="bt st"></button>
+												<div class="list">
+													<ul class="menu">
+														<li><button type="button" class="bt" value="v_1">인기순</button></li>
+														<li><button type="button" class="bt" value="v_2">조회순</button></li>
+													</ul>
+												</div>
+											</nav>
+										</div>
+									</div>
+								
+									<div class="thumbnail-list t2">
+										<ul>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+											<li>
+												<div class="gdset packg">
+													<div class="thum">
+														<a href="javascript:;" class="pic"><img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지"></a>
+														<span class="favorites">즐겨찾기</span>
+													</div>
+													<div class="boxs">
+														<div class="tit"><a href="javascript:;" class="lk">반려견 습식사료 아미로 후코이단 시츄용 20개 set 반려견 습식사료 아미로 후코이단 시츄용 20개 set </a></div>
+														<a href="javascript:;" class="inf">
+															<span class="prc"><em class="p">23,000</em><i class="w">원</i></span>
+															<span class="pct"><em class="n">90</em><i class="w">%</i></span>
+														</a>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+
+									
+								</li>
+							</ul>
+						</div>
+						<!-- // tab content -->
+					</section>
+					<!-- // tab -->
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

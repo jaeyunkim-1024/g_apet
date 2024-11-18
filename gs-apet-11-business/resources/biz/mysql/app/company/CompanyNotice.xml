@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	업체 공지
+	작성자  	snw
+	작성일자  	2016.03.07
+-->
+
+<mapper namespace="companyNotice">
+
+	<select id="listCompanyNotice" resultType="biz.app.company.model.CompanyNoticeVO">
+		<!--
+			Query Name	: companyNotice.listCompanyNotice
+			Description	: 업체 공지 목록 조회
+		-->
+		SELECT	/* QUERYID(companyNotice.listCompanyNotice) */
+			  COMP_NTC_NO			/* 업체 공지 번호 */
+			, COMP_NO				/* 업체 번호 */
+			, CONTENT				/* 내용 */
+			, NTC_STRT_DTM			/* 공지 시작 일시 */
+			, NTC_END_DTM			/* 공지 종료 일시 */
+			, DISP_YN				/* 전시 여부 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM
+			COMPANY_NOTICE
+		WHERE
+			COMP_NO = #{compNo}
+		<if test='dispYn != null and dispYn != ""'>
+			AND DISP_YN = #{dispYn}
+		</if>
+			AND NOW() BETWEEN NTC_STRT_DTM AND NTC_END_DTM
+		ORDER BY COMP_NTC_NO ASC
+	</select>
+
+
+	<select id="pageCompanyNotice" resultType="biz.app.company.model.CompanyNoticeVO" >
+		<!--
+			Query Name	: companyNotice.pageCompanyNotice
+			Description	: 업체 공지 목록 조회
+		-->
+		SELECT	/* QUERYID(companyNotice.pageCompanyNotice) */
+			  CN.COMP_NO			/* 공지받은 업체 번호 */
+			, CN.COMP_NTC_NO		/* 업체 공지 번호 */
+			, CN.CONTENT			/* 내용 */
+			, CN.DISP_YN			/* 전시 여부 */
+			, CN.SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, CN.SYS_REG_DTM		/* 시스템 등록 일시 */
+			, CN.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, CN.SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, CN.NTC_STRT_DTM		/* 공지 시작 일시 */
+			, CN.NTC_END_DTM		/* 공지 종료 일시 */
+			, IF(CN.COMP_NO = 0, '전체 업체', FN_GET_COMPANY_NAME(CN.COMP_NO)) AS COMP_NM	/* 공지받은 업체 */
+			, FN_GET_USER_NAME(CN.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자, 공지한 사람 */
+			, FN_GET_USER_NAME(CN.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 , 공지한 사람*/
+			, FN_GET_COMPANY_NAME_BY_USR_NO(CN.SYS_UPDR_NO) AS WR_COMP_NM	/* 공지한 업체 */
+		FROM
+			COMPANY_NOTICE CN
+			JOIN COMPANY_BASE CB ON (CN.COMP_NO = CB.COMP_NO)
+			JOIN USER_BASE UB ON (CN.SYS_UPDR_NO = UB.USR_NO)
+		WHERE	1 = 1
+		<include refid="companyNotice.pageCompanyNoticeWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageCompanyNoticeCount" resultType="java.lang.Integer" >
+		<!--
+			Query Name	: companyNotice.pageCompanyNoticeCount
+			Description	: 업체 공지 목록 카운트
+		-->
+		SELECT	/* QUERYID(companyNotice.pageCompanyNoticeCount) */
+			COUNT(1)
+		FROM
+			COMPANY_NOTICE CN
+			JOIN COMPANY_BASE CB ON (CN.COMP_NO = CB.COMP_NO)
+			JOIN USER_BASE UB ON (CN.SYS_UPDR_NO = UB.USR_NO)
+		WHERE	1 = 1
+		<include refid="companyNotice.pageCompanyNoticeWhere" />
+	</select>
+
+	<sql id="pageCompanyNoticeWhere">
+		<if test='"Y" == showAllLowCompany'>
+		AND CB.UP_COMP_NO = #{compNo}
+		</if>
+		<if test='"Y" != showAllLowCompany'>	
+			<if test='lowCompNo != null and lowCompNo != ""'>
+		AND CN.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+			</if>
+			<if test='lowCompNo == null or lowCompNo == ""'>
+				<if test='compNo != null and ! compNo.equals("")'>
+		AND (CN.COMP_NO = #{compNo} OR CN.COMP_NO = 0)	/* 전체공지는 항상 조회 */
+				</if>
+			</if> 
+		</if> 
+		<if test='dispYn != null and dispYn != ""'>
+		AND CN.DISP_YN = #{dispYn}
+		</if>
+	</sql>
+
+
+	<select id="getCompanyNotice" resultType="biz.app.company.model.CompanyNoticeVO">
+		<!--
+			Query Name	: companyNotice.getCompanyNotice
+			Description	: 업체 공지사항 상세
+		-->
+		SELECT	/* QUERYID(company.getCompanyNotice) */
+			  COMP_NO			/* 공지받은 업체 번호 */
+			, COMP_NTC_NO		/* 업체 공지 번호 */
+			, CONTENT			/* 내용 */
+			, DISP_YN			/* 전시 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, NTC_STRT_DTM		/* 공지 시작 일시 */
+			, NTC_END_DTM		/* 공지 종료 일시 */
+			, IF(COMP_NO = 0, '전체 업체', FN_GET_COMPANY_NAME(COMP_NO)) AS COMP_NM	/* 공지받은 업체 */
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자, 공지한 사람 */
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 , 공지한 사람*/
+			, FN_GET_COMPANY_NAME_BY_USR_NO(SYS_UPDR_NO) AS WR_COMP_NM		/* 공지한 업체 이름 */
+			, FN_GET_COMPANY_NO_BY_USR_NO(SYS_UPDR_NO) AS WR_COMP_NO		/* 공지한 업체 번호 */
+		FROM
+			COMPANY_NOTICE
+		WHERE
+			COMP_NTC_NO	= #{compNtcNo}
+	</select>
+
+
+	<insert id="insertCompanyNotice" parameterType="biz.app.company.model.CompanyNoticePO" >
+		<!--
+			Query Name	: companyNotice.insertCompanyNotice
+			Description	: 업체 공지사항 등록
+		-->
+		<selectKey keyProperty="compNtcNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_COMPANY_NOTICE_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO COMPANY_NOTICE (	/* QUERYID(company.insertCompanyNotice) */
+			  COMP_NO			/* 업체 번호 */
+			, COMP_NTC_NO		/* 업체 공지 번호 */
+			, CONTENT			/* 내용 */
+			, DISP_YN			/* 전시 여부 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+			, NTC_STRT_DTM		/* 공지 시작 일시 */
+			, NTC_END_DTM		/* 공지 종료 일시 */
+		) VALUES (
+			  #{compNo}			/* 업체 번호 */
+			, #{compNtcNo}		/* 업체 공지 번호 */
+			, #{content}		/* 내용 */
+			, #{dispYn}			/* 전시 여부 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+			, #{ntcStrtDtm}		/* 공지 시작 일시 */
+			, #{ntcEndDtm}		/* 공지 종료 일시 */
+		)
+	</insert>
+
+	
+	<update id="updateCompanyNotice" parameterType="biz.app.company.model.CompanyNoticePO">
+		<!--
+			Query Name	: companyNotice.updateCompanyNotice
+			Description	: 업체 공지사항 수정
+		-->
+		UPDATE	/* QUERYID(company.updateCompanyNotice) */
+		COMPANY_NOTICE SET
+			CONTENT			= #{content}		/* 내용 */
+			, DISP_YN			= #{dispYn}			/* 전시 여부 */
+			, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+			, NTC_STRT_DTM		= #{ntcStrtDtm}		/* 공지 시작 일시 */
+			, NTC_END_DTM		= #{ntcEndDtm}		/* 공지 종료 일시 */
+		WHERE
+			COMP_NTC_NO = #{compNtcNo}
+	</update>
+
+	
+	<delete id="deleteCompanyNotice" parameterType="biz.app.company.model.CompanyNoticePO">
+		<!--
+			Query Name	: companyNotice.deleteCompanyNotice
+			Description	: 업체 공지사항 수정
+		-->
+		DELETE	/* QUERYID(company.deleteCompanyNotice) */
+		FROM COMPANY_NOTICE
+		WHERE
+			COMP_NTC_NO = #{compNtcNo}
+	</delete>
+
+</mapper>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+	</script>
+	<style>
+		.header{/* margin-bottom: 50px; */}
+		.header.cu >.hdr{position:relative;}
+		.body.ui{background-color:#f7f7f7 ;}
+	</style>
+</head>
+<body class="body ui">
+	<div class="wrap" id="wrap">
+		
+		<!-- 헤더 -->
+		<include class="header" data-include-html="../inc/header_cu.html"></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page " id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					
+				</div>
+			</div>
+		</main>
+		<!-- 하단메뉴
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		 -->
+		<!-- 푸터
+        <include class="footer" data-include-html="../inc/footer.html"></include>
+		 -->
+	</div>
+</body>
+</html>

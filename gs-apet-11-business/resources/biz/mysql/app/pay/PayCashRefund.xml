@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  
+	결제 현금 환불
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="payCashRefund">
+
+	<insert id="insertPayCashRefund">
+		<!--
+			Query Name : payCashRefund.insertPayCashRefund
+			Description : 결제 현금 환불 등록
+		-->
+		INSERT INTO PAY_CASH_REFUND (
+			CASH_RFD_NO			/* 현금 환불 번호 */
+			, PAY_NO					/* 결제 번호 */
+			, RFD_TP_CD				/* 환불 유형 코드 */
+			, RFD_STAT_CD			/* 환불 상태 코드 */
+			, BANK_CD				/* 은행 코드 */
+			, ACCT_NO				/* 계좌 번호 */
+			, OOA_NM				/* 예금주 명 */
+			, SCHD_AMT				/* 예정 금액 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+		) SELECT
+			#{cashRfdNo}			/* 현금 환불 번호 */
+			, #{payNo}				/* 결제 번호 */
+			, #{rfdTpCd}				/* 환불 유형 코드 */
+			, #{rfdStatCd}				/* 환불 상태 코드 */
+			, #{bankCd}				/* 은행 코드 */
+			, #{acctNo}				/* 계좌 번호 */
+			, #{ooaNm}				/* 예금주 명 */
+			, #{schdAmt}				/* 예정 금액 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+	</insert>
+	
+	<update id="updatePayCashRefundStatus">
+		<!--
+			Query Name : payCashRefund.updatePayCashRefundStatus
+			Description : 결제 현금 환불 상태 변경
+		-->
+		UPDATE	PAY_CASH_REFUND SET
+				SYS_UPDR_NO				= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()						/* 시스템 수정 일시 */
+			<if test="rfdStatCd != null and rfdStatCd != ''">
+				, RFD_STAT_CD			= #{rfdStatCd}				/* 환불 상태 코드 */
+			</if>	
+			<if test="cpltrNo != null">
+				, CPLTR_NO				= #{cpltrNo}					/* 완료자 번호 */
+				, CPLT_DTM = NOW()
+			</if>
+			<if test="rfdAmt != null">
+				, RFD_AMT				= #{rfdAmt}					/* 환불 금액 */
+			</if>
+			<if test="memo != null and memo != ''">
+				, MEMO					= #{memo}					/* 메모 */
+			</if>
+		WHERE	1 = 1
+		<if test="cashRfdNo != null">
+		AND		CASH_RFD_NO	= #{cashRfdNo}
+		</if>
+	</update>		
+	
+	<select id="getPayCashRefund" resultType="biz.app.pay.model.PayCashRefundVO" >
+		<!--
+			Query Name : payCashRefund.getPayCashRefund
+			Description : 결제 현금 환불 단건 조회
+		-->
+		SELECT	/* QUERYID(payCashRefund.getPayCashRefund) */
+					PCR.CASH_RFD_NO				/* 현금 환불 번호 */
+					, PCR.PAY_NO				/* 결제 번호 */
+					, PCR.RFD_TP_CD				/* 환불 유형 코드 */
+					, PCR.RFD_STAT_CD			/* 환불 상태 코드 */
+					, PCR.BANK_CD				/* 은행 코드 */
+					, PCR.ACCT_NO				/* 계좌 번호 */
+					, PCR.OOA_NM				/* 예금주 명 */
+					, PCR.SCHD_AMT				/* 예정 금액 */
+					, PCR.RFD_AMT				/* 환불 금액 */
+					, PCR.CPLT_DTM				/* 완료 일시 */
+					, PCR.CPLTR_NO				/* 완료자 번호 */
+					, PCR.MEMO					/* 메모 */
+					, PCR.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, PCR.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, PCR.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, PCR.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(PCR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(PCR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		PAY_CASH_REFUND PCR
+		WHERE	1=1
+		<if test="cashRfdNo != null  and cashRfdNo != ''    ">
+		AND		PCR.CASH_RFD_NO		= #{cashRfdNo}
+		</if>
+		<if test="payNo != null">
+		AND		PCR.PAY_NO	= #{payNo}
+		</if>
+	</select>
+	
+	<select id="pagePayCashRefund" resultType="biz.app.pay.model.PayCashRefundVO" >
+		<!--
+			Query Name : payCashRefund.pagePayCashRefund
+			Description : 홈 > 주문 관리 > 클레임 관리 > 환불 목록
+		-->
+		SELECT	/* QUERYID(payCashRefund.pagePayCashRefund) */
+					  PCR.CASH_RFD_NO				/* 현금 환불 번호 */
+					, PCR.PAY_NO				/* 결제 번호 */
+					, PCR.RFD_TP_CD				/* 환불 유형 코드 */
+					, PCR.RFD_STAT_CD			/* 환불 상태 코드 */
+					, PCR.BANK_CD				/* 은행 코드 */
+					, PCR.ACCT_NO				/* 계좌 번호 */
+					, PCR.OOA_NM				/* 예금주 명 */
+					, PCR.SCHD_AMT				/* 예정 금액 */
+					, PCR.RFD_AMT				/* 환불 금액 */
+					, PCR.CPLT_DTM				/* 완료 일시 */
+					, FN_GET_USER_NAME(PCR.CPLTR_NO) AS CPLTR_NM			/* 완료자 번호 */
+					, PCR.MEMO					/* 메모 */
+					, PCR.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, PCR.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, PCR.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, PCR.SYS_UPD_DTM			/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(PCR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(PCR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, PB.ORD_NO 	/** 주문번호 */
+					, PB.CLM_NO		/** 클레임번호 */
+		FROM		PAY_CASH_REFUND PCR
+					LEFT OUTER JOIN PAY_BASE PB ON PB.PAY_NO = PCR.PAY_NO
+		WHERE	1 = 1
+		<include refid="pagePayCashRefundWhere" />
+		    ORDER BY PCR.CASH_RFD_NO	DESC 
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pagePayCashRefundCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : payCashRefund.pagePayCashRefundCount
+			Description : 홈 > 주문 관리 > 클레임 관리 > 환불 목록
+		-->
+		SELECT	COUNT(*)
+		FROM		PAY_CASH_REFUND PCR
+					LEFT OUTER JOIN PAY_BASE PB ON PB.PAY_NO = PCR.PAY_NO
+		WHERE	1 = 1
+		<include refid="pagePayCashRefundWhere" />
+	</select>
+	
+ 	<sql id="pagePayCashRefundWhere">
+		AND 		PCR.SYS_REG_DTM BETWEEN #{dtmStart} AND DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+		<if test="rfdTpCd != null and rfdTpCd != '' ">
+		AND		PCR.RFD_TP_CD		= #{rfdTpCd}
+		</if>
+		<if test="rfdStatCd != null and rfdStatCd != '' ">
+		AND		PCR.RFD_STAT_CD		= #{rfdStatCd}
+		</if>
+	</sql>
+	
+			
+</mapper>

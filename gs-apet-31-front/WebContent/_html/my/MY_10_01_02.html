@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			if($("link[href *= 'style.mo.css']").length){
+				$(window).scroll(function(){
+					var source = '<li><div class="sale">30,000 만원 할인<!-- alert : 웹용 --><div class="alert_pop" data-pop="popCpnGud"><div class="bubble_txtBox" style="width:267px;"><div class="tit">추가 배송비</div><div class="info-txt"><ul><li>취소/반품/교환 시 발생한 배송비 금액입니다.</li><li>도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.</li><li>취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.</li></ul></div></div></div><!-- // alert --></div><p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p><div class="bottom-item"><div class="txt"><p>1000원 이상 구매 시 / 최대 5000원 할인</p><p>2020.12.01 00:00 ~ 2030.12.31 00:00</p></div></div><button class="btn-down">쿠폰 다운로드 </button></li>';
+					var diff = 50;
+					var st = $(window).scrollTop();
+					var point = $(document).height() - window.innerHeight - 20 - ($("#footer").innerHeight() || 0);
+					var $target = $(".cupon-list");
+					if(st >= point){
+						$target.append(source);
+						
+						ui.bubble_pop.open($target.children().last().find(".alert_pop"));
+					}
+				})
+			};
+		})
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set22","tit":"내 쿠폰"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>쿠폰존</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<div class="cupon-wrap">
+						<div class="my-cupon t2" data-dh="60">
+							<ul class="cupon-list">
+								<li class="bubble_par"><!-- 2021.03.26 : "bubble_par" 클래스 추가 -->
+									<div class="sale">
+										30,000 만원 할인
+										<!-- alert : 웹용 -->
+										<div class="alert_pop" data-pop="popCpnGud">
+											<div class="bubble_txtBox" style="width:267px;">
+												<div class="tit">추가 배송비</div>
+												<div class="info-txt">
+													<ul>
+														<li>
+															취소/반품/교환 시 발생한 배송비 금액입니다.
+														</li>
+														<li>
+															도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+														</li>
+														<li>
+															취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<!-- // alert -->
+									</div>
+									<!-- 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<p class="s-tit">배송비쿠폰</p>
+									<p class="tit">텍스트영역은 기본이 2줄입니다. 2줄을 고정영역으로 잡아주세요. 감사합니다.</p>
+									<!-- // 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<div class="bottom-item">
+										<div class="txt">
+											<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+											<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+										</div>
+									</div>
+									<button class="btn-down">
+										쿠폰 다운로드 
+									</button>
+								</li>
+								<li class="bubble_par"><!-- 2021.03.26 : "bubble_par" 클래스 추가 -->
+									<div class="sale">
+										30,000 만원 할인
+										<!-- alert : 웹용 -->
+										<div class="alert_pop" data-pop="popCpnGud">
+											<div class="bubble_txtBox" style="width:267px;">
+												<div class="tit">추가 배송비</div>
+												<div class="info-txt">
+													<ul>
+														<li>
+															취소/반품/교환 시 발생한 배송비 금액입니다.
+														</li>
+														<li>
+															도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+														</li>
+														<li>
+															취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<!-- // alert -->
+									</div>
+									<!-- 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<p class="s-tit">배송비쿠폰</p>
+									<p class="tit">텍스트영역은 기본이 2줄입니다. 2줄을 고정영역으로 잡아주세요. 감사합니다.</p>
+									<!-- // 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<div class="bottom-item">
+										<div class="txt">
+											<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+											<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+										</div>
+									</div>
+									<button class="btn-down">
+										쿠폰 다운로드 
+									</button>
+								</li>
+								<li class="bubble_par"><!-- 2021.03.26 : "bubble_par" 클래스 추가 -->
+									<div class="sale">
+										30,000 만원 할인
+										<!-- alert : 웹용 -->
+										<div class="alert_pop" data-pop="popCpnGud">
+											<div class="bubble_txtBox" style="width:267px;">
+												<div class="tit">추가 배송비</div>
+												<div class="info-txt">
+													<ul>
+														<li>
+															취소/반품/교환 시 발생한 배송비 금액입니다.
+														</li>
+														<li>
+															도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+														</li>
+														<li>
+															취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<!-- // alert -->
+									</div>
+									<p class="s-tit">배송비쿠폰</p>
+									<p class="tit">텍스트영역은 기본이 2줄입니다. 2줄을 고정영역으로 잡아주세요. 감사합니다.</p>
+									<div class="bottom-item">
+										<div class="txt">
+											<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+											<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+										</div>
+									</div>
+									<button class="btn-down">
+										쿠폰 다운로드 
+									</button>
+								</li>
+								<li class="bubble_par disabled"><!-- 2021.03.26 : "bubble_par" 클래스 추가 -->
+									<div class="sale">
+										20% 할인
+										<!-- alert : 웹용 -->
+										<div class="alert_pop" data-pop="popCpnGud">
+											<div class="bubble_txtBox" style="width:267px;">
+												<div class="tit">추가 배송비</div>
+												<div class="info-txt">
+													<ul>
+														<li>
+															취소/반품/교환 시 발생한 배송비 금액입니다.
+														</li>
+														<li>
+															도서/산간지역의 경우 반품/교환 시 추가 배송비가 발생할 수 있습니다.
+														</li>
+														<li>
+															취소/반품/교환으로 인해 무료배송 조건이 충족되지 못할경우 배송비가 추가로 발생할 수 있습니다.
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<!-- // alert -->
+									</div>
+									<!-- 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<p class="s-tit">배송비쿠폰</p>
+									<p class="tit">텍스트영역은 기본이 2줄입니다. 2줄을 고정영역으로 잡아주세요. 감사합니다.</p>
+									<!-- // 03.29 수정 : 디자인 변경으로 인한 HTML 구조 변경 -->
+									<div class="bottom-item">
+										<div class="txt">
+											<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+											<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+										</div>
+									</div>
+									<button class="btn-down ">
+										쿠폰 다운로드 
+									</button>
+								</li>
+							</ul>
+						</div>
+						<div class="pbt fixed">
+							<div class="bts">
+								<!-- <button type="button" class="btn xl d" onclick="ui.popLayer.close('popSample1');">취소</button> -->
+								<button type="button" class="btn xl a">쿠폰 모두 받기</button>
+							</div>
+						</div>	
+					</div>
+					
+				</div>
+			</div>
+		</main>
+				
+		<div class="layers">
+			<!-- 쿠폰이용안내 -->
+			<!-- @@ PC에선 하단 팝업.  MO에선 툴팁으로 해달래요 ㅜㅜ -->
+			<article class="popBot popCpnGud k0427" id="popCpnGud"><!-- 04.27 -->
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit">이용안내</h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							
+							<ul class="tplist">
+								<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>
+								<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>
+							</ul>
+						</main>
+					</div>
+				</div>
+			</article>
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

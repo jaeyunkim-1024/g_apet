@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 09. 18.
+	작성자 : schoi
+-->
+
+<mapper namespace="oborderhist">
+
+	<insert id="insertObApiBase">
+		<!--
+			Query Name : oborderhist.insertObApiBase
+			Description : Outbound API 이력 등록
+		-->
+			INSERT INTO OB_API_BASE (
+			   OB_API_GB
+			  ,OB_API_ST_CD
+			  ,OB_API_CD
+			  ,OB_API_REQ_CONT
+			  ,OB_API_RES_CONT
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			  ,SYS_REMOTE_IP
+			) VALUES (
+			   #{obApiGb}
+			  ,#{obApiStCd}
+			  ,#{obApiCd}
+			  ,#{obApiReqCont}
+			  ,#{obApiResCont}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			  ,#{sysRemoteIp}
+			)		
+		
+	</insert>
+			
+	<insert id="insertObOrderHistory">
+		<!--
+			Query Name : oborderhist.insertObOrderHistory
+			Description : Outbound API 주문 이력 상세 등록
+		-->
+			INSERT INTO OB_ORDER_HISTORY (
+			   OB_API_SEQ
+			  ,ADD_PRD_NO
+			  ,ADD_PRD_YN
+			  ,BNDL_DLV_SEQ
+			  ,BNDL_DLV_YN
+			  ,CUST_GRD_NM
+			  ,DLV_CST
+			  ,DLV_CST_TYPE
+			  ,BM_DLV_CST
+			  ,BM_DLV_CST_TYPE
+			  ,DLV_NO
+			  ,GBL_DLV_YN
+			  ,MEM_ID
+			  ,MEM_NO
+			  ,ORD_AMT
+			  ,ORD_BASE_ADDR
+			  ,ORD_DLV_REQ_CONT
+			  ,ORD_DT
+			  ,ORD_DTLS_ADDR
+			  ,ORD_MAIL_NO
+			  ,ORD_NM
+			  ,ORD_NO
+			  ,ORD_OPT_WON_STL
+			  ,ORD_PAY_AMT
+			  ,ORD_PRD_SEQ
+			  ,ORD_PRTBL_TEL
+			  ,ORD_QTY
+			  ,ORD_STL_END_DT
+			  ,ORD_TLPHN_NO
+			  ,PL_CODR_CNF_DT
+			  ,PRD_NM
+			  ,PRD_NO
+			  ,PRD_STCK_NO
+			  ,RCVR_BASE_ADDR
+			  ,RCVR_DTLS_ADDR
+			  ,RCVR_MAIL_NO
+			  ,RCVR_MAIL_NO_SEQ
+			  ,RCVR_NM
+			  ,RCVR_PRTBL_NO
+			  ,RCVR_TLPHN
+			  ,SEL_PRC
+			  ,SELLER_DSC_PRC
+			  ,SLCT_PRD_OPT_NM
+			  ,TMALL_DSC_PRC
+			  ,TYPE_ADD
+			  ,TYPE_BIL_NO
+			  ,LST_TMALL_DSC_PRC
+			  ,LST_SELLER_DSC_PRC
+			  ,SELLER_STOCK_CD
+			  ,APPMT_DD_DLV_DY
+			  ,APPMT_ELT_REFUSE_YN
+			  ,APPMT_SEL_STOCK_CD
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			   (SELECT MAX(OB_API_SEQ) 
+			      FROM OB_API_BASE 
+			     WHERE OB_API_GB = 20
+				   AND OB_API_CD = 20
+			   )
+			  ,#{addPrdNo}
+			  ,#{addPrdYn}
+			  ,#{bndlDlvSeq}
+			  ,#{bndlDlvYn}
+			  ,#{custGrdNm}
+			  ,#{dlvCst}
+			  ,#{dlvCstType}
+			  ,#{bmDlvCst}
+			  ,#{bmDlvCstType}
+			  ,#{dlvNo}
+			  ,#{gblDlvYn}
+			  ,#{memId}
+			  ,#{memNo}
+			  ,#{ordAmt}
+			  ,#{ordBaseAddr}
+			  ,#{ordDlvReqCont}
+			  ,#{ordDt}
+			  ,#{ordDtlsAddr}
+			  ,#{ordMailNo}
+			  ,#{ordNm}
+			  ,#{ordNo}
+			  ,#{ordOptWonStl}
+			  ,#{ordPayAmt}
+			  ,#{ordPrdSeq}
+			  ,#{ordPrtblTel}
+			  ,#{ordQty}
+			  ,#{ordStlEndDt}
+			  ,#{ordTlphnNo}
+			  ,#{plCodrCnfDt}
+			  ,#{prdNm}
+			  ,#{prdNo}
+			  ,#{prdStckNo}
+			  ,#{rcvrBaseAddr}
+			  ,#{rcvrDtlsAddr}
+			  ,#{rcvrMailNo}
+			  ,#{rcvrMailNoSeq}
+			  ,#{rcvrNm}
+			  ,#{rcvrPrtblNo}
+			  ,#{rcvrTlphn}
+			  ,#{selPrc}
+			  ,#{sellerDscPrc}
+			  ,#{slctPrdOptNm}
+			  ,#{tmallDscPrc}
+			  ,#{typeAdd}
+			  ,#{typeBilNo}
+			  ,#{lstTmallDscPrc}
+			  ,#{lstSellerDscPrc}
+			  ,#{sellerStockCd}
+			  ,#{appmtDdDlvDy}
+			  ,#{appmtEltRefuseYn}
+			  ,#{appmtSelStockCd}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			)
+
+	</insert>
+	
+	<insert id="insertObOrderResponse">
+		<!--
+			Query Name : oborderhist.insertObOrderResponse
+			Description : Outbound API Response 이력 등록
+		-->
+			INSERT INTO OB_ORDER_RESPONSE (
+			   OB_API_SEQ
+			  ,ORD_NO
+			  ,SHOP_ORD_NO
+			  ,ORD_RES_CD
+			  ,OPEN_MALL_ID
+			  ,OPEN_11ST_MALL
+			  ,OPEN_DONE_PAYMENT_INTERFACE
+			  ,RESULT_CODE
+			  ,RESULT_TEXT
+			  ,SYS_REGR_NO
+			  ,SYS_REG_DTM
+			  ,SYS_UPDR_NO
+			  ,SYS_UPD_DTM
+			) VALUES (
+			   (SELECT MAX(OB_API_SEQ) 
+			      FROM OB_API_BASE 
+			     WHERE OB_API_GB = 20
+				   AND OB_API_CD = #{obApiCd}
+			   )
+			  ,#{ordNo}
+			  ,#{shopOrdNo}
+			  ,#{ordResCd}
+			  ,#{openMallId}
+			  ,#{open11stMall}
+			  ,#{openDonePaymentInterface}
+			  ,#{resultCode}
+			  ,#{resultText}
+			  ,#{sysRegrNo}
+			  ,NOW()
+			  ,#{sysUpdrNo}
+			  ,NOW()
+			)
+		
+	</insert>		
+	
+</mapper>

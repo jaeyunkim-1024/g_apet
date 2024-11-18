@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<article class="popLayer a popBilPwdMod" id="popBilPwdMod">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">결제 비밀번호 등록<!--결제 비밀번호 입력 --></h1>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+					<div class="uibilpwdmod payMentBox">				<!-- payMentBox클래스추가 2021.04.29 수정 -->
+						<div class="hdts">
+							<div class="boxs">
+								<div class="txt">
+									<p class="t">결제 비밀번호를 입력해주세요.</p>
+									<!-- <p class="t">비밀번호로 사용할 수 없는 숫자입니다. <br> 다시 입력해주세요. </p> -->
+								</div>
+								<div class="dots">
+									<em class="dot on">.</em>
+									<em class="dot">.</em>
+									<em class="dot">.</em>
+									<em class="dot">.</em>
+									<em class="dot">.</em>
+									<em class="dot">.</em>
+								</div>
+								<div class="ttt"><a class="lk" href="javascript:;">비밀번호 재설정</a></div>
+							</div>
+						</div>
+						<div class="cdts">
+							<div class="gdmsg">연속된 숫자, 동일한 숫자 반복, 생년월일, 휴대폰번호 사용 불가</div>
+							<div class="keynumsbox">
+								<ul class="nums">
+									<li><button type="button" class="nm" disabled>.</button></li>
+									<li><button type="button" class="nm">1</button></li>
+									<li><button type="button" class="nm">2</button></li>
+									<li><button type="button" class="nm">5</button></li>
+									<li><button type="button" class="nm">4</button></li>
+									<li><button type="button" class="nm">7</button></li>
+									<li><button type="button" class="nm" disabled>.</button></li>
+									<li><button type="button" class="nm">3</button></li>
+									<li><button type="button" class="nm">8</button></li>
+									<li><button type="button" class="nm">9</button></li>
+									<li><button type="button" class="nm">6</button></li>
+									<li><button type="button" class="nm">0</button></li>
+								</ul>
+								<div class="bts">
+									<button type="button" class="bt res">재배열</button>
+									<button type="button" class="bt del">삭제</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</main>
+			</div>
+			
+		</div>
+	</article>
+	<script>
+		ui.popLayer.open("popBilPwdMod");
+	</script>
+</body>
+</html>

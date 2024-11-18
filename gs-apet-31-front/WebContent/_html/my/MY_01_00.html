@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set3","tit":"친구 초대하기"}'></include>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb my" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my home" id="container">
+
+			<div class="inr">			
+
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<section class="sect top">
+						<dl>
+							<dt class="pic">
+								<img src="../../_images/_temp/goods_1.jpg" alt="등록한 프로필 이미지" class="img" >
+							</dt>
+							<dd class="info-bx">
+								<P>
+									<span class="nm">mong2mom</span>
+									<button class="btn re">수정</button>
+								</P>
+								<ul class="data">
+									<li>
+										<span>등급</span>
+										<i class="label vvip">VVIP</i>
+										<i class="label vip">VIP</i>
+										<i class="label family">패밀리</i>
+										<i class="label welcome">웰컴</i>
+									</li>
+									<li>
+										<span>GS&amp;POINT</span>
+										<!-- <em class="blue">200000</em>P -->
+										<a href="javascrpit:;" class="bt point">포인트조회</a>
+									</li>
+								</ul>
+							</dd>
+						</dl>
+					</section>
+
+					<section class="myinfo">
+						<div class="sect line">
+							<dl class="my">
+								<dt>마이펫 관리</dt>
+								<dd>
+									<div class="pet">
+										<p class="ex">반려동물 등록하고 <span>예방접종 내역을 관리하세요</span></p>
+										<button class="btn add">마이펫 등록하기</button>
+									</div>
+								</dd>
+							</dl> 
+						</div>
+						<dl class="zzim">
+							<dt>마이찜 리스트</dt>
+							<dd>
+								<!-- <p class="nodata">아직 찜한 콘텐츠가 없습니다.</p> -->
+								<ul class="zzim-list">
+									<!-- 04.13 수정 -->
+									<li>
+										<a href="javascrpit:;">
+											<b>TV</b>
+											<span>1</span>
+										</a>
+									</li>
+									<li>
+										<a href="javascrpit:;">
+											<b>로그</b>
+											<span>1</span>
+										</a>
+									</li>
+									<li>
+										<a href="javascrpit:;">
+											<b>스토어</b>	<!-- APET-1250 210721 lju02 - 펫샵 서비스명 변경 -->
+											<span>1</span>
+										</a>
+									</li>
+									<!-- // 04.13 수정 -->
+								</ul>
+							</dd>
+						</dl>
+						<dl class="sect watch">
+							<dt>
+								<a href="javascrpit:;">
+									<span>최근 본 영상</span>
+									<span class="next all">TV 바로보기</span>	<!-- APET-1250 210721 lju02 - 펫샵 서비스명 변경 -->
+								</a>
+							</dt>
+							<dd>
+								<p class="nodata">최근 시청한 영상이 없습니다. 반려동물과 함께하는 펫TV를 시청해보세요.</p>
+							</dd>
+						</dl>
+						<dl class="sect shop line">
+							<dt>
+								<span>나의 쇼핑정보</span>
+							</dt>
+							<dd>
+								<ul class="coupon">
+									<li>
+										<a class="my1" href="#">
+											<em>31</em>
+											<span>내쿠폰</span>
+										</a>
+									</li>
+									<li>
+										<a class="my2" href="#"><em>3</em><span>최근본상품</span></a>
+									</li>
+									<li>
+										<a class="my3" href="#"><em>3</em><span>찜한상품</span></a>
+									</li>
+									<li>
+										<a class="my4" href="#"><em>3</em><span>장바구니</span></a>
+									</li>
+								</ul>
+								<div class="barwrap">
+									<ul class="bar">
+										<li>
+											<a href="javascript:;">
+												<span class="tit">주문/배송 <em>3</em></span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit new">취소/반품/교환</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">재입고 알림</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">쿠폰존</span>
+												<span class="next"></span>
+											</a>
+										</li>
+									</ul>
+									<ul class="bar line">
+										<li>
+											<a href="javascript:;">
+												<span class="tit">고객 문의</span>	<!-- APET-1227 210730 lju02 -->
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">상품 후기</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">배송지 관리</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">간편결제 카드 관리</span>
+												<span class="next"></span>
+											</a>
+										</li>
+									</ul>
+								</div>
+								<div class="line mt25">
+									<div class="invite">
+										<span class="ex">어바웃펫에 <em>친구를 초대</em>하고 <span class="block">친구와 함께 혜택을 받아보세요</span></span>
+									</div>
+								</div>
+							</dd>
+						</dl>
+
+					</section>
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+	</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<header class="header mo" id="header_mo">
+			<div class="hdr">
+				<div class="inr back">
+					<div class="hdt">
+						<button type="button" class="btnPop-back">닫기</button>
+						<h1 class="tit">최근 시청한 영상</h1>
+					</div>
+					<div class="mdt">
+						<button class="bt schs" type="button">검색</button>
+						<button class="bt cart" type="button">장바구니</button>
+						<button class="bt alim" type="button">알림</button>
+						<button class="bt gnbs btnGnb" type="button">메뉴</button>
+						<!-- <a href="javascript:;" class="golist">시리즈목록</a> -->
+					</div>
+				</div>
+			</div>
+		</header>
+		<!-- 헤더 PC-->
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		
+		<include class="lnb" data-include-html="../inc/lnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>최근 시청한 영상</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- 컨텐츠가 없을 경우 주석 제거 -->
+					<div class="noneBoxPoint" style="display:none;">
+						<div>
+							<span class="noneBoxPoint_img"></span>
+							<div class="noneBoxPoint_infoTxt">
+								최근 시청한 영상이 없습니다.<br />
+								반려동물과 함께하는 <strong>펫TV</strong>를 시청해 보세요.
+							</div>
+							<a href="javascript:;" class="btn lg a">펫TV 바로가기</a>
+						</div>
+					</div>
+					<!-- 컨텐츠가 없을 경우 주석 제거 -->
+					<!-- 최근 싱청한 영상  -->
+					<div class="watch-movie">
+						<div class="item">
+							<div class="movie">
+								<a href="javascript:;">
+									<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+								</a>
+								<div class="time">
+									10:08
+								</div>
+								<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+							</div>
+							<div class="text-box">
+								<p class="t1">시리즈명노출영역</p>
+								<p class="t2">
+									<a href="javascript:;">
+										행복해보이는 친칠라 자몽이의 숨겨진 …
+									</a>
+								</p>
+								<div class="box">
+									<p class="play">86,000</p>
+									<p class="like">33</p>
+								</div>
+								<a href="javascript:;" class="btn close">삭제</a>
+							</div>
+						</div>
+						<div class="item">
+							<div class="movie">
+								<a href="javascript:;">
+									<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+								</a>
+								<div class="time">
+									10:08
+								</div>
+								<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+							</div>
+							<div class="text-box">
+								<p class="t1">시리즈명노출영역</p>
+								<p class="t2">
+									<a href="javascript:;">
+										행복해보이는 친칠라 자몽이의 숨겨진 …
+									</a>
+								</p>
+								<div class="box">
+									<p class="play">86,000</p>
+									<p class="like">33</p>
+								</div>
+								<a href="javascript:;" class="btn close">삭제</a>
+							</div>
+						</div>
+						<div class="item">
+							<div class="movie">
+								<a href="javascript:;">
+									<img src="../../_images/_temp/temp_logimg002.jpg" alt="">
+								</a>
+								<div class="time">
+									10:08
+								</div>
+								<p class="progressbar" style="width: 60%">동영상 진행 상태</p>
+							</div>
+							<div class="text-box">
+								<p class="t1">시리즈명노출영역</p>
+								<p class="t2">
+									<a href="javascript:;">
+										행복해보이는 친칠라 자몽이의 숨겨진 …
+									</a>
+								</p>
+								<div class="box">
+									<p class="play">86,000</p>
+									<p class="like">33</p>
+								</div>
+								<a href="javascript:;" class="btn close">삭제</a>
+							</div>
+						</div>
+					
+					</div>
+					<!-- // 최근 싱청한 영상  -->
+					
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+
+	</div>
+</body>
+</html>

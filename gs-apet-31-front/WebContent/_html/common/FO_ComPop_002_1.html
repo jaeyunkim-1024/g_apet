@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 버튼 클릭 시  */
+			$(".btn").click(function(){
+				ui.commentBox.open('.type01');
+			});
+		});
+	</script>
+</head>
+<body style="background:rgba(0,0,0,0.5)">
+	<div class="btnSet" style="width:80%;">
+		<a href="javascript:;" class="btn lg a">팝업 OPEN</a>
+	</div>
+	<!-- drop pop -->
+	<div class="commentBoxAp type01 handHead tabMode" data-priceh="100%"><!-- tabMode 클래스 추가 시 : 탭해더 부분 display:block ; // backMode 클래스 추가 시 : 뒤로가기 버튼 display:block -->
+		<div class="head h2 bnone">
+			<div class="con">
+				<button class="mo-header-backNtn t2">뒤로</button>
+				<div class="tit">
+					<!-- tab header -->
+					<section class="sect petTabHeader">
+						<ul class="uiTab b">
+							<li>
+								<a class="bt" href="javascript:;">연관상품</a>
+							</li>
+							<li class="active">
+								<a class="bt active" href="javascript:;">장바구니</a>
+							</li>
+						</ul>
+					</section>
+					<!-- // tab header -->
+				</div>
+				<a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+			</div>
+		</div>
+		<div class="con">
+			<!-- tab -->
+			<section class="sect petTabContent">
+				<!-- tab content -->
+				<div class="uiTab_content">
+					<ul>
+						<li>
+							<!-- 연관 상품 -->
+							<div class="product-area" style="padding:20px 20px 0;">
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+								<div class="item">
+									<div class="img-box">
+										<img src="/../_images/tv/@temp01.jpg" alt="">
+										<button class="keep">보관하기</button>
+										<button class="cart">장바구니</button>
+									</div>
+									<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+									<div class="price">
+										<strong class="num">23,000</strong>
+										<span>원</span>
+										<strong class="discount">10%</strong>
+									</div>
+								</div>
+							</div>
+							<!-- // 연관 상품 -->
+						</li>
+						<li>
+							<!-- 장바구니 -->
+							<div class="cart-area">
+								<div class="all-check">
+									<label class="checkbox t01">
+										<input type="checkbox"><span class="txt">전체 선택</span>
+									</label>
+								</div>
+								<div class="check-list">
+									<ul class="list">
+										<li>
+											<div class="untcart">
+												<label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+												<div class="box">
+													<div class="tops">
+														<div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+														<div class="name">
+															<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+															<div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+														</div>
+													</div>
+													
+													<div class="amount">
+														<div class="uispiner">
+															<input type="text" value="1" class="amt" disabled>
+															<button type="button" class="bt minus">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="prcs">
+															<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+															<a href="javascript:;" class="btn sm a buy">바로구매</a>
+														</div>
+													</div>
+												</div>
+											</div>
+										</li>
+										<li>
+											<div class="untcart">
+												<label class="checkbox"><input type="checkbox"><span class="txt"></span></label>
+												<div class="box">
+													<div class="tops">
+														<div class="pic"><img src="../../_images/_temp/goods_1.jpg" alt="상품" class="img"></div>
+														<div class="name">
+															<div class="tit">반려견 습식사료 아미로 후코이단 홀리티 20개 set</div>
+															<div class="stt">한입 맛보기 습식사료 체험 추가 증정</div>
+														</div>
+													</div>
+													
+													<div class="amount">
+														<div class="uispiner">
+															<input type="text" value="1" class="amt" disabled>
+															<button type="button" class="bt minus">수량더하기</button>
+															<button type="button" class="bt plus">수량빼기</button>
+														</div>
+														<div class="prcs">
+															<span class="prc"><em class="p">25,000</em><i class="w">원</i></span>
+															<a href="javascript:;" class="btn sm a buy">바로구매</a>
+														</div>
+													</div>
+												</div>
+											</div>
+										</li>
+									</ul>
+									<p class="info-t1">최근에 장바구니에 담은 상품 5개까지만 노출됩니다.</p>
+									<div class="btn-area">
+										<a href="javascript:;" class="btn round">바로구매 <span class="arrow"></span></a>
+									</div>
+								</div>
+							</div>
+							<!-- // 장바구니 -->	
+						</li>
+					</ul>
+				</div>
+				<!-- // tab content -->
+			</section>
+			<!-- // tab -->
+		</div>
+	</div>
+	<!-- //drop pop -->
+</body>
+</html>

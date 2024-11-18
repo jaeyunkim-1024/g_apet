@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 버튼 클릭 시  */
+			$(".btn").click(function(){
+				ui.selAc.open('.acSelect');
+			});
+			var t, a;
+			a = setInterval(function (){
+				t++;
+				$('.mo-header-btnType01').hide();
+				if(t >= 100) clearInterval(a);
+			});
+		});
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set7","tit":"건강수첩" , "class":"noneAc"}'></include><!-- 2021.03.15 : noneAc 클래스 추가 -->
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb" data-include-html="../inc/lnb_my.html"></include>
+
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>
+							<p class="img">
+								<img class="img" src="../../_images/_temp/goods_1.jpg" alt="이미지">
+							</p> 
+							건강수첩
+						</h2>
+						<div class="right-item">
+							<div class="mo-header-rightBtn">
+								<button class="mo-header-btnType01">
+									<span class="mo-header-icon-tip"></span>
+									기초건강관리
+								</button>
+							</div>
+						</div>
+						
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- tab -->
+					<section class="sect petTabContent mode_fixed leftTab hmode_auto"><!-- 2021.03.15 : mode_fixed, hmode_auto 클래스 추가 -->
+						<!-- tab header -->
+						<ul class="uiTab a line t2 newTap">
+							<li class="active">
+								<a class="bt" href="javascript:;">예방접종 내역</a>
+							</li>
+							<li>
+								<a class="bt" href="javascript:;">접종안내</a>
+							</li>
+						</ul>
+						<!-- // tab header -->
+						<!-- tab content -->
+						<div class="uiTab_content">
+							<ul>
+								<li>
+									<div class="health-note">
+										<div class="item t2">
+											<div class="g-box t2 newDn"><!-- 2021.04.08 클래스 newDn 추가  -->
+												<p class="txt"><strong>오래</strong>의 다음 예방 접종일은 <span>2021.03.10</span> 입니다.</p>
+												<div class="btn-area">
+													<!-- mobile만 노출 -->
+													<button class="btn add onMo_if">접종내역 등록</button>
+													<!-- pc만 노출 -->
+													<button class="btn add onWeb_if">예방접종 기록</button>
+													<button class="btn add onWeb_if">투약 기록</button>
+												</div>
+											</div>
+												
+											<!-- 안내 텍스트 사용시 주석 제거 -->
+											<!-- p class="info">강아지 예방접종 (기초접종, 정기접종) 에 대한 설명은 <span>접종 안내</span> 메뉴에서 확인하실 수 있습니다.</p -->
+											<!-- // 안내 텍스트 사용시 주석 제거 -->
+											<div class="table-type01 t2">
+												<table>
+													<!-- APETQA-6808 2021.09.07 수정함 start -->
+													<colgroup>
+														<col style="width: auto">
+														<col style="width: 28%">
+														<col style="width: 29%">
+														<col style="width: 24%">
+													</colgroup>
+													<!-- APETQA-6808 2021.09.07 수정함 end -->
+													<thead>
+														<tr>
+															<th scope="col">접종일</th>
+															<th scope="col">필수접종</th>
+															<th scope="col">선택접종</th>
+															<th scope="col">다음예정일</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td><a href="javascript:;">2020.12.28</a></td>
+															<td><a href="javascript:;">기초 종합백신 3차</a></td>
+															<td>
+																<div class="box">
+																	<p class="t"><a href="javascript:;">인플루엔자</a></p>
+																	<span class="icon"></span>
+																</div>
+															</td>
+															<td>
+																<div class="box">
+																	<p class="t">
+																		<a href="javascript:;">
+																			<span class="f-blue">
+																				2021.03.10
+																			</span>
+																		</a>
+																	</p>
+																	<a href="javascript:;" class="r-btn"><span class="icon2"></span></a>
+																</div>
+															</td>
+														</tr>
+														<tr>
+															<td><a href="javascript:;">2020.12.28</a></td>
+															<td><a href="javascript:;">기초 종합백신 3차</a></td>
+															<td>
+																<div class="box">
+																	<p class="t"><a href="javascript:;">인플루엔자루엔자루엔자</a></p>
+																	<span class="icon"></span>
+																</div>
+															</td>
+															<td>
+																<div class="box">
+																	<p class="t">
+																		<a href="javascript:;">
+																			<span class="f-red">
+																				2021.03.10
+																			</span>
+																		</a>
+																	</p>
+																	<a href="javascript:;" class="r-btn"><span class="icon2"></span></a>
+																</div>
+															</td>
+														</tr>
+														<tr>
+															<td><a href="javascript:;">2020.12.28</a></td>
+															<td><a href="javascript:;">기초 종합백신 3차</a></td>
+															<td>
+																<div class="box">
+																	<p class="t"><a href="javascript:;">인플루엔자</a></p>
+																	<span class="icon"></span>
+																</div>
+															</td>
+															<td>
+																<div class="box">
+																	<p class="t">
+																		<a href="javascript:;">
+																			<span class="f-blue">
+																				2021.03.10
+																			</span>
+																		</a>
+																	</p>
+																	<a href="javascript:;" class="r-btn"><span class="icon2"></span></a>
+																</div>
+															</td>
+														</tr>
+													
+														
+													</tbody>
+												</table>
+											</div>
+
+
+
+
+										</div>
+										
+									</div>
+								</li>
+								<li>
+									<!-- content -->
+									<div class="noneBoxPoint p3" style="display:none;">
+										<div>
+											<span class="noneBoxPoint_img2"></span>
+											<div class="noneBoxPoint_infoTxt" style="color:#666;">
+												회원님을 아직<br />
+												팔로우하는 사람이 없어요.
+											</div>
+										</div>
+									</div>
+									<!-- content -->
+									<div class="health-note">
+										<div class="item">
+											<p class="tit">기초 접종</p>
+											<div class="item-right">
+												<p class="txt">1년 미만의 강아지는 기초접종이 필요합니다. 생후 6주부터 시작해 2주 간격으로 접종합니다.</p>
+												<div class="table-type01 mt0"><!-- 2021.04.08 mt0 클래스 추가 -->
+													<p class="t-info">*선택사항</p>
+													<table>
+														<colgroup>
+															<col style="width: 33%">
+															<col style="width: 33%">
+															<col style="width: 33%">
+														</colgroup>
+														<thead>
+															<tr>
+																<th scope="col">접종시기</th>
+																<th scope="col">기초접종</th>
+																<th scope="col">선택접종</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>생후 6주</td>
+																<td>종합백신 1차</td>
+																<td><span class="f-gray">코로나 장염 1차</span></td>
+															</tr>
+															<tr>
+																<td>생후 8주</td>
+																<td>종합백신 2차</td>
+																<td><span class="f-gray">코로나 장염 2차</span></td>
+															</tr>
+															<tr>
+																<td>생후 10주</td>
+																<td>종합백신 3차</td>
+																<td><span class="f-gray">켄넬코프 1차</span></td>
+															</tr>
+															<tr>
+																<td>생후 12주</td>
+																<td>종합백신 4차</td>
+																<td><span class="f-gray">켄넬코프 2차</span></td>
+															</tr>
+															<tr>
+																<td>생후 14주</td>
+																<td>종합백신 5차</td>
+																<td><span class="f-gray">인플루엔자 1차</span></td>
+															</tr>
+															<tr>
+																<td><span class="f-gray">생후 16주</span></td>
+																<td><span class="f-gray">광견병</span></td>
+																<td><span class="f-gray">인플루엔자 2차</span></td>
+															</tr>
+														</tbody>
+													</table>
+													<p class="b-info">항체가검사 : 5차 접종 후 2주뒤</p>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<p class="tit">정기 접종</p>
+											<div class="item-right">
+												<p class="txt">기초 예방접종을 마친 성견은 매년 1회 접종을 해야 합니다.</p>
+												<div class="table-type01">
+													<table>
+														<colgroup>
+															<col style="width: 50%">
+															<col style="width: 50%">
+														</colgroup>
+														<thead>
+															<tr>
+																<th scope="col">예방접종명</th>
+																<th scope="col">접종주기</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>종합백신</td>
+																<td>매년 1회</td>
+															</tr>
+															<tr>
+																<td>코로나 장염</td>
+																<td>매년 1회</td>
+															</tr>
+															<tr>
+																<td>켄넬코프</td>
+																<td>매년 1회</td>
+															</tr>
+															<tr>
+																<td>인플루엔자</td>
+																<td>매년 1회</td>
+															</tr>
+															<tr>
+																<td>광견병</td>
+																<td>매년 1회</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<p class="tit">예방접종 종류</p>
+											<div class="g-box newDnPc"><!-- 2021.04.08 클래스 newDnPc 추가  -->
+												<p class="tit">종합백신 (DHPPL)</p>
+												<p class="txt">설사 또는 구토 증상을 일으키는 전염성 소화기관 질병입니다. 특히 비위생적이거나 밀집된 사육 환경에서 감염이 촉진됩니다.</p>
+												<p class="tit">켄넬코프 (보데텔라) </p>
+												<p class="txt">전염성이 매우 강한 호흡기 질환입니다. 가벼운 증상일 경우 금방 회복될 수 있지만, 바이러스하나 이상 복합적으로 감염되면 폐렴으로 이어질 수 있습니다. </p>
+												<div class="movie">
+													<img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지">
+												</div>
+												<p class="tit">인플루엔자 (신종플루)</p>
+												<p class="txt">접촉 및 공기중으로 전염되는 호흡기 바이러스 질환으로 무기력, 식욕감퇴, 고열, 폐렴 등으로 진행될 수 있습니다.</p>
+												<div class="movie">
+													<img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지">
+												</div>
+												<p class="tit">광견병</p>
+												<p class="txt">강아지 뿐만 아니라 모든 포유동물에게 감염되며, 100% 치사율에 도달하는 무시무시한 질병입니다.</p>
+												<div class="movie">
+													<img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지">
+												</div>
+												<p class="tit">항체가검사</p>
+												<p class="txt">백신 전/후, 항체가검사는 백신 접종 프로그램의 기본입니다. 반려견이 예방접종을 했어도 항체가 높지않으면, 홍역이나 파보 바이러스로부터 안전하지 않습니다.</p>
+												<div class="movie">
+													<img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="이미지">
+												</div>
+											</div>
+										</div>
+										<div class="item">
+											<div class="tit">유의사항</div>
+											<div class="info-txt ">
+												<ul>
+													<li>
+														본 프로그램은 지역별, 병원별로 차이가 있을 수 있습니다. 
+													</li>
+													<li>
+														접종 후에는 때에 따라 가려움, 종창, 발적, 통증, 회농, 발열, 의기소침, 예민, 쇼크 등의 증상이 나타날 수 있습니다. 접종반응이 심하거나 쇼크가 발생하면 즉시 동물병원에서 적절한 조치를 받아야 합니다. 
+													</li>
+													<li>접종 후 약 1주일 정도는 목욕, 미용, 여행 등의 스트레스를 가급적 피해야 합니다.</li>
+													<li>임신, 수술 전후, 투약중, 질병, 바이러스 감염 시에는 접종을 피하거나 수의사의 검진 후에 접종을 해야 합니다. </li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<!-- // content -->
+								</li>
+								
+							</ul>
+						</div>
+						<!-- // tab content -->
+					</section>
+					<!-- // tab -->
+					
+				</div>
+			</div>
+		</main>
+
+		<!-- select 레이어 팝업 -->
+		<div class="acSelect t2">
+			<input type="text" class="acSelInput" readonly />
+			<div class="head ">
+				<div class="con">
+					<div class="tit">재생속도</div>
+					<a href="javascript:;" class="close" onClick="ui.selAc.close(this)"></a>
+				</div>
+			</div>
+			<div class="con">
+				<ul>
+					<li onClick="ui.selAc.liClick(this)">예방접종</li>
+					<li onClick="ui.selAc.liClick(this)">투약내역</li>
+				</ul>
+			</div>
+		</div>
+		<!-- //select 레이어 팝업 -->
+		<include class="footer" data-include-html="../inc/footer.html" data-footer-opt='{"foot_mo":"hide","talk_mo":"","foot_pc":"hide","talk_pc":"hide"}'></include>
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		
+	</div>
+
+
+
+	
+</body>
+</html>

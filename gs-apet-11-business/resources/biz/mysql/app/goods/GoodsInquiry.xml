@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 문의
+	작성자  	snw
+	작성일자  	2016.03.03
+-->
+
+<mapper namespace="goodsInquiry">
+
+	<!-- 상품문의 목록 페이징 조회 -->
+	<select id="pageGoodsInquiry" resultType="biz.app.goods.model.GoodsInquiryVO">
+		SELECT	GOODS_IQR_NO
+				,GOODS_ID
+				,GOODS_IQR_STAT_CD
+				,(SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@GOODS_IQR_STAT}' AND DTL_CD = GI.GOODS_IQR_STAT_CD) AS IQR_STAT_NM
+				,IQR_TTL
+				,IQR_CONTENT
+				,EQRR_MBR_NO
+				,(SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = GI.EQRR_MBR_NO) AS EQRR_ID
+				,EQRR_MOBILE
+				,EQRR_EMAIL
+				,RPL_CONTENT
+				,RPLR_USR_NO
+				,RPLR_NM
+				,RPL_DTM
+				,RPL_CONTENT_HEADER
+				,RPL_CONTENT_FOOTER
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+				,(SELECT UB.USR_GRP_CD FROM USER_BASE UB WHERE UB.USR_NO = GI.RPLR_USR_NO) AS USR_GRP_CD /* 사용자 그룹 코드 */
+				,HIDDEN_YN
+		FROM	(
+				SELECT	GOODS_IQR_NO
+						,GOODS_ID
+						,GOODS_IQR_STAT_CD
+						,IQR_TTL
+						,IQR_CONTENT
+						,EQRR_MBR_NO
+						,EQRR_MOBILE
+						,EQRR_EMAIL
+						,RPL_CONTENT
+						,RPLR_USR_NO
+						,RPLR_NM
+						,RPL_DTM
+						,RPL_CONTENT_HEADER
+						,RPL_CONTENT_FOOTER
+						,SYS_REGR_NO
+						,SYS_REG_DTM
+						,SYS_UPDR_NO
+						,SYS_UPD_DTM
+						,HIDDEN_YN
+				FROM	GOODS_INQUIRY
+				WHERE	1 = 1
+				<include refid="pageGoodsInquiryCondition" />
+				ORDER BY ${sidx} ${sord}
+				<include refid="bizCommon.pageSql" />
+				) GI
+	</select>
+
+	<!-- 상품문의 데이터 수 조회 -->
+	<select id="pageGoodsInquiryCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM	GOODS_INQUIRY
+		WHERE	1 = 1
+		<include refid="pageGoodsInquiryCondition" />
+	</select>
+
+	<!-- 상품문의 페이징 목록 조건절 -->
+	<sql id="pageGoodsInquiryCondition">
+		AND		GOODS_ID = #{goodsId}
+		<if test="dispYn != null and dispYn != ''">
+		AND		DISP_YN = #{dispYn}
+		</if>
+		<if test="stId != null and stId != ''">
+		AND		ST_ID = #{stId}
+		</if>
+	</sql>
+
+	<!-- 상품 설명 상세 조회 -->
+	<select id="getGoodsInquiry" resultMap="getGoodsInquiryMap">
+		SELECT	GOODS_IQR_NO
+				,GOODS_ID
+				,GOODS_IQR_STAT_CD
+				,IQR_TTL
+				,IQR_CONTENT
+				,EQRR_MBR_NO
+				,EQRR_MOBILE
+				,EQRR_EMAIL
+				,RPL_CONTENT
+				,RPLR_USR_NO
+				,RPLR_NM
+				,RPL_DTM
+				,HIDDEN_YN
+				,RPL_ALM_RCV_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+		FROM	GOODS_INQUIRY
+		WHERE	GOODS_IQR_NO = #{goodsIqrNo}
+	</select>
+
+	<!-- 상품문의 등록 -->
+	<insert id="insertGoodsInquiry" parameterType="biz.app.goods.model.GoodsInquiryPO">
+		<selectKey keyProperty="goodsIqrNo" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_INQUIRY_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_INQUIRY (/*QUERYID(goodsQna.insertGoodsInquiry) */
+			GOODS_IQR_NO		/* 상품 문의 번호 */
+		  , ST_ID				/* 사이트 ID */
+		  , GOODS_ID			/* 상품 번호 */
+		  , COMP_NO				/* 업체 번호 */
+		  , GOODS_IQR_STAT_CD	/* 상품 문의 상태코드 */
+		  , IQR_CONTENT			/* 문의 내용 */
+		  , EQRR_MBR_NO			/* 문의자 회원 번호 */
+		  , EQRR_MOBILE			/* 문의자 휴대폰 번호 */
+		  , EQRR_EMAIL			/* 문의자 이메일 */
+		  , DISP_YN				/* 전시 여부 */
+		  , HIDDEN_YN			/* 숨김 여부 */
+		  , RPL_ALM_RCV_YN		/* 알림 여부 */
+		  , SYS_REGR_NO			/* 작성자 */
+		  , SYS_REG_DTM			/* 작성 일자 */
+		  , SYS_UPDR_NO			/* 수정자 */
+		  , SYS_UPD_DTM			/* 수정 일자 */
+		)
+		VALUES (
+			#{goodsIqrNo}
+			,#{stId}
+			,#{goodsId}
+			,(SELECT COMP_NO FROM GOODS_BASE WHERE GOODS_ID = #{goodsId})
+			,#{goodsIqrStatCd}
+			,#{iqrContent}
+			,#{eqrrMbrNo}
+			,#{eqrrMobile}
+			,#{eqrrEmail}
+			,#{dispYn}
+			,#{hiddenYn}
+			,#{rplAlmRcvYn}
+			,#{sysRegrNo}
+			,NOW()
+			,#{sysRegrNo}
+			,NOW()
+		)
+	</insert>
+
+	<!-- 상품문의 삭제 -->
+	<delete id="deleteGoodsInquiry">
+		DELETE
+		FROM	GOODS_INQUIRY
+		WHERE	GOODS_IQR_NO = #{goodsIqrNo}
+	</delete>
+
+	<!-- 마이페이지 - 상품문의 목록 페이징 조회 -->
+	<select id="pageMyGoodsInquiry" resultType="biz.app.goods.model.GoodsInquiryVO">
+		SELECT	GI.GOODS_IQR_NO	/* 상품 문의 번호 */
+				,GI.GOODS_ID	/* 상품 아이디 */
+				,GB.GOODS_NM	/* 상품 명 */
+				,GB.BND_NO	/* 브랜드 번호 */
+				,(SELECT BND_NM_KO FROM BRAND_BASE BB WHERE BB.BND_NO = GB.BND_NO) AS BND_NM_KO	/* 브랜드 명 국문 */
+				,FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM
+				,GI.GOODS_IQR_STAT_CD	/* 상품 문의 상태 코드 */
+				,GI.IQR_TTL	/* 문의 제목 */
+				,GI.IQR_CONTENT	/* 문의 내용 */
+				,GI.EQRR_MBR_NO	/* 문의자 회원 번호 */
+				,(SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = GI.EQRR_MBR_NO) AS EQRR_NM	/* 문의자 명 */
+				,GI.EQRR_MOBILE	/* 문의자 휴대폰 번호 */
+				,GI.EQRR_EMAIL /* 문의자 이메일 */
+				,GI.RPL_CONTENT	/* 답변 내용 */
+				,GI.RPLR_USR_NO	/* 답변자 사용자 번호 */
+				,GI.RPLR_NM	/* 답변자 명 */
+				,GI.RPL_DTM	/* 답변 일시 */
+				,GI.SYS_REGR_NO	/* 시스템 등록자 번호 */
+				,GI.SYS_REG_DTM	/* 시스템 등록 일시 */
+				,GI.SYS_UPDR_NO	/* 시스템 수정자 번호 */
+				,GI.SYS_UPD_DTM	/* 시스템 수정 일시 */
+				,I.IMG_SEQ
+				,I.IMG_PATH
+				,(SELECT UB.USR_GRP_CD FROM USER_BASE UB WHERE UB.USR_NO = GI.RPLR_USR_NO) AS USR_GRP_CD /* 사용자 그룹 코드 */
+		FROM	GOODS_INQUIRY GI
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = GI.GOODS_ID
+		LEFT OUTER JOIN GOODS_IMG I
+		ON	GI.GOODS_ID = I.GOODS_ID
+		AND	I.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		WHERE	1 = 1
+		<include refid="pageMyGoodsInquiryCondition" />
+		ORDER BY ${sidx} ${sord}
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<!-- 마이페이지 - 상품문의 목록  데이터 수 조회 -->
+	<select id="pageMyGoodsInquiryCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		FROM	GOODS_INQUIRY GI
+    	INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = GI.GOODS_ID
+		WHERE	1 = 1
+		<include refid="pageMyGoodsInquiryCondition" />
+	</select>
+
+	<!-- 마이페이지 - 상품문의 페이징 목록 조건절 -->
+	<sql id="pageMyGoodsInquiryCondition">
+		AND		EQRR_MBR_NO = #{eqrrMbrNo}
+		<if test="stId != null and stId != ''" >
+		AND GI.ST_ID = #{stId }
+		</if>
+		<if test='sysRegDtmStart != null and sysRegDtmStart != "" and sysRegDtmEnd != null and sysRegDtmEnd != ""'>
+		AND GI.SYS_REG_DTM BETWEEN #{sysRegDtmStart} AND #{sysRegDtmEnd}
+		</if>
+	</sql>
+
+	<select id="listGoodsInquiryGrid" resultType="biz.app.goods.model.GoodsInquiryVO">
+		<!--
+			Query Name : goodsInquiry.listGoodsInquiryGrid
+			Description : 상품Q&A 리스트 [BO]
+		-->
+		SELECT	/* QUERYID(goodsInquiry.listGoodsInquiryGrid) */
+				  G.GOODS_IQR_NO		/* 상품 문의 번호 */
+				, CB.COMP_NO
+				, FN_GET_COMPANY_NAME_BY_GOODS_ID(G.GOODS_ID) COMP_NM
+				, G.ST_ID				/* 사이트 아이디 */
+				, S.ST_NM				/* 사이트 명 */
+				, G.IQR_CONTENT			/* 문의 내용 */
+				, G.RPL_CONTENT			/* 답변 내용 */
+				, G.RPLR_NM				/* 답변자 명 */
+				, G.GOODS_IQR_STAT_CD	/* 상품 문의 상태 코드 */
+				, G.IQR_TTL				/* 문의 제목 */
+				, G.GOODS_ID			/* 상품 아이디 */
+				, G.RPL_DTM				/* 답변 일시 */
+				, G.EQRR_MBR_NO			/* 문의자 회원 번호 */
+				, G.RPLR_USR_NO			/* 답변자 사용자 번호 */
+				, G.EQRR_MOBILE			/* 문의자 휴대폰 */
+				, G.EQRR_EMAIL			/* 문의자 이메일 */
+				, G.DISP_YN				/* 전시 여부 */
+				, G.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, G.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, G.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, G.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = G.GOODS_ID) AS GOODS_NM		/* 상품명 */
+				, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = G.EQRR_MBR_NO) AS EQRR_ID	/* 고객ID */
+				, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = G.EQRR_MBR_NO) AS EQRR_NM		/* 고객명 */
+				, FN_GET_USER_NAME(G.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(G.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_INQUIRY G INNER JOIN ST_STD_INFO S ON G.ST_ID = S.ST_ID JOIN COMPANY_BASE CB ON (G.COMP_NO = CB.COMP_NO)
+		WHERE	1 = 1
+		<if test="stId != null and stId != ''">
+			AND		G.ST_ID	= #{stId}
+		</if>
+		<!-- 등록일 시작일 -->
+		<if test="sysRegDtmStart != null">
+			AND G.SYS_REG_DTM &gt;= #{sysRegDtmStart}
+		</if>
+		<!-- 등록일 종료일 -->
+		<if test="sysRegDtmEnd != null">
+			AND G.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd}, INTERVAL 1 DAY)
+		</if>
+		<!-- 상품 아이디  -->
+		<if test="goodsIds != null" >
+			<foreach collection="goodsIds" item="item" separator="," open="AND G.GOODS_ID IN (" close=")" >
+				#{item}
+			</foreach>
+		</if>
+		<!-- 업체번호  -->
+		<if test='"Y" == showAllLowCompany'>
+        AND CB.UP_COMP_NO = #{compNo}
+        </if>
+        <if test='"Y" != showAllLowCompany'>
+            <if test="lowCompNo != null and lowCompNo != ''">
+        AND G.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+            </if>
+            <if test="lowCompNo == null or lowCompNo == ''">
+                <if test="compNo != null and compNo != ''">
+        AND     G.COMP_NO = #{compNo}
+                </if>
+            </if>
+        </if>
+		<!-- 고객ID  -->
+		<if test="loginId != null and loginId != ''">
+			AND G.EQRR_MBR_NO IN (SELECT MBR_NO FROM MEMBER_BASE WHERE LOGIN_ID LIKE CONCAT('%', #{loginId}, '%'))
+		</if>
+		<!-- 답변여부  -->
+		<if test="goodsIqrStatCd != null and goodsIqrStatCd != ''">
+			AND G.GOODS_IQR_STAT_CD = #{goodsIqrStatCd}
+		</if>
+		<!-- 답변자  -->
+		<if test="rplrNm != null and rplrNm != ''">
+			AND G.RPLR_NM LIKE CONCAT('%',#{rplrNm}, '%')
+		</if>
+		<!-- 전시여부  -->
+		<if test="dispYn != null and dispYn != ''">
+			AND G.DISP_YN = #{dispYn}
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+			AND		G.GOODS_ID	= #{goodsId}
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="listGoodsInquiryGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsInquiry.listGoodsInquiryGridCount
+			Description : 상품Q&A 리스트 카운트 [BO]
+		-->
+		SELECT /* QUERYID(display.listGoodsInquiryGridCount) */
+				COUNT(*)
+		FROM	GOODS_INQUIRY G INNER JOIN ST_STD_INFO S ON G.ST_ID = S.ST_ID JOIN COMPANY_BASE CB ON (G.COMP_NO = CB.COMP_NO)
+		WHERE	1 = 1
+		<if test="stId != null and stId != ''">
+			AND		G.ST_ID	= #{stId}
+		</if>
+		<!-- 등록일 시작일 -->
+		<if test="sysRegDtmStart != null">
+			AND G.SYS_REG_DTM &gt;= #{sysRegDtmStart}
+		</if>
+		<!-- 등록일 종료일 -->
+		<if test="sysRegDtmEnd != null">
+			AND G.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd}, INTERVAL 1 DAY)
+		</if>
+		<!-- 상품 아이디  -->
+		<if test="goodsIds != null" >
+			<foreach collection="goodsIds" item="item" separator="," open="AND G.GOODS_ID IN (" close=")" >
+				#{item}
+			</foreach>
+		</if>
+		<!-- 업체번호  -->
+        <if test='"Y" == showAllLowCompany'>
+        AND CB.UP_COMP_NO = #{compNo}
+        </if>
+        <if test='"Y" != showAllLowCompany'>
+            <if test="lowCompNo != null and lowCompNo != ''">
+        AND G.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+            </if>
+            <if test="lowCompNo == null or lowCompNo == ''">
+                <if test="compNo != null and compNo != ''">
+        AND     G.COMP_NO = #{compNo}
+                </if>
+            </if>
+        </if>
+		<!-- 고객ID  -->
+		<if test="loginId != null and loginId != ''">
+			AND G.EQRR_MBR_NO IN (SELECT MBR_NO FROM MEMBER_BASE WHERE LOGIN_ID LIKE CONCAT('%', #{loginId}, '%'))
+		</if>
+		<!-- 답변여부  -->
+		<if test="goodsIqrStatCd != null and goodsIqrStatCd != ''">
+			AND G.GOODS_IQR_STAT_CD = #{goodsIqrStatCd}
+		</if>
+		<!-- 답변자  -->
+		<if test="rplrNm != null and rplrNm != ''">
+			AND G.RPLR_NM LIKE CONCAT('%',#{rplrNm}, '%')
+		</if>
+		<!-- 전시여부  -->
+		<if test="dispYn != null and dispYn != ''">
+			AND G.DISP_YN = #{dispYn}
+		</if>
+
+	</select>
+
+	<select id="getGoodsInquiryDetail" resultType="biz.app.goods.model.GoodsInquiryVO">
+		<!--
+			Query Name : goodsInquiry.getGoodsInquiryDetail
+			Description : 상품Q&A 상세 조회 [BO]
+		-->
+		SELECT	/* QUERYID(goodsInquiry.goodsInquiryDetail) */
+				  A.GOODS_IQR_NO		/* 상품 문의 번호 */
+				, A.ST_ID				/* 사이트 아이디 */
+				, S.ST_NM				/* 사이트 명 */
+				, A.IQR_CONTENT			/* 문의 내용 */
+				, A.RPL_CONTENT			/* 답변 내용 */
+				, A.RPLR_NM				/* 답변자 명 */
+				, A.GOODS_IQR_STAT_CD	/* 상품 문의 상태 코드 */
+				, A.IQR_TTL				/* 문의 제목 */
+				, A.GOODS_ID			/* 상품 아이디 */
+				, A.RPL_DTM				/* 답변 일시 */
+				, A.EQRR_MBR_NO			/* 문의자 회원 번호 */
+				, A.RPLR_USR_NO			/* 답변자 사용자 번호 */
+				, A.EQRR_MOBILE			/* 문의자 휴대폰 */
+				, A.EQRR_EMAIL			/* 문의자 이메일 */
+				, A.DISP_YN				/* 전시 여부 */
+				, A.BIGO				/* 비고 */
+				, A.RPL_ALM_RCV_YN
+				, A.RPL_CONTENT_HEADER	/* 답변 내용 머리말 */
+				, A.RPL_CONTENT_FOOTER	/* 답변 내용 맺음말 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, A.COMP_NO		/* 업체 번호 */
+				, (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = A.GOODS_ID) AS GOODS_NM		/* 상품명 */
+				, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = A.EQRR_MBR_NO) AS EQRR_ID	/* 고객ID */
+				, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = A.EQRR_MBR_NO) AS EQRR_NM		/* 고객명 */
+				, (SELECT COMP_NM FROM COMPANY_BASE
+					WHERE COMP_NO = (SELECT COMP_NO FROM GOODS_BASE WHERE GOODS_ID = A.GOODS_ID)) AS COMP_NM	/* 업체명 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_INQUIRY A INNER JOIN ST_STD_INFO S ON A.ST_ID = S.ST_ID
+		WHERE	A.GOODS_IQR_NO	= #{goodsIqrNo}
+	</select>
+
+	<update id="updateGoodsInquiry" parameterType="biz.app.goods.model.GoodsInquiryPO">
+		UPDATE	GOODS_INQUIRY SET
+				  BIGO				= #{bigo}			/* 비고 */
+				, DISP_YN			= #{dispYn}			/* 전시여부 */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GOODS_IQR_NO		= #{goodsIqrNo}
+	</update>
+
+	<select id="listGoodsReplyGrid" resultType="biz.app.goods.model.GoodsInquiryVO">
+		<!--
+			Query Name : goodsInquiry.listGoodsReplyGrid
+			Description : 상품Q&A 답변 리스트 [BO]
+		-->
+		SELECT	/* QUERYID(goodsInquiry.listGoodsReplyGrid) */
+				  A.GOODS_IQR_NO		/* 상품 문의 번호 */
+				, A.IQR_CONTENT			/* 문의 내용 */
+				, A.RPL_CONTENT			/* 답변 내용 */
+				, A.RPLR_NM				/* 답변자 명 */
+				, A.GOODS_IQR_STAT_CD	/* 상품 문의 상태 코드 */
+				, A.IQR_TTL				/* 문의 제목 */
+				, A.GOODS_ID			/* 상품 아이디 */
+				, A.RPL_DTM				/* 답변 일시 */
+				, A.EQRR_MBR_NO			/* 문의자 회원 번호 */
+				, A.RPLR_USR_NO			/* 답변자 사용자 번호 */
+				, A.EQRR_MOBILE			/* 문의자 휴대폰 */
+				, A.EQRR_EMAIL			/* 문의자 이메일 */
+				, A.DISP_YN				/* 전시 여부 */
+				, A.BIGO				/* 비고 */
+				, A.RPL_CONTENT_HEADER	/* 답변 내용 머리말 */
+				, A.RPL_CONTENT_FOOTER	/* 답변 내용 맺음말 */
+				, A.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, A.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, A.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, A.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, CONCAT(A.RPL_CONTENT_HEADER, ' ', A.RPL_CONTENT, ' ', A.RPL_CONTENT_FOOTER) AS RPL_CONTENT_FULL	/* 답변 전체 내용 */
+				, (SELECT GOODS_NM FROM GOODS_BASE WHERE GOODS_ID = A.GOODS_ID) AS GOODS_NM		/* 상품명 */
+				, (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = A.EQRR_MBR_NO) AS EQRR_ID	/* 고객ID */
+				, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = A.EQRR_MBR_NO) AS EQRR_NM		/* 고객명 */
+				, FN_GET_USER_NAME(A.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(A.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	GOODS_INQUIRY A
+		WHERE	A.GOODS_IQR_NO	= #{goodsIqrNo}
+		<include refid="bizCommon.sortSql" />
+	</select>
+
+	<update id="updateGoodsReply" parameterType="biz.app.goods.model.GoodsInquiryPO">
+		UPDATE	GOODS_INQUIRY SET
+				  RPL_CONTENT			= #{rplContent}			/* 답변 내용 */
+				, RPL_CONTENT_HEADER	= #{rplContentHeader}	/* 답변 내용 머리말 */
+				, RPL_CONTENT_FOOTER	= #{rplContentFooter}	/* 답변 내용 맺음말 */
+				, RPL_DTM				= NOW()					/* 답변 일시 */
+				, RPLR_USR_NO			= #{sysRegrNo}			/* 답변자 사용자 번호 */
+				, GOODS_IQR_STAT_CD		= #{goodsIqrStatCd}		/* 상품 문의 상태 코드 */
+				, DISP_YN				= '${@framework.common.constants.CommonConstants@DISP_YN_Y}'		/* 전시여부 */
+				, RPLR_NM				= (SELECT USR_NM FROM USER_BASE	WHERE USR_NO = #{sysRegrNo})	/* 답변자 명 */
+				, SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GOODS_IQR_NO			= #{goodsIqrNo}
+	</update>
+
+	<update id="updateGoodsInquiryDisp" parameterType="biz.app.goods.model.GoodsInquiryPO">
+		UPDATE	GOODS_INQUIRY SET
+				  DISP_YN				= #{strDispYn}			/* 전시여부 */
+				, SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GOODS_IQR_NO			= #{goodsIqrNo}
+	</update>
+
+	<resultMap id="getGoodsInquiryMap" type="biz.app.goods.model.GoodsInquiryVO">
+		<id property="goodsIqrNo"			column="GOODS_IQR_NO" />
+		<result property="stId"				column="ST_ID" />
+		<result property="goodsId"			column="GOODS_ID" />
+		<result property="compNo"			column="COMP_NO" />
+		<result property="goodsIqrStatCd"	column="GOODS_IQR_STAT_CD" />
+		<result property="iqrTtl"			column="IQR_TTL" />
+		<result property="iqrContent"		column="IQR_CONTENT" />
+		<result property="eqrrMbrNo"		column="EQRR_MBR_NO" />
+		<result property="eqrrId"			column="EQRR_ID" />
+		<result property="eqrrMobile"		column="EQRR_MOBILE" />
+		<result property="eqrrEmail"		column="EQRR_EMAIL" />
+		<result property="rplContent"		column="RPL_CONTENT" />
+		<result property="rplrUsrNo"		column="RPLR_USR_NO" />
+		<result property="rplrNm"			column="RPLR_NM" />
+		<result property="rplDtm"			column="RPL_DTM" />
+		<result property="dispYn"			column="DISP_YN" />
+		<result property="upGoodsIqrNo"		column="UP_GOODS_IQR_NO" />
+		<result property="bigo"				column="BIGO" />
+		<result property="rplContentHeader"	column="RPL_CONTENT_HEADER" />
+		<result property="rplContentFooter"	column="RPL_CONTENT_FOOTER" />
+		<result property="hiddenYn"			column="HIDDEN_YN" />
+		<result property="rplAlmRcvYn"		column="RPL_ALM_RCV_YN" />
+		<result property="sysRegrNo"		column="SYS_REGR_NO" />
+		<result property="sysRegrNm"		column="SYS_REGR_NM" />
+		<result property="sysRegDtm"		column="SYS_REG_DTM" />
+		<result property="sysUpdrNo"		column="SYS_UPDR_NO" />
+		<result property="sysUpdrNm"		column="SYS_UPDR_NM" />
+		<result property="sysUpdDtm"		column="SYS_UPD_DTM" />
+
+		<collection property="goodsIqrImgList" column="GOODS_IQR_NO" javaType="java.util.ArrayList"
+		            ofType="biz.app.goods.model.GoodsIqrImgVO" select="getGoodsIqrImgList" />
+	</resultMap>
+	
+	<select id="getGoodsInquiryList" resultMap="getGoodsInquiryMap">
+		<!-- Query Name : goodsQna.getGoodsInquiryList Description : 상품 qna 리스트 조회 [FO-상품상세]-->
+		SELECT /*QUERYID(goodsQna.getGoodsQnaList) */
+				EQR.GOODS_IQR_NO		/* 상품 문의 번호 */
+			  , EQR.ST_ID				/* 사이트 ID */
+			  , EQR.GOODS_ID			/* 상품 번호 */
+			  , EQR.COMP_NO				/* 업체 번호 */
+			  , EQR.GOODS_IQR_STAT_CD	/* 상품 문의 상태코드 */
+			  , EQR.IQR_TTL				/* 문의 제목 */
+			  , EQR.IQR_CONTENT			/* 문의 내용 */
+			  , EQR.EQRR_MBR_NO			/* 문의자 회원 번호 */
+			  , MB.LOGIN_ID AS EQRR_ID	/* 문의자 아이디 */
+			  , MB.NICK_NM AS NICK_NM	/* 문의자 닉네임 */
+			  , EQR.EQRR_MOBILE			/* 문의자 휴대폰 번호 */
+			  , EQR.EQRR_EMAIL			/* 문의자 이메일 */
+			  , EQR.RPL_CONTENT			/* 답변내용 */
+			  , EQR.RPLR_USR_NO			/* 답변 내용 */
+			  , EQR.RPLR_NM				/* 답변자명 */
+			  , EQR.RPL_DTM				/* 답변 일시 */
+			  , EQR.DISP_YN				/* 노출 여부 */
+			  , EQR.UP_GOODS_IQR_NO		/* 상위 상품 문의 번호 */
+			  , EQR.BIGO				/* 비고 */
+			  , EQR.RPL_CONTENT_HEADER	/* 답변 상위 노출 내용 */
+			  , EQR.RPL_CONTENT_FOOTER	/* 답변 하위 노출 내용 */
+			  , EQR.HIDDEN_YN			/* 숨김 여부 */
+			  , EQR.RPL_ALM_RCV_YN		/* 답변 알림 여부 */
+			  , EQR.SYS_REGR_NO			/* 작성자 */
+			  , FN_GET_USER_NAME(EQR.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 명 */
+			  , EQR.SYS_REG_DTM			/* 작성 일자 */
+			  , EQR.SYS_UPDR_NO			/* 수정자 */
+			  , FN_GET_USER_NAME(EQR.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 명 */
+			  , EQR.SYS_UPD_DTM			/* 수정 일자 */
+		  FROM	GOODS_INQUIRY EQR
+		  JOIN	MEMBER_BASE MB 
+		    ON	EQR.EQRR_MBR_NO = MB.MBR_NO
+		   AND	MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+		 WHERE	1 = 1
+		   AND	EQR.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test="goodsId != null and goodsId != ''">
+		   AND	EQR.GOODS_ID = #{goodsId}
+		</if>
+		<if test='hiddenYn == "N"'>
+		   AND	EQR.HIDDEN_YN = #{hiddenYn}
+		</if>
+		<if test="eqrrMbrNo != null and eqrrMbrNo != ''">
+		   AND	EQR.EQRR_MBR_NO = #{eqrrMbrNo}
+		</if>
+	  ORDER BY	EQR.SYS_REG_DTM DESC, EQR.GOODS_IQR_NO DESC
+		<if test="goodsId != null and goodsId != ''">
+			<include refid="bizCommon.pageSql" />
+		</if>
+	</select>
+
+	<select id="getGoodsInquiryListCount" resultType="java.lang.Integer">
+		SELECT	COUNT(*)
+		  FROM	GOODS_INQUIRY EQR
+		  JOIN	MEMBER_BASE MB 
+		    ON	EQR.EQRR_MBR_NO = MB.MBR_NO
+		   AND	MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'
+		 WHERE	1 = 1
+		   AND	EQR.DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test="goodsId != null and goodsId != ''">
+		   AND	EQR.GOODS_ID = #{goodsId}
+		</if>
+		<if test='hiddenYn == "N"'>
+		   AND	EQR.HIDDEN_YN = #{hiddenYn}
+		</if>
+		<if test="eqrrMbrNo != null and eqrrMbrNo != ''">
+		   AND	EQR.EQRR_MBR_NO = #{eqrrMbrNo}
+		</if>
+	</select>
+	
+	<select id="getGoodsIqrImgList" resultType="biz.app.goods.model.GoodsIqrImgVO">
+	<!-- Query Name : goodsQna.getGoodsIqrImgList Description : 상품 qna 이미지 리스트 조회 [FO-상품상세]-->
+		SELECT /*QUERYID(goodsQna.getGoodsIqrImgList) */
+			  GII.GOODS_IQR_NO
+			, GII.IMG_PATH
+			, GII.IMG_SEQ
+			, GII.VD_YN
+		FROM GOODS_IQR_IMG GII 
+		WHERE GII.GOODS_IQR_NO = #{goodsIqrNo}
+		ORDER BY IMG_SEQ
+	</select>
+	
+	<insert id="insertGoodsQnaImage" parameterType="biz.app.goods.model.GoodsIqrImgPO">
+	<!-- Query Name : goodsQna.insertGoodsQnaImage Description : 상품 qna 이미지 등록 [FO-상품상세]-->
+		<selectKey keyProperty="imgSeq" resultType="java.lang.Long"
+			order="BEFORE">
+			SELECT FN_GET_SEQ
+			('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_IQR_IMG_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_IQR_IMG (/*QUERYID(goodsQna.insertGoodsQnaImage) */
+			GOODS_IQR_NO
+			, IMG_SEQ
+			, IMG_PATH
+			, VD_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		)
+		VALUES (
+			#{goodsIqrNo}
+		  , #{imgSeq}
+		  , #{imgPath}
+		  , #{vdYn}
+		  , #{sysRegrNo}
+		  , NOW()
+		)
+	</insert>
+	
+	<update id="updateGoodsQna" parameterType="biz.app.goods.model.GoodsInquiryPO">
+	<!-- Query Name : goodsQna.insertGoodsQnaImage Description : 상품 qna 수정 [FO-상품상세]-->
+		UPDATE	GOODS_INQUIRY SET /*QUERYID(goodsQna.updateGoodsQna) */
+				IQR_CONTENT		= #{iqrContent}		/* 문의 내용 */
+			  , HIDDEN_YN		= #{hiddenYn}		/* 숨김 여부 */
+			  , RPL_ALM_RCV_YN	= #{rplAlmRcvYn}	/* 알림 여부 */
+			  , SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			  , SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	1 = 1
+		AND		GOODS_IQR_NO		= #{goodsIqrNo}
+	</update>
+	
+	<!-- 상품문의 삭제 -->
+	<delete id="deleteGoodsQnaImg" parameterType="biz.app.goods.model.GoodsInquiryPO">
+		DELETE
+		FROM	GOODS_IQR_IMG
+		WHERE	GOODS_IQR_NO = #{goodsIqrNo}
+		<if test="imgSeq != null and imgSeq != ''">
+		AND	IMG_SEQ = #{imgSeq}
+		</if>
+	</delete>
+	
+	
+	
+	
+</mapper>

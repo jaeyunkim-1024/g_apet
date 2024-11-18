@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="capa">
+
+	<select id="listHolidayCalendar" resultType="biz.app.system.model.HolidayVO">
+		<!--
+			Query Name : capa.listHolidayCalendar
+			Description : 휴일관리 리스트
+		-->
+		SELECT	/* QUERYID() */
+				  TITLE				/* 제목 */
+				, CONTENTS			/* 내용 */
+				, HOLIDAY_DATE		/* 휴일 시작일시 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	HOLIDAY
+		WHERE	1 = 1
+		<if test="strtDate != null and endDate != null">
+		AND		HOLIDAY_DATE BETWEEN #{strtDate} AND #{endDate}
+		</if>
+	</select>
+
+	<select id="getHolidayCalendar" resultType="biz.app.system.model.HolidayVO">
+		<!--
+			Query Name : capa.listHolidayCalendar
+			Description : 휴일관리 리스트
+		-->
+		SELECT	/* QUERYID(holiday.listHolidayCalendar) */
+				  TITLE				/* 제목 */
+				, CONTENTS			/* 내용 */
+				, HOLIDAY_DATE		/* 휴일 시작일시 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	HOLIDAY
+		WHERE	1 = 1
+		<if test="holidayDate != null">
+			AND		HOLIDAY_DATE	= #{holidayDate}		/* 휴일순번 */
+		</if>
+	</select>
+
+	<insert id="insertHoliday" parameterType="biz.app.system.model.HolidayPO">
+		<!--
+			Query Name : capa.insertHoliday
+			Description : 휴일 등록
+		-->
+		INSERT INTO HOLIDAY (
+			  TITLE				/* 제목 */
+			, CONTENTS			/* 내용 */
+			, HOLIDAY_DATE		/* 휴일 시작일시 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{title}			/* 제목 */
+			, #{contents}		/* 내용 */
+			, #{holidayDate}	/* 휴일 시작일시 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateHoliday" parameterType="biz.app.system.model.HolidayPO">
+		<!--
+			Query Name : capa.updateHoliday
+			Description : 휴일 수정
+		-->
+		UPDATE	HOLIDAY SET
+				  TITLE			= #{title}			/* 제목 */
+				, CONTENTS		= #{contents}		/* 내용 */
+				, SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+		WHERE	HOLIDAY_DATE	= #{holidayDate}
+	</update>
+
+	<delete id="deleteHoliday" parameterType="biz.app.system.model.HolidayPO">
+		<!--
+			Query Name : capa.deleteHoliday
+			Description : 휴일관리 삭제
+		-->
+		DELETE
+		FROM	HOLIDAY
+		WHERE	HOLIDAY_DATE	= #{holidayDate}		/* 휴일순번 */
+	</delete>
+
+	<insert id="insertDeliverDateSet" parameterType="biz.app.system.model.DeliverDateSetPO">
+		<!--
+			Query Name : capa.updateCapaMgmt
+			Description : 케파관리 수정
+		-->
+		<selectKey keyProperty="dsId" resultType="java.lang.Integer" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DELIVER_DATE_SET_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO DELIVER_DATE_SET (
+			  DS_ID							/* 직배송아이디 */
+			, AREA_ID						/* 직배지역코드 */
+			, DELIVER_GUBUN_CD				/* 구분(1:기간,2:이후) */
+			, DELIVER_DATE					/* 배송일자 */
+			, DAYS_DELIVERY_LIMIT			/* 일일배송량한계 */
+			, DAYS_DELIVERY_CNT_LIMIT		/* 일일배송수량한계 */
+			, DELIVERY_INCREASE				/* 배송량가중치 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{dsId}						/* 직배송아이디 */
+			, #{areaId}						/* 직배지역코드 */
+			, #{deliverGubunCd}				/* 구분(1:기간,2:이후) */
+			, #{deliverDate}				/* 배송일자 */
+			, #{daysDeliveryLimit}			/* 일일배송량한계 */
+			, #{daysDeliveryCntLimit}		/* 일일배송수량한계 */
+			, #{deliveryIncrease}			/* 배송량가중치 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateDeliverDateSet" parameterType="biz.app.system.model.DeliverDateSetPO">
+		<!--
+			Query Name : capa.updateCapaMgmt
+			Description : 케파관리 수정
+		-->
+		UPDATE	DELIVER_DATE_SET SET
+				DELIVER_DATE				= #{deliverDate}				/* 배송일자 */
+				, DAYS_DELIVERY_LIMIT		= #{daysDeliveryLimit}			/* 일일배송량한계 */
+				, DAYS_DELIVERY_CNT_LIMIT	= #{daysDeliveryCntLimit}		/* 일일배송수량한계 */
+				, DELIVERY_INCREASE			= #{deliveryIncrease}			/* 배송량가중치 */
+				, SYS_UPDR_NO				= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM				= NOW()				/* 시스템 수정 일시 */
+		WHERE	DS_ID = #{dsId}
+	</update>
+
+	<select id="getDeliverDateSet" resultType="biz.app.system.model.DeliverDateSetVO">
+		<!--
+			Query Name : capa.updateCapaMgmt
+			Description : 케파관리 수정
+		-->
+		SELECT	/* QUERYID() */
+				  DS_ID							/* 직배송아이디 */
+				, AREA_ID						/* 직배지역코드 */
+				, DELIVER_GUBUN_CD				/* 구분(1:기간,2:이후) */
+				, DELIVER_DATE					/* 배송일자 */
+				, DAYS_DELIVERY_LIMIT			/* 일일배송량한계 */
+				, DAYS_DELIVERY_CNT_LIMIT		/* 일일배송수량한계 */
+				, DELIVERY_INCREASE				/* 배송량가중치 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	DELIVER_DATE_SET
+		WHERE	1 = 1
+		<if test="dsId != null">
+		AND		DS_ID = #{dsId}
+		</if>
+		<if test="deliverDate != null and deliverDate != ''">
+		AND		DELIVER_DATE = #{deliverDate}
+		</if>
+		<if test="areaId != null and areaId != ''">
+		AND		AREA_ID = #{areaId}
+		</if>
+		<if test="deliverGubunCd != null and deliverGubunCd != ''">
+		AND		DELIVER_GUBUN_CD = #{deliverGubunCd}
+		</if>
+	</select>
+
+	<select id="listCalendarDeliverDateSet" resultType="biz.app.system.model.DeliverDateSetVO">
+		<!--
+			Query Name : capa.updateCapaMgmt
+			Description : 케파관리 수정
+		-->
+		SELECT	A.*
+				, IFNULL(B.DAYS_DELIVERY_STATUS, 0)			AS DAYS_DELIVERY_STATUS
+				, IFNULL(B.DAYS_DELIVERY_CNT_STATUS, 0)		AS DAYS_DELIVERY_CNT_STATUS
+		FROM (
+			SELECT	A.DS_ID							/* 직배송아이디 */
+					, A.AREA_ID						/* 직배지역코드 */
+					, A.DELIVER_GUBUN_CD			/* 구분(1:기간,2:이후) */
+					, A.DELIVER_DATE				/* 배송일자 */
+					, A.DAYS_DELIVERY_LIMIT			/* 일일배송량한계 */
+					, A.DAYS_DELIVERY_CNT_LIMIT		/* 일일배송수량한계 */
+					, A.DELIVERY_INCREASE			/* 배송량가중치 */
+					, B.AREA_NAME
+			FROM	DELIVER_DATE_SET A
+			INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+			WHERE	A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_10}'
+			AND		A.DELIVER_DATE = #{deliverDate}
+			<if test="areaCd != null and areaCd != ''">
+			AND		B.AREA_CD	= #{areaCd}
+			</if>
+			UNION
+			SELECT	A.DS_ID								/* 직배송아이디 */
+					, A.AREA_ID					/* 직배지역코드 */
+					, A.DELIVER_GUBUN_CD				/* 구분(1:기간,2:이후) */
+					, #{deliverDate} AS	DELIVER_DATE	/* 배송일자 */
+					, A.DAYS_DELIVERY_LIMIT				/* 일일배송량한계 */
+					, A.DAYS_DELIVERY_CNT_LIMIT			/* 일일배송수량한계 */
+					, A.DELIVERY_INCREASE				/* 배송량가중치 */
+					, B.AREA_NAME
+			FROM	DELIVER_DATE_SET A
+			INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+			WHERE	A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_20}'
+			AND		A.DELIVER_DATE <![CDATA[<=]]> #{deliverDate}
+			<if test="areaCd != null and areaCd != ''">
+			AND		B.AREA_CD	= #{areaCd}
+			</if>
+			AND		A.AREA_ID NOT IN (
+				SELECT	A.AREA_ID
+				FROM	DELIVER_DATE_SET A
+				INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+				WHERE	A.DELIVER_DATE = #{deliverDate}
+				AND		A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_10}'
+			)
+		) A
+		LEFT JOIN DELIVER_DATE_STATUS B ON A.AREA_ID = B.AREA_ID AND B.DELIVER_DATE = #{deliverDate}
+	</select>
+
+	<select id="getCalendarDeliverDateSet" resultType="biz.app.system.model.DeliverDateSetVO">
+		<!--
+			Query Name : capa.updateCapaMgmt
+			Description : 케파관리 수정
+		-->
+		SELECT	A.*
+				, IFNULL(B.DAYS_DELIVERY_STATUS, 0)			AS DAYS_DELIVERY_STATUS
+				, IFNULL(B.DAYS_DELIVERY_CNT_STATUS, 0)		AS DAYS_DELIVERY_CNT_STATUS
+		FROM (
+			SELECT	A.DS_ID							/* 직배송아이디 */
+					, A.AREA_ID						/* 직배지역코드 */
+					, A.DELIVER_GUBUN_CD			/* 구분(1:기간,2:이후) */
+					, A.DELIVER_DATE				/* 배송일자 */
+					, A.DAYS_DELIVERY_LIMIT			/* 일일배송량한계 */
+					, A.DAYS_DELIVERY_CNT_LIMIT		/* 일일배송수량한계 */
+					, A.DELIVERY_INCREASE			/* 배송량가중치 */
+					, B.AREA_NAME
+			FROM	DELIVER_DATE_SET A
+			INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+			WHERE	A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_10}'
+			AND		A.DELIVER_DATE = #{deliverDate}
+			AND		A.AREA_ID = #{areaId}
+			UNION
+			SELECT	A.DS_ID								/* 직배송아이디 */
+					, A.AREA_ID							/* 직배지역코드 */
+					, A.DELIVER_GUBUN_CD				/* 구분(1:기간,2:이후) */
+					, #{deliverDate} AS	DELIVER_DATE	/* 배송일자 */
+					, A.DAYS_DELIVERY_LIMIT				/* 일일배송량한계 */
+					, A.DAYS_DELIVERY_CNT_LIMIT			/* 일일배송수량한계 */
+					, A.DELIVERY_INCREASE				/* 배송량가중치 */
+					, B.AREA_NAME
+			FROM	DELIVER_DATE_SET A
+			INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+			WHERE	A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_20}'
+			AND		A.DELIVER_DATE <![CDATA[<=]]> #{deliverDate}
+			AND		A.AREA_ID = #{areaId}
+			AND		A.AREA_ID NOT IN (
+				SELECT	A.AREA_ID
+				FROM	DELIVER_DATE_SET A
+				INNER JOIN DELIVER_AREA_SET B ON A.AREA_ID = B.AREA_ID
+				WHERE	A.DELIVER_DATE = #{deliverDate}
+				AND		A.DELIVER_GUBUN_CD = '${@framework.common.constants.CommonConstants@DELIVER_GUBUN_10}'
+			)
+		) A
+		LEFT JOIN DELIVER_DATE_STATUS B ON A.AREA_ID = B.AREA_ID AND B.DELIVER_DATE = #{deliverDate}
+	</select>
+
+
+	<insert id="insertDeliverDateStatus">
+		<!--
+			Query Name : capa.insertDeliverDateStatus
+			Description : 현재 캐파량 등록
+		-->
+		INSERT INTO DELIVER_DATE_STATUS (
+			DELIVER_DATE					/* 기준 일자 */
+			, DAYS_DELIVERY_STATUS			/* 현재 배송 예정량 */
+			, DAYS_DELIVERY_CNT_STATUS		/* 현재 배송 수량 예정량*/
+			, AREA_ID						/* 지역코드 */
+			, SYS_REGR_NO					/* 시스템 등록자 번호 */
+			, SYS_REG_DTM					/* 시스템 등록 일시 */
+			, SYS_UPDR_NO					/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM					/* 시스템 수정 일시 */
+		) VALUES (
+			#{deliverDate}					/* 기준 일자 */
+			, #{daysDeliveryStatus}			/* 현재 배송 예정량 */
+			, #{daysDeliveryCntStatus}		/* 현재 배송 수량 예정량*/
+			, #{areaId}						/* 지역코드 */
+			, #{sysRegrNo}					/* 시스템 등록자 번호 */
+			, NOW()							/* 시스템 등록 일시 */
+			, #{sysUpdrNo}					/* 시스템 수정자 번호 */
+			, NOW()							/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<update id="updateDeliverDateStatus">
+		<!--
+			Query Name : capa.updateDeliverDateStatus
+			Description : 현재 캐파량 업데이트
+		-->
+		UPDATE	DELIVER_DATE_STATUS
+		SET		DAYS_DELIVERY_STATUS = IFNULL(DAYS_DELIVERY_STATUS, 0) + #{daysDeliveryStatus}
+				,DAYS_DELIVERY_CNT_STATUS = IFNULL(DAYS_DELIVERY_CNT_STATUS, 0) + #{daysDeliveryCntStatus}
+		WHERE	AREA_ID = #{areaId}
+		AND		DELIVER_DATE = #{deliverDate}
+	</update>
+
+</mapper>

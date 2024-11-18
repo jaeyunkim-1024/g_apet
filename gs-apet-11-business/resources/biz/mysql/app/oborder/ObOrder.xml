@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 09. 25.
+	작성자 : schoi
+-->
+
+<mapper namespace="oborder">
+
+	<select id="checkOrdNoCnt" resultType="java.lang.Integer" >
+		<!--
+			Query Name : oborder.checkOrdNoCnt
+			Description : Outbound API 주문 번호 확인
+		-->
+		SELECT COUNT(1)
+		  FROM ORDER_BASE
+		 WHERE 1=1
+		   AND OUTSIDE_ORD_NO = (SELECT ORD_NO 
+		                           FROM OB_ORDER_BASE 
+		                          WHERE ORD_SEQ = #{ordSeq}
+		                         )
+		   
+	</select>
+	
+	<select id="checkOrdNo" resultType="java.lang.String" >
+		<!--
+			Query Name : oborder.checkOrdNo
+			Description : Outbound API 주문 번호 확인
+		-->
+		SELECT A.ORD_NO
+		  FROM ORDER_BASE A,
+		       OB_ORDER_BASE B
+		 WHERE 1=1
+		   AND A.OUTSIDE_ORD_NO = B.ORD_NO
+		   AND B.ORD_SEQ = #{ordSeq}
+		 LIMIT 1
+		   
+	</select>	
+
+	<select id="checkOrdDlvraNo" resultType="java.lang.Long" >
+		<!--
+			Query Name : oborder.checkOrdDlvraNo
+			Description : Outbound API 주문 배송지 번호 확인
+		-->
+		SELECT ORD_DLVRA_NO
+		  FROM ORDER_DLVRA
+		 WHERE 1=1
+		   AND ORD_NO = #{ordNo}
+		 LIMIT 1
+		   
+	</select>	
+	
+	<select id="checkDlvrcNo" resultType="java.lang.Long" >
+		<!--
+			Query Name : oborder.checkDlvrcNo
+			Description : Outbound API 주문 배송비 번호 확인
+		-->
+		SELECT A.DLVRC_NO
+		  FROM DELIVERY_CHARGE A,
+		       ORDER_DETAIL B
+		 WHERE 1=1
+		   AND A.DLVRC_NO = B.DLVRC_NO
+		   AND B.ORD_NO = #{ordNo}
+		 LIMIT 1
+		   
+	</select>
+
+	<insert id="insertMarketOrderBase">
+		<!--
+			Query Name : oborder.insertMarketOrderBase
+			Description : Outbound API 주문 기본 정보 등록
+		-->
+		INSERT INTO ORDER_BASE
+		(
+		  ORD_NO,	
+		  ST_ID,
+		  MBR_NO,
+		  ORD_STAT_CD,
+		  ORD_MDA_CD,
+		  CHNL_ID,		
+		  MBR_GRD_CD,
+		  ORD_NM,	
+		  ORDR_ID,	
+		  ORDR_EMAIL,
+		  ORDR_TEL,	
+		  ORDR_MOBILE,
+		  ORDR_IP,	
+		  ORD_ACPT_DTM,
+		  ORD_CPLT_DTM,
+		  ORD_DTL_CNT,
+		  OUTSIDE_ORD_NO,
+		  ORD_PRCS_RST_CD,
+		  ORD_PRCS_RST_MSG,
+		  DATA_STAT_CD,
+		  SYS_REGR_NO,	
+		  SYS_REG_DTM,	
+		  SYS_UPDR_NO,	
+		  SYS_UPD_DTM
+		)
+		SELECT #{ordNo} AS ORD_NO,
+		       #{stId} AS ST_ID,
+		       #{mbrNo} AS MBR_NO,
+		       #{ordStatCd} AS ORD_STAT_CD,
+		       #{ordMdaCd} AS ORD_MDA_CD,
+		       #{chnlId} AS CHNL_ID,
+		       NULL AS MBR_GRD_CD,
+		       ORD_NM,
+		       MEM_ID AS ORDR_ID,
+		       'sunnyday40@hanmail.net' AS ORDR_EMAIL,
+		       ORD_TLPHN_NO AS ORDR_TEL,
+		       ORD_PRTBL_TEL AS ORDR_MOBILE,
+		       SYS_REMOTE_IP AS ORDR_IP,
+		       ORD_DT AS ORD_ACPT_DTM,  
+		       ORD_STL_END_DT AS ORD_CPLT_DTM,
+			   (SELECT MAX(B.ORD_PRD_SEQ) FROM OB_ORDER_BASE B WHERE B.ORD_NO = ORD_NO) AS ORD_DTL_CNT,
+		       ORD_NO AS OUTSIDE_ORD_NO,
+		       #{ordPrcsRstCd} AS ORD_PRCS_RST_CD,
+		       #{ordPrcsRstMsg} AS ORD_PRCS_RST_MSG,
+		       #{dataStatCd} AS DATA_STAT_CD,		       
+			   #{sysRegrNo} AS SYS_REGR_NO,
+			   NOW() AS SYS_REG_DTM,
+			   #{sysUpdrNo} AS SYS_UPDR_NO,
+			   NOW() AS SYS_UPD_DTM
+		  FROM OB_ORDER_BASE
+		 WHERE 1=1
+		   AND PROC_CD = '10'
+		   AND ORD_SEQ = #{ordSeq}
+
+	</insert>
+			
+	<insert id="insertMarketOrderDetail">
+		<!--
+			Query Name : oborder.insertMarketOrderDetail
+			Description : Outbound API 주문 상세 정보 등록
+		-->
+		INSERT INTO ORDER_DETAIL
+		(
+		  ORD_NO,
+		  ORD_DTL_SEQ,
+		  ORD_DTL_STAT_CD,
+		  GOODS_ID,
+		  GOODS_NM,
+		  ITEM_NO,
+		  ITEM_NM,
+		  DEAL_GOODS_ID,
+		  DISP_CLSF_NO,
+		  COMP_GOODS_ID,
+		  COMP_ITEM_ID,
+		  ORD_QTY,
+		  CNC_QTY,
+		  RTN_QTY,
+		  RMN_ORD_QTY,
+		  GOODS_PRC_NO,
+		  SALE_AMT,
+		  PAY_AMT,
+		  RMN_PAY_AMT,
+		  CMS,
+		  GOODS_CMSN_RT,
+		  TAX_GB_CD,
+		  ORD_SVMN,
+		  SVMN_VLD_PRD_CD,
+		  SVMN_VLD_PRD,
+		  FREE_DLVR_YN,
+		  HOT_DEAL_YN,
+		  DLVRC_NO,
+		  ORD_DLVRA_NO,
+		  DLVR_NO,
+		  COMP_NO,
+		  UP_COMP_NO,
+		  MBR_NO,
+		  MD_USR_NO,
+		  GOODS_ESTM_NO,
+		  GOODS_ESTM_REG_YN,
+		  OUTSIDE_ORD_DTL_NO,
+		  STL_NO,
+		  SYS_REGR_NO,
+		  SYS_REG_DTM,
+		  SYS_UPDR_NO,
+		  SYS_UPD_DTM
+		)
+		SELECT ORD_NO,
+		       ORD_DTL_SEQ,
+		       ORD_DTL_STAT_CD,
+		       GOODS_ID,
+		       GOODS_NM,
+		       (SELECT ITEM_NO
+		          FROM ITEM
+		         WHERE GOODS_ID = A.GOODS_ID
+		           AND INSTR(A.SLCT_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 1), '/', -1)) > 0
+		           AND INSTR(A.SLCT_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 2), '/', -1)) > 0
+		       ) AS ITEM_NO,
+		       (SELECT ITEM_NM
+		          FROM ITEM
+		         WHERE GOODS_ID = A.GOODS_ID
+		           AND INSTR(A.SLCT_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 1), '/', -1)) > 0
+		           AND INSTR(A.SLCT_PRD_OPT_NM, SUBSTRING_INDEX(SUBSTRING_INDEX(ITEM_NM, '/', 2), '/', -1)) > 0
+		       ) AS ITEM_NM,     
+		       DEAL_GOODS_ID,
+		       DISP_CLSF_NO,
+		       COMP_GOODS_ID,
+		       COMP_ITEM_ID,
+		       ORD_QTY,
+		       CNC_QTY,
+		       RTN_QTY,
+		       RMN_ORD_QTY,
+		       GOODS_PRC_NO,
+		       SALE_AMT,
+		       PAY_AMT,
+		       RMN_PAY_AMT,
+		       CMS,
+		       GOODS_CMSN_RT,
+		       TAX_GB_CD,
+		       ORD_SVMN,
+		       SVMN_VLD_PRD_CD,
+		       SVMN_VLD_PRD,
+		       FREE_DLVR_YN,
+		       HOT_DEAL_YN,
+		       DLVRC_NO,
+		       ORD_DLVRA_NO,
+		       DLVR_NO,
+		       COMP_NO,
+		       UP_COMP_NO,
+		       MBR_NO,
+		       MD_USR_NO,
+		       GOODS_ESTM_NO,
+		       GOODS_ESTM_REG_YN,
+		       OUTSIDE_ORD_DTL_NO,
+		       STL_NO,
+		       SYS_REGR_NO,
+		       SYS_REG_DTM,
+		       SYS_UPDR_NO,
+		       SYS_UPD_DTM
+		  FROM (SELECT #{ordNo} AS ORD_NO,
+				       ORD_PRD_SEQ AS ORD_DTL_SEQ,
+				       #{ordDtlStatCd} AS ORD_DTL_STAT_CD,
+			           (SELECT GOODS_ID
+			              FROM GOODS_BASE
+			             WHERE GOODS_NM = PRD_NM
+			           ) AS GOODS_ID,
+			           PRD_NM AS GOODS_NM,
+			           SLCT_PRD_OPT_NM,
+			           NULL AS DEAL_GOODS_ID,
+			           NULL AS DISP_CLSF_NO,
+			           NULL AS COMP_GOODS_ID,
+			           NULL AS COMP_ITEM_ID,
+			           ORD_QTY,
+			           #{cncQty} AS CNC_QTY,
+			           #{rtnQty} AS RTN_QTY,
+			           ORD_QTY AS RMN_ORD_QTY,
+			           NULL AS GOODS_PRC_NO,
+			           SEL_PRC AS SALE_AMT,
+			           ORD_AMT AS PAY_AMT,
+			           #{rmnPayAmt} AS RMN_PAY_AMT,
+			           NULL AS CMS,
+			           NULL AS GOODS_CMSN_RT,
+			           #{taxGbCd} AS TAX_GB_CD,
+			           NULL AS ORD_SVMN,
+			           NULL AS SVMN_VLD_PRD_CD,
+			           NULL AS SVMN_VLD_PRD,
+			           CASE WHEN DLV_CST_TYPE = '03'
+			                THEN 'Y' 
+			                ELSE 'N'
+			           END AS FREE_DLVR_YN,
+			           #{hotDealYn} AS HOT_DEAL_YN,
+			           #{dlvrcNo} AS DLVRC_NO,
+			           #{ordDlvraNo} AS ORD_DLVRA_NO,
+			           NULL AS DLVR_NO,
+			           (SELECT COMP_NO
+			              FROM GOODS_BASE
+			             WHERE GOODS_NM = PRD_NM
+			           ) AS COMP_NO,
+			           NULL AS UP_COMP_NO,
+			           #{mbrNo} AS MBR_NO,  
+			           NULL AS MD_USR_NO,
+			           NULL AS GOODS_ESTM_NO,
+			           #{goodsEstmRegYn} AS GOODS_ESTM_REG_YN,
+			           ORD_NO AS OUTSIDE_ORD_DTL_NO,
+			           NULL AS STL_NO,
+				       #{sysRegrNo} AS SYS_REGR_NO,
+				       NOW() AS SYS_REG_DTM,
+				       #{sysUpdrNo} AS SYS_UPDR_NO,
+				       NOW() AS SYS_UPD_DTM
+		      	  FROM OB_ORDER_BASE
+		      	 WHERE 1=1
+		      	   AND PROC_CD = '10'
+		      	   AND ORD_SEQ = #{ordSeq}
+		       ) A
+	
+	</insert>
+
+	<insert id="insertMarketOrderDelivery">
+		<!--
+			Query Name : oborder.insertMarketOrderDelivery
+			Description : Outbound API 주문 배송지 정보 등록
+		-->
+		INSERT INTO ORDER_DLVRA
+		(
+		  ORD_DLVRA_NO,
+		  ORD_NO,
+		  CLM_NO,
+		  ADRS_NM,
+		  TEL,
+		  MOBILE,
+		  POST_NO_OLD,
+		  PRCL_ADDR,
+		  PRCL_DTL_ADDR,
+		  POST_NO_NEW,
+		  ROAD_ADDR,
+		  ROAD_DTL_ADDR,
+		  DLVR_MEMO,
+		  SYS_REGR_NO,
+		  SYS_REG_DTM,
+		  SYS_UPDR_NO,
+		  SYS_UPD_DTM
+		)
+		SELECT #{ordDlvraNo} AS ORD_DLVRA_NO,
+		       #{ordNo} AS ORD_NO,
+		       NULL AS CLM_NO,
+		       RCVR_NM AS ADRS_NM,
+		       RCVR_TLPHN AS TEL,
+		       RCVR_PRTBL_NO AS MOBILE,
+		       (CASE WHEN TYPE_ADD = '01'
+                	THEN RCVR_MAIL_NO
+                	WHEN TYPE_ADD = '02'
+                	THEN NULL
+	           END) AS POST_NO_OLD,
+	 		   (CASE WHEN TYPE_ADD = '01'
+	                THEN RCVR_BASE_ADDR
+	                WHEN TYPE_ADD = '02'
+	                THEN NULL
+	           END) AS PRCL_ADDR,
+	 		   (CASE WHEN TYPE_ADD = '01'
+	                THEN RCVR_DTLS_ADDR
+	                WHEN TYPE_ADD = '02'
+	                THEN NULL
+	           END) AS PRCL_DTL_ADDR, 
+	 		   (CASE WHEN TYPE_ADD = '01'
+	                THEN NULL
+	                WHEN TYPE_ADD = '02'
+	                THEN RCVR_MAIL_NO
+	           END) AS POST_NO_NEW,
+	 		   (CASE WHEN TYPE_ADD = '01'
+	                THEN NULL
+	                WHEN TYPE_ADD = '02'
+	                THEN RCVR_BASE_ADDR
+	           END) AS ROAD_ADDR,
+	 		   (CASE WHEN TYPE_ADD = '01'
+	                THEN NULL
+	                WHEN TYPE_ADD = '02'
+	                THEN RCVR_DTLS_ADDR
+	           END) AS ROAD_DTL_ADDR,
+		       ORD_DLV_REQ_CONT AS DLVR_MEMO,
+			   #{sysRegrNo} AS SYS_REGR_NO,
+			   NOW() AS SYS_REG_DTM,
+			   #{sysUpdrNo} AS SYS_UPDR_NO,
+			   NOW() AS SYS_UPD_DTM
+		  FROM OB_ORDER_BASE
+		 WHERE 1=1
+		   AND PROC_CD = '10'
+		   AND ORD_SEQ = #{ordSeq}
+		
+	</insert>
+	
+	<insert id="insertMarketDeliveryCharge">
+		<!--
+			Query Name : oborder.insertMarketDeliveryCharge
+			Description : Outbound API 주문 배송비 정보 등록
+		-->
+		INSERT INTO DELIVERY_CHARGE
+		(
+		  DLVRC_NO,
+		  DLVRC_PLC_NO,
+		  DLVRC_STD_CD,
+		  DLVRC_PAY_MTD_CD,
+		  DLVRC_CDT_CD,
+		  DLVRC_CDT_STD_CD,
+		  DLVR_STD_AMT,
+		  ADD_DLVR_STD_AMT,
+		  BUY_QTY,
+		  BUY_PRC,
+		  ORG_DLVR_AMT,
+		  REAL_DLVR_AMT,
+		  ADD_DLVR_AMT,
+		  ORG_DLVRC_NO,
+		  COST_GB_CD,
+		  PREPAY_GB_CD,
+		  CP_NO,
+		  MBR_CP_NO,
+		  CP_DC_AMT,
+		  COMP_BDN_AMT,
+		  CNC_CLM_NO,
+		  CNC_YN,
+		  SYS_REGR_NO,
+		  SYS_REG_DTM,
+		  SYS_UPDR_NO,
+		  SYS_UPD_DTM
+		)
+		SELECT #{dlvrcNo} AS DLVRC_NO,
+		       NULL AS DLVRC_PLC_NO,
+		       NULL AS DLVRC_STD_CD,
+		       NULL AS DLVRC_PAY_MTD_CD,
+		       NULL AS DLVRC_CDT_CD,
+		       NULL AS DLVRC_CDT_STD_CD,
+		       NULL AS DLVR_STD_AMT,
+		       NULL AS ADD_DLVR_STD_AMT,
+		       ORD_QTY AS BUY_QTY,
+		       ORD_PAY_AMT AS BUY_PRC,
+		       DLV_CST AS ORG_DLVR_AMT,
+		       DLV_CST AS REAL_DLVR_AMT,
+		       BM_DLV_CST AS ADD_DLVR_AMT,
+		       NULL AS ORG_DLVRC_NO,
+		       #{costGbCd} AS COST_GB_CD,
+		       (CASE WHEN DLV_CST_TYPE = '01'
+		             THEN '10'
+		             WHEN DLV_CST_TYPE = '02'
+		             THEN '20'
+		       END) AS PREPAY_GB_CD,      
+		       NULL AS CP_NO,
+		       NULL AS MBR_CP_NO,
+		       SELLER_DSC_PRC AS CP_DC_AMT,
+		       NULL AS COMP_BDN_AMT,
+		       NULL AS CNC_CLM_NO,
+		       #{cncYn} AS CNC_YN,
+			   #{sysRegrNo} AS SYS_REGR_NO,
+			   NOW() AS SYS_REG_DTM,
+			   #{sysUpdrNo} AS SYS_UPDR_NO,
+			   NOW() AS SYS_UPD_DTM
+		  FROM OB_ORDER_BASE
+		 WHERE 1=1
+		   AND PROC_CD = '10'
+		   AND ORD_SEQ = #{ordSeq}
+
+	</insert>	
+
+	<select id="selectOrderConfirmGoodsInfo" resultType="biz.app.market.model.MarketOrderConfirmVO">
+		<!--
+			Query Name : oborder.selectOrderConfirmGoodsInfo
+			Description : Outbound API 주문 등록 상품 정보
+		-->
+	    SELECT A.GOODS_ID,
+	           A.GOODS_NM,
+	           A.ITEM_NO,
+	           A.ITEM_NM
+	      FROM ORDER_DETAIL A,
+	           OB_ORDER_BASE B
+	     WHERE A.OUTSIDE_ORD_DTL_NO = B.ORD_NO
+	       AND A.ORD_DTL_SEQ = B.ORD_PRD_SEQ
+	       AND A.ORD_NO = #{ordNo}
+	       AND B.ORD_SEQ = #{ordSeq}
+		   
+	</select>
+	
+	<update id="updateObOrderProcCd" parameterType="biz.app.market.model.MarketOrderConfirmPO">
+		<!--
+			Query Name : oborder.updateObOrderProcCd
+			Description : Outbound API 주문 처리 상태 변경
+		-->
+		UPDATE OB_ORDER_BASE 
+		   SET SHOP_ORD_NO = #{ordNo},
+		       SHOP_PRD_NO = #{shopPrdNo},
+		       SHOP_PRD_NM = #{shopPrdNm},
+		       SHOP_PRD_OPT_NM = #{shopPrdOptNm},
+		       PROC_CD = #{procCd},
+			   SYS_UPDR_NO = #{sysUpdrNo},
+			   SYS_UPD_DTM = NOW()
+		 WHERE 1=1
+		   AND ORD_SEQ = #{ordSeq}
+
+	</update>
+	
+</mapper>

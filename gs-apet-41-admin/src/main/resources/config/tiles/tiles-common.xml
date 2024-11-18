@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<definition name="defaultLayout" template="/WEB-INF/tiles/defaultLayout.jsp" >
+		<put-attribute name="common" value="/WEB-INF/include/common.jsp" />
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp" />
+		<put-attribute name="left" value="/WEB-INF/tiles/left.jsp" />
+	</definition>
+
+	<definition name="contentsLayout" template="/WEB-INF/tiles/contentsLayout.jsp" >
+		<put-attribute name="common" value="/WEB-INF/include/common.jsp" />
+	</definition>
+	
+	<definition name="popupLayout" template="/WEB-INF/tiles/popupLayout.jsp" >
+	</definition>
+
+	<definition name="mainLayout" template="/WEB-INF/tiles/mainLayout.jsp" >
+		<put-attribute name="common" value="/WEB-INF/include/common.jsp" />
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp" />
+		<put-attribute name="left" value="/WEB-INF/tiles/left.jsp" />
+	</definition>
+
+	<definition name="subTabLayout" template="/WEB-INF/tiles/subTabLayout.jsp">
+		<put-attribute name="common" value="/WEB-INF/include/common.jsp" />
+	</definition>
+
+	<!-- 빈페이지 필요 - 결제 통보 부분에서 사용 -->
+	<definition name="blankLayout" template="/WEB-INF/tiles/blankLayout.jsp">
+	</definition>
+
+</tiles-definitions>

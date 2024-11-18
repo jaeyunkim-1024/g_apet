@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<article class="popLayer a popReceipt" id="popReceipt">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">현금영수증 신청</h1>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+					<div class="uireceipt">
+						<div class="frms">
+							<div class="rdos mt04">
+								<label class="radio"><input type="radio" name="rd_receipt" checked><span class="txt"><em class="tt">개인소득공제용</em></span></label>
+								<label class="radio ml25"><input type="radio" name="rd_receipt"><span class="txt"><em class="tt">사업자증빙용</em></span></label>
+							</div>
+							<div class="rbox">
+								<!-- <span class="select"><select><option>현금영수증카드번호</option></select></span> -->
+								<div class="input"><input type="number" placeholder="휴대폰 번호를 입력해주세요." title="현금영수증번호"></div>
+							</div>
+							<div class="saves">
+								<label class="checkbox"><input type="checkbox">
+									<span class="txt"><em class="tt">현금 영수증 신청정보 저장</em></span>
+								</label>
+							</div>
+						</div>
+						<div class="btnSet bot">
+							<button type="button" class="btn lg d cancel">취소</button>
+							<button type="button" class="btn lg a save">저장</button>
+						</div>
+					</div>
+				</main>
+			</div>
+			
+		</div>
+	</article>
+	<script>
+		ui.popLayer.open("popReceipt");
+	</script>
+</body>
+</html>

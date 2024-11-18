@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<style>
+		.font-test {padding:0 20px;}
+		.font-test > div {margin-bottom: 20px;}
+		.font-test .tit {font-size: 16px; font-weight: 500; color:#ff7777}
+		.font-test .t1 {font-size: 12rem;}
+		.font-test .t2 {font-size: 13rem;}
+		.font-test .t3 {font-size: 14rem;}
+		.font-test .t4 {font-size: 20rem;}
+		.font-test span {display: block; }
+		.font-test .font100 {font-weight: 100;  font-family: "Roboto", "Apple Neo", "NotoSans" }		
+		.font-test .font100.t2 {font-weight: 100; font-family: "Roboto", "NotoSans", "Apple Neo"; border-bottom: 1px solid #ddd; padding-bottom: 20px}
+
+		.font-test .font300 {font-weight: 300;  font-family: "Roboto", "Apple Neo", "NotoSans"}		
+		.font-test .font300.t2 {font-weight: 300; font-family: "Roboto", "NotoSans", "Apple Neo"; border-bottom: 1px solid #ddd; padding-bottom: 20px}	
+
+		.font-test .font400 {font-weight: 400;  font-family: "Roboto", "Apple Neo", "NotoSans"}		
+		.font-test .font400.t2 {font-weight: 400; font-family: "Roboto", "NotoSans", "Apple Neo"; border-bottom: 1px solid #ddd; padding-bottom: 20px}	
+
+		.font-test .font500 {font-weight: 500;  font-family: "Roboto", "Apple Neo", "NotoSans"}		
+		.font-test .font500.t2 {font-weight: 500; font-family: "Roboto", "NotoSans", "Apple Neo"; border-bottom: 1px solid #ddd; padding-bottom: 20px}	
+
+		.font-test .font700 {font-weight: 700;  font-family: "Roboto", "Apple Neo", "NotoSans"}		
+		.font-test .font700.t2 {font-weight: 700; font-family: "Roboto", "NotoSans", "Apple Neo"; border-bottom: 1px solid #ddd; padding-bottom: 20px}	
+
+		.font-test .font900 {font-weight: 900;  font-family: "Roboto", "Apple Neo", "NotoSans"}		
+		.font-test .font900.t2 {font-weight: 900; font-family: "Roboto", "NotoSans", "Apple Neo";}		
+		.tline1 {border:1px solid #000; margin: 20px 0 20px}
+	</style>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set9","tit":"폰트 테스트"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login srch agree" id="container">
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>폰트 테스트 </h2>
+						<style>	
+						</style>
+					</div>
+					<div class="font-test">
+						<div class="font100">
+							<p class="tit">Apple FONT 100</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font100 t2">
+							<p class="tit">NotoSans FONT 100</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font300">
+							<p class="tit">Apple FONT 300</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font300 t2">
+							<p class="tit">NotoSans FONT 300</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font400">
+							<p class="tit">Apple FONT 400</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font400 t2">
+							<p class="tit">NotoSans FONT 400</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font500">
+							<p class="tit">Apple FONT 500</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font500 t2">
+							<p class="tit">NotoSans FONT 500</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font700">
+							<p class="tit">Apple FONT 700</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font700 t2">
+							<p class="tit">NotoSans FONT 700</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font900">
+							<p class="tit">Apple FONT 900</p>
+							<span class="t1">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t2">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t3">Apple 폰트 적용 입니다. 123456789</span>
+							<span class="t4">Apple 폰트 적용 입니다. 123456789</span>
+						</div>
+						<div class="font900 t2">
+							<p class="tit">NotoSans FONT 900</p>
+							<span class="t1">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t2">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t3">NotoSans 폰트 적용 입니다. 123456789</span>
+							<span class="t4">NotoSans 폰트 적용 입니다. 123456789</span>
+						</div>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+				</div>
+			</div>
+		</main>
+
+	
+	</div>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="memberBatch">
+
+	<sql id="listMemberBaseForBatch">
+		SELECT	MBR_NO
+				, ST_ID
+				, POLICY_NO
+				, login_id
+				, MBR_NM
+				, NICK_NM
+				, PET_LOG_URL
+				, PET_LOG_SRT_URL
+				, RCOM_CD
+				, RCOM_URL
+				, MBR_GB_CD
+				, MBR_STAT_CD
+				, MBR_GRD_CD
+				, BIRTH
+				, GD_GB_CD
+				, NTN_GB_CD
+				, JOIN_DTM
+				, MOD_DTM
+				, JOIN_PATH_CD
+				, JOIN_ENV_CD
+				, CTF_YN
+				, CI_CTF_VAL
+				, DI_CTF_VAL
+				, GSPT_NO
+				, GSPT_USE_YN
+				, GSPT_STATE_CD
+				, GSPT_START_DTM
+				, GSPT_STOP_DTM
+				, DEVICE_TOKEN
+				, DEVICE_TP_CD
+				, INFO_RCV_YN
+				, MKNG_RCV_YN
+				, PST_INFO_AGR_YN
+				, ALM_RCV_YN
+				, DFFC_MBR_YN
+				, PET_SCHL_YN
+				, PSWD
+				, PSWD_INIT_YN
+				, PSWD_CHG_DTM
+				, LOGIN_FAIL_CNT
+				, LAST_LOGIN_DTM
+				, PSWD_CHG_SCD_DTM
+				, TEL
+				, MOBILE
+				, MOBILE_CD
+				, EMAIL
+				, RCOM_LOGIN_ID
+				, MBR_LEV_RSN_CD
+				, MBR_LEV_CONTENT
+				, MBR_LEV_DTM
+				, RE_JOIN_PSB_DT
+				, DORMANT_APL_DTM
+				, DORMANT_RLS_DTM
+				, PET_LOG_ITRDC
+				, PRFL_IMG
+				, MBR_STOP_DTM
+				, DLGT_PET_GB_CD
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, UPDR_IP
+				, BUY_CNT
+		FROM	MEMBER_BASE
+	</sql>
+	
+	<select id="listMemberBaseForBirthdayBatch" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name	: memberBatch.listMemberBaseForBirthdayBatch
+			Description	: 회원 생일 쿠폰 발급을 위한 조회 
+			Writer		: 조은지
+			Date 		: 2021. 3. 24.
+		-->
+		<include refid="memberBatch.listMemberBaseForBatch" />
+		WHERE MBR_GB_CD = '${@framework.common.constants.CommonConstants@MBR_GB_CD_10}'
+		AND MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+	</select>
+	
+	<select id="listMemberBaseForDomantAlarmBatch" resultType="biz.app.member.model.MemberBaseVO">
+		<!--
+			Query Name	: memberBatch.listMemberBaseForDomantAlarmBatch
+			Description	: 휴면 사전 알람 회원 조회
+			Writer		: 조은지
+			Date 		: 2021. 4. 1.
+		-->
+		<include refid="memberBatch.listMemberBaseForBatch" />
+		WHERE MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}' 
+		AND LAST_LOGIN_DTM IS NOT NULL 
+		AND DATE_FORMAT(DATE_ADD(LAST_LOGIN_DTM, INTERVAL 11 MONTH), '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+	</select>
+	
+	
+	
+	<sql id="dormantCondition">
+		WHERE MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_10}'
+		AND LAST_LOGIN_DTM IS NOT NULL 
+		<![CDATA[ AND DATE_FORMAT(DATE_ADD(LAST_LOGIN_DTM, INTERVAL 12 MONTH), '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y-%m-%d') ]]>
+	</sql>
+	
+	<sql id="leaveCondition">
+		WHERE MBR_STAT_CD = '${@framework.common.constants.CommonConstants@MBR_STAT_50}' 
+		AND MBR_LEV_DTM IS NOT NULL
+		<![CDATA[ AND DATE_FORMAT(MBR_LEV_DTM, '%Y-%m-%d %T') <= DATE_FORMAT(CONCAT(DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 23:59:59'), '%Y-%m-%d %T') ]]>
+	</sql>
+	
+	<select id="listMemberBaseForDormantOrLeave" resultType="biz.app.member.model.MemberBaseVO">
+		<include refid="memberBatch.listMemberBaseForBatch" />
+		<if test='batchGb.equals("dormant")'>
+			<include refid="memberBatch.dormantCondition" />
+		</if>
+		<if test='batchGb.equals("leave")'>
+			<include refid="memberBatch.leaveCondition" />
+		</if>
+	</select>
+	
+	<select id="listMemberBizInfoForDormantOrLeave" resultType="biz.app.member.model.MemberBizInfoVO">
+		SELECT	MBR_NO , BIZ_NO , BIZ_ID , BIZ_NM , POST_NO_OLD , POST_NO_NEW , ROAD_ADDR , ROAD_DTL_ADDR , PRCL_ADDR , PRCL_DTL_ADDR
+				, EMAIL , PTN_DATE , STAT_CD , CEO_NM , BIZ_LIC_NO , BIZ_LIC_IMG_PATH , BIZ_CDTS , BIZ_TP , DLGT_NO , REL_POST_NO_OLD
+				, REL_POST_NO_NEW , REL_ROAD_ADDR , REL_ROAD_DTL_ADDR , REL_PRCL_ADDR , REL_PRCL_DTL_ADDR , RE_POST_NO_OLD , RE_POST_NO_NEW
+				, RE_ROAD_ADDR , RE_ROAD_DTL_ADDR , RE_PRCL_ADDR , RE_PRCL_DTL_ADDR , CHRG_PART , CHRG_NM , CHRG_TEL , CHRG_MOBILE
+				, CHRG_EMAIL , BANK_CD , ACCT_NO , OOA_NM , MEMO , SYS_REGR_NO , SYS_REG_DTM , SYS_UPDR_NO , SYS_UPD_DTM
+		FROM	MEMBER_BIZ_INFO A
+		WHERE	EXISTS (
+							SELECT	1
+							FROM	MEMBER_BASE B
+							<if test='batchGb.equals("dormant")'>
+								<include refid="memberBatch.dormantCondition" />
+							</if>
+							<if test='batchGb.equals("leave")'>
+								<include refid="memberBatch.leaveCondition" />
+							</if>
+							AND A.MBR_NO = B.MBR_NO
+						)
+	</select>
+	
+	<select id="listMemberAddressForDormantOrLeave" resultType="biz.app.member.model.MemberAddressVO">
+		SELECT	MBR_DLVRA_NO , MBR_NO , GB_NM , ADRS_NM , TEL , MOBILE , POST_NO_OLD , POST_NO_NEW , ROAD_ADDR , ROAD_DTL_ADDR
+				, PRCL_ADDR , PRCL_DTL_ADDR , DFT_YN , DLVR_DEMAND_YN , GOODS_RCV_PST_CD , GOODS_RCV_PST_ETC , PBL_GATE_ENT_MTD_CD
+				, PBL_GATE_PSWD , DLVR_DEMAND , SYS_REGR_NO , SYS_REG_DTM , SYS_UPDR_NO , SYS_UPD_DTM
+		FROM	MEMBER_ADDRESS A
+		WHERE	EXISTS (
+							SELECT	1
+							FROM	MEMBER_BASE B
+							<if test='batchGb.equals("dormant")'>
+								<include refid="memberBatch.dormantCondition" />
+							</if>
+							<if test='batchGb.equals("leave")'>
+								<include refid="memberBatch.leaveCondition" />
+							</if>
+							AND A.MBR_NO = B.MBR_NO
+						)
+	</select>
+	
+	<update id="updateMemberBaseForDormant" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET
+			POLICY_NO            	= NULL , MBR_NM                = NULL
+			, PET_LOG_URL           = NULL , PET_LOG_SRT_URL       = NULL
+			, RCOM_CD               = NULL , RCOM_URL              = NULL
+			, MBR_GB_CD             = NULL , MBR_STAT_CD			= '${@framework.common.constants.CommonConstants@MBR_STAT_30}'	/* 휴면 */  
+			, MBR_GRD_CD            = NULL , BIRTH                 = NULL
+			, GD_GB_CD              = NULL , NTN_GB_CD             = NULL
+			, JOIN_DTM              = NULL , MOD_DTM               = NULL
+			, JOIN_PATH_CD          = NULL , JOIN_ENV_CD           = NULL
+			, CTF_YN                = NULL , CI_CTF_VAL            = NULL
+			, GSPT_NO               = NULL , GSPT_USE_YN           = NULL
+			, GSPT_STATE_CD         = NULL , GSPT_START_DTM        = NULL
+			, GSPT_STOP_DTM         = NULL , DEVICE_TOKEN          = NULL
+			, DEVICE_TP_CD          = NULL , INFO_RCV_YN           = NULL
+			, MKNG_RCV_YN           = NULL , PST_INFO_AGR_YN       = NULL
+			, ALM_RCV_YN            = NULL , DFFC_MBR_YN           = NULL
+			, PET_SCHL_YN           = NULL , SIMP_SCR_NO           = NULL
+			, BILL_INPUT_FAIL_CNT	= NULL , TEL                   = NULL
+			, MOBILE                = NULL , MOBILE_CD             = NULL
+			, EMAIL                 = NULL , MBR_LEV_RSN_CD        = NULL
+			, MBR_LEV_CONTENT       = NULL , MBR_LEV_DTM           = NULL
+			, RE_JOIN_PSB_DT        = NULL , DORMANT_APL_DTM       = NULL
+			, DORMANT_RLS_DTM       = NULL , PET_LOG_ITRDC         = NULL
+			, PRFL_IMG              = NULL , MBR_STOP_DTM          = NULL
+			, DLGT_PET_GB_CD        = NULL , SYS_REGR_NO           = NULL
+			, SYS_REG_DTM           = NULL , SYS_UPDR_NO           = NULL
+			, SYS_UPD_DTM           = NULL , UPDR_IP               = NULL
+			, BUY_CNT               = NULL
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</update> 
+	
+	<update id="updateMemberBizInfoForDormant" parameterType="biz.app.member.model.MemberBizInfoPO">
+		UPDATE MEMBER_BIZ_INFO SET
+			BIZ_NM              = NULL , POST_NO_OLD       = NULL
+			, POST_NO_NEW       = NULL , ROAD_ADDR         = NULL
+			, ROAD_DTL_ADDR     = NULL , PRCL_ADDR         = NULL
+			, PRCL_DTL_ADDR     = NULL , EMAIL             = NULL
+			, PTN_DATE          = NULL , STAT_CD           = NULL
+			, CEO_NM            = NULL , BIZ_LIC_NO        = NULL
+			, BIZ_LIC_IMG_PATH  = NULL , BIZ_CDTS          = NULL
+			, BIZ_TP            = NULL , DLGT_NO           = NULL
+			, REL_POST_NO_OLD   = NULL , REL_POST_NO_NEW   = NULL
+			, REL_ROAD_ADDR     = NULL , REL_ROAD_DTL_ADDR = NULL
+			, REL_PRCL_ADDR     = NULL , REL_PRCL_DTL_ADDR = NULL
+			, RE_POST_NO_OLD    = NULL , RE_POST_NO_NEW    = NULL
+			, RE_ROAD_ADDR      = NULL , RE_ROAD_DTL_ADDR  = NULL
+			, RE_PRCL_ADDR      = NULL , RE_PRCL_DTL_ADDR  = NULL
+			, CHRG_PART         = NULL , CHRG_NM           = NULL
+			, CHRG_TEL          = NULL , CHRG_MOBILE       = NULL
+			, CHRG_EMAIL        = NULL , BANK_CD           = NULL
+			, ACCT_NO           = NULL , OOA_NM            = NULL
+			, MEMO              = NULL , SYS_REGR_NO       = NULL
+			, SYS_REG_DTM       = NULL , SYS_UPDR_NO       = NULL
+			, SYS_UPD_DTM       = NULL
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</update>
+	
+	<delete id="deleteMemberAddressForDormant" parameterType="biz.app.member.model.MemberAddressPO">
+		DELETE FROM MEMBER_ADDRESS
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</delete>
+	
+	<update id="updateListMemberBaseForLeave" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET
+			POLICY_NO               = NULL , LOGIN_ID              = NULL
+			, MBR_NM                = NULL , NICK_NM               = NULL
+			, PET_LOG_URL           = NULL , PET_LOG_SRT_URL       = NULL
+			, RCOM_CD               = NULL , RCOM_URL              = NULL
+			, MBR_GB_CD             = NULL , MBR_GRD_CD            = NULL
+			, BIRTH                 = NULL , GD_GB_CD              = NULL
+			, NTN_GB_CD             = NULL , JOIN_DTM              = NULL
+			, MOD_DTM               = NULL , JOIN_PATH_CD          = NULL
+			, JOIN_ENV_CD           = NULL , CTF_YN                = NULL
+			, CI_CTF_VAL            = NULL , DI_CTF_VAL            = NULL
+			, GSPT_NO               = NULL , GSPT_USE_YN           = NULL
+			, GSPT_STATE_CD         = NULL , GSPT_START_DTM        = NULL
+			, GSPT_STOP_DTM         = NULL , DEVICE_TOKEN          = NULL
+			, DEVICE_TP_CD          = NULL , INFO_RCV_YN           = NULL
+			, MKNG_RCV_YN           = NULL , PST_INFO_AGR_YN       = NULL
+			, ALM_RCV_YN            = NULL , DFFC_MBR_YN           = NULL
+			, PET_SCHL_YN           = NULL , PSWD                  = NULL
+			, PSWD_INIT_YN          = NULL , PSWD_CHG_DTM          = NULL
+			, LOGIN_FAIL_CNT        = NULL , LAST_LOGIN_DTM        = NULL
+			, PSWD_CHG_SCD_DTM      = NULL , SIMP_SCR_NO           = NULL
+			, BILL_INPUT_FAIL_CNT	= NULL , TEL                   = NULL
+			, MOBILE                = NULL , MOBILE_CD             = NULL
+			, EMAIL                 = NULL , RCOM_LOGIN_ID         = NULL
+			, MBR_LEV_RSN_CD        = NULL , MBR_LEV_CONTENT       = NULL
+			, MBR_LEV_DTM           = NULL , RE_JOIN_PSB_DT        = NULL
+			, DORMANT_APL_DTM       = NULL , DORMANT_RLS_DTM       = NULL
+			, PET_LOG_ITRDC         = NULL , PRFL_IMG              = NULL
+			, MBR_STOP_DTM          = NULL , DLGT_PET_GB_CD        = NULL
+			, SYS_REGR_NO           = NULL , SYS_REG_DTM           = NULL
+			, SYS_UPDR_NO           = NULL , SYS_UPD_DTM           = NULL
+			, UPDR_IP               = NULL , BUY_CNT               = NULL
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</update>
+	
+	<update id="updateListMemberBizInfoForLeave" parameterType="biz.app.member.model.MemberBizInfoPO">
+		UPDATE MEMBER_BIZ_INFO SET
+			BIZ_ID              = NULL , BIZ_NM            = NULL
+			, POST_NO_OLD       = NULL , POST_NO_NEW       = NULL
+			, ROAD_ADDR         = NULL , ROAD_DTL_ADDR     = NULL
+			, PRCL_ADDR         = NULL , PRCL_DTL_ADDR     = NULL
+			, EMAIL             = NULL , PTN_DATE          = NULL
+			, STAT_CD           = NULL , CEO_NM            = NULL
+			, BIZ_LIC_NO        = NULL , BIZ_LIC_IMG_PATH  = NULL
+			, BIZ_CDTS          = NULL , BIZ_TP            = NULL
+			, DLGT_NO           = NULL , REL_POST_NO_OLD   = NULL
+			, REL_POST_NO_NEW   = NULL , REL_ROAD_ADDR     = NULL
+			, REL_ROAD_DTL_ADDR = NULL , REL_PRCL_ADDR     = NULL
+			, REL_PRCL_DTL_ADDR	= NULL , RE_POST_NO_OLD    = NULL
+			, RE_POST_NO_NEW    = NULL , RE_ROAD_ADDR      = NULL
+			, RE_ROAD_DTL_ADDR  = NULL , RE_PRCL_ADDR      = NULL
+			, RE_PRCL_DTL_ADDR  = NULL , CHRG_PART         = NULL
+			, CHRG_NM           = NULL , CHRG_TEL          = NULL
+			, CHRG_MOBILE       = NULL , CHRG_EMAIL        = NULL
+			, BANK_CD           = NULL , ACCT_NO           = NULL
+			, OOA_NM            = NULL , MEMO              = NULL
+			, SYS_REGR_NO       = NULL , SYS_REG_DTM       = NULL
+			, SYS_UPDR_NO       = NULL , SYS_UPD_DTM       = NULL
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</update>
+	
+	<delete id="deleteMemberAddressForLeave" parameterType="biz.app.member.model.MemberAddressPO">
+		DELETE FROM MEMBER_ADDRESS
+		WHERE MBR_NO IN 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		 	#{item.mbrNo}
+		</foreach>
+	</delete>
+	
+	<update id="updateMemberBaseForLeave" parameterType="biz.app.member.model.MemberBasePO">
+		UPDATE MEMBER_BASE SET
+			POLICY_NO               = NULL , LOGIN_ID              = NULL
+			, MBR_NM                = NULL , NICK_NM               = NULL
+			, PET_LOG_URL           = NULL , PET_LOG_SRT_URL       = NULL
+			, RCOM_CD               = NULL , RCOM_URL              = NULL
+			, MBR_GB_CD             = NULL , MBR_GRD_CD            = NULL
+			, BIRTH                 = NULL , GD_GB_CD              = NULL
+			, NTN_GB_CD             = NULL , JOIN_DTM              = NULL
+			, MOD_DTM               = NULL , JOIN_PATH_CD          = NULL
+			, JOIN_ENV_CD           = NULL , CTF_YN                = NULL
+			, CI_CTF_VAL            = NULL , DI_CTF_VAL            = NULL
+			, GSPT_NO               = NULL , GSPT_USE_YN           = NULL
+			, GSPT_STATE_CD         = NULL , GSPT_START_DTM        = NULL
+			, GSPT_STOP_DTM         = NULL , DEVICE_TOKEN          = NULL
+			, DEVICE_TP_CD          = NULL , INFO_RCV_YN           = NULL
+			, MKNG_RCV_YN           = NULL , PST_INFO_AGR_YN       = NULL
+			, ALM_RCV_YN            = NULL , DFFC_MBR_YN           = NULL
+			, PET_SCHL_YN           = NULL , PSWD                  = NULL
+			, PSWD_INIT_YN          = NULL , PSWD_CHG_DTM          = NULL
+			, LOGIN_FAIL_CNT        = NULL , LAST_LOGIN_DTM        = NULL
+			, PSWD_CHG_SCD_DTM      = NULL , SIMP_SCR_NO           = NULL
+			, BILL_INPUT_FAIL_CNT	= NULL , TEL                   = NULL
+			, MOBILE                = NULL , MOBILE_CD             = NULL
+			, EMAIL                 = NULL , RCOM_LOGIN_ID         = NULL
+			, MBR_LEV_RSN_CD        = NULL , MBR_LEV_CONTENT       = NULL
+			/*, MBR_LEV_DTM           = NULL*/ , RE_JOIN_PSB_DT        = NULL
+			, DORMANT_APL_DTM       = NULL , DORMANT_RLS_DTM       = NULL
+			, PET_LOG_ITRDC         = NULL , PRFL_IMG              = NULL
+			, MBR_STOP_DTM          = NULL , DLGT_PET_GB_CD        = NULL
+			, SYS_REGR_NO           = NULL , SYS_REG_DTM           = NULL
+			/*, SYS_UPDR_NO           = NULL , SYS_UPD_DTM           = NULL*/
+			, UPDR_IP               = NULL , BUY_CNT               = NULL
+		WHERE MBR_NO = #{mbrNo}
+	</update>
+	
+	<update id="updateMemberBizInfoForLeave" parameterType="biz.app.member.model.MemberBizInfoPO">
+		UPDATE MEMBER_BIZ_INFO SET
+			BIZ_ID              = NULL , BIZ_NM            = NULL
+			, POST_NO_OLD       = NULL , POST_NO_NEW       = NULL
+			, ROAD_ADDR         = NULL , ROAD_DTL_ADDR     = NULL
+			, PRCL_ADDR         = NULL , PRCL_DTL_ADDR     = NULL
+			, EMAIL             = NULL , PTN_DATE          = NULL
+			, STAT_CD           = NULL , CEO_NM            = NULL
+			, BIZ_LIC_NO        = NULL , BIZ_LIC_IMG_PATH  = NULL
+			, BIZ_CDTS          = NULL , BIZ_TP            = NULL
+			, DLGT_NO           = NULL , REL_POST_NO_OLD   = NULL
+			, REL_POST_NO_NEW   = NULL , REL_ROAD_ADDR     = NULL
+			, REL_ROAD_DTL_ADDR = NULL , REL_PRCL_ADDR     = NULL
+			, REL_PRCL_DTL_ADDR	= NULL , RE_POST_NO_OLD    = NULL
+			, RE_POST_NO_NEW    = NULL , RE_ROAD_ADDR      = NULL
+			, RE_ROAD_DTL_ADDR  = NULL , RE_PRCL_ADDR      = NULL
+			, RE_PRCL_DTL_ADDR  = NULL , CHRG_PART         = NULL
+			, CHRG_NM           = NULL , CHRG_TEL          = NULL
+			, CHRG_MOBILE       = NULL , CHRG_EMAIL        = NULL
+			, BANK_CD           = NULL , ACCT_NO           = NULL
+			, OOA_NM            = NULL , MEMO              = NULL
+			, SYS_REGR_NO       = NULL , SYS_REG_DTM       = NULL
+			, SYS_UPDR_NO       = NULL , SYS_UPD_DTM       = NULL
+		WHERE MBR_NO = #{mbrNo}
+	</update>
+	
+	
+
+	<select id="listMemberCouponExpire" parameterType="java.lang.Integer" resultType="biz.app.member.model.MemberCouponVO">
+		SELECT 		/* QUERYID(memberCoupon.listMemberCouponExpire) */
+			MB.MBR_NM
+		,	MB.MBR_NO
+		,	MB.MOBILE
+		,	( DATEDIFF(MC.USE_END_DTM,NOW()) ) AS LEFT_DAYS
+		,	CB.CP_NO
+		,	CB.CP_NM
+		,	CB.CP_KIND_CD
+		,	CB.CP_STAT_CD
+		,	CB.CP_APL_CD
+		,	CB.CP_TG_CD
+		,	CB.RVS_MRG_PMT_YN
+		,	CB.CP_PVD_MTH_CD
+		,	IF(MB.MKNG_RCV_YN ='Y',CB.EXPR_ITDC_YN,'N') AS EXPR_ITDC_YN
+		,	CB.OUTSIDE_CP_YN
+		,	CB.OUTSIDE_CP_CD
+		,	CB.NOTICE
+		,	MC.USE_YN
+		,	MC.USE_DTM
+		,	MC.ORD_NO
+		,	MC.ISU_TP_CD
+		,	MC.USE_STRT_DTM
+		,	MC.USE_END_DTM
+		,	MC.SYS_REGR_NO
+		,	MC.SYS_REG_DTM
+		,	MC.SYS_UPDR_NO
+		,	MC.SYS_UPD_DTM
+		FROM MEMBER_COUPON MC
+		INNER JOIN COUPON_BASE CB ON MC.CP_NO = CB.CP_NO
+		INNER JOIN MEMBER_BASE MB ON MC.MBR_NO = MB.MBR_NO
+		LEFT JOIN COUPON_ISSUE CI ON MC.MBR_CP_NO = CI.MBR_CP_NO
+		WHERE (
+		    MC.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}' OR  MC.USE_END_DTM &lt;= CURDATE()
+			AND CB.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+			AND (
+				( CURDATE() &lt;= MC.USE_END_DTM AND CURDATE() &lt;= MC.USE_STRT_DTM )
+				OR 	CURDATE() &lt;= MC.USE_STRT_DTM
+			)
+		)
+		AND CB.EXPR_ITDC_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND  ( DATEDIFF(MC.USE_END_DTM,NOW()) ) = #{expire}
+	</select>
+
+
+	<insert id="insertMemberGrdCoupon" parameterType="biz.app.member.model.MemberCouponPO">
+		<selectKey keyProperty="mbrNos" resultType="java.lang.String" order="BEFORE">
+			SELECT IFNULL(GROUP_CONCAT(MBR_NO),'')
+			FROM MEMBER_BASE
+			WHERE MBR_GRD_CD = #{mbrGrdCd}
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_30}' 
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' 
+		</selectKey>
+		INSERT /* QUERYID(memberBatch.insertMemberGrdCoupon) */ INTO MEMBER_COUPON
+		(
+			 MBR_CP_NO
+			,CP_NO
+			,MBR_NO
+			,USE_YN
+			,ORD_NO
+			,ISU_TP_CD /* 발급유형코드 */
+			,USE_STRT_DTM /* 사용시작일시 */
+			,USE_END_DTM /* 사용종료일시 */
+			,SYS_REGR_NO
+			,SYS_REG_DTM
+			,SYS_UPDR_NO
+			,SYS_UPD_DTM
+		)
+		SELECT 	 FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_MEMBER_COUPON_SEQ}') AS MBR_CP_NO
+			 ,   CB.CP_NO
+			 ,   MB.MBR_NO AS MBR_NO
+			 ,   '${@framework.common.constants.CommonConstants@USE_YN_N}' AS USE_YN
+			 ,   NULL AS ORD_NO
+			 ,   '${@framework.common.constants.CommonConstants@ISU_TP_10}' AS ISU_TP_CD
+			 ,   NOW() AS USE_STRT_DTM
+			 ,   ( IF(CB.VLD_PRD_CD ='${@framework.common.constants.CommonConstants@VLD_PRD_10}',DATE_ADD(NOW(),INTERVAL CB.VLD_PRD_DAY DAY) , CB.VLD_PRD_END_DTM) ) AS USE_END_DTM
+			 ,   MB.MBR_NO AS SYS_REGR_NO
+			 ,   NOW() AS SYS_REG_DTM
+			 ,   MB.MBR_NO AS SYS_UPDR_NO
+			 ,   NOW() AS SYS_UPD_DTM
+		FROM (
+			SELECT *
+			FROM COUPON_BASE
+			WHERE CP_NO IN (
+				SELECT USR_DFN1_VAL
+				FROM CODE_DETAIL
+				WHERE GRP_CD = '${@framework.common.constants.CommonConstants@AUTO_ISU_COUPON}'
+				<foreach collection="dtlCds" item="dtlCd" separator="," open="AND DTL_CD IN  (" close=")">
+					#{dtlCd}
+				</foreach>
+			)
+		) CB -- 자동 발급 쿠폰 中 등급별 쿠폰만
+		   , (
+			SELECT MBR_NO,MBR_GRD_CD
+			FROM MEMBER_BASE
+			WHERE MBR_GRD_CD = #{mbrGrdCd}
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_30}' 
+			AND MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}' 
+			) MB
+		ORDER BY MB.MBR_NO
+	</insert>
+	
+	
+	<update id="updateMemberGrade" parameterType="hashmap">
+		<!--
+			Query Name	: memberBatch.getMemberDeviceToken
+			Description	: 회원 등급 배치 쿼리
+			Writer		: 이지희
+			Date 		: 2021. 5. 20.
+		-->
+		UPDATE 	MEMBER_BASE
+		SET		MBR_GRD_CD  = #{grdCd}
+		<choose>
+			<when test="grdCd.equals('40')">
+			WHERE 	MBR_NO NOT IN (
+									SELECT AMOUNT.MBR_NO 
+									FROM (
+									    SELECT MB.MBR_NO  , OD.PAY_AMT AS AMT
+									    FROM MEMBER_BASE MB
+									    INNER JOIN ORDER_DETAIL OD ON MB.MBR_NO = OD.MBR_NO 
+									    INNER JOIN ORDER_DETAIL_STATUS_HIST ODSH ON OD.ORD_NO = ODSH.ORD_NO AND OD.ORD_DTL_SEQ = ODSH.ORD_DTL_SEQ
+									    WHERE OD.ORD_DTL_STAT_CD = 170
+									    AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+									    AND ODSH.ORD_DTL_STAT_CD = 170
+									    AND ODSH.HIST_STRT_DTM <![CDATA[ >= ]]>  date_format((date_sub(NOW(),INTERVAL 3 MONTH)),'%Y-%m-%d')
+									    AND ODSH.HIST_STRT_DTM <![CDATA[ < ]]>   date_format(NOW(),'%Y-%m-%d')
+									    UNION ALL
+									    SELECT MB.MBR_NO
+									            , (((IFNULL(EOG.GOODSPRICE,0) + IFNULL(EOG.OPTIONPRICE,0))*IFNULL(EOG.GOODSCNT,0)) - IFNULL(COUPONGOODSDCPRICE,0) - IFNULL(DIVISIONCOUPONORDERDCPRICE,0)) AS AMT
+									    FROM  MEMBER_BASE MB 
+									    <choose>
+										    <when test="'stg'.equals(env)">
+										    INNER JOIN ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+										    INNER JOIN ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+										    </when>
+										    <when test="'prd'.equals(env)">
+										    INNER JOIN GODOMALL.ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+										    INNER JOIN GODOMALL.ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+										    </when>
+										    <otherwise>
+										    INNER JOIN MIG_ASIS.ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+			    							INNER JOIN MIG_ASIS.ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+										    </otherwise>
+									    </choose>
+									    WHERE EOG.ORDERSTATUS='S1'
+									    AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+									    AND EOG.FINISHDT <![CDATA[ >= ]]> date_format((date_sub(NOW(),INTERVAL 3 MONTH)),'%Y-%m-%d')    
+									)AMOUNT
+									WHERE 1=1
+									GROUP BY AMOUNT.MBR_NO
+								    HAVING 		SUM(AMOUNT.AMT)  <![CDATA[ >= ]]>  ${end}
+									ORDER BY AMOUNT.MBR_NO ASC 
+							   )
+		    AND MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+			</when>
+			<otherwise>
+			WHERE 	MBR_NO IN (
+								SELECT AMOUNT.MBR_NO 
+								FROM (
+								    SELECT MB.MBR_NO  , OD.PAY_AMT AS AMT
+								    FROM MEMBER_BASE MB
+								    INNER JOIN ORDER_DETAIL OD ON MB.MBR_NO = OD.MBR_NO 
+								    INNER JOIN ORDER_DETAIL_STATUS_HIST ODSH ON OD.ORD_NO = ODSH.ORD_NO AND OD.ORD_DTL_SEQ = ODSH.ORD_DTL_SEQ
+								    WHERE OD.ORD_DTL_STAT_CD = 170
+								    AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+								    AND    ODSH.ORD_DTL_STAT_CD = 170
+								    AND ODSH.HIST_STRT_DTM <![CDATA[ >= ]]>  date_format((date_sub(NOW(),INTERVAL 3 MONTH)),'%Y-%m-%d')
+								    AND ODSH.HIST_STRT_DTM <![CDATA[ < ]]>   date_format(NOW(),'%Y-%m-%d')
+								    UNION ALL
+								    SELECT MB.MBR_NO
+								            , (((IFNULL(EOG.GOODSPRICE,0) + IFNULL(EOG.OPTIONPRICE,0))*IFNULL(EOG.GOODSCNT,0)) - IFNULL(COUPONGOODSDCPRICE,0) - IFNULL(DIVISIONCOUPONORDERDCPRICE,0)) AS AMT
+								    FROM  MEMBER_BASE MB 
+								    <choose>
+									    <when test="'stg'.equals(env)">
+									    INNER JOIN ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+									    INNER JOIN ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+									    </when>
+									    <when test="'prd'.equals(env)">
+									    INNER JOIN GODOMALL.ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+									    INNER JOIN GODOMALL.ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+									    </when>									    
+									    <otherwise>
+									    INNER JOIN MIG_ASIS.ES_ORDER      EO  ON(EO.MEMNO=MB.MBR_NO AND EO.MEMNO=MB.MIG_MEMNO )
+		    							INNER JOIN MIG_ASIS.ES_ORDERGOODS EOG ON(EOG.ORDERNO=EO.ORDERNO)
+									    </otherwise>
+								    </choose>
+								    WHERE EOG.ORDERSTATUS='S1'
+								    AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}','${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+								    AND EOG.FINISHDT <![CDATA[ >= ]]> date_format((date_sub(NOW(),INTERVAL 3 MONTH)),'%Y-%m-%d')    
+								)AMOUNT
+								WHERE 1=1
+								GROUP BY AMOUNT.MBR_NO
+								<choose>
+									<when test="end != null and start == null">
+								    HAVING 		SUM(AMOUNT.AMT ) <![CDATA[ < ]]>  ${end}
+									</when>
+									<when test="end == null and start != null">
+								    HAVING 		SUM(AMOUNT.AMT)  <![CDATA[ >= ]]>  ${start}
+									</when>
+									<otherwise>
+								    HAVING 		SUM(AMOUNT.AMT )  BETWEEN ${start} AND ${end}
+									</otherwise>
+								</choose>
+								ORDER BY AMOUNT.MBR_NO ASC 
+							   )
+		   </otherwise>
+		   </choose>
+		 					   
+	</update>
+	
+	<select id="listCouponIsuStbBatch" resultType="biz.app.member.model.MemberCouponVO">
+		<!--
+			Query Name	: memberBatch.listCouponIsuStbBatch
+			Description	: 회원 쿠폰 발급 대기 대상 발급 처리를 위한 조회 
+			Writer		: cjw01
+			Date 		: 2021. 8. 20.
+		-->
+		SELECT 		/* QUERYID(memberBatch.listCouponIsuStbBatch) */
+			CIS.CP_NO
+		,	CIS.MBR_NO
+		FROM COUPON_ISU_STB CIS
+		INNER JOIN COUPON_BASE CB ON CIS.CP_NO = CB.CP_NO
+		INNER JOIN MEMBER_BASE MB ON CIS.MBR_NO = MB.MBR_NO
+		WHERE (
+		    CIS.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_N}'
+			AND CURDATE() = CB.APL_STRT_DTM
+		)
+	</select>
+</mapper>

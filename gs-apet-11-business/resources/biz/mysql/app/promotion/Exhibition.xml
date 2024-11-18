@@ -1,0 +1,1053 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exhibition">
+
+	<select id="listExhibitionMainNc" resultType="biz.app.promotion.model.ExhibitionMainVO">
+		SELECT
+			IFNULL(SUM(STAT_10), 0) AS STAT_10
+			,IFNULL(SUM(STAT_20), 0) AS STAT_20
+			,IFNULL(SUM(STAT_30), 0) AS STAT_30
+			,IFNULL(SUM(STAT_40), 0) AS STAT_40
+		FROM (
+			SELECT
+				CASE
+					WHEN EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_10}'
+					THEN 1
+					ELSE 0
+					END AS STAT_10
+				, CASE
+					WHEN EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}'
+					THEN 1
+					ELSE 0
+					END AS STAT_20
+				, CASE
+					WHEN EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_30}'
+					THEN 1
+					ELSE 0
+					END AS STAT_30
+				, CASE
+					WHEN EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_40}'
+					THEN 1
+					ELSE 0
+					END AS STAT_40
+			FROM EXHIBITION_BASE EXB
+			WHERE 1 = 1
+<!-- 			INNER JOIN EXHIBITION_THEME EXT ON EXT.EXHBT_NO = EXB.EXHBT_NO -->
+<!-- 			INNER JOIN EXHIBITION_THEME_GOODS EXTG ON EXTG.THM_NO = EXT.THM_NO -->
+			AND EXB.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			<if test="mdUsrNo != null and mdUsrNo != ''">
+			AND EXB.MD_USR_NO = #{mdUsrNo}
+			</if>
+		) A
+	</select>
+
+	<select id="pageExhibition" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : exhibition.pageExhibition
+			Description : 기획전 페이지 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibition) */
+				  DISTINCT EXB.EXHBT_NO		/* 기획전 번호 */
+				, EXB.EXHBT_NM				/* 기획전 명 */
+				, EXB.EXHBT_GB_CD			/* 기획전 구분 코드 */
+				, EXB.MD_USR_NM				
+				, EXB.EXHBT_STAT_CD			/* 기획전 승인 상태 코드 */
+				, EXB.DISP_YN		/* 전시 여부 */
+				, EXB.DISP_STRT_DTM			/* 전시 시작 일시 */
+				, EXB.DISP_END_DTM			/* 전시 종료 일시 */
+				, STEXM.ST_ID
+				, SI.ST_NM
+				, EXB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+				, EXB.SYS_REG_DTM			/* 시스템 등록 일시 */
+				, EXB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+				, EXB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(EXB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(EXB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+				, EXB.BNR_IMG_PATH     /* 배너 이미지 경로 */
+		     	, EXB.BNR_MO_IMG_PATH  /* 배너 모바일 이미지 경로 */
+		FROM	EXHIBITION_BASE EXB
+		INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME EXT ON EXT.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME_GOODS EXTG ON EXTG.THM_NO = EXT.THM_NO
+		JOIN ST_STD_INFO SI ON SI.ST_ID = STEXM.ST_ID
+		WHERE	1 = 1
+		<include refid="exhibition.pageExhibitionWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageExhibitionCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.pageExhibitionCount
+			Description : 기획전 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionCount) */
+				COUNT(DISTINCT EXB.EXHBT_NO)
+		FROM	EXHIBITION_BASE EXB
+		INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME EXT ON EXT.EXHBT_NO = EXB.EXHBT_NO
+		LEFT OUTER JOIN EXHIBITION_THEME_GOODS EXTG ON EXTG.THM_NO = EXT.THM_NO
+		WHERE	1 = 1
+		<include refid="exhibition.pageExhibitionWhere" />
+	</select>
+
+	<sql id="pageExhibitionWhere">
+	
+		<!-- if test='dispStrtDtm != null and dispStrtDtm != "" and dispEndDtm != null and dispEndDtm != ""' -->
+		<if test='dispStrtDtm != null and dispEndDtm != null '>
+			<!--
+				1. 검색기간 끝보다 전시기간 끝이 과거인 경우 전시기간 끝이 검색기간 사이에 있어야 한다.
+				2. 검색기간 끝보다 전시기간 끝이 미래인 경우 전시기간 시작이 검색기간 끝보다 과거여야 한다.
+			 -->
+			AND ( (DATE_ADD(#{dispEndDtm }, INTERVAL 1 DAY) &gt;= EXB.DISP_END_DTM AND EXB.DISP_END_DTM BETWEEN #{dispStrtDtm} AND DATE_ADD(#{dispEndDtm }, INTERVAL 1 DAY)) 
+					OR (DATE_ADD(#{dispEndDtm }, INTERVAL 1 DAY) &lt;= EXB.DISP_END_DTM AND EXB.DISP_STRT_DTM &lt;= DATE_ADD(#{dispEndDtm }, INTERVAL 1 DAY)) )
+		</if>
+		<if test="sysRegDtmStart != null">
+			AND EXB.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+		</if>
+		<if test="sysRegDtmEnd != null">
+			AND EXB.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+		</if>
+		<if test='exhbtNo != null'>
+			AND EXB.EXHBT_NO = #{exhbtNo}
+		</if>
+		<if test='exhbtNm != null and exhbtNm != ""'>
+			AND EXB.EXHBT_NM LIKE CONCAT('%', #{exhbtNm}, '%')
+		</if>
+		<if test='exhbtGbCd != null and exhbtGbCd != ""'>
+			AND EXB.EXHBT_GB_CD = #{exhbtGbCd}
+		</if>
+		<if test='exhbtStatCd != null and exhbtStatCd != ""'>
+			AND EXB.EXHBT_STAT_CD = #{exhbtStatCd}
+		</if>
+		<if test='dispYn != null and dispYn != ""'>
+			AND EXB.DISP_YN = #{dispYn}
+		</if>
+		<if test='mdUsrNm != null and mdUsrNm != ""'>
+			AND EXB.MD_USR_NM LIKE  CONCAT('%', #{mdUsrNm} , '%')
+		</if>
+		<if test='stId != null'>
+			AND STEXM.ST_ID = #{stId}
+		</if>
+		<if test='compNo != null and sysRegrNo == null'>
+			AND EXT.COMP_NO = #{compNo}
+		</if>
+		<if test='compNo != null and sysRegrNo != null'>
+			AND (EXT.COMP_NO = #{compNo} OR EXB.SYS_REGR_NO = #{sysRegrNo})
+		</if>
+		AND EXB.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</sql>
+	
+	<select id="getExhibitionBase" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : exhibition.getExhibitionBase
+			Description : 기획전 기본
+		-->
+		SELECT	/* QUERYID(exhibition.getExhibitionBase) */
+				EXB.EXHBT_NO			/* 기획전 번호 */
+				, EXB.EXHBT_NM			/* 기획전 명 */
+				, EXB.EXHBT_GB_CD			/* 기획전 구분 코드 */
+				, EXB.EXHBT_STAT_CD		/* 기획전 승인 상태 코드 */
+				, EXB.DISP_CLSF_NO			/* 전시 분류 번호 */
+				, EXB.SEO_INFO_NO			/* SEO 정보 번호 */
+                , DC.DISP_CLSF_NM			/* 전시 분류 명 */
+                , DC.UP_DISP_CLSF_NO		/* 상위 전시 분류 번호 */
+				, EXB.DISP_STRT_DTM			/* 전시 시작 일시 */
+				, EXB.DISP_END_DTM			/* 전시 종료 일시 */
+				, EXB.DISP_YN				/* 전시 여부 */
+				, EXB.KWD					/* 키워드 */
+				, EXB.MD_USR_NO			/* 담당 MD 번호 */
+				, EXB.MD_USR_NM		/* 담당 MD 번호 */
+				, EXB.WEB_MOBILE_GB_CD	/* 웹 모바일 구분 코드 */
+				, EXB.TTL_HTML			/* 타이틀 HTML */
+				, EXB.TTL_MO_HTML		/* 타이틀 HTML 모바일 */
+				, EXB.BNR_IMG_PATH		/* 배너 이미지 경로 */
+				, EXB.BNR_MO_IMG_PATH		/* 배너 모바일 이미지 경로 */
+				, EXB.GD_BNR_IMG_PATH		/* 상품상세 이미지 경로 */
+				, EXB.GD_BNR_MO_IMG_PATH		/* 상품상세 모바일 이미지 경로 */
+				, EXB.BIGO			/* 비고 */
+				, STEXM1.ST_ID
+				, SI.ST_NM
+				, (SELECT USR_NM
+				  FROM USER_BASE
+				  WHERE USR_NO = EXB.MD_USR_NO) AS MD_USR_NM
+		  FROM 
+		      EXHIBITION_BASE EXB 
+		      JOIN ST_EXHIBITION_MAP STEXM1 ON (EXB.EXHBT_NO = STEXM1.EXHBT_NO)
+		      JOIN ST_STD_INFO SI ON (STEXM1.ST_ID = SI.ST_ID) 
+		      LEFT OUTER JOIN DISPLAY_CATEGORY DC ON (DC.DISP_CLSF_NO = EXB.DISP_CLSF_NO)
+		 WHERE 1 = 1
+		   AND EXB.EXHBT_NO = #{exhbtNo}
+	</select>
+	
+	<select id="getExhibitionStMap" resultType="biz.app.st.model.StStdInfoVO">
+		<!--
+			Query Name : exhibition."getExhibitionStMap"
+			Description : 사이트와 기획전 매핑리스트
+		-->
+		SELECT	/* QUERYID(exhibition.getExhibitionStMap) */
+				ST_ID			/* 사이트 ID */
+		  FROM ST_EXHIBITION_MAP
+		 WHERE 1 = 1
+		   AND EXHBT_NO = #{exhbtNo}
+	</select>
+	
+	<select id="getExhbtThmCnt" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.getExhbtThmCnt
+			Description : 기획전 테마 등록 수량
+		-->
+		SELECT	/* QUERYID(exhibition.getExhbtThmCnt) */
+				COUNT(*)
+		FROM	EXHIBITION_THEME 
+		WHERE 1=1
+		AND EXHBT_NO = #{exhbtNo}
+		AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</select>
+
+	<insert id="insertExhibitionBase" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.insertExhibitionBase
+			Description : 기획전 기본정보 등록
+		-->
+		INSERT INTO EXHIBITION_BASE ( /* QUERYID(exhibition.insertExhibitionBase) */
+			EXHBT_NO			/* 기획전 번호 */
+			, EXHBT_NM			/* 기획전 명 */
+			, EXHBT_GB_CD		/* 기획전 구분 코드 */
+			, EXHBT_STAT_CD		/* 기획전 승인 상태 코드 */
+			, DISP_STRT_DTM		/* 전시 시작 일시 */
+			, DISP_END_DTM		/* 전시 종료 일시 */
+			, DISP_YN			/* 전시 여부 */
+			<if test='dispClsfNo != null and dispClsfNo != ""'>
+			, DISP_CLSF_NO 		/* 전시 분류 번호 */
+			</if> 
+			<if test='seoInfoNo != null and seoInfoNo != ""'>
+			, SEO_INFO_NO 		/* SEO 정보 번호 */
+			</if> 			
+			<if test='kwd != null and kwd != ""'>
+			, KWD					/* 키워드 */
+			</if>
+			, MD_USR_NM			/* 담당 MD 번호 */
+			, WEB_MOBILE_GB_CD	/* 웹 모바일 구분 코드 */
+			, TTL_HTML			/* 타이틀 HTML */
+			<if test='ttlMoHtml != null and ttlMoHtml != ""'>
+			, TTL_MO_HTML		/* 타이틀 HTML 모바일 */
+			</if>
+			<if test='bnrImgPath != null'>
+			, BNR_IMG_PATH		/* 배너 이미지 경로 */
+			</if>
+			<if test='bnrMoImgPath != null'>
+			, BNR_MO_IMG_PATH		/* 배너 모바일 이미지 경로 */
+			</if>
+			<if test='gdBnrImgPath != null'>
+			, GD_BNR_IMG_PATH		/* 상품상세 이미지 경로 */
+			</if>
+			<if test='gdBnrMoImgPath != null'>
+			, GD_BNR_MO_IMG_PATH		/* 상품상세 모바일 이미지 경로 */
+			</if>
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES ( 
+			#{exhbtNo}			/* 기획전 번호 */
+			, #{exhbtNm}			/* 기획전 명 */
+			, #{exhbtGbCd}			/* 기획전 구분 코드 */
+			, #{exhbtStatCd}		/* 기획전 승인 상태 코드 */
+			, #{dispStrtDtm}			/* 전시 시작 일시 */
+			, #{dispEndDtm}			/* 전시 종료 일시 */
+			, #{dispYn}				/* 전시 여부 */
+			<if test='dispClsfNo != null and dispClsfNo != ""'>
+			, #{dispClsfNo} 		/* 전시 분류 번호 */
+			</if> 
+			<if test='seoInfoNo != null and seoInfoNo != ""'>
+			, #{seoInfoNo}		/* SEO 정보 번호 */
+			</if> 			
+			<if test='kwd != null and kwd != ""'>
+			, #{kwd}					/* 키워드 */
+			</if>
+			, #{mdUsrNm}			/* 담당 MD 번호 */
+			, #{webMobileGbCd}	/* 웹 모바일 구분 코드 */
+			, #{ttlHtml}			/* 타이틀 HTML */
+			<if test='ttlMoHtml != null and ttlMoHtml != ""'>
+			, #{ttlMoHtml}		/* 타이틀 HTML 모바일 */
+			</if>
+			<if test='bnrImgPath != null'>
+			, #{bnrImgPath}		/* 배너 이미지 경로 */
+			</if>
+			<if test='bnrMoImgPath != null'>
+			, #{bnrMoImgPath}		/* 배너 모바일 이미지 경로 */
+			</if>
+			<if test='gdBnrImgPath != null'>
+			, #{gdBnrImgPath}		/* 상품상세 이미지 경로 */
+			</if>
+			<if test='gdBnrMoImgPath != null'>
+			, #{gdBnrMoImgPath}		/* 상품상세 모바일 이미지 경로 */
+			</if>
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateExhibitionBase" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.updateExhibitionBase
+			Description : 기획전 기본 수정
+		-->
+		UPDATE	/* QUERYID(exhibition.updateExhibitionBase) */
+			EXHIBITION_BASE SET  
+				SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+				<if test='exhbtGbCd != null and exhbtGbCd != ""'>
+				, EXHBT_GB_CD = #{exhbtGbCd}
+				</if>
+				<if test='exhbtNm != null and exhbtNm != ""'>
+				, EXHBT_NM = #{exhbtNm}			/* 기획전 명 */
+				</if>
+				<if test='exhbtStatCd != null and exhbtStatCd != ""'>
+				, EXHBT_STAT_CD = #{exhbtStatCd}		/* 기획전 승인 상태 코드 */
+					<if test='exhbtStatCd == @framework.common.constants.CommonConstants@EXHBT_STAT_20'>
+					, CFM_PRCS_DTM	= NOW()			/* 승인 처리 일시 */
+					</if>
+				</if>
+				<if test='dispClsfNo != null and dispClsfNo != ""'>
+				, DISP_CLSF_NO = #{dispClsfNo}			/* 전시 분류 번호 */
+				</if> 
+				<if test='seoInfoNo != null and seoInfoNo != ""'>
+				, SEO_INFO_NO = #{seoInfoNo}			/* SEO 정보 번호 */
+				</if> 					
+				<if test='dispStrtDtm != null'>
+				, DISP_STRT_DTM = #{dispStrtDtm}			/* 전시 시작 일시 */
+				</if>
+				<if test='dispEndDtm != null'>
+				, DISP_END_DTM = #{dispEndDtm}			/* 전시 종료 일시 */
+				</if>
+				<if test='dispYn != null and dispYn != ""'>
+				, DISP_YN = #{dispYn}				/* 전시 여부 */
+				</if>
+				<if test='kwd != null'>
+				, KWD	= #{kwd}				/* 키워드 */
+				</if>
+				<if test='mdUsrNm != null'>
+				, MD_USR_NM = #{mdUsrNm}			/* 담당 MD 번호 */
+				</if>
+				<if test='webMobileGbCd != null and webMobileGbCd != ""'>
+				, WEB_MOBILE_GB_CD = #{webMobileGbCd}	/* 웹 모바일 구분 코드 */
+				</if>
+				<if test='ttlHtml != null'>
+				, TTL_HTML = #{ttlHtml}			/* 타이틀 HTML */
+				</if>
+				<if test='ttlMoHtml != null'>
+				, TTL_MO_HTML = #{ttlMoHtml}		/* 타이틀 HTML 모바일 */
+				</if>
+				<if test='bnrImgPath != null'>
+				, BNR_IMG_PATH = #{bnrImgPath}		/* 배너 이미지 경로 */
+				</if>
+				<if test='bnrMoImgPath != null'>
+				, BNR_MO_IMG_PATH = #{bnrMoImgPath}		/* 배너 모바일 이미지 경로 */
+				</if>
+				<if test='gdBnrImgPath != null'>
+				, GD_BNR_IMG_PATH = #{gdBnrImgPath}		/* 상품상세 이미지 경로 */
+				</if>
+				<if test='gdBnrMoImgPath != null'>
+				, GD_BNR_MO_IMG_PATH = #{gdBnrMoImgPath}		/* 상품상세 모바일 이미지 경로 */
+				</if>
+				<if test='delYn != null and delYn != ""'>
+				, DEL_YN	= #{delYn}				/* 삭제 여부 */
+				</if>
+				<if test='bigo != null'>
+				, BIGO	= #{bigo}				/* 비고 */
+				</if>
+			WHERE EXHBT_NO = #{exhbtNo}
+	</update>
+
+	<update id="updateExhibitionBaseStat30To10" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.updateExhibitionBaseStat30To10
+			Description : 기획전 기본정보 수정 - 업체 기획전 기본 승인상태 가 반려일 경우 대기로 변경
+		-->
+		UPDATE	EXHIBITION_BASE SET
+			SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+			, EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_10}'		/* 기획전 승인 상태 코드 */
+		WHERE EXHBT_NO = #{exhbtNo}
+		AND EXHBT_GB_CD = '${@framework.common.constants.CommonConstants@EXHBT_GB_20}'
+		AND EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_30}'
+	</update>
+	
+    <update id="updateExhibitionStateBatch" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+        <!--
+            Query Name : exhibition.updateExhibitionStateBatch
+            Description : 기획전 전시여부, 기획전 상태를 일괄 변경
+        -->
+        UPDATE  EXHIBITION_BASE SET
+            SYS_UPDR_NO = #{sysUpdrNo}          /* 시스템 수정자 번호 */
+            , SYS_UPD_DTM = NOW()           /* 시스템 수정 일시 */
+            <if test="dispYn != null and dispYn != ''">
+            , DISP_YN = #{dispYn}        /* 기획전 전시여부 */
+            </if>
+            <if test="exhbtStatCd != null and exhbtStatCd != ''">
+            , EXHBT_STAT_CD = #{exhbtStatCd}        /* 기획전 상태 */
+            </if>            
+        WHERE
+            <foreach collection="exhbtNos" item="exhbtNo" separator="," open="EXHBT_NO IN (" close=")">
+            #{exhbtNo}
+            </foreach>
+            <if test="dispYn != null and dispYn != ''">
+            AND DISP_YN = IF(UPPER(#{dispYn}) = '${@framework.common.constants.CommonConstants@DISP_YN_Y}', '${@framework.common.constants.CommonConstants@DISP_YN_N}', '${@framework.common.constants.CommonConstants@DISP_YN_Y}')
+            </if>
+            <if test="exhbtStatCd != null and exhbtStatCd != ''">
+                <choose>
+                <when test="exhbtStatCd eq @framework.common.constants.CommonConstants@EXHBT_STAT_10">
+            AND EXHBT_STAT_CD IN ('${@framework.common.constants.CommonConstants@EXHBT_STAT_10}')    
+                </when> 
+                <when test="exhbtStatCd eq @framework.common.constants.CommonConstants@EXHBT_STAT_20">
+            AND EXHBT_STAT_CD IN ('${@framework.common.constants.CommonConstants@EXHBT_STAT_10}', '${@framework.common.constants.CommonConstants@EXHBT_STAT_30}')    
+                </when>
+                <when test="exhbtStatCd eq @framework.common.constants.CommonConstants@EXHBT_STAT_30">
+            AND EXHBT_STAT_CD IN ('${@framework.common.constants.CommonConstants@EXHBT_STAT_10}', '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}')    
+                </when>
+                <when test="exhbtStatCd eq @framework.common.constants.CommonConstants@EXHBT_STAT_40">
+            AND EXHBT_STAT_CD IN ('${@framework.common.constants.CommonConstants@EXHBT_STAT_10}', '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}', '${@framework.common.constants.CommonConstants@EXHBT_STAT_30}')    
+                </when>             
+                </choose>
+            </if>
+            <if test="exhbtNos == null or exhbtNos.length == 0">
+            AND 1 = 2
+            </if>
+    </update>
+	
+	<insert id="insertStExhibitionMap" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.insertStExhibitionMap
+			Description : 사이트와 기획전 매핑 등록
+		-->
+		INSERT INTO ST_EXHIBITION_MAP (
+			  ST_ID				/* 사이트 ID */
+			, EXHBT_NO			/* 기획전 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{stId}			/* 사이트 아이디 */
+			, #{exhbtNo}		/* 기획전 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>	
+	
+	<delete id="deleteStExhibitionMap" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.deleteStExhibitionMap
+			Description : 기획전에 매핑된 사이트 정보를 삭제
+		-->
+		DELETE FROM ST_EXHIBITION_MAP
+		WHERE EXHBT_NO = #{exhbtNo}
+	</delete>
+	
+	<select id="getExhibitionTheme" resultType="biz.app.promotion.model.ExhibitionThemeVO">
+		<!--
+			Query Name : exhibition.getExhibitionTheme
+			Description : 기획전 테마
+		-->
+		SELECT	/* QUERYID(exhibition.getExhibitionTheme) */
+			EXT.THM_NO			/* 테마 번호 */
+			, EXT.EXHBT_NO			/* 기획전 번호 */
+			, EXT.COMP_NO			/* 업체 번호 */
+			, CB.COMP_NM			/* 업체 명 */
+			, EXT.THM_NM		/* 테마 명 */
+			, EXT.THM_NM_SHOW_YN			/* 테마 명 노출 여부 */
+			, EXT.LIST_TP_CD			/* 리스트 타입 코드 */
+			, EXT.DISP_YN				/* 전시 여부 */
+			, EXT.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+   			, EB.EXHBT_GB_CD				/* 기획전 구분 코드 */
+            , EB.WEB_MOBILE_GB_CD			/* 웹 모바일 구분 코드 */	
+            , EB. EXHBT_STAT_CD 
+		FROM EXHIBITION_THEME EXT
+		JOIN EXHIBITION_BASE EB ON (EB.EXHBT_NO = EXT.EXHBT_NO)
+		LEFT OUTER JOIN COMPANY_BASE CB ON CB.COMP_NO = EXT.COMP_NO
+		WHERE 1=1
+		<if test='thmNo != null'>
+			AND EXT.THM_NO = #{thmNo}
+		</if>
+		<if test='exhbtNo != null'>
+			AND EXT.EXHBT_NO = #{exhbtNo}
+		</if>
+		AND EXT.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY EXT.THM_NO
+	</select>
+	
+	<select id="pageExhibitionTheme" resultType="biz.app.promotion.model.ExhibitionThemeVO">
+		<!--
+			Query Name : exhibition.pageExhibitionTheme
+			Description : 기획전 테마 페이지 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionTheme) */
+			EXT.THM_NO			/* 테마 번호 */
+			, EXT.EXHBT_NO			/* 기획전 번호 */
+			, EXT.COMP_NO			/* 업체 번호 */
+			, CB.COMP_NM			/* 업체 명 */
+			, EXT.THM_NM		/* 테마 명 */
+			, EXT.THM_NM_SHOW_YN			/* 테마 명 노출 여부 */
+			, EXT.LIST_TP_CD			/* 리스트 타입 코드 */
+			, EXT.DISP_YN				/* 전시 여부 */
+			, EXT.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+		FROM EXHIBITION_THEME EXT
+		LEFT OUTER JOIN COMPANY_BASE CB ON CB.COMP_NO = EXT.COMP_NO
+		WHERE 1=1
+		<include refid="exhibition.pageExhibitionThemeWhere" />
+		ORDER BY EXT.DISP_PRIOR_RANK ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageExhibitionThemeCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.pageExhibitionThemeCount
+			Description : 기획전 테마 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionThemeCount) */
+				COUNT(EXT.THM_NO)
+		FROM	EXHIBITION_THEME EXT
+		LEFT OUTER JOIN COMPANY_BASE CB ON CB.COMP_NO = EXT.COMP_NO
+		WHERE	1 = 1
+		<include refid="exhibition.pageExhibitionThemeWhere" />
+	</select>
+
+	<sql id="pageExhibitionThemeWhere">
+		<if test='thmNo != null'>
+			AND EXT.THM_NO = #{thmNo}
+		</if>
+		<if test='exhbtNo != null'>
+			AND EXT.EXHBT_NO = #{exhbtNo}
+		</if>
+		<if test='compNo != null'>
+			AND EXT.COMP_NO = #{compNo}
+		</if>
+		AND EXT.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</sql>
+
+	<insert id="insertExhibitionTheme" parameterType="biz.app.promotion.model.ExhibitionThemePO">
+		<!--
+			Query Name : exhibition.insertExhibitionTheme
+			Description : 기획전 테마정보 등록
+		-->
+		<selectKey keyProperty="thmNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_EXHBT_THM_NO_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO EXHIBITION_THEME (
+			THM_NO			/* 테마 번호 */
+			, EXHBT_NO			/* 기획전 번호 */
+			<if test='compNo != null'>
+			, COMP_NO			/* 업체 번호 */
+			</if>
+			, THM_NM		/* 테마 명 */
+			, THM_NM_SHOW_YN			/* 테마 명 노출 여부 */
+			, LIST_TP_CD			/* 리스트 타입 코드 */
+			, DISP_YN				/* 전시 여부 */
+			, DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) 
+		SELECT 
+			#{thmNo}			/* 테마 번호 */
+			, #{exhbtNo}			/* 기획전 번호 */
+			<if test='compNo != null'>
+			, #{compNo}			/* 업체 번호 */
+			</if>
+			, #{thmNm}		/* 테마 명 */
+			, #{thmNmShowYn}			/* 테마 명 노출 여부 */
+			, #{listTpCd}			/* 리스트 타입 코드 */
+			, #{dispYn}				/* 전시 여부 */
+			, IFNULL(MAX(DISP_PRIOR_RANK)+1,1)/* 전시 우선 순위 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		FROM EXHIBITION_THEME 
+		WHERE EXHBT_NO = #{exhbtNo}
+		AND DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+	</insert>
+
+	<update id="updateExhibitionTheme" parameterType="biz.app.promotion.model.ExhibitionThemePO">
+		<!--
+			Query Name : exhibition.updateExhibitionTheme
+			Description : 기획전 테마 수정
+		-->
+		UPDATE	EXHIBITION_THEME SET
+			SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+			<if test='thmNm != null and thmNm != ""'>
+			, THM_NM = #{thmNm}		/* 테마 명 */
+			</if>
+			<if test='thmNmShowYn != null and thmNmShowYn != ""'>
+			, THM_NM_SHOW_YN = #{thmNmShowYn}			/* 테마 명 노출 여부 */
+			</if>
+			<if test='listTpCd != null and listTpCd != ""'>
+			, LIST_TP_CD = #{listTpCd}			/* 리스트 타입 코드 */
+			</if>
+			<if test='dispYn != null and dispYn != ""'>
+			, DISP_YN = #{dispYn}				/* 전시 여부 */
+			</if>
+			<if test='dispPriorRank != null'>
+			, DISP_PRIOR_RANK	 = #{dispPriorRank}		/* 전시 우선 순위 */
+			</if>
+			<if test='compNo != null'>
+			, COMP_NO = #{compNo}			/* 업체 번호 */
+			</if>
+			<if test='delYn != null and delYn != ""'>
+			, DEL_YN = #{delYn}				/* 삭제 여부 */
+			</if>
+		WHERE THM_NO = #{thmNo}
+		AND EXHBT_NO = #{exhbtNo}
+	</update>
+	
+	<select id="pageExhibitionThemeGoods" resultType="biz.app.promotion.model.ExhibitionThemeGoodsVO">
+		<!--
+			Query Name : exhibition.pageExhibitionThemeGoods
+			Description : 기획전 테마 상품 페이지 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionThemeGoods) */
+			ETG.THM_NO			/* 테마 번호 */
+			, ETG.GOODS_ID			/* 상품 번호 */
+			, ETG.DISP_PRIOR_RANK	/* 전시 우선 순위 */
+			, GB.COMP_GOODS_ID			/* 상품 아이디 */
+			, GB.GOODS_NM			/* 상품 명 */
+			, GB.GOODS_STAT_CD		/* 상품 상태 코드 */
+			, GB.MDL_NM				/* 모델 명 */
+			, GB.COMP_NO			/* 업체 번호 */
+			, CB.COMP_NM
+			, GB.BND_NO				/* 브랜드 번호 */
+			, C.BND_NM_KO
+			, GB.MMFT				/* 제조사 */
+			, GB.SALE_STRT_DTM		/* 판매 시작 일시 */
+			, GB.SALE_END_DTM		/* 판매 종료 일시 */
+			, GB.SHOW_YN			/* 노출 여부 */
+			, GB.GOODS_TP_CD		/* 상품 유형 코드 */
+			, GB.BIGO				/* 비고 */
+			, D.SALE_AMT
+			, GI.IMG_SEQ
+            , GI.IMG_PATH
+            , GI.RVS_IMG_PATH			
+		FROM EXHIBITION_THEME_GOODS ETG
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = ETG.GOODS_ID
+		JOIN COMPANY_BASE CB ON (CB.COMP_NO = GB.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (C.BND_NO = GB.BND_NO)
+		LEFT OUTER JOIN GOODS_PRICE D ON (D.GOODS_ID = GB.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		LEFT OUTER JOIN GOODS_IMG GI ON (GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+		WHERE 1=1
+		<include refid="exhibition.pageExhibitionThemeGoodsWhere" />
+		ORDER BY ETG.DISP_PRIOR_RANK ASC
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageExhibitionThemeGoodsCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.pageExhibitionThemeGoodsCount
+			Description : 기획전 테마 페이지 리스트 Count
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionThemeCount) */
+				COUNT(ETG.GOODS_ID)
+		FROM	EXHIBITION_THEME_GOODS ETG
+		INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = ETG.GOODS_ID
+		JOIN COMPANY_BASE CB ON (CB.COMP_NO = GB.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (C.BND_NO = GB.BND_NO)
+		LEFT OUTER JOIN GOODS_PRICE D ON (D.GOODS_ID = GB.GOODS_ID AND NOW() BETWEEN D.SALE_STRT_DTM AND D.SALE_END_DTM)
+		LEFT OUTER JOIN GOODS_IMG GI ON (GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}')
+		WHERE	1 = 1
+		<include refid="exhibition.pageExhibitionThemeGoodsWhere" />
+	</select>
+
+	<sql id="pageExhibitionThemeGoodsWhere">
+		AND ETG.THM_NO = #{thmNo}
+	 	AND D.DEL_YN != '${@framework.common.constants.CommonConstants@DEL_YN_Y}'
+	</sql>
+
+	<insert id="insertUpdateExhibitionThemeGoods" parameterType="biz.app.promotion.model.ExhibitionThemeGoodsPO">
+		<!--
+			Query Name : exhibition.insertUpdateExhibitionThemeGoods
+			Description : 기획전 테마 상품 정보 등록 및 저장
+		-->
+		INSERT INTO EXHIBITION_THEME_GOODS (
+			THM_NO			/* 테마 번호 */
+			, GOODS_ID			/* 상품 번호 */
+			, DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) 
+		SELECT 
+			#{thmNo}			/* 테마 번호 */
+			, #{goodsId}			/* 상품 번호 */
+			<if test="dispPriorRank != null and dispPriorRank != ''">
+			, #{dispPriorRank}		/* 전시 우선 순위 */
+			</if>
+			<if test="dispPriorRank == null or dispPriorRank == ''">
+			, (SELECT IFNULL(MAX(DISP_PRIOR_RANK)+1, 1) FROM EXHIBITION_THEME_GOODS WHERE THM_NO = #{thmNo}) /* 전시 우선 순위 */
+			</if>
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()			/* 시스템 수정 일시 */
+		ON DUPLICATE KEY UPDATE 
+			SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+			<if test='dispPriorRank != null'>
+			, DISP_PRIOR_RANK	 = #{dispPriorRank}		/* 전시 우선 순위 */
+			</if>
+	</insert>
+
+	<update id="updateExhibitionThemeGoods" parameterType="biz.app.promotion.model.ExhibitionThemeGoodsPO">
+		<!--
+			Query Name : exhibition.updateExhibitionThemeGoods
+			Description : 기획전 테마 상품 수정
+		-->
+		UPDATE	EXHIBITION_THEME_GOODS SET
+			SYS_UPDR_NO = #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()			/* 시스템 수정 일시 */
+			<if test='dispPriorRank != null'>
+			, DISP_PRIOR_RANK	 = #{dispPriorRank}		/* 전시 우선 순위 */
+			</if>
+		WHERE THM_NO = #{thmNo}
+		AND GOODS_ID = #{goodsId}
+	</update>
+
+	<delete id="deleteExhibitionThemeGoods" parameterType="biz.app.promotion.model.ExhibitionThemeGoodsPO">
+		<!--
+			Query Name : exhibition.deleteExhibitionThemeGoods
+			Description : 기획전 테마 상품 삭제
+		-->
+		DELETE FROM EXHIBITION_THEME_GOODS
+		WHERE THM_NO = #{thmNo}
+		AND GOODS_ID = #{goodsId}
+	</delete>
+	
+	<resultMap type="biz.app.promotion.model.ExhibitionVO" id="exhibitionList">
+		<collection property="exhibitionTagList" column="exhbtNo=EXHBT_NO" javaType="java.util.ArrayList" ofType="biz.app.promotion.model.ExhibitionVO" select="exhibition.listExhibitionTagMap" />
+		<collection property="exhibitionThemeList" column="exhbtNo=EXHBT_NO" javaType="java.util.ArrayList" ofType="biz.app.promotion.model.ExhibitionThemeVO" select="exhibition.selectExhibitionTheme" />
+	</resultMap>
+	
+	<select id="pageExhibitionFO" resultMap="exhibitionList">
+		<!--
+			Query Name : exhibition.pageExhibitionFO
+			Description : FO 기획전 리스트 페이지
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionFO) */
+			 EXB.EXHBT_NO		/* 기획전 번호 */
+			, EXB.EXHBT_NM				/* 기획전 명 */
+			, DC.UP_DISP_CLSF_NO
+            , DC.DISP_CLSF_NO
+            , DC.DISP_CLSF_NM			/* 전시 분류 명 */			
+			, EXB.EXHBT_GB_CD			/* 기획전 구분 코드 */
+			, EXB.DISP_STRT_DTM			/* 전시 시작 일시 */
+			, EXB.DISP_END_DTM			/* 전시 종료 일시 */
+			, EXB.TTL_HTML				/* 타이틀 HTML */
+			, EXB.TTL_MO_HTML			/* 타이틀 HTML 모바일 */
+			, EXB.BNR_IMG_PATH			/* 배너 이미지 경로 */
+			, EXB.BNR_MO_IMG_PATH		/* 배너 모바일 이미지 경로 */
+			, EXB.GD_BNR_IMG_PATH		/* 상품상세 이미지 경로 */
+			, EXB.GD_BNR_MO_IMG_PATH	/* 상품상세 모바일 이미지 경로 */
+			, EXB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, EXB.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, EXB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, EXB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM
+			EXHIBITION_BASE EXB
+			INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+			LEFT OUTER JOIN DISPLAY_CATEGORY DC ON (DC.DISP_CLSF_NO = EXB.DISP_CLSF_NO)
+		WHERE	
+			EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}'
+			AND	EXB.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND EXB.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND EXB.EXHBT_GB_CD = #{exhbtGbCd}
+			AND	NOW() BETWEEN EXB.DISP_STRT_DTM AND EXB.DISP_END_DTM
+			AND (DC.UP_DISP_CLSF_NO = #{dispClsfNo} OR DC.DISP_CLSF_NO = #{dispClsfNo})
+			AND EXB.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}'
+			<choose>
+				<when test="deviceGb eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+					, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+				</when>
+				<otherwise>, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+			</choose>
+			)
+			<if test='sysRegDtm != null'>
+			AND	EXB.SYS_REG_DTM &gt; DATE_ADD(now(), INTERVAL-7 DAY)
+			</if>
+			<if test='exhbtGbCd == 10'>
+			AND	EXB.EXHBT_NO = #{exhbtNo}
+			</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageExhibitionFOCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.pageExhibitionFOCount
+			Description : FO 기획전 리스트 페이지 Count
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhibitionFOCount) */
+				COUNT(*)
+		FROM	
+			EXHIBITION_BASE EXB
+			INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+			LEFT OUTER JOIN DISPLAY_CATEGORY DC ON (DC.DISP_CLSF_NO = EXB.DISP_CLSF_NO)
+		WHERE	
+			EXB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}'
+			AND	EXB.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND EXB.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+			AND EXB.EXHBT_GB_CD = #{exhbtGbCd}
+			AND	NOW() BETWEEN EXB.DISP_STRT_DTM AND EXB.DISP_END_DTM
+			AND (DC.UP_DISP_CLSF_NO = #{dispClsfNo} OR DC.DISP_CLSF_NO = #{dispClsfNo})
+			AND EXB.WEB_MOBILE_GB_CD IN ('${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}'
+			<choose>
+				<when test="deviceGb eq @framework.common.constants.CommonConstants@DEVICE_GB_10">
+					, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+				</when>
+				<otherwise>, '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'</otherwise>
+			</choose>
+			)
+			<if test='sysRegDtm != null'>
+			AND	EXB.SYS_REG_DTM &gt; DATE_ADD(now(), INTERVAL-7 DAY)
+			</if>
+			<if test='exhbtGbCd == 10'>
+			AND	EXB.EXHBT_NO = #{exhbtNo}
+			</if>
+	</select>
+	
+	<select id="selectExhibitionTheme" resultType="biz.app.promotion.model.ExhibitionThemeVO">
+		<!--
+			Query Name : exhibition.selectExhibitionTheme
+			Description : 기획전 테마 가져오기
+		-->
+		SELECT /* QUERYID(exhibition.selectExhibitionTheme) */
+			THM_NO
+			,EXHBT_NO
+			,THM_NM
+			,THM_NM_SHOW_YN
+			,LIST_TP_CD
+			,DISP_YN
+			,DISP_PRIOR_RANK
+			,DEL_YN
+			,SYS_REGR_NO
+			,SYS_REG_DTM
+			,SYS_UPD_DTM
+			,SYS_UPDR_NO
+		FROM EXHIBITION_THEME
+			WHERE 1=1
+		AND EXHBT_NO = #{exhbtNo}
+		AND THM_NM_SHOW_YN = 'Y'
+		AND DISP_YN = 'Y'
+		AND DEL_YN = 'N'
+		ORDER BY DISP_PRIOR_RANK ASC
+	</select>
+
+	<select id="listExhibitionByGoods" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : exhibition.pageExhibitionFO
+			Description : FO 상품상세 - 기획전 배너 조회
+		-->
+		SELECT DISTINCT /* QUERYID(exhibition.listExhibitionByGoods) */
+				EB.EXHBT_NO, EB.DISP_CLSF_NO, EB.EXHBT_NM, EB.GD_BNR_IMG_PATH, GD_BNR_MO_IMG_PATH
+		FROM	EXHIBITION_BASE EB
+				INNER JOIN ST_EXHIBITION_MAP SEM ON SEM.EXHBT_NO = EB.EXHBT_NO AND SEM.ST_ID = #{stId}
+				INNER JOIN EXHIBITION_THEME ET ON ET.EXHBT_NO = EB.EXHBT_NO
+		        INNER JOIN EXHIBITION_THEME_GOODS ETG ON ETG.THM_NO = ET.THM_NO	AND ETG.GOODS_ID = #{goodsId}
+				WHERE	EB.EXHBT_STAT_CD = '${@framework.common.constants.CommonConstants@EXHBT_STAT_20}'
+				<if test="exhbtGbCd != null">
+					AND EB.EXHBT_GB_CD = #{exhbtGbCd}
+				</if>
+				AND	EB.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+				AND EB.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+				AND	NOW() BETWEEN EB.DISP_STRT_DTM AND EB.DISP_END_DTM
+				AND (EB.BNR_IMG_PATH IS NOT NULL AND EB.BNR_MO_IMG_PATH <![CDATA[<>]]> '')
+			<if test="webMobileGbCds != null">
+				<foreach collection="webMobileGbCds" item="code" separator="," open="AND EXB.WEB_MOBILE_GB_CD IN (" close=")">
+					#{code}
+				</foreach>
+			</if>
+		Limit #{limit}, #{offset}
+	</select>
+	
+	<select id="listExhibitionTheme" resultType="biz.app.promotion.model.ExhibitionThemeVO">
+		<!--
+			Query Name : exhibition.listExhibitionTheme
+			Description : FO 기획전 상세 테마 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.listExhibitionTheme) */ 
+			  EXT.THM_NO				/* 테마 번호 */
+			, EXT.EXHBT_NO				/* 기획전 번호 */
+			, EXT.THM_NM				/* 테마 명 */
+			, EXT.THM_NM_SHOW_YN		/* 테마 명 노출 여부 */
+			, EXT.DISP_PRIOR_RANK		/* 전시 우선 순위 */
+			, EXT.LIST_TP_CD			/* 리스트 타입 코드 */
+		FROM
+			EXHIBITION_THEME EXT
+		WHERE
+			EXT.EXHBT_NO = #{exhbtNo}
+			AND EXT.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			AND EXT.DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		ORDER BY EXT.DISP_PRIOR_RANK
+	</select>	
+	
+	<select id="pageExhbtThemeGoodsFO" resultType="biz.app.promotion.model.ExhibitionThemeGoodsVO">
+		<!--
+			Query Name : exhibition.pageExhbtThemeGoodsFO
+			Description : FO 기획전 상세 테마별 상품 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhbtThemeGoodsFO) */
+			<include refid="goods.goodsFOSelect" />
+			,ETG.THM_NO				/* 테마 번호 */
+			,ET.THM_NM				/* 테마 이름 */
+		FROM	
+			EXHIBITION_THEME ET,
+			EXHIBITION_THEME_GOODS ETG
+			INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = ETG.GOODS_ID
+			,GOODS_PRICE_INFO_TOTAL GPIT
+			,GOODS_IMG GI
+			,BRAND_BASE BB
+		WHERE
+			GB.GOODS_ID = GPIT.GOODS_ID
+			AND GPIT.TOTAL_DAY = (SELECT MAX(TOTAL_DAY) FROM GOODS_PRICE_INFO_TOTAL) 
+			AND GPIT.ST_ID = #{stId}	
+			<include refid="exhibition.pageExhbtThemeGoodsFOWhere" />	
+		ORDER BY <if test="exhbtNo != null and exhbtNo != ''">ET.DISP_PRIOR_RANK, </if>ETG.DISP_PRIOR_RANK 
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageExhbtThemeGoodsFOCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : exhibition.pageExhbtThemeGoodsFOCount
+			Description : FO 기획전 상세 테마별 상품 리스트
+		-->
+		SELECT	/* QUERYID(exhibition.pageExhbtThemeGoodsFOCount) */ 
+			COUNT(*)
+		FROM	
+			EXHIBITION_THEME ET,
+			EXHIBITION_THEME_GOODS ETG
+			INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = ETG.GOODS_ID
+			,GOODS_PRICE_INFO_TOTAL GPIT
+			,GOODS_IMG GI
+			,BRAND_BASE BB
+		WHERE
+			GB.GOODS_ID = GPIT.GOODS_ID
+			AND GPIT.TOTAL_DAY = (SELECT MAX(TOTAL_DAY) FROM GOODS_PRICE_INFO_TOTAL) 
+			AND GPIT.ST_ID = #{stId}		
+			<include refid="exhibition.pageExhbtThemeGoodsFOWhere" />			
+
+	</select>
+
+	<!-- FO 상품 목록 조건절 -->
+	<sql id="pageExhbtThemeGoodsFOWhere">
+		<if test="exhbtNo != null and exhbtNo != ''">
+		AND ET.EXHBT_NO = #{exhbtNo}
+		</if>
+		AND ET.THM_NO = ETG.THM_NO
+		<if test="thmNo != null and thmNo != ''">
+		AND ETG.THM_NO = #{thmNo}
+		</if>
+	    AND GB.GOODS_ID = GI.GOODS_ID
+	    AND GB.BND_NO = BB.BND_NO
+	    AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+	    AND now() BETWEEN GB.SALE_STRT_DTM AND GB.SALE_END_DTM
+	    AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+	    AND GB.GOODS_TP_CD <![CDATA[<>]]> '${@framework.common.constants.CommonConstants@GOODS_TP_30}'
+	    AND GB.SHOW_YN = '${@framework.common.constants.CommonConstants@SHOW_YN_Y}'
+	    <if test="webMobileGbCds != null">
+			<foreach collection="webMobileGbCds" item="code" separator="," open="AND GB.WEB_MOBILE_GB_CD IN (" close=")">
+				#{code}
+			</foreach>
+		</if>
+	</sql>
+	
+	<insert id="saveExhibitionTagMap" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.saveExhibitionTagMap
+			Description : 기획전 태그 매핑 저장
+		-->	
+		INSERT INTO EXHIBITION_TAG_MAP ( /* QUERYID(exhibition.saveExhibitionTagMap) */ 
+ 			  EXHBT_NO			   /* 기획전 번호 */
+		    , TAG_NO			   /* 태그 번호 */
+			, SYS_REGR_NO		  /* 시스템 등록자 번호 */
+			, SYS_REG_DTM		  /* 시스템 등록 일시 */
+		) VALUES ( 
+			  #{exhbtNo}			/* 기획전 번호 */
+			, #{tagNo}			   /* 태그 번호 */
+			, #{sysRegrNo}		   /* 시스템 등록자 번호 */
+			, NOW()				  /* 시스템 등록 일시 */			
+		)
+	</insert>
+	
+	<select id="listExhibitionTagMap" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : exhibition.listExhibitionTagMap
+			Description : 기획전 태그 매핑 리스트
+		-->	
+		SELECT /* QUERYID(exhibition.listExhibitionTagMap) */ 
+			 ETM.EXHBT_NO
+		    ,ETM.TAG_NO
+			,TB.TAG_NM
+		    ,ETM.SYS_REGR_NO
+		    ,ETM.SYS_REG_DTM
+		FROM EXHIBITION_TAG_MAP ETM
+		JOIN TAG_BASE TB ON (TB.TAG_NO = ETM.TAG_NO)
+		WHERE 1=1
+			AND ETM.EXHBT_NO = #{exhbtNo}
+	</select>
+	
+	<delete id="deleteExhibitionTagMap" parameterType="biz.app.promotion.model.ExhibitionBasePO">
+		<!--
+			Query Name : exhibition.deleteExhibitionTagMap
+			Description : 기획전 태그 매핑 삭제
+		-->
+		DELETE 
+		FROM EXHIBITION_TAG_MAP
+		WHERE EXHBT_NO = #{exhbtNo}
+	</delete>
+	
+		<select id="getThemeTitle" resultType="biz.app.promotion.model.ExhibitionVO">
+		<!--
+			Query Name : exhibition.getThemeTitle
+			Description : 기획전 title
+		-->	
+		SELECT	/* QUERYID(exhibition.getThemeTitle) */
+			 EXB.EXHBT_NO		/* 기획전 번호 */
+			, EXB.EXHBT_NM				/* 기획전 명 */
+			, DC.UP_DISP_CLSF_NO		/* 상위 전시 분류 번호 */
+			, EXB.SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, EXB.SYS_REG_DTM			/* 시스템 등록 일시 */
+			, EXB.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, EXB.SYS_UPD_DTM			/* 시스템 수정 일시 */
+		FROM
+			EXHIBITION_BASE EXB
+			INNER JOIN ST_EXHIBITION_MAP STEXM ON STEXM.EXHBT_NO = EXB.EXHBT_NO
+			LEFT OUTER JOIN DISPLAY_CATEGORY DC ON (DC.DISP_CLSF_NO = EXB.DISP_CLSF_NO)
+		WHERE	
+			EXB.EXHBT_STAT_CD = '20'
+			AND	NOW() BETWEEN EXB.DISP_STRT_DTM AND EXB.DISP_END_DTM
+			AND EXB.WEB_MOBILE_GB_CD IN ('00'
+			 , '20' 
+			)
+			AND (DC.UP_DISP_CLSF_NO = #{dispClsfNo} OR DC.DISP_CLSF_NO = #{dispClsfNo})
+			AND	EXB.DISP_YN = 'Y'
+			AND EXB.DEL_YN = 'N'
+			AND EXB.EXHBT_GB_CD = #{exhbtGbCd}
+            ORDER BY EXHBT_NO ASC
+	</select>
+	
+	<select id="countThemeGoods" resultType="java.lang.Integer">
+		SELECT	/* QUERYID(exhibition.countThemeGoods) */
+			COUNT(GB.GOODS_ID)
+		FROM EXHIBITION_THEME_GOODS ETG
+			INNER JOIN GOODS_BASE GB ON GB.GOODS_ID = ETG.GOODS_ID
+		WHERE 1=1
+			AND ETG.THM_NO in (SELECT THM_NO FROM EXHIBITION_THEME T5 WHERE T5.EXHBT_NO = #{exhbtNo} AND T5.DEL_YN = 'N')
+		LIMIT		0, 50
+	</select>
+</mapper>

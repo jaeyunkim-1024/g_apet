@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명 공통 관리
+	작성자  	valueFactory
+	작성일자  	2021.01.04
+-->
+<mapper namespace="goodsDescComm">
+
+	<insert id="insertGoodsDescComm" parameterType="biz.app.goods.model.GoodsDescCommPO">
+		<!--
+			Query Name : goodsDescComm.insertGoodsDescComm
+			Description : 상품 설명 공통 등록
+		-->
+		<selectKey keyProperty="commGoodsDscrtNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_DESC_COMM_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_DESC_COMM (
+			COMM_GOODS_DSCRT_NO
+			, ST_ID
+			, SHOW_AREA_GB_CD
+			, STRT_DT
+			, END_DT
+			, CONTENT_PC
+			, CONTENT_MO
+			, USE_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{commGoodsDscrtNo}
+			, #{stId}
+			, #{showAreaGbCd}
+			, #{strtDt}
+			, #{endDt}
+			, #{contentPc}
+			, #{contentMo}
+			, #{useYn}
+			, #{sysRegrNo}
+			, NOW()			
+			, #{sysUpdrNo}	
+			, NOW()			
+		)
+	</insert>
+	
+	<select id="pageGoodsDescComm" resultType="biz.app.goods.model.GoodsDescCommVO">
+		<!--
+			Query Name : goodsDescComm.pageGoodsDescComm
+			Description : 상품 설명 공통 페이지 리스트
+		-->
+		SELECT 
+			COMM_GOODS_DSCRT_NO
+			, ST_ID
+			, FN_GET_SITE_NAME(ST_ID) AS ST_NM
+			, CASE 
+				WHEN CONTENT_PC != '' and CONTENT_MO != '' THEN '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_00}'
+                WHEN CONTENT_PC != '' and CONTENT_MO = '' THEN '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+                WHEN CONTENT_PC = '' and CONTENT_MO != '' THEN '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'
+            END AS SVC_GB_CD
+			, SHOW_AREA_GB_CD
+			, STRT_DT
+			, END_DT
+			, CONCAT(STR_TO_DATE(STRT_DT, '%Y-%m-%d %H:%i:%s'), " ~ ", STR_TO_DATE(END_DT, '%Y-%m-%d %H:%i:%s')) AS LIMITED_DTE
+			, CONTENT_PC
+			, CONTENT_MO
+			, USE_YN
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM
+			, SYS_REG_DTM
+			, SYS_UPD_DTM
+		FROM GOODS_DESC_COMM
+		WHERE 1 = 1
+			<include refid="goodsDescComm.wherePageGoodsDescComm" />
+			<include refid="bizCommon.sortSql" />
+			<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageGoodsDescCommCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : goodsDescComm.pageGoodsDescCommCount
+			Description : 상품 설명 공통 페이지 리스트 카운트
+		-->
+		SELECT 
+			COUNT(1)
+		FROM GOODS_DESC_COMM
+		WHERE 1 = 1
+		<include refid="goodsDescComm.wherePageGoodsDescComm" />
+	</select>
+	
+	<sql id="wherePageGoodsDescComm">
+		<!--
+			Query Name : goodsDescComm.wherePageGoodsDescComm
+			Description : 상품 설명 공통 페이지 리스트 where 조건 sql
+		-->
+		<if test="svcGbCds != null">
+			<choose>
+				<when test="svcGbCds.length > 1">
+					AND ( CONTENT_MO != '' AND CONTENT_PC != '' ) 
+				</when>
+				<otherwise>
+					<foreach collection="svcGbCds" item="item" >
+						<if test="item == @framework.common.constants.CommonConstants@SVC_GB_10">
+							AND CONTENT_MO = ''
+						</if>
+						<if test="item == @framework.common.constants.CommonConstants@SVC_GB_20">
+							AND CONTENT_PC = ''
+						</if>
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="stId != null">
+			AND ST_ID = #{stId}
+		</if>
+		<if test="showAreaGbCd != null and showAreaGbCd != ''">
+			AND SHOW_AREA_GB_CD = #{showAreaGbCd}
+		</if>
+		<choose>
+			<when test="isCheckReDuplication">
+				<if test="commGoodsDscrtNo != null">
+					AND COMM_GOODS_DSCRT_NO != #{commGoodsDscrtNo}
+				</if>
+				AND USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+				AND ( #{strtDt} BETWEEN STRT_DT AND END_DT OR #{endDt} BETWEEN STRT_DT AND END_DT )
+			</when>
+			<otherwise>
+				<if test="commGoodsDscrtNo != null">
+					AND COMM_GOODS_DSCRT_NO = #{commGoodsDscrtNo}
+				</if>
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<update id="updateGoodsDescComm" >
+		<!--
+			Query Name : goodsDescComm.wherePageGoodsDescComm
+			Description : 상품 설명 공통 수정
+		-->
+		UPDATE GOODS_DESC_COMM
+		SET 
+			ST_ID  				= COALESCE(#{stId}, ST_ID) 
+			, SHOW_AREA_GB_CD	= COALESCE(#{showAreaGbCd}, SHOW_AREA_GB_CD)
+			, STRT_DT			= COALESCE(#{strtDt}, STRT_DT)
+			, END_DT			= COALESCE(#{endDt}, END_DT)
+			, CONTENT_PC		= COALESCE(#{contentPc}, CONTENT_PC)
+			, CONTENT_MO		= COALESCE(#{contentMo}, CONTENT_MO)
+			, USE_YN			= COALESCE(#{useYn}, USE_YN)
+			, SYS_UPDR_NO		= #{sysUpdrNo}
+			, SYS_UPD_DTM		= now()
+		WHERE COMM_GOODS_DSCRT_NO = #{commGoodsDscrtNo}
+	</update>
+	
+	<select id="getGoodsDescComm" resultType="biz.app.goods.model.GoodsDescCommVO">
+		<!--
+			Query Name : goodsDescComm.getGoodsDescComm
+			Description : 상품 설명 공통 단건 조회
+		-->
+		SELECT 
+			COMM_GOODS_DSCRT_NO
+			, ST_ID
+			, SHOW_AREA_GB_CD
+			, STRT_DT
+			, END_DT
+			, CONTENT_PC
+			, CONTENT_MO
+			, USE_YN
+			, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM
+			, SYS_REG_DTM
+			, SYS_UPD_DTM
+		FROM GOODS_DESC_COMM
+		WHERE 1 = 1
+			AND COMM_GOODS_DSCRT_NO = #{commGoodsDscrtNo}
+	</select>	
+</mapper>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="deliveryHist">
+
+	<insert id="insertDeliveryHist" parameterType="biz.app.delivery.model.DeliveryHistPO">
+		<!--
+			Query Name : deliveryHist.insertDeliveryHist
+			Description : 배송 이력 등록
+		-->
+		INSERT INTO DELIVERY_HISTORY
+		(
+			DLVR_HIST_NO
+			, DLVR_NO
+			, ORD_CLM_GB_CD
+			, DLVR_GB_CD
+			, DLVR_TP_CD
+			, DLVR_PRCS_TP_CD
+			, ORD_DLVRA_NO
+			, HDC_CD
+			, INV_NO
+			, DLVR_CMD_DTM
+			, OO_CPLT_DTM
+			, DLVR_CPLT_DTM
+			, CIS_OO_YN
+			, CIS_OO_NO
+			, CIS_HDC_CD
+			, CIS_INV_NO
+			, CIS_DLVR_CPLT_PIC_URL
+			, CIS_DLVR_CPLT_YN
+			, CIS_DLVR_SMS
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, ORD_NO
+			, ORD_DTL_SEQ
+			, CLM_NO
+			, CLM_DTL_SEQ
+			, ORD_DTL_STAT_CD
+			, CLM_DTL_STAT_CD
+			, ITEM_UNIQUE_CODE
+		) 
+			SELECT 
+				FN_GET_SEQ ('${@framework.common.constants.CommonConstants@SEQUENCE_DELIVERY_HISTORY_SEQ}')		/* 배송 히스토리 번호  */
+				, DLVR_NO
+				, ORD_CLM_GB_CD
+				, DLVR_GB_CD
+				, DLVR_TP_CD
+				, DLVR_PRCS_TP_CD
+				, ORD_DLVRA_NO
+				, HDC_CD
+				, INV_NO
+				, DLVR_CMD_DTM
+				, OO_CPLT_DTM
+				, DLVR_CPLT_DTM
+				, CIS_OO_YN
+				, CIS_OO_NO
+				, CIS_HDC_CD
+				, CIS_INV_NO
+				, CIS_DLVR_CPLT_PIC_URL
+				, CIS_DLVR_CPLT_YN
+				, CIS_DLVR_SMS
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, ORD_NO
+				, ORD_DTL_SEQ
+				, CLM_NO
+				, CLM_DTL_SEQ
+				, ORD_DTL_STAT_CD
+				, CLM_DTL_STAT_CD
+				, ITEM_UNIQUE_CODE 
+			FROM	
+		(
+			SELECT DISTINCT
+				A1.DLVR_NO
+				, A1.ORD_CLM_GB_CD
+				, A1.DLVR_GB_CD
+				, A1.DLVR_TP_CD
+				, A1.DLVR_PRCS_TP_CD
+				, A1.ORD_DLVRA_NO
+				, A1.HDC_CD
+				, A1.INV_NO
+				, A1.DLVR_CMD_DTM
+				, A1.OO_CPLT_DTM
+				, A1.DLVR_CPLT_DTM
+				, A1.CIS_OO_YN
+				, A1.CIS_OO_NO
+				, A1.CIS_HDC_CD
+				, A1.CIS_INV_NO
+				, A1.CIS_DLVR_CPLT_PIC_URL
+				, A1.CIS_DLVR_CPLT_YN
+				, A1.CIS_DLVR_SMS
+				, A1.SYS_REGR_NO
+				, A1.SYS_REG_DTM
+				, A1.SYS_UPDR_NO
+				, A1.SYS_UPD_DTM
+				, A4.ORD_NO
+				, A4.ORD_DTL_SEQ
+				, A7.CLM_NO
+				, A7.CLM_DTL_SEQ
+				, A4.ORD_DTL_STAT_CD
+				, A7.CLM_DTL_STAT_CD
+				, T2.ITEM_UNIQUE_CODE
+			  FROM DELIVERY A1
+			  LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP A2 ON A2.DLVR_NO = A1.DLVR_NO
+			  LEFT JOIN ORD_DTL_CSTRT A3 ON A3.ORD_DTL_CSTRT_NO  = A2.ORD_DTL_CSTRT_NO 
+			  LEFT JOIN ORDER_DETAIL A4 ON A4.ORD_NO = A3.ORD_NO AND A4.ORD_DTL_SEQ = A3.ORD_DTL_SEQ AND A4.RMN_ORD_QTY > 0
+			  LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP A5 ON A5.DLVR_NO = A1.DLVR_NO
+			  LEFT JOIN CLM_DTL_CSTRT A6 ON A6.CLM_DTL_CSTRT_NO = A5.CLM_DTL_CSTRT_NO
+			  LEFT JOIN CLAIM_DETAIL A7 ON A7.CLM_NO = A6.CLM_NO AND A7.CLM_DTL_SEQ = A6.CLM_DTL_SEQ
+			  LEFT JOIN DLVR_GOODS_FLOW_MAP T2 ON A1.DLVR_NO = T2.DLVR_NO
+		WHERE	1 = 1
+			<choose>
+				<when test="ordDtlCstrtNo != null">
+					AND	A2.ORD_DTL_CSTRT_NO = #{ordDtlCstrtNo}
+					AND	INV_NO = #{searchInvNo}
+				</when>
+				<when test="clmDtlCstrtNo != null">
+					AND	A5.CLM_DTL_CSTRT_NO = #{clmDtlCstrtNo}
+					AND	INV_NO = #{searchInvNo}
+				</when>
+				<otherwise>
+					AND A1.DLVR_NO = #{dlvrNo}
+				</otherwise>
+			</choose>
+		) T1
+	</insert>
+	
+	<select id="pageDeliveryHist" resultType="biz.app.delivery.model.DeliveryHistVO" >
+		<!--
+			Query Name : deliveryHist.pageDeliveryHist
+			Description : 배송 이력 목록
+		-->
+		SELECT
+			DLVR_HIST_NO
+			, DLVR_NO
+			, ORD_CLM_GB_CD
+			, DLVR_GB_CD
+			, DLVR_TP_CD
+			, DLVR_PRCS_TP_CD
+			, ORD_DLVRA_NO
+			, HDC_CD
+			, INV_NO
+			, DLVR_CMD_DTM
+			, OO_CPLT_DTM
+			, DLVR_CPLT_DTM
+			, CIS_OO_YN
+			, CIS_OO_NO
+			, CIS_HDC_CD
+			, CIS_INV_NO
+			, CIS_DLVR_CPLT_PIC_URL
+			, CIS_DLVR_CPLT_YN
+			, CIS_DLVR_SMS
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, ORD_NO
+			, ORD_DTL_SEQ
+			, CLM_NO
+			, CLM_DTL_SEQ
+			, ORD_DTL_STAT_CD
+			, CLM_DTL_STAT_CD
+			, ITEM_UNIQUE_CODE
+		FROM DELIVERY_HISTORY
+		WHERE 1 = 1
+		<include refid="whereDeliveryHist" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<sql id="whereDeliveryHist">
+		<if test="dlvrNo != null and dlvrNo != ''">
+			AND DLVR_NO = #{dlvrNo}
+		</if>
+		<if test="arrDlvrNo != null and arrDlvrNo.length > 0">
+			<foreach collection="arrDlvrNo" item="arrDlvrNo" separator="," open="AND DLVR_NO IN (" close=")">
+		    	#{arrDlvrNo}
+		    </foreach>
+	    </if>
+	</sql>
+	
+	<select id="pageDeliveryHistCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : deliveryHist.pageDeliveryHistCount
+			Description : 배송 이력 목록 카운트
+		-->
+		SELECT
+			COUNT(1)
+		FROM DELIVERY_HISTORY
+		WHERE 1 = 1
+		<include refid="whereDeliveryHist" />
+	</select>
+
+</mapper>

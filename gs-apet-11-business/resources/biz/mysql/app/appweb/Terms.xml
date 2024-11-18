@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="terms">
+
+	<select id="termsListGrid" resultType="biz.app.appweb.model.TermsVO">
+		<!--
+			Query Name : terms.termsListGrid
+			Description : 통합약관 목록 그리드
+			- BO
+		-->
+		SELECT /* QUERYID(terms.termsListGrid) */
+			T.TERMS_NO /*약관번호*/
+			, T.TERMS_CD /*약관 카테고리*/
+			, CONCAT_WS(" > ", DH1.DTL_NM, DH2.DTL_NM, DH3.DTL_NM) AS CATEGORY_NM /*약관 카테고리명*/
+			, T.TERMSNM /*약관명*/
+			, CONCAT(T.TERMS_VER, ".0") AS TERMS_VER /*약관버전*/
+			, DATE_FORMAT(STR_TO_DATE(T.TERMS_STRT_DT, '%Y%m%d'), '%Y-%m-%d') AS TERMS_STRT_DT /*약관 적용기간 시작일*/
+			, DATE_FORMAT(STR_TO_DATE(T.TERMS_END_DT, '%Y%m%d'), '%Y-%m-%d') AS TERMS_END_DT /*약관 적용기간 종료일*/
+			, T.RQID_YN /*동의 필수여부*/
+			, CASE WHEN T.RQID_YN = 'Y' THEN '필수' ELSE '선택' END AS RQID_NM	 /*동의 필수여부명*/
+			, T.USE_YN /*약관 사용여부*/
+			, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = '${@framework.common.constants.CommonConstants@USE_YN}' AND DTL_CD = T.USE_YN) AS USE_NM /*약관 사용여부명*/
+			, GROUP_CONCAT(BP.POC_GB_CD) AS POC_GB_CD /*POC 구분*/
+			, GROUP_CONCAT(PG.DTL_NM) AS POC_GB_NM /*POC 구분명*/
+			, T.SYS_REGR_NO /*시스템 등록자 번호*/
+			, FN_GET_USER_NAME(T.SYS_REGR_NO) AS SYS_REGR_NM /*시스템 등록자 명*/
+			, T.SYS_REG_DTM /*시스템 등록 일시*/
+			, DATE_FORMAT(T.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 등록일*/
+			, T.SYS_UPDR_NO /*시스템 수정자 번호*/
+			, FN_GET_USER_NAME(T.SYS_UPDR_NO) AS SYS_UPDR_NM /*시스템 수정자 명*/
+			, T.SYS_UPD_DTM /*시스템 수정 일시*/
+			, DATE_FORMAT(T.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /*시스템 수정일*/
+			, CASE WHEN (
+					SELECT TERMS_NO
+					  FROM TERMS T1
+					  	INNER JOIN (
+					  		SELECT TERMS_CD, MAX(TERMS_VER) AS TERMS_VER
+					  		  FROM TERMS
+					  		GROUP BY TERMS_CD
+					  	) T2
+					  		ON T1.TERMS_CD = T2.TERMS_CD
+					  		AND T1.TERMS_VER = T2.TERMS_VER
+					 WHERE T1.TERMS_NO = T.TERMS_NO
+			  ) IS NOT NULL THEN 'Y' ELSE 'N' END AS NEW_YN /*최신버전여부*/
+			, CASE WHEN T.TERMS_END_DT <![CDATA[ < ]]> '99991231' THEN 'Y' ELSE 'N' END END_DT_CMPL_YN /*적용기간 종료 여부*/
+		  FROM TERMS T
+		  	INNER JOIN BBS_POC BP
+		  		ON T.TERMS_NO = BP.LETT_NO
+		  	LEFT OUTER JOIN CODE_DETAIL PG
+		  		ON BP.POC_GB_CD = PG.DTL_CD
+		  		AND PG.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_POC_GB}'
+		  		AND PG.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH3
+		  		ON T.TERMS_CD = DH3.DTL_CD
+		  		AND DH3.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH3.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH2
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 3, 4) = DH2.DTL_CD*/
+		  		On DH3.USR_DFN2_VAL = DH2.DTL_CD
+		  		AND DH2.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH2.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH1
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 1, 2) = DH1.DTL_CD*/
+		  		ON DH2.USR_DFN1_VAL = DH1.DTL_CD
+		  		AND DH1.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH1.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		 WHERE BP.POC_MENU_CD = '02' /*약관*/
+		<if test="termsCd1 != null and termsCd1 != ''">
+		   AND DH1.DTL_CD = #{termsCd1}
+		</if>
+		<if test="termsCd2 != null and termsCd2 != ''">
+		   AND DH2.DTL_CD = #{termsCd2}
+		</if>
+		<if test="termsCd3 != null and termsCd3 != ''">
+		   AND DH3.DTL_CD = #{termsCd3}
+		</if>
+		<if test="rqidYn != null and rqidYn != ''">
+		   AND T.RQID_YN = #{rqidYn}
+		</if>
+		<if test="useYn != null and useYn != ''">
+		   AND T.USE_YN = #{useYn}
+		</if>
+		<if test="arrPocGb != null and arrPocGb.length > 0">
+		   AND T.TERMS_NO IN (
+		   			SELECT LETT_NO
+		   			  FROM BBS_POC
+		   			 WHERE BP.POC_MENU_CD = POC_MENU_CD
+		   			   AND POC_GB_CD IN (
+		   			   		<foreach collection="arrPocGb" item="pocGb" separator="," >
+					   			#{pocGb}
+					   		</foreach>
+		   			   )
+		   	   )
+		</if>
+		GROUP BY T.TERMS_NO
+		ORDER BY T.SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="termsListGridCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : terms.
+			Description : 통합약관 목록 그리드 Count
+			- BO
+		-->
+		SELECT /* QUERYID(terms.termsListGridCount) */
+			COUNT(DISTINCT T.TERMS_NO)
+		  FROM TERMS T
+		  	INNER JOIN BBS_POC BP
+		  		ON T.TERMS_NO = BP.LETT_NO
+		  	LEFT OUTER JOIN CODE_DETAIL PG
+		  		ON BP.POC_GB_CD = PG.DTL_CD
+		  		AND PG.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_POC_GB}'
+		  		AND PG.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH3
+		  		ON T.TERMS_CD = DH3.DTL_CD
+		  		AND DH3.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH3.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH2
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 3, 4) = DH2.DTL_CD*/
+		  		On DH3.USR_DFN2_VAL = DH2.DTL_CD
+		  		AND DH2.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH2.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH1
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 1, 2) = DH1.DTL_CD*/
+		  		ON DH2.USR_DFN1_VAL = DH1.DTL_CD
+		  		AND DH1.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH1.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		 WHERE BP.POC_MENU_CD = '02' /*약관*/
+		<if test="termsCd1 != null and termsCd1 != ''">
+		   AND DH1.DTL_CD = #{termsCd1}
+		</if>
+		<if test="termsCd2 != null and termsCd2 != ''">
+		   AND DH2.DTL_CD = #{termsCd2}
+		</if>
+		<if test="termsCd3 != null and termsCd3 != ''">
+		   AND DH3.DTL_CD = #{termsCd3}
+		</if>
+		<if test="rqidYn != null and rqidYn != ''">
+		   AND T.RQID_YN = #{rqidYn}
+		</if>
+		<if test="useYn != null and useYn != ''">
+		   AND T.USE_YN = #{useYn}
+		</if>
+		<if test="arrPocGb != null and arrPocGb.length > 0">
+		   AND T.TERMS_NO IN (
+		   			SELECT LETT_NO
+		   			  FROM BBS_POC
+		   			 WHERE BP.POC_MENU_CD = POC_MENU_CD
+		   			   AND POC_GB_CD IN (
+		   			   		<foreach collection="arrPocGb" item="pocGb" separator="," >
+					   			#{pocGb}
+					   		</foreach>
+		   			   )
+		   	   )
+		</if>
+	</select>
+	
+	<select id="getTermsDetailInfo" resultType="biz.app.appweb.model.TermsVO">
+		<!--
+			Query Name : terms.getTermsDetailInfo
+			Description : 통합약관 상세정보 조회
+			- BO
+		-->
+		SELECT /* QUERYID(terms.getTermsDetailInfo) */
+			T.TERMS_NO /*약관번호*/
+			, GROUP_CONCAT(BP.POC_GB_CD) AS POC_GB_CD /*POC 구분*/
+			, DH1.DTL_CD AS TERMS_CD1 /*약관 카테고리 1Depth*/
+			, DH2.DTL_CD AS TERMS_CD2 /*약관 카테고리 2Depth*/
+			, DH3.DTL_CD AS TERMS_CD3 /*약관 카테고리 3Depth*/
+			<if test='verUpYn == "Y"'>
+			, CONCAT(T.TERMS_VER+1, ".0") AS TERMS_VER /*약관버전*/
+			</if>
+			<if test='verUpYn != "Y"'>
+			, CONCAT(T.TERMS_VER, ".0") AS TERMS_VER /*약관버전*/
+			</if>
+			, T.RQID_YN /*동의 필수여부*/
+			, T.USE_YN /*약관 사용여부*/
+			, T.TERMSNM /*약관명*/
+			, DATE_FORMAT(STR_TO_DATE(T.TERMS_STRT_DT, '%Y%m%d'), '%Y-%m-%d') AS TERMS_STRT_DT /*약관 적용기간 시작일*/
+			, DATE_FORMAT(STR_TO_DATE(T.TERMS_END_DT, '%Y%m%d'), '%Y-%m-%d') AS TERMS_END_DT /*약관 적용기간 종료일*/
+			, T.SUMMARY_CONTENT /*약관 요약정보*/
+			, T.CONTENT /*약관 내용*/
+			, CASE WHEN (
+					SELECT TERMS_NO
+					  FROM TERMS T1
+					  	INNER JOIN (
+					  		SELECT TERMS_CD, MAX(TERMS_VER) AS TERMS_VER
+					  		  FROM TERMS
+					  		GROUP BY TERMS_CD
+					  	) T2
+					  		ON T1.TERMS_CD = T2.TERMS_CD
+					  		AND T1.TERMS_VER = T2.TERMS_VER
+					 WHERE T1.TERMS_NO = T.TERMS_NO
+			  ) IS NOT NULL THEN 'Y' ELSE 'N' END AS NEW_YN
+		  FROM TERMS T
+			INNER JOIN BBS_POC BP
+		  		ON T.TERMS_NO = BP.LETT_NO
+		  	LEFT OUTER JOIN CODE_DETAIL PG
+		  		ON BP.POC_GB_CD = PG.DTL_CD
+		  		AND PG.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_POC_GB}'
+		  		AND PG.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH3
+		  		ON T.TERMS_CD = DH3.DTL_CD
+		  		AND DH3.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH3.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH2
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 3, 4) = DH2.DTL_CD*/
+		  		On DH3.USR_DFN2_VAL = DH2.DTL_CD
+		  		AND DH2.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH2.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		  	LEFT OUTER JOIN CODE_DETAIL DH1
+		  		/*ON SUBSTRING(DH3.USR_DFN1_VAL, 1, 2) = DH1.DTL_CD*/
+		  		ON DH2.USR_DFN1_VAL = DH1.DTL_CD
+		  		AND DH1.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		  		AND DH1.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		 WHERE BP.POC_MENU_CD = '02' /*약관*/
+		   AND T.TERMS_NO = #{termsNo}
+	</select>
+
+	<select id="getTermsCategoryList" resultType="biz.app.system.model.CodeDetailVO">
+		<!--
+			Query Name : terms.getTermsCategoryList
+			Description : 통합약관 카테고리 조회
+			- BO
+		-->
+		SELECT /* QUERYID(terms.getTermsCategoryList) */
+			GRP_CD
+			, DTL_CD
+			, DTL_NM
+			, DTL_SHT_NM
+			, SORT_SEQ
+			, USE_YN
+			, USR_DFN1_VAL
+			, USR_DFN2_VAL
+			, USR_DFN3_VAL
+			, USR_DFN4_VAL
+			, USR_DFN5_VAL
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+			, SYS_DEL_YN
+			, SYS_DELR_NO
+			, SYS_DEL_DTM
+		  FROM CODE_DETAIL
+		 WHERE GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+		   AND SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		<if test="code != null and code != ''">
+		   AND USR_DFN1_VAL = #{code}
+		</if>
+		<if test="code == null or code == ''">
+		   AND USR_DFN1_VAL = ''
+		</if>
+	</select>
+	
+	<select id="getTermsVerCheck" resultType="java.lang.String">
+		<!--
+			Query Name : terms.getTermsVerCheck
+			Description : 통합약관 버전 조회
+			- BO
+		-->
+		SELECT /* QUERYID(terms.getTermsVerCheck) */
+			CONCAT(IFNULL(MAX(TERMS_VER), 0)+1, '.0')
+		  FROM TERMS
+		 WHERE TERMS_CD = #{code}
+	</select>
+	
+	<insert id="insertTerms" parameterType="biz.app.appweb.model.TermsPO">
+		<!--
+			Query Name : terms.insertTerms
+			Description : 통합약관 등록
+			- BO
+		-->
+		INSERT INTO TERMS /* QUERYID(terms.insertTerms) */ 
+		(	
+			TERMS_NO 			/*약관번호*/
+			, ST_ID				/*사이트ID*/
+			, TERMS_CD			/*약관 카테고리*/
+			, TERMS_VER			/*약관버전*/
+			, RQID_YN			/*동의 필수여부*/
+			, USE_YN			/*약관 사용여부*/
+			, TERMSNM			/*약관명*/
+			, TERMS_STRT_DT		/*약관 적용기간 시작일*/
+			, TERMS_END_DT		/*약관 적용기간 종료일*/
+			, SUMMARY_CONTENT	/*약관 요약내용*/
+			, CONTENT			/*약관 내용*/
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			#{termsNo}
+			, #{stId}
+			, #{termsCd3}
+			, #{termsVer}
+			, #{rqidYn}
+			, #{useYn}
+			, #{termsNm}
+			, replace( #{termsStrtDt}, '-', '' )
+			, replace( #{termsEndDt}, '-', '' )
+			, #{smryContent}
+			, #{content}
+			, #{sysRegrNo}
+			, NOW()	
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateTerms" parameterType="biz.app.appweb.model.TermsPO">
+		<!--
+			Query Name : terms.updateTerms
+			Description : 통합약관 수정
+			- BO
+		-->
+		UPDATE TERMS
+		   SET RQID_YN = #{rqidYn}
+		   	  ,USE_YN = #{useYn}
+		   	  ,TERMSNM = #{termsNm}
+		   	  ,TERMS_STRT_DT = replace( #{termsStrtDt}, '-', '' )
+		   	  ,SUMMARY_CONTENT = #{smryContent}
+		   	  ,CONTENT = #{content}
+		 WHERE TERMS_NO = #{termsNo}  
+	</update>
+	
+	<insert id="insertLetterPoc" parameterType="biz.app.appweb.model.TermsPO">
+		<!--
+			Query Name : terms.insertLetterPoc
+			Description : 통합약관 게시판 POC 등록
+			- BO
+		-->
+		INSERT INTO BBS_POC /* QUERYID(terms.insertLetterPoc) */
+		(
+			POC_MENU_CD
+			, POC_GB_CD
+			, LETT_NO
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		)
+		VALUES
+		(
+			#{pocMenuCd}
+			, #{pocGb}
+			, #{termsNo}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<delete id="deleteLetterPoc" parameterType="biz.app.appweb.model.TermsPO">
+		<!--
+			Query Name : terms.deleteLetterPoc
+			Description : 통합약관 게시판 POC 삭제
+			- BO
+		-->
+		DELETE FROM BBS_POC /* QUERYID(terms.deleteLetterPoc) */
+		 WHERE POC_MENU_CD = #{pocMenuCd}
+		   AND LETT_NO = #{termsNo}
+	</delete>
+	
+	<update id="updateTermsStrtDtToTermsEndDt" parameterType="biz.app.appweb.model.TermsPO">
+		<!--
+			Query Name : terms.updateTermsStrtDtToTermsEndDt
+			Description : 통합약관 이전버전의 적용기간 종료일을 현재 날짜가 이전버전 시작일보다 크면 현재날짜, 아니면 이전버전의 시작일로 수정되도록 변경
+			- BO
+		-->
+		/* QUERYID(terms.updateTermsStrtDtToTermsEndDt) */
+		UPDATE TERMS
+		   SET TERMS_END_DT = (
+		   		SELECT *
+		   		  FROM(
+			   		SELECT
+						CASE WHEN TERMS_STRT_DT <![CDATA[ < ]]> DATE_FORMAT(CURDATE(), '%Y%m%d') THEN DATE_FORMAT(CURDATE(), '%Y%m%d')
+							 ELSE TERMS_STRT_DT
+						END AS DT
+					  FROM TERMS
+					 WHERE TERMS_CD = #{termsCd3}
+					   AND TERMS_VER = #{beTermsVer}
+		   		  ) AS X
+		   )
+		WHERE TERMS_CD = #{termsCd3}
+		  AND TERMS_VER = #{beTermsVer}
+	</update>
+	
+	
+	<resultMap type="biz.app.appweb.model.TermsVO" id="listTermsMap">
+		<id		property="termsNo"			column="TERMS_NO"/>		
+		<result property="termsCd"			column="TERMS_CD"/>		
+		<result property="termsNm"		column="TERMSNM"/>		
+		<result property="termsVer"		column="TERMS_VER"/>	
+		<result property="useYn"		column="USE_YN"/>		
+		<result property="rqidYn"		column="RQID_YN"/>
+		<result property="usrDfn1Val"		column="USR_DFN1_VAL"/>		
+		<result property="usrDfn2Val"		column="USR_DFN2_VAL"/>
+		<result property="usrDfn3Val"		column="USR_DFN3_VAL"/>		
+		<collection property="listTermsContent" column="TERMS_CD"  ofType="biz.app.appweb.model.TermsVO" javaType="java.util.ArrayList" select="listTermsContent" />
+	</resultMap>
+	
+	
+	<select id="listTermsForMemberJoin" resultType="biz.app.appweb.model.TermsVO">
+		<!--
+			Query Name : terms.listTermsForMemberJoin
+			Description : FO회원가입 시 약관동의 화면에서 사용할 약관 리스트
+			Date : 2021-01-18
+			Writer : 이지희 
+		-->
+		SELECT 	/* QUERYID(terms.listTermsForMemberJoin) */
+				T.TERMS_NO 
+				,T.TERMS_CD
+				,T.TERMSNM 
+				,T.TERMS_VER
+<!-- 				,T.CONTENT -->
+				,T.TERMS_STRT_DT
+				,T.TERMS_END_DT
+				,T.USE_YN
+				,T.RQID_YN
+				,DH.USR_DFN1_VAL 
+				,DH.USR_DFN2_VAL
+				,DH.USR_DFN3_VAL
+		FROM 	TERMS T
+		INNER JOIN BBS_POC BP  
+			ON 		T.TERMS_NO = BP.LETT_NO
+			<if test="pocGbCd != null and pocGbCd != ''">
+			AND 	BP.POC_GB_CD = #{pocGbCd}
+			</if>
+			<if test="termsCd != null and termsCd != ''">
+		  	 AND 	T.TERMS_CD = #{termsCd}
+			</if>
+			AND  	BP.POC_MENU_CD = '${@framework.common.constants.CommonConstants@POC_MENU_02}'  /*약관*/
+		LEFT OUTER JOIN 	CODE_DETAIL DH
+			ON 				T.TERMS_CD = DH.DTL_CD
+			AND 			DH.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+			AND 			DH.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		WHERE 	1=1
+		AND 	T.USE_YN = 'Y'
+		AND 	DH.USR_DFN2_VAL IN ('${@framework.common.constants.CommonConstants@TERMS_GB_GSR_MEM}','${@framework.common.constants.CommonConstants@TERMS_GB_ABP_MEM}','${@framework.common.constants.CommonConstants@TERMS_GB_NAVER_MEM}')
+		-- AND 	T.TERMS_VER = ( SELECT MAX(TERMS_VER) FROM TERMS WHERE TERMS_CD = T.TERMS_CD AND USE_YN='Y')
+	 	AND		T.TERMS_NO = (
+			 					SELECT	MAX(B.TERMS_NO)
+								FROM	TERMS B
+								WHERE 	B.TERMS_CD = T.TERMS_CD
+									AND B.USE_YN = 'Y'
+									AND DATE_FORMAT(NOW(), '%Y%m%d') >= DATE_FORMAT(B.TERMS_STRT_DT, '%Y%m%d') 
+								ORDER BY B.TERMS_NO DESC
+	 						)
+		<!-- GROUP BY T.TERMS_CD -->
+<!--         ORDER BY T.RQID_YN DESC , T.TERMS_CD ASC  -->
+		ORDER BY RQID_YN DESC, CASE USR_DFN1_VAL WHEN '20' THEN 1 WHEN '30' THEN 2 WHEN '10' THEN 3 END
+	</select>
+	
+	<select id ="listTermsContent" resultType = "biz.app.appweb.model.TermsVO">
+		SELECT /* QUERYID(terms.listTermsContent) */
+			TERMS_NO
+			, TERMS_CD
+			, TERMSNM
+			, TERMS_VER
+			, CONTENT
+			, TERMS_STRT_DT
+			, TERMS_END_DT
+			, RQID_YN
+		FROM
+			TERMS 
+		WHERE TERMS_CD = #{termsCd}
+		AND USE_YN = 'Y'
+		AND DATE_FORMAT(NOW(), '%Y%m%d') >= DATE_FORMAT(TERMS_STRT_DT, '%Y%m%d')
+		ORDER BY TERMS_NO DESC			
+	</select>
+	
+	<select id="listTermsForPayment" resultMap="listTermsMap">
+		<!--
+			Query Name : terms.listTermsForPayment
+			Description : 상품결제시 사용되는 약관리스트
+			Date : 2021-03-31
+			Writer : 김대희 
+		-->
+		SELECT 	/* QUERYID(terms.listTermsForPayment) */
+				T.TERMS_NO 
+				,T.TERMS_CD
+				,T.TERMSNM 
+				,T.TERMS_VER
+				,T.CONTENT
+				,T.TERMS_STRT_DT
+				,T.TERMS_END_DT
+				,T.USE_YN
+				,T.RQID_YN
+				,DH.USR_DFN1_VAL 
+				,DH.USR_DFN2_VAL
+				,DH.USR_DFN3_VAL
+				,DH.SORT_SEQ
+		FROM 	TERMS T
+		INNER JOIN BBS_POC BP  
+			ON 		T.TERMS_NO = BP.LETT_NO
+			<if test="pocGbCd != null and pocGbCd != ''">
+			AND 	BP.POC_GB_CD = #{pocGbCd}
+			</if>
+			<if test="termsCd != null and termsCd != ''">
+		  	 AND 	T.TERMS_CD = #{termsCd}
+			</if>
+			AND  	BP.POC_MENU_CD = '${@framework.common.constants.CommonConstants@POC_MENU_02}'  /*약관*/
+		LEFT OUTER JOIN 	CODE_DETAIL DH
+			ON 				T.TERMS_CD = DH.DTL_CD
+			AND 			DH.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+			AND 			DH.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		WHERE 	1=1
+		AND T.USE_YN = 'Y'
+		AND 	T.TERMS_VER = ( SELECT MAX(TERMS_VER) FROM TERMS WHERE TERMS_CD = T.TERMS_CD AND USE_YN='Y')
+		AND DH.USR_DFN1_VAL = #{usrDfn1Val} <!-- 결재 -->
+		AND DH.USR_DFN2_VAL = #{usrDfn2Val} <!-- 주문결제 -->
+		<!-- GROUP BY T.TERMS_CD -->
+        ORDER BY DH.SORT_SEQ ASC , T.RQID_YN DESC , T.TERMS_CD ASC 
+	</select>
+	
+	<select id="listGsPointTerms" resultType="biz.app.appweb.model.TermsVO">
+		SELECT 	/* QUERYID(terms.listGsPointTerms) */
+				T.TERMS_NO 
+				,T.TERMS_CD
+				,T.TERMSNM 
+				,T.TERMS_VER
+				,T.CONTENT
+				,T.TERMS_STRT_DT
+				,T.TERMS_END_DT
+				,T.USE_YN
+				,T.RQID_YN
+				,DH.USR_DFN1_VAL 
+				,DH.USR_DFN2_VAL
+				,DH.USR_DFN3_VAL
+		FROM 	TERMS T
+		INNER JOIN BBS_POC BP  
+			ON 		T.TERMS_NO = BP.LETT_NO
+			<if test="pocGbCd != null and pocGbCd != ''">
+			AND 	BP.POC_GB_CD = #{pocGbCd}
+			</if>
+		  	AND 	T.TERMS_CD IN ('${@framework.common.constants.CommonConstants@TERMS_GB_GSR_MEM_TERM}','${@framework.common.constants.CommonConstants@TERMS_GB_GSR_MEM_THIRD_CHC}', '${@framework.common.constants.CommonConstants@TERMS_GB_GSR_MEM_THIRD_REQ_ABP}') 
+			AND  	BP.POC_MENU_CD = '${@framework.common.constants.CommonConstants@POC_MENU_02}'  /*약관*/
+		LEFT OUTER JOIN 	CODE_DETAIL DH
+			ON 				T.TERMS_CD = DH.DTL_CD
+			AND 			DH.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+			AND 			DH.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		WHERE 	1=1
+		AND 	T.USE_YN = 'Y'
+		AND 	DH.USR_DFN1_VAL = '${@framework.common.constants.CommonConstants@TERMS_GB_GSR}'
+		AND 	DH.USR_DFN2_VAL = '${@framework.common.constants.CommonConstants@TERMS_GB_GSR_MEM}'
+	 	AND		T.TERMS_NO = (
+			 					SELECT	MAX(B.TERMS_NO)
+								FROM	TERMS B
+								WHERE 	B.TERMS_CD = T.TERMS_CD
+									AND B.USE_YN = 'Y'
+									AND DATE_FORMAT(NOW(), '%Y%m%d') >= DATE_FORMAT(B.TERMS_STRT_DT, '%Y%m%d') 
+								ORDER BY B.TERMS_NO DESC
+	 						)
+		<!-- GROUP BY T.TERMS_CD -->
+        ORDER BY T.RQID_YN DESC , T.TERMS_CD ASC 
+	</select>
+	
+	<select id="listSktmpTerms" resultType="biz.app.appweb.model.TermsVO">
+		SELECT 	/* QUERYID(terms.listSktmpTerms) */
+				T.TERMS_NO 
+				,T.TERMS_CD
+				,T.TERMSNM 
+				,T.TERMS_VER
+				,T.CONTENT
+				,T.TERMS_STRT_DT
+				,T.TERMS_END_DT
+				,T.USE_YN
+				,T.RQID_YN
+				,DH.USR_DFN1_VAL 
+				,DH.USR_DFN2_VAL
+				,DH.USR_DFN3_VAL
+				,(SELECT COUNT(1) FROM MP_CARD_INFO MCI WHERE 1=1 AND MBR_NO = #{mbrNo}) AS TERMS_HISTORY_CNT
+		FROM 	TERMS T
+		INNER JOIN BBS_POC BP  
+			ON 		T.TERMS_NO = BP.LETT_NO
+			<if test="pocGbCd != null and pocGbCd != ''">
+			AND 	BP.POC_GB_CD = #{pocGbCd}
+			</if>
+		  	AND 	T.TERMS_CD IN ('${@framework.common.constants.CommonConstants@TERMS_GB_ABP_PAY_PRIVACY_SKTMP}','${@framework.common.constants.CommonConstants@TERMS_GB_ABP_PAY_THIRD_REQ_SKTMP}') 
+			AND  	BP.POC_MENU_CD = '${@framework.common.constants.CommonConstants@POC_MENU_02}'  /*약관*/
+		LEFT OUTER JOIN 	CODE_DETAIL DH
+			ON 				T.TERMS_CD = DH.DTL_CD
+			AND 			DH.GRP_CD = '${@framework.common.constants.CommonConstants@TERMS_GB}'
+			AND 			DH.SYS_DEL_YN = '${@framework.common.constants.CommonConstants@DEL_YN_N}'
+		WHERE 	1=1
+		AND 	T.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		AND 	DH.USR_DFN1_VAL = #{usrDfn1Val}
+		AND 	DH.USR_DFN2_VAL = #{usrDfn2Val}
+	 	AND		T.TERMS_NO = (
+			 					SELECT	MAX(B.TERMS_NO)
+								FROM	TERMS B
+								WHERE 	B.TERMS_CD = T.TERMS_CD
+									AND B.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+									AND DATE_FORMAT(NOW(), '%Y%m%d') >= DATE_FORMAT(B.TERMS_STRT_DT, '%Y%m%d') 
+								ORDER BY B.TERMS_NO DESC
+	 						)
+	 	AND 	T.TERMS_VER = (SELECT MAX(TERMS_VER) FROM TERMS WHERE TERMS_CD = T.TERMS_CD)
+        ORDER BY T.RQID_YN DESC , T.TERMS_CD ASC 
+	</select>
+	
+	<insert id="insertCommonTermsRcvHistory" parameterType="biz.app.member.model.TermsRcvHistoryPO">
+		INSERT INTO TERMS_RCV_HISTORY (
+			TERMS_AGREE_HIST_NO
+			, MBR_NO
+			, TERMS_NO
+			, RCV_YN
+			, RCV_DT
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+		) VALUES (
+			#{termsAgreeHistNo}
+			, #{mbrNo}
+			, #{termsNo}
+			, #{rcvYn}
+			, NOW()
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

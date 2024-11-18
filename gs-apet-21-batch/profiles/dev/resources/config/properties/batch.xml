@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<comment>batch_dev</comment>
+
+	<entry key="project.gb">batch</entry>
+	
+	<entry key="inipay.str.id">INIpayTest</entry>	<!-- 이니시스 상점 키 : 테스트-->
+	
+		
+</properties>

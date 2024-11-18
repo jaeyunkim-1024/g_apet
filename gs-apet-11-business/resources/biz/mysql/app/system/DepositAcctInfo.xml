@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="depositAcctInfo">
+
+	<select id="pageDepositAcctInfo" resultType="biz.app.system.model.DepositAcctInfoVO">
+		<!--
+			Query Name : depositAcctInfo.pageDepositAcctInfo
+			Description : 무통장 계좌 목록 (Paging)
+		-->
+		SELECT	/* QUERYID(depositAcctInfo.pageDepositAcctInfo) */
+			  D.ACCT_INFO_NO			/* 계좌 정보 번호 */
+			, D.ST_ID		   			/* 사이트 ID */
+			, S.ST_NM		    		/* 사이트 명 */
+			, D.BANK_CD		   			/* 은행 코드 */
+			, B.DTL_NM AS BANK_NM 		/* 은행 명 */
+			, D.ACCT_NO		    		/* 계좌 번호 */
+			, D.OOA_NM		    		/* 예금주 명 */
+			, D.DISP_PRIOR_RANK			/* 전시 우선 순위    */
+			, D.SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, D.SYS_REG_DTM				/* 시스템 등록 일시 */
+			, D.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, D.SYS_UPD_DTM				/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(D.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(D.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			DEPOSIT_ACCT_INFO D
+			LEFT OUTER JOIN ST_STD_INFO S ON (D.ST_ID = S.ST_ID)
+			LEFT OUTER JOIN (SELECT DTL_CD, DTL_NM 
+								FROM CODE_DETAIL 
+								WHERE GRP_CD = '${@framework.common.constants.CommonConstants@BANK}'  
+			) B ON (D.BANK_CD = B.DTL_CD) 
+		WHERE	1=1
+		<if test='acctInfoNo != null'>
+			AND D.ACCT_INFO_NO = #{acctInfoNo}
+		</if>
+		<if test='stId != null and stId != ""'>
+			AND D.ST_ID = #{stId}
+		</if>
+		<if test='bankCd != null and bankCd != ""'>
+			AND D.BANK_CD = #{bankCd}
+		</if>
+		<if test='acctNo != null and acctNo != ""'>
+			AND D.ACCT_NO LIKE CONCAT('%', #{acctNo}, '%')
+		</if>
+		<if test='ooaNm != null and ooaNm != ""'>
+			AND D.OOA_NM LIKE CONCAT('%', #{ooaNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	
+	<select id="pageDepositAcctInfoCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : pageDepositAcctInfoCount
+			Description : test
+		-->
+		SELECT	/* QUERYID(depositAcctInfo.pageDepositAcctInfoCount) */
+			COUNT(*)
+		FROM
+			DEPOSIT_ACCT_INFO D
+		WHERE	1=1
+		<if test='acctInfoNo != null'>
+			AND D.ACCT_INFO_NO = #{acctInfoNo}
+		</if>
+		<if test='stId != null and stId != ""'>
+			AND D.ST_ID = #{stId}
+		</if>
+		<if test='bankCd != null and bankCd != ""'>
+			AND D.BANK_CD = #{bankCd}
+		</if>
+		<if test='acctNo != null and acctNo != ""'>
+			AND D.ACCT_NO LIKE CONCAT('%', #{acctNo}, '%')
+		</if>
+		<if test='ooaNm != null and ooaNm != ""'>
+			AND D.OOA_NM LIKE CONCAT('%', #{ooaNm}, '%')
+		</if>
+	</select>
+
+
+	<select id="listDepositAcctInfo" resultType="biz.app.system.model.DepositAcctInfoVO">
+		<!--
+			Query Name : depositAcctInfo.listDepositAcctInfo
+			Description : 무통장 계좌 목록
+		-->
+		SELECT	/* QUERYID(depositAcctInfo.listDepositAcctInfo) */
+			  D.ACCT_INFO_NO			/* 계좌 정보 번호 */
+			, D.ST_ID		   			/* 사이트 ID */
+			, D.BANK_CD		   			/* 은행 코드 */
+			, B.DTL_NM AS BANK_NM 		/* 은행 명 */
+			, D.ACCT_NO		    		/* 계좌 번호 */
+			, D.OOA_NM		    		/* 예금주 명 */
+			, D.DISP_PRIOR_RANK			/* 전시 우선 순위 */
+			, D.SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, D.SYS_REG_DTM				/* 시스템 등록 일시 */
+			, D.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, D.SYS_UPD_DTM				/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(D.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(D.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			DEPOSIT_ACCT_INFO D
+			LEFT OUTER JOIN (SELECT DTL_CD, DTL_NM 
+								FROM CODE_DETAIL 
+								WHERE GRP_CD = '${@framework.common.constants.CommonConstants@BANK}'  
+			) B ON (D.BANK_CD = B.DTL_CD) 
+		WHERE	1=1
+		<if test='stId != null'>
+			AND D.ST_ID = #{stId}
+		</if>
+		ORDER BY D.DISP_PRIOR_RANK ASC
+	</select>
+		
+		
+	<select id="getDepositAcctInfo"  resultType="biz.app.system.model.DepositAcctInfoVO">
+		<!--
+			Query Name : depositAcctInfo.getDepositAcctInfo
+			Description : 무통장 계좌 정보 조회
+		-->
+		SELECT	/* QUERYID(depositAcctInfo.getDepositAcctInfo) */
+			  D.ACCT_INFO_NO			/* 계좌 정보 번호 */
+			, D.ST_ID		   			/* 사이트 ID */
+			, S.ST_NM		    		/* 사이트 명 */
+			, D.BANK_CD		   			/* 은행 코드 */
+			, B.DTL_NM AS BANK_NM 		/* 은행 명 */
+			, D.ACCT_NO		    		/* 계좌 번호 */
+			, D.OOA_NM		    		/* 예금주 명 */
+			, D.DISP_PRIOR_RANK			/* 전시 우선 순위    */
+			, D.SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, D.SYS_REG_DTM				/* 시스템 등록 일시 */
+			, D.SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, D.SYS_UPD_DTM				/* 시스템 수정 일시 */
+			, FN_GET_USER_NAME(D.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(D.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM
+			DEPOSIT_ACCT_INFO D
+			LEFT OUTER JOIN ST_STD_INFO S ON (D.ST_ID = S.ST_ID)
+			LEFT OUTER JOIN (SELECT DTL_CD, DTL_NM 
+								FROM CODE_DETAIL 
+								WHERE GRP_CD = '${@framework.common.constants.CommonConstants@BANK}'  
+			) B ON (D.BANK_CD = B.DTL_CD) 
+		WHERE
+			D.ACCT_INFO_NO = #{acctInfoNo}
+	</select>
+
+
+	<insert id="insertDepositAcctInfo" parameterType="biz.app.system.model.DepositAcctInfoPO">
+		<!--
+			Query Name : depositAcctInfo.insertDepositAcctInfo
+			Description : insertDepositAcctInfo
+		-->
+		<selectKey keyProperty="acctInfoNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_DEPOSIT_ACCT_INFO_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO DEPOSIT_ACCT_INFO (	/* QUERYID(depositAcctInfo.insertDepositAcctInfo) */
+			  ACCT_INFO_NO	    		/* 계좌 정보 번호 */
+			, ST_ID		        		/* 사이트 ID */
+			, BANK_CD		    		/* 은행 코드 */
+			, ACCT_NO		    		/* 계좌 번호 */
+			, OOA_NM		    		/* 예금주 명 */
+			, DISP_PRIOR_RANK			/* 전시 우선 순위 */			
+			, SYS_REGR_NO				/* 시스템 등록자 번호 */
+			, SYS_REG_DTM				/* 시스템 등록 일시 */
+			, SYS_UPDR_NO				/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM				/* 시스템 수정 일시 */
+		) VALUES (
+			  #{acctInfoNo}
+			, #{stId}
+			, #{bankCd}
+			, #{acctNo}
+			, #{ooaNm}
+			, #{dispPriorRank}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+
+
+	<update id="updateDepositAcctInfo" parameterType="biz.app.system.model.DepositAcctInfoPO">
+		<!--
+			Query Name : depositAcctInfo.updateDepositAcctInfo
+			Description : updateDepositAcctInfo
+		-->
+		UPDATE	DEPOSIT_ACCT_INFO	/* QUERYID(depositAcctInfo.updateDepositAcctInfo) */
+		SET	
+			  ST_ID		        = #{stId}	        /* 사이트 ID */
+			, BANK_CD		    = #{bankCd}	        /* 은행 코드 */
+			, ACCT_NO		    = #{acctNo}	        /* 계좌 번호 */
+			, OOA_NM		    = #{ooaNm}	        /* 예금주 명 */
+			, DISP_PRIOR_RANK	= #{dispPriorRank}  /* 전시 우선 순위 */
+			, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	
+			ACCT_INFO_NO = #{acctInfoNo}
+	</update>
+	
+	
+	<delete id="deleteDepositAcctInfo" parameterType="biz.app.system.model.DepositAcctInfoPO">
+		<!--
+			Query Name : depositAcctInfo.deleteDepositAcctInfo
+			Description : 무통장 계좌  베이스 삭제
+		-->
+		DELETE	/* QUERYID(depositAcctInfo.deleteDepositAcctInfo) */
+		FROM	DEPOSIT_ACCT_INFO
+		WHERE	ACCT_INFO_NO = #{acctInfoNo}
+	</delete>      
+	
+</mapper>

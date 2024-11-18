@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="claimBase">
+
+	<select id="getClaimNo" resultType="java.lang.String">
+		<!--
+			Query Name : claimBase.getClaimNo
+			Description : 클레임 번호 생성
+		-->
+		SELECT 	/* QUERYID(claimBase.getClaimNo) */ 
+					FN_GET_CLM_NO(#{ordNo})
+		FROM		DUAL
+	</select>
+
+	<insert id="insertClaimBase">
+		<!--
+			Query Name : claimBase.insertClaimBase
+			Description : 클레임 기본 등록
+		-->
+		INSERT INTO CLAIM_BASE (
+			CLM_NO					/* 클레임 번호 */
+			, ST_ID					/* 사이트 아이디 */
+			, ORD_NO				/* 주문 번호 */
+			, MBR_NO				/* 회원 번호 */
+			, CLM_TP_CD				/* 클레임 유형 코드 */
+			, CLM_STAT_CD			/* 클레임 상태 코드 */
+			, ORD_MDA_CD			/* 주문 매체 코드 */
+			, SWAP_YN				/* 맞교환 여부 */
+			, CHNL_ID				/* 채널 아이디 */
+			, ACPT_DTM				/* 접수 일시 */
+			, ACPTR_NO				/* 접수자 번호 */
+			, OUTSIDE_CLM_NO		/* 외부 클레임 번호 */
+			, DLVR_PRCS_TP_CD		/* 배송 처리 유형 코드 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{clmNo}					/* 클레임 번호 */
+			, #{stId}					/* 사이트 아이디 */
+			, #{ordNo}				/* 주문 번호 */
+			, #{mbrNo}				/* 회원 번호 */
+			, #{clmTpCd}				/* 클레임 유형 코드 */
+			, #{clmStatCd}			/* 클레임 상태 코드 */
+			, #{ordMdaCd}			/* 주문 매체 코드 */
+			, #{swapYn}				/* 맞교환 여부 */
+			, #{chnlId}				/* 채널ID */
+			, NOW()					/* 접수 일시 */
+			, #{acptrNo}				/* 접수자 번호 */
+			, #{outsideClmNo} 		/* 외부 클레임 번호 */
+			, #{dlvrPrcsTpCd}		/* 배송 처리 유형 코드 */
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+	
+	<select id="getClaimBase" resultType="biz.app.claim.model.ClaimBaseVO" >
+		<!--
+			Query Name : claimBase.getClaimBase
+			Description : 클레임 기본 추출
+		-->
+		SELECT	/* QUERYID(claimBase.getClaimBase) */
+					CB.CLM_NO			/* 클레임 번호 */
+					, CB.ST_ID			/* 사이트 아이디 */
+					, (SELECT ST_NM FROM ST_STD_INFO WHERE ST_ID = CB.ST_ID) AS ST_NM 	/* 사이트 명 */
+					, CB.ORD_NO		/* 주문 번호 */
+					, (SELECT ORD_STAT_CD FROM ORDER_BASE WHERE ORD_NO = CB.ORD_NO) ORD_STAT_CD	/* 주문 상태 코드 */
+					, CB.ORG_CLM_NO	/* 원 클레임 번호 */
+					, CB.MBR_NO		/* 회원 번호 */
+					, (SELECT MBR_NM FROM MEMBER_BASE WHERE MBR_NO = CB.MBR_NO) AS MBR_NM  /* 회원 이름 */
+					, CB.CLM_TP_CD		/* 클레임 유형 코드 */
+					, CB.CLM_STAT_CD	/* 클레임 상태 코드 */
+					, CB.ORD_MDA_CD	/* 주문 매체 코드 */
+					, CB.CHNL_ID		/* 채널 아이디 */
+					, CB.SWAP_YN				/* 맞교환 여부 */
+					, (SELECT CHNL_NM FROM CHNL_STD_INFO WHERE CHNL_ID = CB.CHNL_ID) AS CHNL_NM /* 채널명 */
+					, CB.ACPT_DTM		/* 접수 일시 */
+					, CB.CNC_DTM		/* 취소 일시 */
+					, CB.CPLT_DTM		/* 완료 일시 */
+					, CB.ACPTR_NO		/* 접수자 번호 */
+					, CB.CNCR_NO		/* 취소자 번호 */
+					, CB.CPLTR_NO		/* 완료자 번호 */
+					, CB.SYS_REGR_NO	/* 시스템 등록자 번호 */
+					, CB.SYS_REG_DTM	/* 시스템 등록 일시 */
+					, CB.SYS_UPDR_NO	/* 시스템 수정자 번호 */
+					, CB.SYS_UPD_DTM	/* 시스템 수정 일시 */
+					, OB.ORD_NM		/* 주문자 명 */
+					, OB.ORDR_ID		/* 주문자 아이디 */
+					, OB.ORDR_EMAIL	/* 주문자 이메일 */
+					, OB.ORDR_TEL		/* 주문자 전화 */
+					, OB.ORDR_MOBILE	/* 주문자 핸드폰 */
+					, FN_GET_USER_NAME(CB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(CB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		CLAIM_BASE CB
+					,ORDER_BASE OB
+		WHERE	CB.ORD_NO = OB.ORD_NO
+		AND		CB.CLM_NO		= #{clmNo}
+	</select>	
+	
+	<update id="updateClaimBase">
+		<!--
+			Query Name : claimBase.updateClaimBase
+			Description : 클레임 기본 수정
+		-->
+
+		<if test='checkClmDtlStatAllEndYn != null and checkClmDtlStatAllEndYn.equals("Y")'>
+		WITH CHECK_CLM_DTL_COUNT AS (
+		    /*CLM_DTL_STAT_CD - 310:교환회수접수, 320:교환회수지시, 330:교환회수중, 340:교환회수완료, 350:교환회수거부완료, 360:교환회수승인완료 / 410:교환배송접수, 420:교환배송지시, 430:교환배송준비중, 440:교환배송중, 450:배송완료*/
+		    select sum(z.clm_ing_count) as CLM_ING_COUNT
+		    from (
+			    SELECT case when (CB.CLM_TP_CD = '20' AND CLM_DTL_TP_CD = '20' AND CLM_DTL_STAT_CD IN ('210','220','230','240'))  then 1 
+			                when (CB.CLM_TP_CD = '10' AND CLM_DTL_TP_CD = '10' AND CLM_DTL_STAT_CD IN ('110'))                    then 1
+			                when (CB.CLM_TP_CD = '30' and MIN(case when CLM_DTL_TP_CD='30' then CLM_DTL_STAT_CD end) OVER (PARTITION BY cd.ORD_NO, cd.ORD_DTL_SEQ) != '350' /*350:교환회수거부완료가 아닐때*/
+			                                          and CLM_DTL_STAT_CD IN ('310','320','330','340',  '410','420','430','440')) then 1
+			                when (CB.CLM_TP_CD = '30' /*맞교환일때*/
+			                						  AND IF(IF(CB2.COMP_GB_CD = '10', CB.DLVR_PRCS_TP_CD, '10') = '10','N',CB.SWAP_YN) = 'Y'
+			                                          AND MIN(case when CLM_DTL_TP_CD='30' then CLM_DTL_STAT_CD end) OVER (PARTITION BY cd.ORD_NO, cd.ORD_DTL_SEQ) = '350' /*350:교환회수거부완료 일때*/
+			                                          and CLM_DTL_STAT_CD IN ('310','320','330','340',  '410','420','430','440')) then 1   
+			                when (CB.CLM_TP_CD = '30' /*일반교환일때*/
+			                                          AND IF(IF(CB2.COMP_GB_CD = '10', CB.DLVR_PRCS_TP_CD, '10') = '10','N',CB.SWAP_YN) = 'N'
+			                						  AND MIN(case when CLM_DTL_TP_CD='30' then CLM_DTL_STAT_CD end) OVER (PARTITION BY cd.ORD_NO, cd.ORD_DTL_SEQ) = '350') /*350:교환회수거부완료 일때*/
+			                                                                                                                      then 0   /*클레임종료 - 교환회수거부완료 존재시 무조건 클레임종료로 취급*/
+			                else 0 end as clm_ing_count
+				  FROM CLAIM_DETAIL CD
+				       INNER JOIN CLAIM_BASE CB      ON CD.CLM_NO = CB.CLM_NO
+				       INNER JOIN COMPANY_BASE CB2   ON CD.COMP_NO = CB2.COMP_NO
+				 WHERE CD.CLM_NO = #{clmNo}
+			 ) z
+		)
+		</if>
+		UPDATE	CLAIM_BASE 
+		SET		SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+				<if test="clmStatCd != null and clmStatCd != ''">
+					, CLM_STAT_CD		= #{clmStatCd}		/* 클레임 상태 코드 */
+				</if>
+				<if test="cncrNo != null">
+					, CNCR_NO			= #{cncrNo}		/* 취소자 번호 */
+					, CNC_DTM			= NOW()			/* 취소 일시 */
+				</if>
+				<if test="cpltrNo != null">
+					, CPLTR_NO			= #{cpltrNo}		/* 완료자 번호 */
+					, CPLT_DTM			= NOW()			/* 완료 일시 */
+				</if>
+		WHERE	CLM_NO			= #{clmNo}
+		<if test='checkClmDtlStatAllEndYn != null and checkClmDtlStatAllEndYn.equals("Y")'>
+		  AND   0 =	( SELECT CLM_ING_COUNT FROM CHECK_CLM_DTL_COUNT )
+		</if>
+	</update>	
+	
+	<select id="selectClaimInfoForDeliveryCahrgeSumAmt" parameterType="biz.app.claim.model.ClaimBasePO"
+		resultType="biz.app.claim.model.ClaimBasePO">
+		select /* QUERYID(claimBase.selectClaimInfoForDeliveryCahrgeSumAmt) */
+			A.CLM_TP_CD, B.CLM_RSN_CD 
+		from claim_base A, claim_detail B 
+		where 
+				a.clm_no = B.clm_no and a.clm_no = 'C20210601000243901' limit 1;
+	</select>
+		
+</mapper>

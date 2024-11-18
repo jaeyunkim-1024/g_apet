@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+
+		<!-- 쿠폰받기 -->
+		<article class="popLayer a popCpnGet" id="popCpnGet">
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">쿠폰받기</h1>
+						<button type="button" class="btnPopClose inpop">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+
+						<div class="btstop">
+							<button type="button" class="bt cpnall" onclick="ui.popBot.open('popOptPdSel');">전체 상품 쿠폰</button>
+							<!-- 쿠폰상품선택 @@02.25 추가 수정 -->
+							<article class="popBot popOptPdSel" id="popOptPdSel">
+								<div class="pbd">
+									<div class="phd">
+										<div class="in">
+											<h1 class="tit">상품선택</h1>
+											<button type="button" class="btnPopInClose"  onclick="ui.popBot.close('popOptPdSel');">닫기</button>
+										</div>
+									</div>
+									<div class="pct">
+										<main class="poptents">
+											<div class="ugdoptlist">
+												<ul class="gdtlist">
+													<li>
+														<div class="unitSel">
+															<div class="box">
+																<div class="infs">
+																	<a href="javascript:;" class="lk">전체 상품 쿠폰</a>
+																</div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+													<li>
+														<div class="unitSel gpic"><!--@@ 상품에 썸네일 있을경우 .gpic 클래스 02.06-->
+															<div class="box">
+																<div class="thum">
+																	<div class="pic"><img class="img" src="../../_images/common/img_default_thumbnail@2x.png" alt="상품"></div>
+																</div>
+																<div class="infs">
+																	<div class="cate">상품1</div>
+																	<a href="javascript:;" class="lk">HOTHALO 스몰브리드 연어&amp;흰살생선 300g 10개 묶음 (+10,000)</a>
+																</div>
+																<div class="price"><em class="p">40,000</em><i class="w">원</i></div>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+										</main>
+									</div>
+								</div>
+							</article>
+							
+						</div>
+						<div class="cupon-wrap">
+							<div class="cupon-area t2 setAutoh" data-dh="60">
+								<ul class="cupon-list">
+									<li>
+										<div class="sale">
+											30,000 만원 할인
+											<div class="uitooltip">
+												<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open('popCpnGud');">이용안내</button>
+												<div class="toolctn">
+													<div class="tptit">이용안내</div>
+													<ul class="tplist">
+														<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다. </li>
+														<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다.</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<p class="s-tit">배송비쿠폰</p>
+										<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>
+										<div class="bottom-item">
+											<div class="txt">
+												<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+												<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+											</div>
+										</div>
+										<button type="button" class="btn-down">
+											쿠폰 다운로드 
+										</button>
+									</li>
+									<li>
+										<div class="sale">
+											30,000 만원 할인
+											<div class="uitooltip">
+												<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open('popCpnGud');">이용안내</button>
+												<div class="toolctn">
+													<div class="tptit">이용안내</div>
+													<ul class="tplist">
+														<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다. </li>
+														<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다.</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<p class="s-tit">배송비쿠폰</p>
+										<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>
+										<div class="bottom-item">
+											<div class="txt">
+												<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+												<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+											</div>
+										</div>
+										<button type="button" class="btn-down">
+											쿠폰 다운로드 
+										</button>
+									</li>
+									<li>
+										<div class="sale">
+											30,000 만원 할인
+											<div class="uitooltip">
+												<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open('popCpnGud');">이용안내</button>
+												<div class="toolctn">
+													<div class="tptit">이용안내</div>
+													<ul class="tplist">
+														<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다. </li>
+														<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다.</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<p class="s-tit">배송비쿠폰</p>
+										<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>
+										<div class="bottom-item">
+											<div class="txt">
+												<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+												<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+											</div>
+										</div>
+										<button type="button" class="btn-down">
+											쿠폰 다운로드 
+										</button>
+									</li>
+									<li class="disabled">
+										<div class="sale">
+											20% 할인
+											<div class="uitooltip">
+												<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open('popCpnGud');">이용안내</button>
+												<div class="toolctn">
+													<div class="tptit">이용안내</div>
+													<ul class="tplist">
+														<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다. </li>
+														<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다.</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+										<p class="s-tit">배송비쿠폰</p>
+										<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>
+										<div class="bottom-item">
+											<div class="txt">
+												<p>1000원 이상 구매 시 / 최대 5000원 할인</p>
+												<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>
+											</div>
+										</div>
+										<button type="button" class="btn-down" disabled>
+											쿠폰 다운로드 
+										</button>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</main>
+				</div>
+				<div class="pbt">
+					<div class="bts">
+						<button type="button" class="btn xl a btnGet">쿠폰 모두 받기</button>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<!-- 쿠폰이용안내 -->
+		<!-- @@ PC에선 하단 팝업.  MO에선 툴팁으로 해달래요 ㅜㅜ -->
+		<article class="popBot popCpnGud k0427" id="popCpnGud"><!-- 04.27 -->
+			<div class="pbd">
+				<div class="phd">
+					<div class="in">
+						<h1 class="tit">이용안내</h1>
+						<button type="button" class="btnPopClose">닫기</button>
+					</div>
+				</div>
+				<div class="pct">
+					<main class="poptents">
+						
+						<ul class="tplist">
+							<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>
+							<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>
+						</ul>
+					
+					</main>
+				</div>
+			</div>
+		</article>
+
+
+		<script>
+			ui.popLayer.open("popCpnGet");
+
+			var isScrBot = true ; 
+			$("#popCpnGet .pct").on("scroll resize",function(){
+				var scTop = $(this).scrollTop();
+				var scBox = $(this).outerHeight();
+				var scCtn = $(this).prop("scrollHeight");
+				// console.log(scTop, scBox, scCtn , scTop+scBox);
+				if (scCtn <= scTop + scBox && isScrBot == true) {
+					console.log("바닥");
+					isScrBot = false;
+					setTimeout(function(){
+						$("#popCpnGet .cupon-list").append(couponHtml);
+						isScrBot = true;
+					},500);
+				}
+			});
+
+			var couponHtml = 
+				'<li>'+
+				'	<div class="sale">'+
+				'		30,000 만원 할인'+
+				'		<div class="uitooltip">'+
+				'			<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open(\'popCpnGud\');">이용안내</button>'+
+				'			<div class="toolctn">'+
+				'				<div class="tptit">이용안내</div>'+
+				'				<ul class="tplist">'+
+				'					<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>'+
+				'					<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>'+
+				'				</ul>'+
+				'			</div>'+
+				'		</div>'+
+				'	</div>'+
+				'	<p class="s-tit">배송비쿠폰</p>'+
+				'	<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>'+
+				'	<div class="bottom-item">'+
+				'		<div class="txt">'+
+				'			<p>1000원 이상 구매 시 / 최대 5000원 할인</p>'+
+				'			<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>'+
+				'		</div>'+
+				'	</div>'+
+				'	<button type="button" class="btn-down">쿠폰 다운로드</button>'+
+				'</li>'+
+				'<li>'+
+				'	<div class="sale">'+
+				'		30,000 만원 할인'+
+				'		<div class="uitooltip">'+
+				'			<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open(\'popCpnGud\');">이용안내</button>'+
+				'			<div class="toolctn">'+
+				'				<div class="tptit">이용안내</div>'+
+				'				<ul class="tplist">'+
+				'					<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>'+
+				'					<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>'+
+				'				</ul>'+
+				'			</div>'+
+				'		</div>'+
+				'	</div>'+
+				'	<p class="s-tit">배송비쿠폰</p>'+
+				'	<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>'+
+				'	<div class="bottom-item">'+
+				'		<div class="txt">'+
+				'			<p>1000원 이상 구매 시 / 최대 5000원 할인</p>'+
+				'			<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>'+
+				'		</div>'+
+				'	</div>'+
+				'	<button type="button" class="btn-down">쿠폰 다운로드</button>'+
+				'</li>';
+				'<li>'+
+				'	<div class="sale">'+
+				'		30,000 만원 할인'+
+				'		<div class="uitooltip">'+
+				'			<button type="button" class="btn i btnTooltop" onclick="ui.popBot.open(\'popCpnGud\');">이용안내</button>'+
+				'			<div class="toolctn">'+
+				'				<div class="tptit">이용안내</div>'+
+				'				<ul class="tplist">'+
+				'					<li>‘미용/목욕’ 카테고리에서만 사용 가능한 쿠폰입니다.</li>'+
+				'					<li>쿠폰 등록 시 이용안내에 입력한 내용이 노출됩니다</li>'+
+				'				</ul>'+
+				'			</div>'+
+				'		</div>'+
+				'	</div>'+
+				'	<p class="s-tit">배송비쿠폰</p>'+
+				'	<p class="tit">[상품쿠폰] 내추럴 발란스 추가 할인</p>'+
+				'	<div class="bottom-item">'+
+				'		<div class="txt">'+
+				'			<p>1000원 이상 구매 시 / 최대 5000원 할인</p>'+
+				'			<p>2020.12.01 00:00 ~ 2030.12.31 00:00</p>'+
+				'		</div>'+
+				'	</div>'+
+				'	<button type="button" class="btn-down">쿠폰 다운로드</button>'+
+				'</li>';
+
+		</script>
+
+</body>
+</html>

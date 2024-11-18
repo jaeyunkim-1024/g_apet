@@ -1,0 +1,1061 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="push">
+	<select id="pageNoticeSendList" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.pageNoticeSendList
+			Description : 알림 메시지 목록
+			- BO
+		-->
+		SELECT NSL.NOTICE_SEND_NO
+				, NSL.NOTICE_TYPE_CD
+				, NSL.SUBJECT
+				, NSL.CONTENTS
+				, NSL.SNDR_NO
+				, NSL.SENDER_EMAIL
+				, NSL.TMPL_NO
+				, NSL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSL.REQ_RST_CD
+				, NSL.SYS_REGR_NO
+				, NSL.SYS_REG_DTM
+				, NSL.SYS_UPDR_NO
+				, NSL.SYS_UPD_DTM
+				, NSL.SND_TYPE_CD
+				, NSL.OUTSIDE_REQ_ID
+				, NTI.CTG_CD
+				, (SELECT COUNT(*)
+					FROM NOTICE_SEND_DETAIL_LIST
+					WHERE 1 = 1
+						AND NOTICE_SEND_NO = NSL.NOTICE_SEND_NO) AS NOTICE_MSG_CNT
+				, (SELECT COUNT(*)
+					FROM NOTICE_SEND_DETAIL_LIST
+					WHERE 1 = 1
+						AND SND_RST_CD = '${@framework.common.constants.CommonConstants@SND_RST_F}'
+						AND NOTICE_SEND_NO = NSL.NOTICE_SEND_NO) AS FAIL_CNT
+				, FN_GET_USER_NAME(NSL.SYS_REGR_NO) AS SYS_REGR_NM
+		FROM NOTICE_SEND_LIST NSL
+		LEFT JOIN NOTICE_TMPL_INFO NTI ON NSL.TMPL_NO = NTI.TMPL_NO
+		WHERE 1 = 1
+		<if test="pushTpGb == 'status'">
+			AND NSL.SEND_REQ_DTM <![CDATA[ < ]]> NOW()
+		</if>
+		<if test="pushTpGb == 'reserve'">
+			AND NSL.SEND_REQ_DTM <![CDATA[ > ]]> NOW()
+			AND NSL.NOTICE_TYPE_CD = '${@framework.common.constants.CommonConstants@NOTICE_TYPE_20}'
+		</if>
+		<if test="noticeTypeCd != null and noticeTypeCd != ''">
+			AND NSL.NOTICE_TYPE_CD = #{noticeTypeCd}
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			AND NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="strtDate != null and endDate != null">
+			<if test="dateSearchGb == '10' or dateSearchGb == null or dateSearchGb == ''">
+				AND NSL.SEND_REQ_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)			
+			</if>
+			<if test="dateSearchGb == '20'">
+				AND NSL.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+			</if>
+		</if>
+		<if test="searchTxt != null and searchTxt != ''">
+			<if test="searchGb == '10'">
+				AND NSL.SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			</if>
+			<if test="searchGb == '20'">
+				AND NSL.CONTENTS LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			</if>
+			<if test="searchGb == '30'">
+				AND (
+					NSL.SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%') OR NSL.CONTENTS LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+				)
+			</if>
+		</if>
+		ORDER BY NSL.SEND_REQ_DTM DESC, NSL.NOTICE_SEND_NO DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageNoticeSendListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : push.pageNoticeSendListCount
+			Description : 알림 메시지 목록 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM NOTICE_SEND_LIST NSL
+		LEFT JOIN NOTICE_TMPL_INFO NTI ON NSL.TMPL_NO = NTI.TMPL_NO
+		WHERE 1 = 1
+		<if test="pushTpGb == 'status'">
+			AND NSL.SEND_REQ_DTM <![CDATA[ < ]]> NOW()
+		</if>
+		<if test="pushTpGb == 'reserve'">
+			AND NSL.SEND_REQ_DTM <![CDATA[ > ]]> NOW()
+			AND NSL.NOTICE_TYPE_CD = '${@framework.common.constants.CommonConstants@NOTICE_TYPE_20}'
+		</if>
+		<if test="noticeTypeCd != null and noticeTypeCd != ''">
+			AND NSL.NOTICE_TYPE_CD = #{noticeTypeCd}
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			AND NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="strtDate != null and endDate != null">
+			<if test="dateSearchGb == '10' or dateSearchGb == null or dateSearchGb == ''">
+				AND NSL.SEND_REQ_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)			
+			</if>
+			<if test="dateSearchGb == '20'">
+				AND NSL.SYS_REG_DTM BETWEEN #{strtDate} AND DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+			</if>
+		</if>
+		<if test="searchTxt != null and searchTxt != ''">
+			<if test="searchGb == '10'">
+				AND NSL.SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			</if>
+			<if test="searchGb == '20'">
+				AND NSL.CONTENTS LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			</if>
+			<if test="searchGb == '30'">
+				AND (
+					NSL.SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%') OR NSL.CONTENTS LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+				)
+			</if>
+		</if>
+	</select>
+	
+	<!-- 예약 발송 리스트 조회  resultMap -->
+	<resultMap type="biz.app.appweb.model.NoticeSendListVO" id="listRsrvNoticeMap">	
+		<id		property="noticeSendNo"		column="NOTICE_SEND_NO"/>		<!-- 이력 통지 번호 -->
+		<result property="noticeTypeCd"		column="NOTICE_TYPE_CD"/>		<!-- 발송 방식 코드 -->
+		<result property="tmplNo"			column="TMPL_NO"/>				<!-- 템플릿 번호 -->
+		<result property="subject"			column="SUBJECT"/>				<!-- 제목 -->
+		<result property="contents"			column="CONTENTS"/>				<!-- 내용 -->
+		<result property="deviceTypeCd"		column="DEVICE_TYPE_CD"/>		<!-- 디바이스 종류 -->
+		<result property="sndrNo"			column="SNDR_NO"/>				<!-- 발신자 번호 -->
+		<result property="senderEmail"		column="SENDER_EMAIL"/>			<!-- 보내는 사람 이메일 -->
+		<result property="sendReqYn"		column="SEND_REQ_YN"/>			<!-- 발송 요청 여부 -->
+		<result property="sendReqDtm"		column="SEND_REQ_DTM"/>			<!-- 발송 요청 일시 -->
+		<result property="reqRstCd"			column="REQ_RST_CD"/>			<!-- 요청 결과 코드 -->
+		<result property="outsideReqId"		column="OUTSIDE_REQ_ID"/>		<!-- 외부API 요청 아이디 -->
+		<result property="sndTypeCd"		column="SND_TYPE_CD"/>			<!-- 전송 방식 -->
+        <collection property="detailList" 	column="NOTICE_SEND_NO"  javaType="java.util.ArrayList" ofType="biz.app.appweb.model.NoticeSendListDetailVO" select="listRsrvNoticeDetail"/>
+	</resultMap>
+	
+	<select id="listRsrvNotice" resultMap="listRsrvNoticeMap">
+		<!--
+			Query Name : push.listRsrvNotice
+			Description : 예약 발송 리스트 조회
+		-->
+		SELECT
+				NSL.NOTICE_SEND_NO
+				, NSL.NOTICE_TYPE_CD
+				, NSL.TMPL_NO
+				, NSL.SUBJECT
+				, NSL.CONTENTS
+				, NSL.DEVICE_TYPE_CD
+				, NSL.SNDR_NO
+				, NSL.SENDER_EMAIL
+				, NSL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSL.REQ_RST_CD
+				, NSL.OUTSIDE_REQ_ID
+				, NSL.SND_TYPE_CD				
+		FROM NOTICE_SEND_LIST NSL
+		WHERE 1=1
+		<if test="noticeSendNo != null and noticeSendNo != ''">
+		AND		NSL.NOTICE_SEND_NO = #{noticeSendNo}
+		</if>
+		<if test="noticeTypeCd != null and noticeTypeCd != ''">
+		AND		NSL.NOTICE_TYPE_CD = #{noticeTypeCd}
+		</if>
+		<if test="sendReqYn != null and sendReqYn != ''">
+		AND		NSL.SEND_REQ_YN = #{sendReqYn}
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+		AND		NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="endDate != null ">
+		AND		NSL.SEND_REQ_DTM &lt; #{endDate}
+		</if>
+		ORDER BY NSL.SEND_REQ_DTM DESC
+	</select>
+	
+		
+	<select id="listRsrvNoticeDetail" resultType="biz.app.appweb.model.NoticeSendListDetailVO">
+		<!--
+			Query Name : push.listRsrvNotice
+			Description : 예약 발송 상세 리스트 조회
+		-->
+		SELECT
+				NSDL.HIST_DTL_NO
+				, NSDL.SND_INFO
+				, NSDL.MBR_NO
+				, NSDL.DEVICE_TYPE_CD
+				, NSDL.DEVICE_TKN
+				, NSDL.RCVR_NO
+				, NSDL.RECEIVER_EMAIL
+				, NSDL.SEND_REQ_YN
+				, NSDL.SEND_REQ_DTM
+				, NSDL.SND_RST_CD
+				, NSDL.OUTSIDE_REQ_DTL_ID
+		FROM NOTICE_SEND_DETAIL_LIST NSDL
+		WHERE NOTICE_SEND_NO = #{noticeSendNo}
+		
+	</select>
+	
+	<select id="listSentNoticeDetail" resultType="biz.app.appweb.model.NoticeSendListDetailVO">
+		<!--
+			Query Name : push.listSentNoticeDetail
+			Description : 발송 상세 리스트 조회 (이력 미입력 데이터)
+		-->
+		SELECT
+				NSDL.HIST_DTL_NO
+				, NSDL.SND_INFO
+				, NSDL.MBR_NO
+				, NSDL.DEVICE_TYPE_CD
+				, NSDL.DEVICE_TKN
+				, NSDL.RCVR_NO
+				, NSDL.RECEIVER_EMAIL
+				, NSDL.SEND_REQ_YN
+				, NSDL.SEND_REQ_DTM
+				, NSDL.SND_RST_CD
+				, NSDL.OUTSIDE_REQ_DTL_ID
+				, NSL.NOTICE_SEND_NO
+				, NSL.SND_TYPE_CD
+				, NSL.OUTSIDE_REQ_ID
+		FROM NOTICE_SEND_DETAIL_LIST NSDL
+		INNER JOIN NOTICE_SEND_LIST NSL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+		WHERE 1=1
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+		AND		NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test='sndRstCdNullYn != null and sndRstCdNullYn.equals("Y")'>
+		AND		NSDL.SND_RST_CD IS NULL
+		</if>
+		<if test="sendReqYn != null and sendReqYn != ''">
+		AND		NSL.SEND_REQ_YN = #{sendReqYn}
+		</if>
+	</select>
+	
+	<select id="getPushMessage" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.getPushMessage
+			Description : 알림 메시지 발송 현황 상세
+			- BO
+		-->
+		SELECT NSL.NOTICE_SEND_NO
+				, NSL.NOTICE_TYPE_CD
+				, NSL.SUBJECT
+				, NSL.CONTENTS
+				, NSL.SNDR_NO
+				, NSL.SENDER_EMAIL
+				, NSL.TMPL_NO
+				, NSL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSL.REQ_RST_CD
+				, NSL.SYS_REGR_NO
+				, NSL.SYS_REG_DTM
+				, NSL.SYS_UPDR_NO
+				, NSL.SYS_UPD_DTM
+				, NSL.SND_TYPE_CD
+				, NSL.OUTSIDE_REQ_ID
+				, NSL.DEVICE_TYPE_CD
+				, (SELECT COUNT(*)
+					FROM NOTICE_SEND_DETAIL_LIST
+					WHERE 1 = 1
+						AND NOTICE_SEND_NO = NSL.NOTICE_SEND_NO) AS NOTICE_MSG_CNT
+				, (SELECT COUNT(*)
+					FROM NOTICE_SEND_DETAIL_LIST
+					WHERE 1 = 1
+						AND SND_RST_CD = '${@framework.common.constants.CommonConstants@SND_RST_S}'
+						AND NOTICE_SEND_NO = #{noticeSendNo}) AS SUCCESS_CNT
+				, (SELECT COUNT(*)
+					FROM NOTICE_SEND_DETAIL_LIST
+					WHERE 1 = 1
+						AND SND_RST_CD = '${@framework.common.constants.CommonConstants@SND_RST_F}'
+						AND NOTICE_SEND_NO = #{noticeSendNo}) AS FAIL_CNT
+		FROM NOTICE_SEND_LIST NSL
+		WHERE 1 = 1
+			AND NSL.NOTICE_SEND_NO = #{noticeSendNo}
+	</select>
+	
+	<select id="pageNoticeCnt" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.pageNoticeCnt
+			Description : 알림 메시지 발송건수 목록
+			- BO
+		-->
+		SELECT NSL.NOTICE_SEND_NO
+				, NSDL.HIST_DTL_NO
+				, NSL.NOTICE_TYPE_CD
+				, NSL.SUBJECT
+				, NSL.CONTENTS
+				, NSL.SNDR_NO
+				, NSL.SENDER_EMAIL
+				, NSL.TMPL_NO
+				, NSL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSDL.SND_RST_CD
+				, NSL.SYS_REGR_NO
+				, NSL.SYS_REG_DTM
+				, NSL.SYS_UPDR_NO
+				, NSL.SYS_UPD_DTM
+				, NSL.SND_TYPE_CD
+				, MB.LOGIN_ID
+				, MB.MBR_GB_CD
+				, NSL.OUTSIDE_REQ_ID
+		FROM NOTICE_SEND_LIST NSL
+		INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSL.NOTICE_SEND_NO = NSDL.NOTICE_SEND_NO
+		LEFT JOIN MEMBER_BASE MB ON NSDL.MBR_NO = MB.MBR_NO
+		WHERE 1 = 1
+			AND NSL.NOTICE_SEND_NO = #{noticeSendNo}
+			AND NSL.SEND_REQ_DTM <![CDATA[ < ]]> NOW()
+		ORDER BY NSL.SEND_REQ_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageNoticeCntCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : push.pagePushCntCount
+			Description : 알림 메시지 발송건수 목록 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM NOTICE_SEND_LIST NSL
+		INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSL.NOTICE_SEND_NO = NSDL.NOTICE_SEND_NO
+		LEFT JOIN MEMBER_BASE MB ON NSDL.MBR_NO = MB.MBR_NO
+		WHERE 1 = 1
+			AND NSL.NOTICE_SEND_NO = #{noticeSendNo}
+			AND NSL.SEND_REQ_DTM <![CDATA[ < ]]> NOW()
+	</select>
+	
+	<select id="pageNoticeTemplate" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.pageNoticeTemplate
+			Description : 알림 메시지 템플릿 목록
+			- BO
+		-->
+		SELECT TMPL_NO
+				, ST_ID
+				, CTG_CD
+				, SND_TYPE_CD
+				, USE_YN
+				, SUBJECT
+				, CONTENTS
+				, IMG_PATH
+				, MOV_PATH
+				, TMPL_CD
+				, SYS_CD
+				, SYS_USE_YN
+				, TMPL_CD AS TMPL_CODE
+				, SYS_CD AS SYS_CODE
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+				, CONCAT(FN_GET_USER_NAME(SYS_REGR_NO), CONCAT('(',FN_GET_USER_ID(SYS_REGR_NO),')')) AS SYS_REGR_NM
+				, CONCAT(FN_GET_USER_NAME(SYS_UPDR_NO), CONCAT('(',FN_GET_USER_ID(SYS_UPDR_NO),')')) AS SYS_UPDR_NM
+		FROM NOTICE_TMPL_INFO
+		WHERE 1 = 1
+			AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		<if test="tmplPopGb == @framework.common.constants.CommonConstants@COMM_YN_Y">
+			AND SYS_USE_YN = '${@framework.common.constants.CommonConstants@SYS_USE_YN_N}'
+			AND SND_TYPE_CD != '${@framework.common.constants.CommonConstants@SND_TYPE_30}'
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			AND SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="ctgCd != null and ctgCd != ''">
+			AND CTG_CD = #{ctgCd}
+		</if>
+		<if test="searchTxt != null and searchTxt != ''">
+			AND (
+			SYS_CD LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			OR TMPL_CD LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			OR SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			)
+		</if>
+		ORDER BY SYS_REG_DTM DESC
+		<include refid="bizCommon.pageSql" />
+	</select>
+	
+	<select id="pageNoticeTemplateCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : push.pageNoticeTemplateCount
+			Description : 알림 메시지 템플릿 목록 count
+			- BO
+		-->
+		SELECT COUNT(*)
+		FROM NOTICE_TMPL_INFO
+		WHERE 1 = 1
+			AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		<if test="tmplPopGb == @framework.common.constants.CommonConstants@COMM_YN_Y">
+			AND SYS_USE_YN = '${@framework.common.constants.CommonConstants@SYS_USE_YN_N}'
+			AND SND_TYPE_CD != '${@framework.common.constants.CommonConstants@SND_TYPE_30}'
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			AND SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="ctgCd != null and ctgCd != ''">
+			AND CTG_CD = #{ctgCd}
+		</if>
+		<if test="searchTxt != null and searchTxt != ''">
+			AND (
+			SYS_CD LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			OR TMPL_CD LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			OR SUBJECT LIKE CONCAT('%', TRIM(#{searchTxt}), '%')
+			)
+		</if>
+	</select>
+	
+	<select id="getNoticeTemplate" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.getNoticeTemplate
+			Description : 알림 메시지 템플릿 단건 조회
+			- BO
+		-->
+		SELECT TMPL_NO
+				, ST_ID
+				, CTG_CD
+				, SND_TYPE_CD
+				, USE_YN
+				, SUBJECT
+				, CONTENTS
+				, IMG_PATH
+				, MOV_PATH
+				, TMPL_CD
+				, SYS_CD
+				, SYS_USE_YN
+				, IMG_PATH
+				, MOV_PATH
+				, SYS_REGR_NO
+				, SYS_REG_DTM
+				, SYS_UPDR_NO
+				, SYS_UPD_DTM
+		FROM NOTICE_TMPL_INFO
+		WHERE 1 = 1
+			AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+			<if test="tmplNo != null and tmplNo != ''">
+				AND TMPL_NO = #{tmplNo}
+			</if>
+			<if test="tmplCd != null and tmplCd != ''">
+				AND TMPL_CD = #{tmplCd}
+			</if>
+			<if test="sysCd != null and sysCd != ''">
+				AND SYS_CD = #{sysCd}
+			</if>
+		ORDER BY SYS_REG_DTM DESC
+		LIMIT 1
+	</select>
+	
+	<insert id="insertNoticeTemplate" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.insertNoticeTemplate
+			Description : 알림 메시지 템플릿 등록
+			- BO
+		-->
+		INSERT INTO NOTICE_TMPL_INFO (
+			TMPL_NO
+			, ST_ID
+			, CTG_CD
+			, SND_TYPE_CD
+			, USE_YN
+			, SUBJECT
+			, CONTENTS
+			, IMG_PATH
+			, MOV_PATH
+			, TMPL_CD
+			, SYS_CD
+			, SYS_USE_YN
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)
+		VALUES (
+			#{tmplNo}
+			, #{stId}
+			, #{ctgCd}
+			, #{sndTypeCd}
+			, #{useYn}
+			, #{subject}
+			, #{contents}
+			, #{imgPath}
+			, #{movPath}
+			, #{tmplCd}
+			, #{sysCd}
+			, #{sysUseYn}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateNoticeTemplate" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.updateNoticeTemplate
+			Description : 알림 메시지 템플릿 수정
+			- BO
+		-->
+		UPDATE NOTICE_TMPL_INFO SET
+			SYS_CD = #{sysCd}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		<if test="ctgCd != null and ctgCd != ''">
+			, CTG_CD = #{ctgCd}
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			, SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="subject != null and subject != ''">
+			, SUBJECT = #{subject}
+		</if>
+		<if test="contents != null and contents != ''">
+			, CONTENTS = #{contents}
+		</if>
+		<if test="imgPath != null and imgPath != ''">
+			, IMG_PATH = #{imgPath}
+		</if>
+		<if test="movPath != null and movPath != ''">
+			, MOV_PATH = #{movPath}
+		</if>
+		<if test="sysUseYn != null and sysUseYn != ''">
+			, SYS_USE_YN = #{sysUseYn}
+		</if>
+		<if test="tmplCd != null and tmplCd != ''">
+			, TMPL_CD = #{tmplCd}
+		</if>
+		WHERE 1 = 1
+			AND TMPL_NO = #{tmplNo}
+	</update>
+	
+	<update id="deleteNoticeTemplate" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.deleteNoticeTemplate
+			Description : 알림 메시지 템플릿 삭제
+			- BO
+		-->
+		UPDATE NOTICE_TMPL_INFO SET
+			USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+		WHERE 1 = 1
+			AND TMPL_NO = #{tmplNo}
+	</update>
+	
+	<select id="listPushMsgSendView" resultType="biz.app.appweb.model.PushVO">
+		<!--
+			Query Name : push.listPushMsgSendView
+			Description : 알림 메시지 발송 정보 목록
+			- BO
+		-->
+		SELECT NSL.NOTICE_SEND_NO
+				, NSL.NOTICE_TYPE_CD
+				, NSL.SNDR_NO
+				, NSL.SENDER_EMAIL
+				, NSL.TMPL_NO
+				, NSL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSL.REQ_RST_CD
+				, NSL.SYS_REGR_NO
+				, NSL.SYS_REG_DTM
+				, NSL.SYS_UPDR_NO
+				, NSL.SYS_UPD_DTM
+				, NSL.SND_TYPE_CD
+				, NSL.SUBJECT
+				, NSL.CONTENTS
+				, NTI.IMG_PATH
+				, NTI.MOV_PATH
+				, NTI.TMPL_CD
+				, NSL.OUTSIDE_REQ_ID
+				, IFNULL(IFNULL(MB.MBR_NO, UB.USR_NO), '${@framework.common.constants.CommonConstants@NO_MEMBER_NO}') AS MBR_NO
+				, IFNULL(IFNULL(MB.MBR_NM, UB.USR_NM), '${@framework.common.constants.CommonConstants@NO_MEMBER_NM}') AS MBR_NM
+				, IFNULL(IFNULL(MB.LOGIN_ID, UB.LOGIN_ID), '${@framework.common.constants.CommonConstants@NO_MEMBER_NM}') AS LOGIN_ID
+				, NSDL.SND_INFO
+				, NSL.DEVICE_TYPE_CD
+		FROM NOTICE_SEND_LIST NSL
+		INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSL.NOTICE_SEND_NO = NSDL.NOTICE_SEND_NO
+		LEFT JOIN MEMBER_BASE MB ON NSDL.MBR_NO = MB.MBR_NO
+		LEFT JOIN USER_BASE UB ON NSDL.MBR_NO = UB.USR_NO
+		LEFT JOIN NOTICE_TMPL_INFO NTI ON NSL.TMPL_NO = NTI.TMPL_NO
+		WHERE 1 = 1
+			AND NSL.NOTICE_SEND_NO = #{noticeSendNo}
+	</select>
+
+	<select id="pageNoticeSendListByDailiy" resultType="biz.app.appweb.model.NoticeSendCommonVO">
+		<!--
+			Query Name : push.pageNoticeSendListByDailiy
+			Description : 알림 메시지 발송 정보 목록
+			Writter : 김재윤
+		-->
+		SELECT	A.*, @rownum := @rownum+1 AS ROW_NUM
+		FROM
+		(
+			SELECT      /* QUERYID(push.pageNoticeSendListByDailiy) */
+			       		NSL.NOTICE_SEND_NO
+					,   NSL.SEND_REQ_DTM
+					,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@SND_TYPE}',NTL.SND_TYPE_CD,'') AS SND_TYPE_NM
+			     	,	IF(		INSTR(GROUP_CONCAT(NSL.REQ_RST_CD),'${@framework.common.constants.CommonConstants@REQ_RST_F}')>0 || GROUP_CONCAT(NSL.REQ_RST_CD) IS NULL
+			     	    	,	FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@REQ_RST}','${@framework.common.constants.CommonConstants@REQ_RST_F}','')
+			     	    	,	FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@REQ_RST}','${@framework.common.constants.CommonConstants@REQ_RST_S}','') ) AS SND_RST_NM
+					,   NSL.SUBJECT
+					,   count(*) AS CNT
+					,	NTL.SYS_CD
+			FROM notice_send_list NSL
+			INNER JOIN notice_tmpl_info NTL ON NSL.SUBJECT = NTL.SUBJECT
+			INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSL.NOTICE_SEND_NO = NSDL.NOTICE_SEND_NO 
+			WHERE NTL.CTG_CD = #{ctgCd}
+			AND NSDL.MBR_NO IN (SELECT MBR_NO FROM MEMBER_BASE WHERE MBR_STAT_CD NOT IN ('30', '50'))
+			<include refid="whereNoticeSend"/>
+			GROUP BY DATE_FORMAT(NSL.SEND_REQ_DTM,'%Y.%m.%d'),NTL.SND_TYPE_CD <if test="sysCds != null"> , NTL.SYS_CD </if>
+			<if test="reqRstCd != null and reqRstCd != ''">
+				<choose>
+					<when test='reqRstCd == "S"'>
+						HAVING INSTR(GROUP_CONCAT(NSL.REQ_RST_CD),'${@framework.common.constants.CommonConstants@REQ_RST_F}') = 0
+					</when>
+					<otherwise>
+						HAVING INSTR(GROUP_CONCAT(NSL.REQ_RST_CD),'${@framework.common.constants.CommonConstants@REQ_RST_F}') > 0 || GROUP_CONCAT(NSL.REQ_RST_CD) IS NULL
+					</otherwise>
+				</choose>
+			</if>
+			ORDER BY NOTICE_SEND_NO ASC
+		) A , (SELECT @rownum :=0) AS R
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageNoticeSendListByDailiyCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM (
+			SELECT DATE_FORMAT(NSL.SEND_REQ_DTM,'%Y.%m.%d'),NTL.SND_TYPE_CD <if test="sysCds != null"> , NTL.SYS_CD </if>
+			FROM notice_send_list NSL
+			INNER JOIN notice_tmpl_info NTL ON NSL.SUBJECT = NTL.SUBJECT
+			INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSL.NOTICE_SEND_NO = NSDL.NOTICE_SEND_NO 
+			WHERE NTL.CTG_CD = #{ctgCd}
+			AND NSDL.MBR_NO IN (SELECT MBR_NO FROM MEMBER_BASE WHERE MBR_STAT_CD NOT IN ('30', '50'))
+			<include refid="whereNoticeSend"/>
+		GROUP BY DATE_FORMAT(NSL.SEND_REQ_DTM,'%Y.%m.%d'),NTL.SND_TYPE_CD <if test="sysCds != null"> , NTL.SYS_CD </if>
+		<if test="reqRstCd != null and reqRstCd != ''">
+			<choose>
+				<when test='reqRstCd == "S"'>
+					HAVING INSTR(GROUP_CONCAT(NSL.REQ_RST_CD),'${@framework.common.constants.CommonConstants@REQ_RST_F}') = 0
+				</when>
+				<otherwise>
+					HAVING INSTR(GROUP_CONCAT(NSL.REQ_RST_CD),'${@framework.common.constants.CommonConstants@REQ_RST_F}') > 0 || GROUP_CONCAT(NSL.REQ_RST_CD) IS NULL
+				</otherwise>
+			</choose>
+		</if>
+		) T
+	</select>
+
+	<select id="pageNoticeSendListForMbr" resultType="biz.app.appweb.model.NoticeSendCommonVO">
+		<!--
+			Query Name : push.pageNoticeSendListForMbr
+			Description : 알림 메시지 발송 정보 목록
+			Writter : 김재윤
+		-->
+		SELECT	*
+		FROM	
+		(
+			SELECT   	/* QUERYID(push.pageNoticeSendListForMbr) */
+					@rownum := @rownum+1 AS ROW_NUM
+					, 	NSL.SEND_REQ_DTM 
+			       	,	NSDL.HIST_DTL_NO
+			       	,	NSDL.NOTICE_SEND_NO
+	<!-- 				,   NSDL.SEND_REQ_DTM -->
+			     	,	NSL.SND_TYPE_CD
+					,   FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@SND_TYPE}',NSL.SND_TYPE_CD,'') AS SND_TYPE_NM
+					,	FN_GET_CODE_NAME('${@framework.common.constants.CommonConstants@SND_RST}',IFNULL(NSDL.SND_RST_CD,'${@framework.common.constants.CommonConstants@SND_RST_F}'),'') AS SND_RST_NM
+					,   NSDL.SUBJECT
+			     	,	NSDL.CONTENTS
+			     	,	NSDL.SND_INFO
+					,   NSDL.MBR_NO
+			     	,	NSDL.RCVR_NO
+			     	,	NSDL.RECEIVER_EMAIL
+					,   FN_GET_MEMBER_NAME(NSDL.MBR_NO) AS MBR_NM
+					,   (SELECT LOGIN_ID FROM MEMBER_BASE WHERE MBR_NO = NSDL.MBR_NO) AS LOGIN_ID
+			FROM notice_send_detail_list NSDL
+			INNER JOIN notice_send_list NSL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+			INNER JOIN notice_tmpl_info NTL ON NSL.SUBJECT = NTL.SUBJECT
+			INNER JOIN MEMBER_BASE MB ON NSDL.MBR_NO = MB.MBR_NO
+			, (SELECT @rownum :=0) AS R
+			WHERE NTL.CTG_CD = #{ctgCd}
+				AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}', '${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+			<include refid="whereNoticeSend"/>
+		) A
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+	<select id="pageNoticeSendListForMbrCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM notice_send_detail_list NSDL
+		INNER JOIN notice_send_list NSL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+		INNER JOIN notice_tmpl_info NTL ON NSL.SUBJECT = NTL.SUBJECT
+			INNER JOIN MEMBER_BASE MB ON NSDL.MBR_NO = MB.MBR_NO
+		WHERE NTL.CTG_CD = #{ctgCd}
+			AND MB.MBR_STAT_CD NOT IN ('${@framework.common.constants.CommonConstants@MBR_STAT_30}', '${@framework.common.constants.CommonConstants@MBR_STAT_50}')
+		<include refid="whereNoticeSend"/>
+	</select>
+
+	<sql id="whereNoticeSend">
+		<if test="sendReqStrtDtm != null and sendReqEndDtm != null">
+			AND NSL.SEND_REQ_DTM BETWEEN #{sendReqStrtDtm} AND DATE_ADD(#{sendReqEndDtm}, INTERVAL 1 DAY)
+		</if>
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+			AND NTL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test="sysCds != null">
+			<foreach collection="sysCds" item="item" separator="," open="AND NTL.SYS_CD IN  (" close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="sysCd != null and sysCd != ''">
+			AND NTL.SYS_CD = #{sysCd}
+		</if>
+	</sql>
+	
+	<insert id="insertNoticeSendList" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.insertNoticeSendList
+			Description : 알림 메시지 발송 정보 등록
+			- BO
+		-->
+		<selectKey keyProperty="noticeSendNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT
+			FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_NOTICE_SEND_LIST_SEQ}')
+			FROM DUAL
+		</selectKey>
+		INSERT INTO NOTICE_SEND_LIST (
+			NOTICE_SEND_NO
+			, NOTICE_TYPE_CD
+			, SUBJECT
+			, CONTENTS
+			, SNDR_NO
+			, SENDER_EMAIL
+			, TMPL_NO
+			, SEND_REQ_YN
+			, SEND_REQ_DTM
+			, REQ_RST_CD
+			, OUTSIDE_REQ_ID
+			, SND_TYPE_CD
+			, DEVICE_TYPE_CD
+			, INFO_TP_CD
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{noticeSendNo}
+			, #{noticeTypeCd}
+			, #{subject}
+			, #{contents}
+			, #{sndrNo}
+			, #{senderEmail}
+			, #{tmplNo}
+			, #{sendReqYn}
+			, #{sendReqDtm}
+			, #{reqRstCd}
+			, #{outsideReqId}
+			, #{sndTypeCd}
+			, #{deviceTypeCd}
+			, #{infoTpCd}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateNoticeSendList" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.updateNoticeSendList
+			Description : 알림 메시지 발송 정보 수정
+			- BO
+		-->
+		UPDATE NOTICE_SEND_LIST SET
+			SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		<if test="noticeTypeCd != null and noticeTypeCd != ''">
+			, NOTICE_TYPE_CD = #{noticeTypeCd}
+		</if>
+		<if test="deviceTypeCd != null and deviceTypeCd != ''">
+			, DEVICE_TYPE_CD = #{deviceTypeCd}
+		</if>
+		<if test="tmplNo != null and tmplNo != ''">
+			, TMPL_NO = #{tmplNo}
+		</if>
+		<if test="subject != null and subject != ''">
+			, SUBJECT = #{subject}
+		</if>
+		<if test="contents != null and contents != ''">
+			, CONTENTS = #{contents}
+		</if>
+		<if test="sndrNo != null and sndrNo != ''">
+			, SNDR_NO = #{sndrNo}
+		</if>
+		<if test="senderEmail != null and senderEmail != ''">
+			, SENDER_EMAIL = #{senderEmail}
+		</if>
+		<if test="sendReqYn != null and sendReqYn != ''">
+			, SEND_REQ_YN = #{sendReqYn}
+		</if>
+		<if test="sendReqDtm != null">
+			, SEND_REQ_DTM = #{sendReqDtm}
+		</if>
+		<if test="reqRstCd != null and reqRstCd != ''">
+			, REQ_RST_CD = #{reqRstCd}
+		</if>
+		<if test="outsideReqId != null and outsideReqId != ''">
+			, OUTSIDE_REQ_ID = #{outsideReqId}
+		</if>
+		WHERE 1 = 1
+			AND NOTICE_SEND_NO = #{noticeSendNo}
+	</update>
+	
+	<delete id="deleteNoticeSendList" parameterType="biz.app.appweb.model.PushPO">
+		<!--
+			Query Name : push.deleteNoticeSendList
+			Description : 알림 메시지 발송 정보 삭제
+			- BO
+		-->
+		DELETE FROM NOTICE_SEND_LIST
+		WHERE 1 = 1
+			AND NOTICE_SEND_NO = #{noticeSendNo}
+	</delete>
+	
+	<insert id="insertNoticeSendDetailList" parameterType="biz.app.appweb.model.PushDetailPO">
+		<!--
+			Query Name : push.insertNoticeSendDetailList
+			Description : 알림 발송 상세 리스트 등록
+		-->
+		INSERT INTO notice_send_detail_list(
+			NOTICE_SEND_NO
+			, HIST_DTL_NO
+			, SUBJECT
+			, CONTENTS
+			, SND_INFO
+			, MBR_NO
+			, DEVICE_TYPE_CD
+			, DEVICE_TKN
+			, RCVR_NO
+			, RECEIVER_EMAIL
+			, SEND_REQ_YN
+			, SEND_REQ_DTM
+			, SND_RST_CD
+			, OUTSIDE_REQ_DTL_ID
+			<if test="liveYn != null and liveYn != ''">
+			, LIVE_YN
+			</if>
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		)VALUES(
+			#{noticeSendNo}
+			, #{histDtlNo}
+			, #{subject}
+			, #{contents}
+			, #{sndInfo}
+			, #{mbrNo}
+			, #{deviceTypeCd}
+			, #{deviceTkn}
+			, #{rcvrNo}
+			, #{receiverEmail}
+			, #{sendReqYn}
+			, #{sendReqDtm}
+			, #{sndRstCd}
+			, #{outsideReqDtlId}
+			<if test="liveYn != null and liveYn != ''">
+			, #{liveYn}
+			</if>
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateNoticeSendDetailList" parameterType="biz.app.appweb.model.PushDetailPO">
+		<!--
+			Query Name : push.updateNoticeSendDetailList
+			Description : 알림 발송 상세 리스트 수정
+			- BO
+		-->
+		UPDATE NOTICE_SEND_DETAIL_LIST SET
+			SYS_UPDR_NO = #{sysUpdrNo}
+			, SYS_UPD_DTM = NOW()
+		<if test="sndInfo != null and sndInfo != ''">
+			, SND_INFO = #{sndInfo}
+		</if>
+		<if test="subject != null and subject != ''">
+			, SUBJECT = #{subject}
+		</if>
+		<if test="contents != null and contents != ''">
+			, CONTENTS = #{contents}
+		</if>
+		<if test="deviceTypeCd != null and deviceTypeCd != ''">
+			, DEVICE_TYPE_CD = #{deviceTypeCd}
+		</if>
+		<if test="deviceTkn != null and deviceTkn != ''">
+			, DEVICE_TKN = #{deviceTkn}
+		</if>
+		<if test="sendReqDtm != null">
+			, SEND_REQ_DTM = #{sendReqDtm}
+		</if>
+		<if test="sndRstCd != null and sndRstCd != ''">
+			, SND_RST_CD = #{sndRstCd}
+		</if>
+		<if test="outsideReqDtlId != null and outsideReqDtlId != ''">
+			, OUTSIDE_REQ_DTL_ID = #{outsideReqDtlId}
+		</if>
+		WHERE 1 = 1
+			AND NOTICE_SEND_NO = #{noticeSendNo}
+		<if test="receiverEmail != null and receiverEmail != ''">
+			AND RECEIVER_EMAIL = #{receiverEmail}
+		</if>		
+		<if test="sndTypeCd == @framework.common.constants.CommonConstants@SND_TYPE_10">
+			AND (OUTSIDE_REQ_DTL_ID IS NULL OR OUTSIDE_REQ_DTL_ID != 'N')
+		</if>
+	</update>
+	
+	<delete id="deleteNoticeSendDetailList" parameterType="biz.app.appweb.model.PushDetailPO">
+		<!--
+			Query Name : push.deleteNoticeSendDetailList
+			Description : 알림 발송 상세 리스트 삭제
+			- BO
+		-->
+		DELETE FROM NOTICE_SEND_DETAIL_LIST
+		WHERE 1 = 1
+			AND NOTICE_SEND_NO = #{noticeSendNo}
+	</delete>
+	
+		
+	<select id="getFrontPushList" resultType="biz.app.appweb.model.PushVO">
+		SELECT T1.*
+		FROM 
+		(SELECT
+			NSL.NOTICE_SEND_NO
+			, NSL.SUBJECT
+			, NSL.CONTENTS
+			, NSDL.MBR_NO
+			, NSDL.SND_INFO
+			, NTI.CTG_CD
+			, NSDL.SYS_REG_DTM 
+			, NSL.SEND_REQ_DTM 
+			, (SELECT ALM_RCV_YN FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo}) AS ALM_RCV_YN
+<!-- 			, TIMESTAMPDIFF(SECOND , NSDL.SYS_REG_DTM , NOW()) AS DATE_DIFF -->
+			<![CDATA[
+			, CASE 	WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 60 THEN '방금'
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 3600 THEN CONCAT(MINUTE(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)), '분 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) > 3600 AND TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 86400 THEN CONCAT(HOUR(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)), '시간 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) > 86400 THEN DATE_FORMAT(NSDL.SYS_REG_DTM, '%Y년 %m월 %d일') 
+			END AS STR_DATE_DIFF
+			]]>
+		FROM
+			NOTICE_SEND_LIST NSL
+		INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+		INNER JOIN NOTICE_TMPL_INFO NTI ON NSL.TMPL_NO = NTI.TMPL_NO
+		WHERE 1 = 1
+			AND	NSDL.MBR_NO = #{mbrNo}
+			AND NTI.CTG_CD IN (
+				'${@framework.common.constants.CommonConstants@CTG_50}'
+				,'${@framework.common.constants.CommonConstants@CTG_60}'
+				, '${@framework.common.constants.CommonConstants@CTG_70}'
+				, '${@framework.common.constants.CommonConstants@CTG_80}'
+				, '${@framework.common.constants.CommonConstants@CTG_90}'
+				, '${@framework.common.constants.CommonConstants@CTG_100}'
+			)
+			AND NSL.SEND_REQ_DTM <![CDATA[<=]]> NOW()
+		UNION ALL
+		SELECT 
+			NSL.NOTICE_SEND_NO
+			, NSL.SUBJECT
+			, NSL.CONTENTS
+			, NSDL.MBR_NO
+			, NSDL.SND_INFO
+			, '100' AS CTG_CD
+			, NSDL.SYS_REG_DTM 
+			, NSL.SEND_REQ_DTM
+			, (SELECT ALM_RCV_YN FROM MEMBER_BASE WHERE MBR_NO = #{mbrNo}) AS ALM_RCV_YN 
+			<![CDATA[
+			, CASE 	WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 60 THEN '방금'
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 3600 THEN CONCAT(MINUTE(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)), '분 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) > 3600 AND TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) < 86400 THEN CONCAT(HOUR(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)), '시간 전')
+					WHEN TIME_TO_SEC(TIMEDIFF(NOW(), NSDL.SYS_REG_DTM)) > 86400 THEN DATE_FORMAT(NSDL.SYS_REG_DTM, '%Y년 %m월 %d일') 
+			END AS STR_DATE_DIFF
+			]]> 
+			FROM
+			NOTICE_SEND_LIST NSL
+			INNER JOIN NOTICE_SEND_DETAIL_LIST NSDL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+			WHERE NSDL.LIVE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			AND NSDL.MBR_NO = #{mbrNo}	
+			) T1 
+		ORDER BY T1.SYS_REG_DTM DESC
+	</select>
+	
+	<select id="listSsgNoticeDetail" resultType="biz.app.appweb.model.NoticeSendListDetailVO">
+		<!--
+			Query Name : push.listSsgNoticeDetail
+			Description : 발송 상세 리스트 조회 (SSG)
+		-->
+		SELECT
+				NSDL.HIST_DTL_NO
+				, NSDL.SND_INFO
+				, NSDL.MBR_NO
+				, NSDL.DEVICE_TYPE_CD
+				, NSDL.DEVICE_TKN
+				, NSDL.RCVR_NO
+				, NSDL.RECEIVER_EMAIL
+				, NSDL.SEND_REQ_YN
+				, NSL.SEND_REQ_DTM
+				, NSDL.SND_RST_CD
+				, NSDL.OUTSIDE_REQ_DTL_ID
+				, NSL.NOTICE_SEND_NO
+				, NSL.SND_TYPE_CD
+				, NSL.OUTSIDE_REQ_ID
+				, NSDL.CONTENTS
+		FROM NOTICE_SEND_DETAIL_LIST NSDL
+		INNER JOIN NOTICE_SEND_LIST NSL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+		WHERE 1=1
+		AND 	NSL.OUTSIDE_REQ_ID IS NOT NULL
+		AND 	NSL.SEND_REQ_DTM IS NOT NULL 
+		AND 	NSL.SEND_REQ_DTM &lt; NOW() 
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+		AND		NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test='sndRstCdNullYn != null and sndRstCdNullYn.equals("Y")'>
+		AND		NSDL.SND_RST_CD IS NULL
+		</if>
+		<if test="sendReqYn != null and sendReqYn != ''">
+		AND		NSL.SEND_REQ_YN = #{sendReqYn}
+		</if>
+		<if test="sndTypeCd == @framework.common.constants.CommonConstants@SND_TYPE_10">
+		AND 	(NSDL.OUTSIDE_REQ_DTL_ID IS NULL OR NSDL.OUTSIDE_REQ_DTL_ID != 'N')
+		</if>
+	</select>
+	
+	<select id="listSensPushDetail" resultType="biz.app.appweb.model.NoticeSendListDetailVO">
+		<!--
+			Query Name : push.listSsgNoticeDetail
+			Description : 푸시발송 상세 리스트 조회 (sens)
+		-->
+		SELECT				
+				  NSL.NOTICE_SEND_NO
+				, NSL.SND_TYPE_CD
+				, NSL.OUTSIDE_REQ_ID				
+		FROM NOTICE_SEND_DETAIL_LIST NSDL
+		INNER JOIN NOTICE_SEND_LIST NSL ON NSDL.NOTICE_SEND_NO = NSL.NOTICE_SEND_NO
+		WHERE 1=1
+		AND 	NSL.OUTSIDE_REQ_ID IS NOT NULL
+		AND 	NSL.SEND_REQ_DTM IS NOT NULL 
+		AND 	NSL.SEND_REQ_DTM &lt; NOW() 
+		<if test="sndTypeCd != null and sndTypeCd != ''">
+		AND		NSL.SND_TYPE_CD = #{sndTypeCd}
+		</if>
+		<if test='sndRstCdNullYn != null and sndRstCdNullYn.equals("Y")'>
+		AND		NSDL.SND_RST_CD IS NULL
+		</if>
+		<if test="sendReqYn != null and sendReqYn != ''">
+		AND		NSL.SEND_REQ_YN = #{sendReqYn}
+		</if>
+		GROUP BY NSL.NOTICE_SEND_NO, NSL.SND_TYPE_CD, NSL.OUTSIDE_REQ_ID
+	</select>
+</mapper>

@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	관리자
+	일자 : 2017. 06. 29
+	작성자 : snw
+-->
+
+<mapper namespace="admin">
+
+	<select id="listSalesStateMain" resultType="biz.admin.model.SalesStateMainVO">
+		SELECT
+			'통합몰' AS NAME
+			, IFNULL(SUM(ORD_CNT), 0) AS ORD_CNT
+			, IFNULL(SUM(ORD_AMT), 0) AS ORD_AMT
+			, IFNULL(SUM(PAY_CNT), 0) AS PAY_CNT
+			, IFNULL(SUM(PAY_AMT), 0) AS PAY_AMT
+			, IFNULL(SUM(CANCEL_CNT), 0) AS CANCEL_CNT
+			, IFNULL(SUM(CANCEL_AMT), 0) AS CANCEL_AMT
+		FROM (
+			SELECT
+				  1           AS ORD_CNT
+				, OD.PAY_AMT  AS ORD_AMT
+				, 1           AS PAY_CNT
+				, OD.PAY_AMT  AS PAY_AMT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN 1
+					ELSE 0
+					END AS CANCEL_CNT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN (SELECT SUM(PAY_AMT) FROM CLAIM_DETAIL WHERE ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = OD.ORD_DTL_SEQ)
+					ELSE 0
+					END AS CANCEL_AMT
+			FROM ORDER_DETAIL OD , ORDER_BASE OB
+			WHERE OD.ORD_NO = OB.ORD_NO
+			AND OD.COMP_NO = 1
+			AND OB.ORD_ACPT_DTM BETWEEN DATE_FORMAT(NOW(), '%Y%m%d') AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+			AND OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		) A
+		<!-- 
+		UNION ALL
+		SELECT
+			'브랜드몰' AS NAME
+			, IFNULL(SUM(ORD_CNT), 0) AS ORD_CNT
+			, IFNULL(SUM(ORD_AMT), 0) AS ORD_AMT
+			, IFNULL(SUM(PAY_CNT), 0) AS PAY_CNT
+			, IFNULL(SUM(PAY_AMT), 0) AS PAY_AMT
+			, IFNULL(SUM(CENCEL_CNT), 0) AS CENCEL_CNT
+			, IFNULL(SUM(CENCEL_AMT), 0) AS CENCEL_AMT
+		FROM (
+			SELECT
+				  1           AS ORD_CNT
+				, OD.PAY_AMT  AS ORD_AMT
+				, 1           AS PAY_CNT
+				, OD.PAY_AMT  AS PAY_AMT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN 1
+					ELSE 0
+					END AS CENCEL_CNT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN (SELECT SUM(PAY_AMT) FROM CLAIM_DETAIL WHERE ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = OD.ORD_DTL_SEQ)
+					ELSE 0
+					END AS CENCEL_AMT
+			FROM ORDER_DETAIL OD , ORDER_BASE OB
+			WHERE OD.ORD_NO = OB.ORD_NO
+			AND OD.COMP_NO = 2
+			AND OB.ORD_ACPT_DTM BETWEEN DATE_FORMAT(NOW(), '%Y%m%d') AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+			AND OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		) A
+		-->
+		UNION ALL
+		SELECT
+			'입점업체' AS NAME
+			, IFNULL(SUM(ORD_CNT), 0) AS ORD_CNT
+			, IFNULL(SUM(ORD_AMT), 0) AS ORD_AMT
+			, IFNULL(SUM(PAY_CNT), 0) AS PAY_CNT
+			, IFNULL(SUM(PAY_AMT), 0) AS PAY_AMT
+			, IFNULL(SUM(CANCEL_CNT), 0) AS CANCEL_CNT
+			, IFNULL(SUM(CANCEL_AMT), 0) AS CANCEL_AMT
+		FROM (
+			SELECT
+				  1           AS ORD_CNT
+				, OD.PAY_AMT  AS ORD_AMT
+				, 1           AS PAY_CNT
+				, OD.PAY_AMT  AS PAY_AMT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN 1
+					ELSE 0
+					END AS CANCEL_CNT
+				, CASE
+					WHEN IFNULL(OD.CNC_QTY, 0) > 0
+					THEN (SELECT SUM(PAY_AMT) FROM CLAIM_DETAIL WHERE ORD_NO = OD.ORD_NO AND ORD_DTL_SEQ = OD.ORD_DTL_SEQ)
+					ELSE 0
+					END AS CANCEL_AMT
+			FROM ORDER_DETAIL OD , ORDER_BASE OB
+			WHERE OD.ORD_NO = OB.ORD_NO
+			AND OD.COMP_NO &gt; 1
+			AND OB.ORD_ACPT_DTM BETWEEN DATE_FORMAT(NOW(), '%Y%m%d') AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+			AND OB.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		) A
+	</select>
+
+	<select id="listOrderMain" resultType="biz.admin.model.OrderMainVO">
+		SELECT
+			'통합몰' AS NAME
+			,IFNULL(SUM(CNT_01), 0) AS CNT_01
+			,IFNULL(SUM(CNT_02), 0) AS CNT_02
+			,IFNULL(SUM(CNT_03), 0) AS CNT_03
+			,IFNULL(SUM(CNT_04), 0) AS CNT_04
+			,IFNULL(SUM(CNT_05), 0) AS CNT_05
+			,IFNULL(SUM(CNT_06), 0) AS CNT_06
+			,IFNULL(SUM(CNT_07), 0) AS CNT_07
+		FROM (
+			SELECT
+				CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+					THEN 1
+					ELSE 0
+					END AS CNT_01
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+					THEN 1
+					ELSE 0
+					END AS CNT_02
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+					THEN 1
+					ELSE 0
+					END AS CNT_03
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+					THEN 1
+					ELSE 0
+					END AS CNT_04
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+					THEN 1
+					ELSE 0
+					END AS CNT_05
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+					THEN 1
+					ELSE 0
+					END AS CNT_06
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+					THEN 1
+					ELSE 0
+					END AS CNT_07
+			FROM ORDER_DETAIL JOIN ORDER_BASE ON (ORDER_DETAIL.ORD_NO = ORDER_BASE.ORD_NO)
+			WHERE ORD_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+			)
+			AND COMP_NO = 1
+			AND RMN_ORD_QTY &gt; 0
+			AND DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		) A
+		<!-- 
+		UNION ALL
+		SELECT
+			'브랜드몰' AS NAME
+			,IFNULL(SUM(CNT_01), 0) AS CNT_01
+			,IFNULL(SUM(CNT_02), 0) AS CNT_02
+			,IFNULL(SUM(CNT_03), 0) AS CNT_03
+			,IFNULL(SUM(CNT_04), 0) AS CNT_04
+			,IFNULL(SUM(CNT_05), 0) AS CNT_05
+			,IFNULL(SUM(CNT_06), 0) AS CNT_06
+			,IFNULL(SUM(CNT_07), 0) AS CNT_07
+		FROM (
+			SELECT
+				CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+					THEN 1
+					ELSE 0
+					END AS CNT_01
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+					THEN 1
+					ELSE 0
+					END AS CNT_02
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+					THEN 1
+					ELSE 0
+					END AS CNT_03
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+					THEN 1
+					ELSE 0
+					END AS CNT_04
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+					THEN 1
+					ELSE 0
+					END AS CNT_05
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+					THEN 1
+					ELSE 0
+					END AS CNT_06
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+					THEN 1
+					ELSE 0
+					END AS CNT_07
+			FROM ORDER_DETAIL
+			WHERE ORD_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+			)
+			AND COMP_NO = 2
+		) A
+		-->
+		UNION ALL
+		SELECT
+			'입점업체' AS NAME
+			,IFNULL(SUM(CNT_01), 0) AS CNT_01
+			,IFNULL(SUM(CNT_02), 0) AS CNT_02
+			,IFNULL(SUM(CNT_03), 0) AS CNT_03
+			,IFNULL(SUM(CNT_04), 0) AS CNT_04
+			,IFNULL(SUM(CNT_05), 0) AS CNT_05
+			,IFNULL(SUM(CNT_06), 0) AS CNT_06
+			,IFNULL(SUM(CNT_07), 0) AS CNT_07
+		FROM (
+			SELECT
+				CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+					THEN 1
+					ELSE 0
+					END AS CNT_01
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+					THEN 1
+					ELSE 0
+					END AS CNT_02
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+					THEN 1
+					ELSE 0
+					END AS CNT_03
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+					THEN 1
+					ELSE 0
+					END AS CNT_04
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+					THEN 1
+					ELSE 0
+					END AS CNT_05
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+					THEN 1
+					ELSE 0
+					END AS CNT_06
+				, CASE
+					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+					THEN 1
+					ELSE 0
+					END AS CNT_07
+			FROM ORDER_DETAIL JOIN ORDER_BASE ON (ORDER_DETAIL.ORD_NO = ORDER_BASE.ORD_NO)
+			WHERE ORD_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+			)
+			AND COMP_NO &gt; 1
+			AND RMN_ORD_QTY &gt; 0
+			AND DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+		) A
+	</select>
+
+	<select id="listClaimMain" resultType="biz.admin.model.OrderMainVO">
+		SELECT
+			'통합몰' AS NAME
+			,IFNULL(SUM(CNT_210), 0) AS CNT_210 /* 반품접수 */
+			,IFNULL(SUM(CNT_220), 0) AS CNT_220 /* 반품수거지시 */
+			,IFNULL(SUM(CNT_230), 0) AS CNT_230 /* 반품수거완료 */
+			,IFNULL(SUM(CNT_310), 0) AS CNT_310 /* 교환접수 */
+<!-- 			,IFNULL(SUM(CNT_08), 0) AS CNT_08 /* 교환취소 */ -->
+			,IFNULL(SUM(CNT_320), 0) AS CNT_320 /* 교환수거지시 */
+			,IFNULL(SUM(CNT_340), 0) AS CNT_340 /* 교환수거완료 */
+<!-- 			,IFNULL(SUM(CNT_11), 0) AS CNT_11 /* ???? */ -->
+<!-- 			,IFNULL(SUM(CNT_12), 0) AS CNT_12 /* ???? */ -->
+		FROM (
+			SELECT
+				 CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+					THEN 1
+					ELSE 0
+					END AS CNT_210
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+					THEN 1
+					ELSE 0
+					END AS CNT_220
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+					THEN 1
+					ELSE 0
+					END AS CNT_230
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+					THEN 1
+					ELSE 0
+					END AS CNT_310
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_08 -->
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+					THEN 1
+					ELSE 0
+					END AS CNT_320
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+					THEN 1
+					ELSE 0
+					END AS CNT_340
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_11 -->
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_12 -->
+			FROM CLAIM_DETAIL
+			WHERE CLM_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}'' -->
+			)
+			AND COMP_NO = 1
+		) A
+		<!-- 
+		UNION ALL
+		SELECT
+			'브랜드몰' AS NAME
+			,IFNULL(SUM(CNT_210), 0) AS CNT_210
+			,IFNULL(SUM(CNT_220), 0) AS CNT_220
+			,IFNULL(SUM(CNT_230), 0) AS CNT_230
+			,IFNULL(SUM(CNT_310), 0) AS CNT_310
+			,IFNULL(SUM(CNT_320), 0) AS CNT_320
+			,IFNULL(SUM(CNT_340), 0) AS CNT_340
+		FROM (
+			SELECT
+				 CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+					THEN 1
+					ELSE 0
+					END AS CNT_210
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+					THEN 1
+					ELSE 0
+					END AS CNT_220
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+					THEN 1
+					ELSE 0
+					END AS CNT_230
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+					THEN 1
+					ELSE 0
+					END AS CNT_310
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+					THEN 1
+					ELSE 0
+					END AS CNT_320
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+					THEN 1
+					ELSE 0
+					END AS CNT_340
+			FROM CLAIM_DETAIL
+			WHERE CLM_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+			)
+			AND COMP_NO = 2
+		) A
+		-->
+		UNION ALL
+		SELECT
+			'입점업체' AS NAME
+			,IFNULL(SUM(CNT_210), 0) AS CNT_210
+			,IFNULL(SUM(CNT_220), 0) AS CNT_220
+			,IFNULL(SUM(CNT_230), 0) AS CNT_230
+			,IFNULL(SUM(CNT_310), 0) AS CNT_310
+<!-- 			,IFNULL(SUM(CNT_08), 0) AS CNT_08 -->
+			,IFNULL(SUM(CNT_320), 0) AS CNT_320
+			,IFNULL(SUM(CNT_340), 0) AS CNT_340
+<!-- 			,IFNULL(SUM(CNT_11), 0) AS CNT_11 -->
+<!-- 			,IFNULL(SUM(CNT_12), 0) AS CNT_12 -->
+		FROM (
+			SELECT
+				 CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+					THEN 1
+					ELSE 0
+					END AS CNT_210
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+					THEN 1
+					ELSE 0
+					END AS CNT_220
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+					THEN 1
+					ELSE 0
+					END AS CNT_230
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+					THEN 1
+					ELSE 0
+					END AS CNT_310
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_08 -->
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+					THEN 1
+					ELSE 0
+					END AS CNT_320
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+					THEN 1
+					ELSE 0
+					END AS CNT_340
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_11 -->
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_12 -->
+			FROM CLAIM_DETAIL
+			WHERE CLM_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}' -->
+			)
+			AND COMP_NO &gt; 2
+		) A
+	</select>
+
+	<select id="listOrderMainNc" resultType="biz.admin.model.OrderMainVO">
+        SELECT
+            (SELECT COMP_NM FROM COMPANY_BASE WHERE COMP_NO = #{compNo}) AS NAME
+            ,IFNULL(SUM(CNT_01), 0) AS CNT_01
+            ,IFNULL(SUM(CNT_02), 0) AS CNT_02
+            ,IFNULL(SUM(CNT_03), 0) AS CNT_03
+            ,IFNULL(SUM(CNT_04), 0) AS CNT_04
+            ,IFNULL(SUM(CNT_05), 0) AS CNT_05
+            ,IFNULL(SUM(CNT_06), 0) AS CNT_06
+            ,IFNULL(SUM(CNT_07), 0) AS CNT_07
+        FROM (
+            SELECT
+                CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_01
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_02
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_03
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_04
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_05
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_06
+                , CASE
+                    WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+                    THEN 1
+                    ELSE 0
+                    END AS CNT_07
+            FROM ORDER_DETAIL
+            WHERE ORD_DTL_STAT_CD IN (
+                '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_120}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_130}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_140}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_160}'
+                , '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_170}'
+            )
+            AND COMP_NO = #{compNo}
+            AND RMN_ORD_QTY &gt; 0
+        ) A
+	</select>
+
+	<select id="listClaimMainNc" resultType="biz.admin.model.OrderMainVO">
+		SELECT
+			IFNULL(SUM(CNT_210), 0) AS CNT_210
+			,IFNULL(SUM(CNT_220), 0) AS CNT_220
+			,IFNULL(SUM(CNT_230), 0) AS CNT_230
+			,IFNULL(SUM(CNT_310), 0) AS CNT_310
+<!-- 			,IFNULL(SUM(CNT_08), 0) AS CNT_08 -->
+			,IFNULL(SUM(CNT_320), 0) AS CNT_320
+			,IFNULL(SUM(CNT_340), 0) AS CNT_340
+<!-- 			,IFNULL(SUM(CNT_11), 0) AS CNT_11 -->
+<!-- 			,IFNULL(SUM(CNT_12), 0) AS CNT_12 -->
+		FROM (
+			SELECT
+				 CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+					THEN 1
+					ELSE 0
+					END AS CNT_210
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+					THEN 1
+					ELSE 0
+					END AS CNT_220
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+					THEN 1
+					ELSE 0
+					END AS CNT_230
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+					THEN 1
+					ELSE 0
+					END AS CNT_310
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_08 -->
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+					THEN 1
+					ELSE 0
+					END AS CNT_320
+				, CASE
+					WHEN CLM_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+					THEN 1
+					ELSE 0
+					END AS CNT_340
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_11 -->
+<!-- 				, CASE -->
+<!-- 					WHEN ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}' -->
+<!-- 					THEN 1 -->
+<!-- 					ELSE 0 -->
+<!-- 					END AS CNT_12 -->
+			FROM CLAIM_DETAIL
+			WHERE CLM_DTL_STAT_CD IN (
+				'${@framework.common.constants.CommonConstants@CLM_DTL_STAT_210}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_220}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_310}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_08}' -->
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_320}'
+				, '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_340}'
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_11}' -->
+<!-- 				, '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_12}' -->
+			)
+			AND COMP_NO = #{compNo}
+		) A
+	</select>
+
+	<select id="listGoodsMain" resultType="biz.admin.model.GoodsMainVO">
+        SELECT 
+            CASE WHEN CB.COMP_NO = 1 THEN '통합몰' ELSE '입점업체' END AS NAME, IFNULL(GB.CNT_10, 0) CNT_10,IFNULL(GB.CNT_20, 0) CNT_20, IFNULL(GB.CNT_30, 0) CNT_30, IFNULL(GB.CNT_40, 0) CNT_40, IFNULL(GB.CNT_50, 0) CNT_50, IFNULL(GB.CNT_60, 0) CNT_60 
+        FROM 
+            (SELECT G.COMP_NO, SUM(G.CNT_10) CNT_10, SUM(G.CNT_20) CNT_20, SUM(G.CNT_30) CNT_30, SUM(G.CNT_40) CNT_40, SUM(G.CNT_50) CNT_50, SUM(G.CNT_60) CNT_60 
+            FROM (
+		        SELECT 
+		            IF(COMP_NO = 1, 1, 2) COMP_NO, 
+		            IF(GOODS_STAT_CD = '10',1,0) CNT_10,
+		            IF(GOODS_STAT_CD = '20',1,0) CNT_20,
+		            IF(GOODS_STAT_CD = '30',1,0) CNT_30,
+		            IF(GOODS_STAT_CD = '40',1,0) CNT_40,
+		            IF(GOODS_STAT_CD = '50',1,0) CNT_50,
+		            IF(GOODS_STAT_CD = '60',1,0) CNT_60
+		        FROM GOODS_BASE
+            ) G
+        GROUP BY COMP_NO) GB 
+        RIGHT OUTER JOIN (SELECT COMP_NO FROM (SELECT 1 COMP_NO UNION SELECT 2 COMP_NO) C) CB ON (GB.COMP_NO = CB.COMP_NO)
+	</select>
+
+	<select id="listGoodsMainNc"  resultType="biz.admin.model.GoodsMainVO">
+		SELECT SUM(G.CNT_10) CNT_10, SUM(G.CNT_20) CNT_20, SUM(G.CNT_30) CNT_30, SUM(G.CNT_40) CNT_40, SUM(G.CNT_50) CNT_50, SUM(G.CNT_60) CNT_60 FROM (
+		SELECT 
+		    IF(GOODS_STAT_CD = '10',1,0) CNT_10,
+		    IF(GOODS_STAT_CD = '20',1,0) CNT_20,
+		    IF(GOODS_STAT_CD = '30',1,0) CNT_30,
+		    IF(GOODS_STAT_CD = '40',1,0) CNT_40,
+		    IF(GOODS_STAT_CD = '50',1,0) CNT_50,
+		    IF(GOODS_STAT_CD = '60',1,0) CNT_60
+		FROM GOODS_BASE
+		WHERE COMP_NO = #{compNo}
+		) G
+	</select>
+			
+</mapper>

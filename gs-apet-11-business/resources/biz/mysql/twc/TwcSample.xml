@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	관리자
+	일자 : 2021. 01. 08
+	작성자 : TWC 샘플
+-->
+
+<mapper namespace="twcSample">
+	<select id="getHelpKeyword" resultType="biz.twc.model.TwcSampleVO">
+		SELECT
+			help_keyword_id
+			,name
+		FROM help_keyword
+	</select>			
+</mapper>

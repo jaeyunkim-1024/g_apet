@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 세트 구성
+	작성자  	valueFactory
+	작성일자  	2020.01.08
+-->
+<mapper namespace="goodsCstrtSet">
+
+	<select id="listGoodsCstrtSet" resultType="biz.app.goods.model.GoodsCstrtSetVO" >
+		<!--
+			Query Name : goodsCstrtSet.listGoodsCstrtSet
+			Description : 상품 세트 구성 리스트
+		-->
+		/* QUERYID(goodsCstrtSet.listGoodsCstrtSet) */
+		
+		SELECT
+			T1.GOODS_ID
+			, T1.SUB_GOODS_ID
+            , T2.GOODS_NM
+			, T1.CSTRT_QTY
+			, T1.DISP_PRIOR_RANK
+			, T1.SYS_REG_DTM
+            , T1.SYS_UPD_DTM
+            , T1.SYS_REGR_NO
+            , FN_GET_USER_NAME(T1.SYS_REGR_NO) AS SYS_REGR_NM
+	        , T1.SYS_UPDR_NO
+            , FN_GET_USER_NAME(T1.SYS_UPDR_NO) AS SYS_UPDR_NM
+            , FN_GET_GOODS_STOCK(T1.SUB_GOODS_ID, NULL) AS WEB_STK_QTY
+            , FN_GET_GOODS_STOCK(T1.GOODS_ID, NULL) AS WEB_SET_STK_QTY
+		FROM GOODS_CSTRT_SET T1
+        JOIN GOODS_BASE T2 ON( T2.GOODS_ID = T1.SUB_GOODS_ID )
+		WHERE 1 = 1
+		AND T1.GOODS_ID = #{goodsId}
+		ORDER BY T1.DISP_PRIOR_RANK
+	</select>
+	
+	<insert id="insertGoodsCstrtSet" parameterType="biz.app.goods.model.GoodsCstrtSetPO" >
+		<!--
+			Query Name : goodsCstrtSet.insertGoodsCstrtSet
+			Description : 상품 세트 구성 등록
+		-->
+		/* QUERYID(goodsCstrtSet.insertGoodsCstrtSet) */
+		
+		INSERT INTO GOODS_CSTRT_SET (
+			GOODS_ID
+			, SUB_GOODS_ID
+			, CSTRT_QTY
+			, DISP_PRIOR_RANK
+			, SYS_REGR_NO
+			, SYS_REG_DTM
+			, SYS_UPDR_NO
+			, SYS_UPD_DTM
+		) VALUES (
+			#{goodsId}
+			, #{subGoodsId}
+			, #{cstrtQty}
+			, #{dispPriorRank}
+			, #{sysRegrNo}
+			, now() 
+			, #{sysUpdrNo}
+			, now() 
+		)
+	</insert>
+	
+	<delete id="deleteGoodsCstrtSet" parameterType="biz.app.goods.model.GoodsCstrtSetPO" >
+		<!--
+			Query Name : goodsCstrtSet.deleteGoodsCstrtSet
+			Description : 상품 세트 구성 삭제
+		-->
+		/* QUERYID(goodsCstrtSet.deleteGoodsCstrtSet) */
+		
+		DELETE FROM GOODS_CSTRT_SET
+		WHERE 1=1
+		AND GOODS_ID = #{goodsId}
+	</delete>
+</mapper>

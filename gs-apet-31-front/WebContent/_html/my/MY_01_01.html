@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.pc.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set3","tit":"친구 초대하기"}'></include>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<!-- LNB -->
+		<include class="lnb my" data-include-html="../inc/lnb_my.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page my home" id="container">
+
+			<div class="inr">			
+
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+
+					<section class="sect top">
+						<dl>
+							<dt class="pic">
+								<img src="../../_images/_temp/goods_1.jpg" alt="등록한 프로필 이미지" class="img" >
+							</dt>
+							<dd class="info-bx">
+								<P>
+									<span class="nm">mong2mom</span>
+									<button class="btn re">수정</button>
+								</P>
+								<ul class="data">
+									<li>
+										<span>등급</span>
+										<!-- label에 a태그로 감싸고 rank_icon클래스 추가함 2021.05.13 -->
+										<a class="rank_icon" href="javascript:rankBox();"><i class="label vvip">VVIP</i></a>
+										<a class="rank_icon" href="javascript:rankBox();"><i class="label vip">VIP</i></a>
+										<a class="rank_icon" href="javascript:rankBox();"><i class="label family">패밀리</i></a>
+										<a class="rank_icon" href="javascript:rankBox();"><i class="label welcome">웰컴</i></a>
+										<!-- //label에 a태그로 감싸고 rank_icon클래스 추가함 2021.05.13 -->
+									</li>
+									<li>
+										<span>GS&amp;POINT</span>
+										<em class="blue">200000</em>P
+										<!-- <a href="javascrpit:;" class="bt point">포인트조회</a> -->
+									</li>
+								</ul>
+							</dd>
+						</dl>
+					</section>
+
+					<section class="myinfo">
+						<div class="sect line">
+							<dl class="my">
+								<dt>
+									<span>마이펫 관리</span>
+									<a href="#" class="next"></a>
+								</dt>
+								<dd>
+									<ul  class="img-set">
+										<li><img src="../../_images/_temp/temp_logimg002.jpg" alt="등록한 프로필 이미지" class="img" ></li>
+										<li><img src="../../_images/_temp/temp_logimg002.jpg" alt="등록한 프로필 이미지" class="img" ></li>
+										<li>
+											<span><img src="../../_images/_temp/temp_logimg002.jpg" alt="등록한 프로필 이미지" class="img" ></span>
+											<em>+3</em>
+										</li>
+									</ul>
+									<button class="btn re">설정</button>
+									
+									<!--  등록한 정보가 없을 때,
+									<div class="pet">
+										<p class="ex">반려동물 등록하고 <span>우리아이 접종내역을 관리하세요.</span></p>
+										<button class="btn add">마이펫 등록하기</button>
+									</div> 
+									-->
+								</dd>
+							</dl>
+						</div>
+						<dl class="zzim">
+							<dt>
+								<a href="javascript:;">
+									<span>마이찜 리스트</span>
+									<span class="next"></span>
+								</a>
+							</dt>
+							<dd>
+								<a href="javasctipt:;" class="allmore">전체보기</a>
+								<ul class="zzim-list">
+									<!-- 04.13 수정 -->
+									<li>
+										<a href="javascrpit:;">
+											<b>TV</b>
+											<span>1</span>
+										</a>
+									</li>
+									<li>
+										<a href="javascrpit:;">
+											<b>로그</b>
+											<span>1</span>
+										</a>
+									</li>
+									<li>
+										<a href="javascrpit:;">
+											<b>스토어</b>	<!-- APET-1250 210721 lju02 - 펫샵 서비스명 변경 -->
+											<span>1</span>
+										</a>
+									</li>
+									<!-- // 04.13 수정 -->
+								</ul>
+
+								<!-- 수정되어 주석처리_210308
+								<div class="swiper-div">
+									<div class="swiper-container">
+										<ul class="swiper-wrapper">
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag log"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag shop"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<a href="#" class="img" style="background-image:url(../../_images/tv/@temp01.jpg);">
+														<span class="tag tv"><i></i></span>
+													</a>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>-->
+								<!-- //Swiper -->
+
+								<!--  등록한 정보가 없을 때,
+									<p class="nodata">아직 찜한 콘텐츠가 없습니다.</p> 
+								-->
+							</dd>
+						</dl>
+						<dl class="sect watch">
+							<dt>
+								<a href="javascript:;">
+									<span>최근 본 영상</span>
+									<span class="next all">전체보기</span>
+								</a>
+							</dt>
+							<dd class="recent">
+								<div class="swiper-div">
+									<div class="swiper-container">
+										<ul class="swiper-wrapper">
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="100"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="90"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="80"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="70"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="60"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+											<li class="swiper-slide">
+												<div class="thumb-box">
+													<div class="circular">
+														<div class="inner" style="background-image:url(../../_images/tv/@temp01.jpg);"></div>
+														<div class="circlePie" data-p="60"></div>
+													</div>
+													<div class="info">
+														<div class="tlt">뭐라하는지 다 알아듣는 강아지 몽자가 나타났다!!</div>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+								<!-- //Swiper -->
+
+								<!-- 등록한 정보가 없을 때,
+									<p class="nodata">최근 시청한 영상이 없습니다. 반려동물과 함께하는 펫TV를 시청해보세요.</p> 
+								-->
+							</dd>
+						</dl>
+						<dl class="sect shop line">
+							<dt>
+								<span>나의 쇼핑정보</span>
+							</dt>
+							<dd>
+								<ul class="coupon">
+									<li>
+										<a class="my1" href="javascript:;">
+											<em>31</em>
+											<span>내쿠폰</span>
+										</a>
+									</li>
+									<li>
+										<a class="my2" href="javascript:;">
+											<em>3</em>
+											<span>최근본상품</span>
+										</a>
+									</li>
+									<li>
+										<a class="my3" href="javascript:;">
+											<em>3</em>
+											<span>찜한상품</span>
+										</a>
+									</li>
+									<li>
+										<a class="my4" href="javascript:;">
+											<em>3</em>
+											<span>장바구니</span>
+										</a>
+									</li>
+								</ul>
+								<div class="barwrap">
+									<ul class="bar">
+										<li>
+											<a href="javascript:;">
+												<span class="tit">주문/배송 <em>3</em></span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit new">취소/반품/교환</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">재입고 알림</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">쿠폰존</span>
+												<span class="next"></span>
+											</a>
+										</li>
+									</ul>
+									<ul class="bar line">
+										<li>
+											<a href="javascript:;">
+												<span class="tit">1:1 문의</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">상품 후기</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">배송지 관리</span>
+												<span class="next"></span>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:;">
+												<span class="tit">간편결제 카드 관리</span>
+												<span class="next"></span>
+											</a>
+										</li>
+									</ul>
+								</div>
+								<div class="mt25">
+									<div class="invite">
+										<span class="ex">어바웃펫에 <em>친구를 초대</em>하고 <span class="block">친구와 함께 혜택을 받아보세요</span></span>
+									</div>
+								</div>
+							</dd>
+						</dl>
+
+					</section>
+				</div>
+
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+			<!-- 등급안내 팝업 추가 2021.05.13 -->
+			<article class="popLayer a popLank " id="popLank">
+				<div class="pbd">
+					<div class="phd">
+						<div class="in">
+							<h1 class="tit"></h1>
+							<button type="button" class="btnPopClose">닫기</button>
+						</div>
+					</div>
+					<div class="pct">
+						<main class="poptents">
+							<div class="rankCont">
+								<div class="rank_imgBox rank_pc">
+									<img src="../../_images/common/img-level-pc.png" alt="어바웃펫 패미리 등급별 혜택 이미지">
+								</div>
+								<div class="rank_imgBox rank_mo">									
+									<img src="../../_images/common/img-level-mw.png" alt="어바웃펫 패미리 등급별 혜택 이미지">
+								</div>
+							</div>
+						</main>
+					</div>
+				</div>
+			</article>
+			<!-- //등급안내 팝업 추가 2021.05.13 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<include class="menubar" data-include-html="../inc/menubar.html"></include>
+		<!-- 푸터 -->
+		<include class="footer" data-include-html="../inc/footer.html"></include>
+
+		<script>
+
+            // Swiper 최근
+            var swiperRecent = new Swiper('.recent .swiper-container', {
+                slidesPerView: "auto",
+                spaceBetween: 18,  
+                navigation: {
+                    nextEl: '.recent .swiper-button-next',
+                    prevEl: '.recent .swiper-button-prev',
+                }
+            });
+
+			// Swiper 최근
+			var swiperFit = new Swiper('.zzim .swiper-container', {
+                slidesPerView: "auto",
+                spaceBetween: 7, 
+                navigation: {
+                    nextEl: '.zzim .swiper-button-next',
+                    prevEl: '.zzim .swiper-button-prev',
+                }
+            });
+
+            // progress
+            var wTimer = null;
+            console.log($(".circlePie").length)
+            if($(".circlePie").length && $(".recent").css("display") !== "none"){
+                $(window).resize(function(){
+                    if(wTimer !== null) clearTimeout(wTimer);
+                    wTimer = setTimeout(function(){
+                        price = $(".circlePie").width();
+                        createPie();
+                        console.log("price : " + price);
+                    },1000);
+                });
+			var price = $(".circlePie").width();
+			createPie();
+			function createPie(p){
+				$(".circlePie").each(function(i,n){
+					var can = document.createElement("canvas");
+					var ctx = can.getContext("2d");
+					var p = ($(n).data("p") !== undefined)?$(n).data("p"):100;
+					console.log("price : " + price);
+					can.width = price;
+					can.height = price;
+					ctx.beginPath();
+					ctx.fillStyle = "black";
+					ctx.moveTo((price / 2),(price / 2));
+					ctx.translate((price / 2),(price / 2));
+					ctx.arc(0,0,60,Math.PI * 0, Math.PI * 0.1,false);
+					ctx.fill();
+					ctx.font = 'bold 20px serif';
+					$(n).html("").append(can);
+					drowC(p,can,ctx);
+				});
+
+				function drowC(angle,can,ctx){
+					var n = 0;
+					var max = 30;
+					var angle = (angle * 3.6) * (2 / 36);
+					var add = (angle / max);
+					var timer = setInterval(function(){
+						n += add;
+						if(n >= angle) n = angle;
+						ctx.translate(-10,-10);
+						ctx.clearRect(0,0,can.width,can.height);
+						ctx.translate(10,10);
+						ctx.rotate(Math.PI * -0.5);
+						ctx.beginPath();
+						ctx.fillStyle="#669aff";
+						ctx.moveTo(0,0);
+						ctx.arc(0,0,(price / 2),Math.PI*0,Math.PI*(n * 0.1),false);
+						ctx.fill();
+						ctx.closePath();
+						ctx.beginPath();
+						ctx.arc(0,0,((price / 2) - 4),0,Math.PI*2);
+						ctx.fillStyle="#ffffff";
+						ctx.fill();
+						ctx.closePath();
+						ctx.textAlign = "center";
+						ctx.fillStyle ="#ffffff";
+						ctx.rotate(Math.PI * 0.5);
+						if(n >= max){
+							clearInterval(timer);
+							};
+						},50)
+					};
+				};
+            };
+            
+          	//등급 레이어팝업 스크립트 추가 2021.05.13
+			var rankBox = function(){
+				ui.popLayer.open('popLank',{
+					ocb:function(){
+						// console.log("popLank 열림");
+					},
+					ccb:function(){
+						// console.log("popLank 닫힘");
+					}
+				});
+
+				if(ui.isMo()) {					
+					$(".rank_mo").addClass("on");
+				}else {					
+					$(".rank_pc").addClass("on");
+				}
+			}
+		</script>
+	</div>
+</body>
+</html>

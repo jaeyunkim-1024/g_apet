@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="petBatch">
+	
+	<select id="listPetForAgeBatch" resultType="biz.app.pet.model.PetBaseVO">
+		SELECT	PET_NO
+				, BIRTH_BATCH
+				, AGE
+				, MONTH
+		FROM	PET_BASE
+	</select>
+        
+	<update id="updatePetAge" parameterType="biz.app.pet.model.PetBasePO">
+		UPDATE PET_BASE SET
+			AGE 			= #{age}
+			, MONTH 		= #{month}
+	        , SYS_UPDR_NO	= ${@framework.common.constants.CommonConstants@COMMON_BATCH_USR_NO}
+	        , SYS_UPD_DTM	= NOW()
+	 	WHERE PET_NO = #{petNo}
+	</update>
+</mapper>

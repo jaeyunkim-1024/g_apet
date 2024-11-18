@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<title>veci</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="stylesheet" type="text/css" href="css/design.css">
+	<script type="text/javascript"  src="js/jquery-1.11.3.min.js" ></script>
+	<script type="text/javascript"  src="js/jquery-ui.min.js" ></script>
+	<script type="text/javascript"  src="js/design-ui.js" ></script>
+	
+</head>
+<body>
+<div class="login_cont">
+	<div class="login-panel panel ">
+		<h2>코다스 디자인 IGP </h2>	
+		<div class="panel-body loginMainWrap">
+			<form name="loginForm" id="loginForm" method="post" role="form">
+				<fieldset>
+					<div class="form-group input-group">
+						<input class="form-control" placeholder="아이디" name="loginId" id="loginId" type="text" title="아이디">
+					</div>
+					<div class="input-group form-group">
+						<input class="form-control" placeholder="비밀번호" name="loginPw" id="loginPw" type="password" title="비밀번호" value="" style="margin-top:10px;" >
+					</div>
+					<div class="checkbox">
+						<label><input type="checkbox" name="checkId" onclick="javascript:saveid(this.form);" id="checkId"> 아이디 저장</label>
+					</div>
+					<a href="#" id="actionForm" class="btn_type3 btn-block">로그인</a>
+				</fieldset>
+			</form>
+		</div>
+		<p class="desc">관련 문의는 000-0000-0000로 문의 해 주시기 바랍니다.</p>
+	</div>
+</div>	
+
+</body>
+</html>

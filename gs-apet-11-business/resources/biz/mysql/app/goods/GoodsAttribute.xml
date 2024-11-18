@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	속성
+	작성자  		snw
+	작성일자  	2017.01.31
+-->
+
+<mapper namespace="goodsAttribute">
+
+	<resultMap type="biz.app.goods.model.GoodsAttributeVO" id="goodsAttrListMap">
+		<id     property="attrNo"				column="ATTR_NO"/>
+		<result property="goodsId"			column="GOODS_ID"/>
+		<result property="attrNm"				column="ATTR_NM"/>
+		<result property="useYn"				column="USE_YN"/>
+		
+		<collection property="goodsAttrValueList" ofType="biz.app.attribute.model.AttributeValueVO">
+			<id     property="attrValNo"		column="ATTR_VAL_NO"/>
+			<result property="attrVal"			column="ATTR_VAL"/>
+			<result property="useYn"			column="VAL_USE_YN"/>
+		</collection>
+	</resultMap>
+
+	<select id="listGoodsAttribute" resultMap="goodsAttrListMap">
+		<!--
+			Query Name : goodsAttribute.listGoodsAttribute
+			Description : 상품 속성 목록 조회
+		-->
+		SELECT /* QUERYID(goodsAttribute.listGoodsAttribute) */
+		    GA.GOODS_ID,
+		    AB.ATTR_NO,
+		    AB.ATTR_NM,
+		    AB.USE_YN,
+		    AV.ATTR_VAL_NO,
+		    AV.ATTR_VAL,
+		    AV.USE_YN AS VAL_USE_YN
+		FROM
+		    GOODS_ATTRIBUTE   GA,
+		    ATTRIBUTE         AB,
+		    ATTRIBUTE_VALUE   AV
+		WHERE
+		    GA.ATTR_NO = AB.ATTR_NO
+		    AND AB.ATTR_NO = AV.ATTR_NO
+		        AND GA.GOODS_ID = #{goodsId}
+				<if test="validItem != null and validItem">
+				AND		(AV.ATTR_NO, AV.ATTR_VAL_NO) IN (
+															SELECT 	
+																IAV.ATTR_NO, 
+																IAV.ATTR_VAL_NO
+															FROM 	ITEM_ATTRIBUTE_VALUE IAV
+																		, ITEM IT
+															WHERE 	IAV.ITEM_NO = IT.ITEM_NO
+															AND		IT.GOODS_ID = GA.GOODS_ID
+															AND		IT.ITEM_STAT_CD = '${@framework.common.constants.CommonConstants@ITEM_STAT_10}'
+															)
+				</if>
+		ORDER BY
+		    GA.DISP_PRIOR_RANK,
+		    AB.ATTR_NO ASC,
+		    AV.ATTR_VAL_NO ASC
+	</select>
+
+
+
+
+</mapper>

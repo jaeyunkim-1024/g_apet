@@ -1,0 +1,1070 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tvDetail">
+
+	<select id="selectVdoWatchHist" resultType="biz.app.tv.model.TvWatchHistVO" >
+		<!--
+			Query Name : tvDetail.selectVdoWatchHist
+			Description : 펫TV 상세 > 영상 시청이력 조회-사용안함
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoWatchHist) */
+			WH.VD_ID /*영상ID*/
+			, WH.MBR_NO /*회원번호*/
+			, WH.HITS /*조회수*/
+			, WH.STEP_NO /*단계번호*/
+			, WH.VD_LNTH /*영상길이(초)*/
+			, WH.SYS_REGR_NO /*시스템 등록자번호*/
+			, WH.SYS_REG_DTM /*시스템 등록 일시*/
+			, DATE_FORMAT(WH.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 등록일*/
+			, WH.SYS_UPDR_NO /*시스템 수정자번호*/
+			, WH.SYS_UPD_DTM /*시스템 수정 일시*/
+			, DATE_FORMAT(WH.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_UPD_DT /*시스템 수정일*/
+		  FROM APET_CONTENTS_WATCH_HIST WH
+		 WHERE WH.MBR_NO = #{mbrNo}
+		   AND WH.VD_ID = #{vdId}
+ 	</select>
+ 	
+ 	<insert id="insertVdoWatchHist" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.insertVdoWatchHist
+			Description : 펫TV 상세 > 영상 시청이력 등록-사용안함
+		-->
+ 		/* QUERYID(tvDetail.insertVdoWatchHist) */
+ 		INSERT INTO APET_CONTENTS_WATCH_HIST 
+ 		(
+ 			VD_ID
+ 			, MBR_NO
+ 			, VD_LNTH
+ 			, SYS_REGR_NO
+ 			, SYS_REG_DTM
+ 			, SYS_UPDR_NO
+ 			, SYS_UPD_DTM
+ 		)
+ 		VALUES
+ 		(
+ 			#{vdId}
+ 			, #{mbrNo}
+ 			, 0
+ 			, #{sysRegrNo}
+			, NOW()	
+			, #{sysUpdrNo}
+			, NOW()
+ 		)
+ 	</insert>
+	
+	<select id="selectVdoDetailInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoDetailInfo
+			Description : 펫TV 상세 > 영상 상세정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoDetailInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.VD_GB_CD /*영상구분코드(10=교육, 20=기타)*/
+			, AC.TP_CD /*타입코드*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, AC.SESN_NO /*시즌번호*/
+			, AC.FL_NO /*파일번호*/
+			, AC.DISP_YN /*전시여부*/
+			, AC.TTL /*제목*/
+			, AC.CONTENT /*내용*/
+			, AC.CRIT /*음원저작권*/
+			, AC.VD_TP_CD /*영상타입코드*/
+			, AC.HITS /*조회수*/
+			, AC.PET_GB_CD /*펫구분코드*/
+			, AC.EUD_CONTS_CTG_L_CD AS CTG_LCD/*교육용컨텐츠카테고리_L_코드*/
+			, AC.EUD_CONTS_CTG_M_CD AS CTG_MCD/*교육용컨텐츠카테고리_M_코드*/
+			, AC.EUD_CONTS_CTG_S_CD AS CTG_SCD/*교육용컨텐츠카테고리_S_코드*/
+			, AC.LOD_CD /*난이도코드*/
+			, AC.PRPM_CD /*준비물코드*/
+			, AC.SYS_REGR_NO /*시스템 등록자번호*/
+			, AC.SYS_REG_DTM /*시스템 등록 일시*/
+			, DATE_FORMAT(AC.SYS_REG_DTM, '%Y.%m.%d') AS SYS_REG_DT /*시스템 등록일*/
+			, AC.SYS_UPDR_NO /*시스템 수정자번호*/
+			, AC.SYS_UPD_DTM /*시스템 수정 일시*/
+			, DATE_FORMAT(AC.SYS_UPD_DTM, '%Y.%m.%d') AS SYS_UPD_DT /*시스템 수정일*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 썸네일 경로*/
+			, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_OUTSIDE_VD_ID /*외부영상ID*/
+			, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+			, SER.SRIS_ID /*시리즈ID*/
+			, SER.SRIS_NM /*시리즈명*/
+			, SER.FL_NO AS SRIS_FL_NO /*시리즈 파일번호*/
+			, IFNULL(SER.AD_YN, 'N') AS SRIS_AD_YN /*시리즈 광고여부*/
+			, SEA.SESN_NM /*시즌명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = SER.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH /*시리즈 섬네일 경로*/
+			, IFNULL((SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST HIST WHERE HIST.VD_ID = AC.VD_ID AND HIST.MBR_NO = #{mbrNo}), 0) AS AC_PLAY_TIME /*시청길이*/
+			, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+			, (SELECT CASE WHEN COUNT(ACI.VD_ID) > 0 THEN 'Y' ELSE 'N' END FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND MBR_NO = #{mbrNo} ) AS LIKE_YN /*좋아요여부*/
+			, (SELECT CASE WHEN COUNT(ACI.VD_ID) > 0 THEN 'Y' ELSE 'N' END FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND MBR_NO = #{mbrNo} ) AS DIBS_YN /*찜여부*/
+			, (SELECT COUNT(REPLY.VD_ID) 
+				FROM APET_CONTENTS_REPLY REPLY 
+				INNER JOIN MEMBER_BASE MB ON MB.MBR_NO = REPLY.MBR_NO
+				WHERE 1 = 1
+					AND REPLY.VD_ID = AC.VD_ID AND REPLY.CONTS_STAT_CD = '${@framework.common.constants.CommonConstants@CONTS_STAT_10}'
+					<!--AND MB.MBR_STAT_CD != '${@framework.common.constants.CommonConstants@MBR_STAT_50}'-->) AS REPLY_CNT /*댓글수*/
+			, AC.SRT_URL /*단축URL*/
+			, SER.REPEATYN /*시리즈 반복여부(임시컬림 추후 삭제)*/
+			, SER.SRIS_SEQ /*시리즈 정렬순서*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SERIES SER
+		  		ON AC.SRIS_NO = SER.SRIS_NO
+		  	LEFT OUTER JOIN APET_CONTENTS_SEASON SEA
+		  		ON SER.SRIS_NO = SEA.SRIS_NO
+		  		AND AC.SESN_NO = SEA.SESN_NO
+		  		AND SEA.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND SER.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND AC.VD_ID = #{vdId}
+ 	</select>
+ 	
+ 	<select id="selectSimpleVdoDetailInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectSimpleVdoDetailInfo
+			Description : 펫TV 상세 > 영상 단순상세정보 조회
+		-->
+		SELECT
+			T.*
+			, TIME_FORMAT(SEC_TO_TIME(T.AC_TOT_TIME), '%i:%s') AS AC_TOT_TIME_STR
+			, CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) <![CDATA[ > ]]> 100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END AS PROGRESS_BAR
+		  FROM(
+			SELECT /* QUERYID(tvDetail.selectSimpleVdoDetailInfo) */
+				AC.VD_ID /*영상ID*/
+				, AC.SRIS_NO /*시리즈번호*/
+				, SER.SRIS_NM /*시리즈명*/
+				, AC.SESN_NO /*시즌번호*/
+				, AC.HITS /*조회수*/
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, IFNULL((SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST HIST WHERE HIST.VD_ID = AC.VD_ID AND HIST.MBR_NO = #{mbrNo}), 0) AS AC_PLAY_TIME /*시청길이*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = SER.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH /*시리즈 섬네일 경로*/
+				, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+				, CASE WHEN DATE_ADD(AC.SYS_REG_DTM, INTERVAL 1 DAY) <![CDATA[ > ]]> NOW() THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+				, SER.SRIS_SEQ /*시리즈 정렬순서*/
+			  FROM APET_CONTENTS AC
+			  	INNER JOIN APET_CONTENTS_SERIES SER
+			  		ON AC.SRIS_NO = SER.SRIS_NO
+			  	LEFT OUTER JOIN APET_CONTENTS_SEASON SEA
+			  		ON SER.SRIS_NO = SEA.SRIS_NO
+			  		AND AC.SESN_NO = SEA.SESN_NO
+			  		AND SEA.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+			   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			   AND SER.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			<if test="vdIdList != null">
+				<foreach collection="vdIdList" item="vdId" separator="," open="AND AC.VD_ID IN (" close=")">
+					#{vdId}
+				</foreach>
+			</if>
+		  ) T
+ 	</select>
+ 	
+ 	<select id="selectVdoTagList" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoTagList
+			Description : 펫TV 상세 > 태그 목록 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoTagList) */
+			T1.TAG_NO AS AC_TAG_NO
+			, T2.TAG_NM AS AC_TAG_NM
+		  FROM APET_CONTENTS_TAG_MAP T1
+  			INNER JOIN TAG_BASE T2
+  				ON (T1.TAG_NO = T2.TAG_NO)
+ 		 WHERE VD_ID = #{vdId}
+ 		ORDER BY T1.SYS_REG_DTM
+ 		LIMIT 10
+ 	</select>
+ 	
+ 	<update id="updateVdoHits" parameterType="biz.app.tv.model.TvDetailSO">
+ 		<!--
+			Query Name : tvDetail.selectVdoTagList
+			Description : 펫TV 상세 > 영상 조회수 증가
+		-->
+ 		UPDATE APET_CONTENTS /* QUERYID(tvDetail.updateVdoHits) */
+ 		   SET HITS = IFNULL(HITS, 0)+1
+ 		 WHERE VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+ 		   AND VD_ID = #{vdId}
+ 	</update>
+ 	
+ 	<select id="selectVdoReplyList" resultType="biz.app.tv.model.TvDetailReplyVO" >
+		<!--
+			Query Name : tvDetail.selectVdoReplyList
+			Description : 펫TV 상세 > 영상 댓글 목록 조회-사용안함
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoReplyList) */
+			REPLY.VD_ID /*영상Id*/
+			, REPLY.APLY_SEQ /*댓글순번*/
+			, REPLY.MBR_NO /*회원번호*/
+			, MBR.MBR_NM /*회원명*/
+			, MBR.LOGIN_ID /*로그인ID*/
+			, REPLY.APLY /*댓글*/
+			, REPLY.RPL /*답변*/
+			, REPLY.CONTS_STAT_CD /*컨텐츠상태코드*/
+			, REPLY.SYS_REGR_NO /*시스템 등록자번호*/
+			, REPLY.SYS_REG_DTM /*시스템 등록 일시*/
+			, DATE_FORMAT(REPLY.SYS_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 등록일*/
+			, REPLY.SYS_UPDR_NO /*시스템 수정자번호*/
+			, REPLY.SYS_UPD_DTM /*시스템 수정 일시*/
+			, DATE_FORMAT(REPLY.SYS_UPD_DTM, '%Y-%m-%d') AS SYS_REG_DT /*시스템 수정일*/
+			, REPLY.RPL_REGR_NO /*답변*/
+			, REPLY.RPL_REG_DTM /**/
+			, DATE_FORMAT(REPLY.RPL_REG_DTM, '%Y-%m-%d') AS SYS_REG_DT /*답변 등록일*/
+			, REPLY.RPL_UPDR_NO /**/
+			, REPLY.RPL_UPD_DTM /**/
+			, DATE_FORMAT(REPLY.RPL_UPD_DTM, '%Y-%m-%d') AS SYS_REG_DT /*답변 수정일*/
+			, COUNT(*) OVER() AS TOT_CNT
+		  FROM APET_CONTENTS_REPLY REPLY
+		  	INNER JOIN MEMBER_BASE MBR
+		  		ON REPLY.MBR_NO = MBR.MBR_NO
+		 WHERE VD_ID = #{vdId}
+ 	</select>
+ 	
+ 	<select id="selectVdoGoodsList" resultType="biz.app.tv.model.TvDetailGoodsVO" >
+ 		<!--
+			Query Name : tvDetail.selectVdoGoodsList
+			Description : 펫TV 상세 > 연관상품 목록 조회-사용안함
+		-->
+		<include refid="sqlVdoGoodsList" />
+		AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'	/* 판매중(승인) */
+		AND AC.VD_GB_CD 	 = '${@framework.common.constants.CommonConstants@VD_GB_20}'		/* 영상구분코드(10=교육, 20=기타) */
+		AND AAF.CONTS_TP_CD  = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'		/* 컨텐츠 유형 코드 */
+		AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		AND ACGM.VD_ID = #{vdId}
+ 	</select>
+
+	<select id="listGoodsContentsByGoodsId" resultType="biz.app.tv.model.TvDetailGoodsVO" >
+		<!--
+		   Query Name : tvDetail.selectVdoGoodsListByGoodsId
+		   Description : 펫샵 상세 > 관련영상 목록 조회
+	   -->
+		<include refid="sqlVdoGoodsList" />
+		AND GB.GOODS_ID 	 = #{goodsId}
+		AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'	/* 판매중(승인) */
+		AND AC.VD_GB_CD 	 = '${@framework.common.constants.CommonConstants@VD_GB_20}'		/* 영상구분코드(10=교육, 20=기타) */
+		AND AAF.CONTS_TP_CD  = '${@framework.common.constants.CommonConstants@CONTS_TP_10}'		/* 컨텐츠 유형 코드 */
+		AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		limit 10
+	</select>
+
+	<sql id="sqlVdoGoodsList">
+		SELECT /* QUERYID(tvDetail.selectVdoGoodsList) */
+			ACGM.VD_ID 			/* 영상ID		*/
+			, ACGM.GOODS_ID 	/* 상품ID		*/
+			, AC.TTL 			/* 콘텐츠 제목 */
+			, GB.GOODS_NM 		/* 상품명		*/
+			, GB.GOODS_STAT_CD 	/* 상품상태코드	*/
+			, GB.GOODS_TP_CD 	/* 상품유형코드	*/
+			, GP.ORG_SALE_AMT 	/* 원 판매금액	*/
+			, GP.SALE_AMT 		/* 판매금액		*/
+			, GI.IMG_SEQ 		/* 이미지순번	*/
+			, GI.IMG_PATH 		/* 이미지경로	*/
+			, IFNULL(AAF.VD_LNTH, 0) VD_LNTH	/* 영상길이 */
+			, IFNULL(AAF.PHY_PATH, '') PHY_PATH	/* 썸네일 이미지 */
+			, IFNULL((SELECT COUNT(*) FROM apet_contents_interest
+				WHERE VD_ID = ACGM.VD_ID AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' GROUP BY VD_ID), 0) LIKE_CNT		/* 좋아요 개수 */
+			, IFNULL((SELECT COUNT(*) FROM apet_contents_watch_hist
+				WHERE VD_ID = ACGM.VD_ID AND STEP_NO >= 1), 0) PLAY_CNT								/* 시청 횟수(STEP_NO 변경가능성 있음.) */
+		  FROM APET_CONTENTS_GOODS_MAP ACGM
+		  	INNER JOIN GOODS_BASE GB
+		  		ON ACGM.GOODS_ID = GB.GOODS_ID
+		  	INNER JOIN GOODS_PRICE GP
+		  		ON (GB.GOODS_ID = GP.GOODS_ID AND NOW() BETWEEN GP.SALE_STRT_DTM AND GP.SALE_END_DTM)
+		  	INNER JOIN GOODS_IMG GI
+		  		ON GB.GOODS_ID = GI.GOODS_ID
+		  	LEFT JOIN apet_contents ac
+			ON ACGM.VD_ID = AC.VD_ID
+			LEFT JOIN apet_attach_file aaf
+			ON AC.FL_NO = AAF.FL_NO
+		 WHERE 1=1
+	</sql>
+
+ 	<select id="selectVdoSrisList" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoSrisList
+			Description : 펫TV 상세 > 시리즈 목록 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoSrisList) */
+			T.*
+			, TIME_FORMAT(SEC_TO_TIME(T.AC_TOT_TIME), '%i:%s') AS AC_TOT_TIME_STR
+			, CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) <![CDATA[ > ]]> 100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END AS PROGRESS_BAR
+		  FROM(
+		 	SELECT 
+				AC.VD_ID /*영상ID*/
+				, AC.TTL /*영상제목*/
+				, AC.HITS /*영상조회수*/
+				, AC.FL_NO /*파일번호*/
+				, AC.SYS_REG_DTM /*시스템 등록 일시*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_OUTSIDE_VD_ID /*외부영상ID*/
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, IFNULL((SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST HIST WHERE HIST.VD_ID = AC.VD_ID AND HIST.MBR_NO = #{mbrNo}), 0) as AC_PLAY_TIME /*시청길이*/
+				, CASE WHEN DATE_ADD(AC.SYS_REG_DTM, INTERVAL 1 DAY) <![CDATA[ > ]]> NOW() THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+				, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+			  FROM APET_CONTENTS AC
+			 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+			   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			   AND AC.SRIS_NO = #{srisNo}
+		  ) T
+		 WHERE 1=1
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				ORDER BY T.SYS_REG_DTM DESC
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				ORDER BY T.HITS DESC, T.LIKE_CNT DESC, T.SYS_REG_DTM DESC
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			ORDER BY T.SYS_REG_DTM DESC
+			/*ORDER BY T.TTL*/
+		</if>
+ 	</select>
+ 	
+ 	<select id="selectVdoPrevSrisInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoPrevSrisInfo
+			Description : 펫TV 상세 > 이전 시리즈 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoPrevSrisInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, ACS.SRIS_NM /*시리즈명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SERIES ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.SRIS_SEQ <![CDATA[ < ]]> #{srisSeq}
+		   		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ DESC
+		   		LIMIT 1
+		   )
+		ORDER BY AC.SRIS_NO, AC.SESN_NO DESC
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS, ACI.LIKE_CNT, AC.SYS_REG_DTM
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM
+			/*, AC.TTL DESC*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<select id="selectVdoNextSrisInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoNextSrisInfo
+			Description : 펫TV 상세 > 다음 시리즈 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoNextSrisInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, ACS.SRIS_NM /*시리즈명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SERIES ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		<if test='repeatYn != "Y"'>
+		/*시리즈 반복여부(임시컬럼 추후 삭제)*/
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.SRIS_SEQ <![CDATA[ > ]]> #{srisSeq}
+		   		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ
+		   		LIMIT 1
+		   )
+		</if>
+		<if test='repeatYn == "Y"'>
+		/*시리즈 반복여부(임시컬럼 추후 삭제)*/
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.SRIS_SEQ <![CDATA[ <> ]]> #{srisSeq}
+		   		   AND ACS.SRIS_SEQ <![CDATA[ > ]]> #{srisSeq}
+		   		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND ACS.REPEATYN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ
+		   		LIMIT 1
+		   )
+		</if>
+		ORDER BY AC.SRIS_NO, AC.SESN_NO
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM DESC
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS DESC, ACI.LIKE_CNT DESC, AC.SYS_REG_DTM DESC
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM DESC
+			/*, AC.TTL*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<select id="selectVdoLastSrisInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoLastSrisInfo
+			Description : 펫TV 상세 > 마지막(등록순) 시리즈 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoLastSrisInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, ACS.SRIS_NM /*시리즈명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SERIES ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ DESC
+		   		LIMIT 1
+		   )
+		/*ORDER BY AC.SRIS_NO, AC.SESN_NO DESC, AC.SYS_REG_DTM*/
+		ORDER BY AC.SRIS_NO, AC.SESN_NO DESC
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS, ACI.LIKE_CNT, AC.SYS_REG_DTM
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM
+			/*, AC.TTL DESC*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<select id="selectVdoFirstSrisInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoFirstSrisInfo
+			Description : 펫TV 상세 > 첫번째(등록순) 시리즈 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoFirstSrisInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, ACS.SRIS_NM /*시리즈명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SERIES ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		<if test='repeatYn != "Y"'>
+		/*시리즈 반복여부(임시컬럼 추후 삭제)*/
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ
+		   		LIMIT 1
+		   )
+		</if>
+		<if test='repeatYn == "Y"'>
+		/*시리즈 반복여부(임시컬럼 추후 삭제)*/
+		   AND AC.SRIS_NO = (
+		   		SELECT
+		   			DISTINCT(ACS.SRIS_NO) AS SRIS_NO
+		   		  FROM APET_CONTENTS_SERIES ACS
+		   		  	INNER JOIN APET_CONTENTS AC
+		   		  		ON ACS.SRIS_NO = AC.SRIS_NO
+		   		 WHERE ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND ACS.REPEATYN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+		   		ORDER BY ACS.SRIS_SEQ
+		   		LIMIT 1
+		   )
+		</if>
+		/*ORDER BY AC.SRIS_NO, AC.SESN_NO, AC.SYS_REG_DTM DESC*/
+		ORDER BY AC.SRIS_NO, AC.SESN_NO
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM DESC
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS DESC, ACI.LIKE_CNT DESC, AC.SYS_REG_DTM DESC
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM DESC
+			/*, AC.TTL*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<select id="selectVdoSesnList" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoSesnList
+			Description : 펫TV 상세 > 시즌 목록 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoSesnList) */
+			T.*
+			, TIME_FORMAT(SEC_TO_TIME(T.AC_TOT_TIME), '%i:%s') AS AC_TOT_TIME_STR
+			, CASE WHEN TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) <![CDATA[ > ]]> 100 THEN 100 ELSE TRUNCATE((T.AC_PLAY_TIME/T.AC_TOT_TIME) * 100, 0) END AS PROGRESS_BAR
+		  FROM(
+		 	SELECT 
+				AC.VD_ID /*영상ID*/
+				, AC.TTL /*영상제목*/
+				, AC.HITS /*영상조회수*/
+				, AC.FL_NO /*파일번호*/
+				, AC.SYS_REG_DTM /*시스템 등록 일시*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_OUTSIDE_VD_ID /*외부영상ID*/
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, IFNULL((SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST HIST WHERE HIST.VD_ID = AC.VD_ID AND HIST.MBR_NO = #{mbrNo}), 0) as AC_PLAY_TIME /*시청길이*/
+				, CASE WHEN DATE_ADD(AC.SYS_REG_DTM, INTERVAL 1 DAY) <![CDATA[ > ]]> NOW() THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+				, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+			  FROM APET_CONTENTS AC
+			 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+			   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+			   AND AC.SRIS_NO = #{srisNo}
+			   AND AC.SESN_NO = #{sesnNo}
+		  ) T
+		 WHERE 1=1
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				ORDER BY T.SYS_REG_DTM DESC
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				ORDER BY T.HITS DESC, T.LIKE_CNT DESC, T.SYS_REG_DTM DESC
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			ORDER BY T.SYS_REG_DTM DESC
+			/*ORDER BY T.TTL*/
+		</if>
+ 	</select>
+ 	
+ 	<select id="selectVdoPrevSesnInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoPrevSesnInfo
+			Description : 펫TV 상세 > 이전 시즌 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoPrevSesnInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, AC.SESN_NO /*시즌번호*/
+			, ACS.SESN_NM /*시즌명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SEASON ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  		AND AC.SESN_NO = ACS.SESN_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND AC.SRIS_NO = #{srisNo}
+		   AND AC.SESN_NO = (
+		   		SELECT
+		   			A.SESN_NO
+		   		  FROM APET_CONTENTS_SEASON A
+		   		  	INNER JOIN APET_CONTENTS B
+		   		  		ON A.SRIS_NO = B.SRIS_NO
+		   		  		AND A.SESN_NO = B.SESN_NO
+		   		 WHERE A.SRIS_NO = AC.SRIS_NO
+		   		   AND A.SESN_NO <![CDATA[ < ]]> #{sesnNo}
+		   		   AND A.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND B.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY A.SESN_NO DESC
+		   		LIMIT 1
+		   )
+		ORDER BY AC.SRIS_NO, AC.SESN_NO
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS, ACI.LIKE_CNT, AC.SYS_REG_DTM
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM
+			/*, AC.TTL DESC*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<select id="selectVdoNextSesnInfo" resultType="biz.app.tv.model.TvDetailVO" >
+		<!--
+			Query Name : tvDetail.selectVdoNextSesnInfo
+			Description : 펫TV 상세 > 다음 시즌 정보 조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectVdoNextSesnInfo) */
+			AC.VD_ID /*영상ID*/
+			, AC.SRIS_NO /*시리즈번호*/
+			, AC.SESN_NO /*시즌번호*/
+			, ACS.SESN_NM /*시즌명*/
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, COUNT(*) OVER() AS VD_CNT /*시즌영상수*/
+		  FROM APET_CONTENTS AC
+		  	INNER JOIN APET_CONTENTS_SEASON ACS
+		  		ON AC.SRIS_NO = ACS.SRIS_NO
+		  		AND AC.SESN_NO = ACS.SESN_NO
+		  	LEFT OUTER JOIN (
+		  		SELECT
+		  			ACI.VD_ID
+		  			, COUNT(*) AS LIKE_CNT
+		  		  FROM APET_CONTENTS_INTEREST ACI
+		  		 WHERE ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}'
+		  		GROUP BY ACI.VD_ID
+		  	) ACI
+		  		ON AC.VD_ID = ACI.VD_ID
+		 WHERE AC.VD_GB_CD = '${@framework.common.constants.CommonConstants@VD_GB_20}'
+		   AND AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND ACS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   AND AC.SRIS_NO = #{srisNo}
+		   AND AC.SESN_NO = (
+		   		SELECT
+		   			A.SESN_NO
+		   		  FROM APET_CONTENTS_SEASON A
+		   		  	INNER JOIN APET_CONTENTS B
+		   		  		ON A.SRIS_NO = B.SRIS_NO
+		   		  		AND A.SESN_NO = B.SESN_NO
+		   		 WHERE A.SRIS_NO = AC.SRIS_NO
+		   		   AND A.SESN_NO <![CDATA[ > ]]> #{sesnNo}
+		   		   AND A.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		   AND B.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   		ORDER BY A.SESN_NO
+		   		LIMIT 1
+		   )
+		ORDER BY AC.SRIS_NO, AC.SESN_NO
+		<if test="sortCd != null and sortCd != ''">
+			<if test='sortCd == "10"'>
+				/*최신순*/
+				, AC.SYS_REG_DTM DESC
+			</if>
+			<if test='sortCd == "20"'>
+				/*인기순*/
+				, AC.HITS DESC, ACI.LIKE_CNT DESC, AC.SYS_REG_DTM DESC
+			</if>
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			, AC.SYS_REG_DTM DESC
+			/*, AC.TTL*/
+		</if>
+		LIMIT 1
+ 	</select>
+ 	
+ 	<update id="saveVdoViewHist" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.saveVdoViewHist
+			Description : 펫TV 상세 > 영상 시청이력 저장
+		-->
+		/* QUERYID(tvDetail.saveVdoViewHist) */
+		INSERT INTO APET_CONTENTS_WATCH_HIST 
+ 		(
+ 			VD_ID
+ 			, MBR_NO
+ 			, VD_LNTH
+ 			, STEP_NO
+ 			, SYS_REGR_NO
+ 			, SYS_REG_DTM
+ 			, SYS_UPDR_NO
+ 			, SYS_UPD_DTM 			
+ 			<if test="cpltYn != null and cpltYn != ''">
+ 			, CPLT_YN
+ 			</if>
+ 		)
+ 		VALUES
+ 		(
+ 			#{vdId}
+ 			, #{mbrNo}
+ 			, 0
+ 			, #{stepNo}
+ 			, #{sysRegrNo}
+			, NOW()	
+			, #{sysUpdrNo}
+			, NOW()
+			<if test="cpltYn != null and cpltYn != ''">
+ 			, #{cpltYn}
+ 			</if>
+ 		)
+ 		ON DUPLICATE KEY 
+ 		UPDATE
+ 		SYS_UPDR_NO = #{sysUpdrNo}
+ 		, SYS_UPD_DTM = NOW() 		
+ 		<if test='cpltYn != "Y"'>
+ 		, VD_LNTH = #{vdLnth}
+ 		, STEP_NO = #{stepNo}
+ 		</if>
+ 		<if test="cpltYn != null and cpltYn != ''">
+		, CPLT_YN = #{cpltYn}
+		</if>
+ 	</update>
+ 	
+ 	<select id="selectVdoLikeDibsCheck" resultType="java.lang.String">
+ 		<!--
+			Query Name : tvDetail.selectVdoLikeDibsCheck
+			Description : 펫TV 상세 > 영상 좋아요, 찜 저장여부 확인
+		-->
+		/* QUERYID(tvDetail.selectVdoLikeDibsCheck) */
+		SELECT
+			CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+		  FROM APET_CONTENTS_INTEREST
+		 WHERE INTR_GB_CD = #{intrGbCd}
+		   AND VD_ID = #{vdId}
+		   AND MBR_NO = #{mbrNo}
+ 	</select>
+ 	
+ 	<insert id="insertVdoLikeDibs" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.insertVdoLikeDibs
+			Description : 펫TV 상세 > 영상 좋아요, 찜 등록
+		-->
+		/* QUERYID(tvDetail.insertVdoLikeDibs) */
+		INSERT INTO APET_CONTENTS_INTEREST
+		(
+			MBR_NO /*회원번호*/
+			, VD_ID /*영상ID*/
+			, INTR_GB_CD /*관심구분(10:좋아요, 20:찜)*/
+			, SYS_REGR_NO /*시스템 등록자*/
+			, SYS_REG_DTM /*시스템 등록 일시*/
+		)
+		VALUES
+		(
+			#{mbrNo}
+			, #{vdId}
+			, #{intrGbCd}
+			, #{sysRegrNo}
+			, NOW()	
+		)
+ 	</insert>
+ 	
+ 	<delete id="deleteVdoLikeDibs" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.deleteVdoLikeDibs
+			Description : 펫TV 상세 > 영상 좋아요, 찜 삭제
+		-->
+		/* QUERYID(tvDetail.deleteVdoLikeDibs) */
+		DELETE FROM APET_CONTENTS_INTEREST
+		 WHERE INTR_GB_CD = #{intrGbCd}
+		   AND VD_ID = #{vdId}
+		   AND MBR_NO = #{mbrNo}
+ 	</delete>
+ 	
+ 	<select id="selectLikeCount" resultType="java.lang.Integer">
+ 		<!--
+			Query Name : tvDetail.selectLikeCount
+			Description : 펫TV 상세 > 영상 좋아요 건수 조회
+		-->
+		/* QUERYID(tvDetail.selectLikeCount) */
+		SELECT
+			COUNT(*) AS CNT
+		  FROM APET_CONTENTS_INTEREST
+		 WHERE INTR_GB_CD = #{intrGbCd}
+		   AND VD_ID = #{vdId}
+ 	</select>
+ 	
+ 	<insert id="insertVdoShare" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.insertVdoShare
+			Description : 펫TV 상세 > 영상 공유 저장
+		-->
+		<selectKey keyProperty="contsShrNo" resultType="java.lang.Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_PET_TV_SHARE_SEQ}') FROM DUAL
+		</selectKey>
+		/* QUERYID(tvDetail.insertVdoShare) */
+		INSERT INTO APET_CONTENTS_SHARE
+		(
+			CONTS_SHR_NO /*공유번호*/
+			, MBR_NO /*회원번호*/
+			, VD_ID /*영상ID*/
+			, SHR_CHNL_CD /*공유채널코드*/
+			, SYS_REGR_NO /*시스템 등록자*/
+			, SYS_REG_DTM /*시스템 등록 일시*/
+		)
+		VALUES
+		(
+			#{contsShrNo}
+			, #{mbrNo}
+			, #{vdId}
+			, #{shrChnlCd}
+			, #{sysRegrNo}
+			, NOW()	
+		)
+ 	</insert>
+ 	
+ 	<insert id="updateVdoShortUrl" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.updateVdoShortUrl
+			Description : 펫TV 상세 > 단축URL 저장
+		-->
+		UPDATE APET_CONTENTS /* QUERYID(tvDetail.updateVdoShortUrl) */
+		   SET SRT_URL = #{srtUrl}
+		 WHERE VD_ID = #{vdId}
+ 	</insert>
+ 	
+ 	<select id="selectRecentVdoList" resultType="biz.app.tv.model.TvDetailVO">
+		<!--
+			Query Name : tvDetail.selectRecentVdoList
+			Description : 마이페이지 > 최근 시청한 영상 목록조회
+		-->
+		SELECT /* QUERYID(tvDetail.selectRecentVdoList) */
+			ACWH.VD_ID /*영상ID*/
+			, ACWH.MBR_NO /*회원번호*/
+			, ACWH.STEP_NO /*단계번호*/
+			, ACWH.AC_PLAY_TIME /*영상시청길이*/
+			, ACWH.VD_GB_CD /*영상구분코드(10=교육, 20=기타)*/
+			, ACWH.TP_CD /*타입코드*/
+			, ACWH.SRIS_NO /*시리즈번호*/
+			, ACWH.SESN_NO /*시즌번호*/
+			, ACWH.FL_NO /*파일번호*/
+			, ACWH.DISP_YN /*전시여부*/
+			, ACWH.TTL /*제목*/
+			, ACWH.HITS /*조회수*/
+			, ACWH.PET_GB_CD /*펫구분코드*/
+			, ACWH.PET_GB_NM /*펫구분코드명*/
+			, ACWH.CTG_LCD /*교육용컨텐츠카테고리_L_코드*/
+			, ACWH.CTG_LNM /*교육용컨텐츠카테고리_L_코드명*/
+			, ACWH.CTG_MCD /*교육용컨텐츠카테고리_M_코드*/
+			, ACWH.CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+			, ACWH.CTG_SCD /*교육용컨텐츠카테고리_S_코드*/
+			, ACWH.CTG_SNM /*교육용컨텐츠카테고리_S_코드명*/
+			, ACWH.LOD_CD /*난이도코드*/
+			, ACWH.SRIS_NM /*시리즈명*/
+			, ACWH.AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+			, ACWH.AC_TOT_TIME /*영상길이*/
+			, ACWH.LIKE_CNT /*좋아요수*/
+			, ACWH.CMPL_FL_NO/*완료영상의 파일번호*/
+			, ACWH.ACD_OUTSIDE_VD_ID /*컨텐츠상세외부영상ID*/
+			, ACWH.TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+			, ACWH.SYS_REG_DTM
+			, ACWH.SYS_REGR_NO
+			, ACWH.SYS_UPD_DTM
+			, ACWH.SYS_UPDR_NO
+			, TIME_FORMAT(SEC_TO_TIME(ACWH.AC_TOT_TIME), '%i:%s') AS AC_TOT_TIME_STR
+			, CASE WHEN ACWH.VD_GB_CD = '10' THEN CASE WHEN ACWH.STEP_NO = ACWH.TOT_STEP_CNT THEN 100 ELSE TRUNCATE(((ACWH.STEP_NO+1)/ACWH.TOT_STEP_CNT) * 100, 0) END
+			   	   ELSE CASE WHEN TRUNCATE((ACWH.AC_PLAY_TIME/ACWH.AC_TOT_TIME) * 100, 0)  <![CDATA[ > ]]>  100 THEN 100 ELSE TRUNCATE((ACWH.AC_PLAY_TIME/ACWH.AC_TOT_TIME) * 100, 0) END
+		  	END AS PROGRESS_BAR /*시청길이 프로그래스바*/
+		  FROM (
+			SELECT
+				ACWH.VD_ID /*영상ID*/
+				, ACWH.MBR_NO /*회원번호*/
+				, ACWH.STEP_NO /*단계번호*/
+				, ACWH.VD_LNTH AS AC_PLAY_TIME /*영상시청길이*/
+				, AC.VD_GB_CD /*영상구분코드(10=교육, 20=기타)*/
+				, AC.TP_CD /*타입코드*/
+				, AC.SRIS_NO /*시리즈번호*/
+				, AC.SESN_NO /*시즌번호*/
+				, AC.FL_NO /*파일번호*/
+				, AC.DISP_YN /*전시여부*/
+				, AC.TTL /*제목*/
+				, AC.HITS /*조회수*/
+				, AC.PET_GB_CD /*펫구분코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND DTL_CD = AC.PET_GB_CD) AS PET_GB_NM /*펫구분코드명*/
+				, AC.EUD_CONTS_CTG_L_CD AS CTG_LCD /*교육용컨텐츠카테고리_L_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_L' AND DTL_CD = AC.EUD_CONTS_CTG_L_CD) AS CTG_LNM /*교육용컨텐츠카테고리_L_코드명*/
+				, AC.EUD_CONTS_CTG_M_CD AS CTG_MCD /*교육용컨텐츠카테고리_M_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, AC.EUD_CONTS_CTG_S_CD AS CTG_SCD /*교육용컨텐츠카테고리_S_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_S' AND DTL_CD = AC.EUD_CONTS_CTG_S_CD) AS CTG_SNM /*교육용컨텐츠카테고리_S_코드명*/
+				, AC.LOD_CD /*난이도코드*/
+				, SRIS.SRIS_NM /*시리즈명*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+				, '' AS CMPL_FL_NO/*완료영상의 파일번호*/
+				, '' AS ACD_OUTSIDE_VD_ID /*컨텐츠상세외부영상ID*/
+				, 0 AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+				, ACWH.SYS_REG_DTM
+				, ACWH.SYS_REGR_NO
+				, ACWH.SYS_UPD_DTM
+				, ACWH.SYS_UPDR_NO
+			  FROM APET_CONTENTS_WATCH_HIST ACWH
+				INNER JOIN APET_CONTENTS AC
+			  		ON ACWH.VD_ID = AC.VD_ID 
+			  	INNER JOIN APET_CONTENTS_SERIES SRIS
+		  			ON AC.SRIS_NO = SRIS.SRIS_NO
+		  	 WHERE AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		  	   AND SRIS.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   	   AND ACWH.MBR_NO = #{mbrNo}
+		  	UNION
+		  	SELECT
+		  		ACWH.VD_ID /*영상ID*/
+				, ACWH.MBR_NO /*회원번호*/
+				, ACWH.STEP_NO /*단계번호*/
+				, ACWH.VD_LNTH AS AC_PLAY_TIME /*영상시청길이*/
+				, AC.VD_GB_CD /*영상구분코드(10=교육, 20=기타)*/
+				, AC.TP_CD /*타입코드*/
+				, AC.SRIS_NO /*시리즈번호*/
+				, AC.SESN_NO /*시즌번호*/
+				, AC.FL_NO /*파일번호*/
+				, AC.DISP_YN /*전시여부*/
+				, AC.TTL /*제목*/
+				, AC.HITS /*조회수*/
+				, AC.PET_GB_CD /*펫구분코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND DTL_CD = AC.PET_GB_CD) AS PET_GB_NM /*펫구분코드명*/
+				, AC.EUD_CONTS_CTG_L_CD AS CTG_LCD /*교육용컨텐츠카테고리_L_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_L' AND DTL_CD = AC.EUD_CONTS_CTG_L_CD) AS CTG_LNM /*교육용컨텐츠카테고리_L_코드명*/
+				, AC.EUD_CONTS_CTG_M_CD AS CTG_MCD /*교육용컨텐츠카테고리_M_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_M' AND DTL_CD = AC.EUD_CONTS_CTG_M_CD) AS CTG_MNM /*교육용컨텐츠카테고리_M_코드명*/
+				, AC.EUD_CONTS_CTG_S_CD AS CTG_SCD /*교육용컨텐츠카테고리_S_코드*/
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'EUD_CONTS_CTG_S' AND DTL_CD = AC.EUD_CONTS_CTG_S_CD) AS CTG_SNM /*교육용컨텐츠카테고리_S_코드명*/
+				, AC.LOD_CD /*난이도코드*/
+				, '' AS SRIS_NM /*시리즈명*/
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS AC_PRFL_IMG_PATH /*영상 섬네일 경로*/
+				, (SELECT VD_LNTH FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS AC_TOT_TIME /*영상길이*/
+				, (SELECT COUNT(ACI.VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE ACI.VD_ID = AC.VD_ID AND ACI.INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT /*좋아요수*/
+				, ACD.FL_NO AS CMPL_FL_NO/*완료영상의 파일번호*/
+				, (SELECT OUTSIDE_VD_ID FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = ACD.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}' ORDER BY SEQ DESC LIMIT 1) AS ACD_OUTSIDE_VD_ID /*컨텐츠상세외부영상ID*/
+				, (SELECT COUNT(*) FROM APET_CONTENTS_DETAIL A WHERE A.VD_ID = ACWH.VD_ID) AS TOT_STEP_CNT /*교육 컨텐츠 총 건수 */
+				, ACWH.SYS_REG_DTM
+				, ACWH.SYS_REGR_NO
+				, ACWH.SYS_UPD_DTM
+				, ACWH.SYS_UPDR_NO
+		  	  FROM APET_CONTENTS_WATCH_HIST ACWH
+		  	 	INNER JOIN APET_CONTENTS AC
+		  			ON ACWH.VD_ID = AC.VD_ID
+		  		INNER JOIN APET_CONTENTS_DETAIL ACD
+		  			ON ACWH.VD_ID = ACD.VD_ID
+		  	 WHERE AC.DISP_YN = '${@framework.common.constants.CommonConstants@DISP_YN_Y}'
+		   	   AND ACD.STEP_NO = 0
+		   	   AND (AC.EUD_CONTS_CTG_L_CD IS NULL OR AC.EUD_CONTS_CTG_L_CD = '${@framework.common.constants.CommonConstants@EUD_CONTS_CTG_L_10}')
+		   	   AND ACWH.MBR_NO = #{mbrNo}
+		  ) ACWH
+		WHERE 1 = 1
+		<if test="dupleVdIds != null">
+			<foreach collection="dupleVdIds" item="vdId" separator="," open="AND ACWH.VD_ID NOT IN (" close=")">
+				#{vdId}
+			</foreach>
+		</if> 
+		ORDER BY ACWH.SYS_UPD_DTM DESC
+		<if test="limit != null and limit != ''">
+			LIMIT ${limit}
+		</if>
+ 	</select>
+ 	
+ 	<delete id="deleteRecentVdo" parameterType="biz.app.tv.model.TvDetailPO">
+ 		<!--
+			Query Name : tvDetail.deleteRecentVdo
+			Description : 마이페이지 > 최근 시청한 영상 삭제
+		-->
+		/* QUERYID(tvDetail.deleteRecentVdo) */
+		DELETE FROM APET_CONTENTS_WATCH_HIST
+		 WHERE VD_ID = #{vdId}
+		   AND MBR_NO = #{mbrNo}
+ 	</delete>
+ 	
+ 	<select id="selectVdoMbrLikeMarkCheck" resultType="java.lang.String">
+		<!--
+			Query Name : tvDetail.selectVdoMbrLikeMarkCheck
+			Description : 펫TV 상세 > 로그인한 회원의 좋아요, 찜 여부 확인
+		-->
+		/* QUERYID(tvDetail.selectVdoMbrLikeMarkCheck) */
+		SELECT
+			CASE WHEN COUNT(*) = 2 THEN 'A'
+				 WHEN INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' THEN 'L'
+				 WHEN INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' THEN 'M'
+				 ELSE 'N'
+			END AS LIKE_MARK_CHECK
+		  FROM APET_CONTENTS_INTEREST ACI
+		 WHERE ACI.VD_ID = #{vdId}
+		   AND MBR_NO = #{mbrNo}
+	</select>
+
+</mapper>

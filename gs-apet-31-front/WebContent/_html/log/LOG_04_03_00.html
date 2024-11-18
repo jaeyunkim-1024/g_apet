@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 사진선택 높이 */
+			var h = ($(window).height() + 14 - ($(".lmp_addpicBt.first").offset().top + $(".lmp_addpicBt.first").height() - $(window).scrollTop() - 14)) / ($(window).height() * 0.01) - 5;/* 2021.02.24 : 수정 */
+			$(".logCommentBox").data("priceh",h+"%");
+			ui.commentBox.open('.logCommentBox');
+			openPictureCon();
+			$(".logCommentBox .btn_right,.logCommentBox .btn_left").click(function(){
+				$("#container").removeClass("changeBg");
+				$(".log_hanBoxTop > a").show();
+				$(".contents").children().not(".commentBoxAp").each(function(i,n){
+					if(i >= 5) $(n).show();
+				});
+				$("body").removeClass("changeBg");
+				$(".lmp_addpicBt.first").parent().removeClass("block_area");
+			});
+			/* 2021.02.24 : 스크립트 추가 */
+			$(".focus_on textarea").focus(function(){
+				$(this).closest(".focus_on").css("margin-top","12px").siblings().not(".log_hanBoxTop").css("overflow","hidden").each(function(i,n){
+					$(".mo-header-btnType02").hide();
+					$(n).data({"h":$(n).innerHeight(),"mt":$(n).css("margin-top"),"mb":$(n).css("margin-bottom"),"pt":$(n).css("padding-top"),"pb":$(n).css("padding-bottom")}).stop().animate({height:0,"margin-top":0,"margin-bottom":0,"padding-top":0,"padding-bottom":0},500).css("border-width",0);
+				});
+				/* 해더 등록 이벤트 초기화 */
+				$(".mo-header-btnType01").text("완료").off("click").click(function(){
+					$(".focus_on").removeAttr("style").siblings().not(".log_hanBoxTop").each(function(i,n){
+						$(n).stop().animate({height:$(n).data("h"),"margin-top":$(n).data("mt"),"margin-bottom":$(n).data("mb"),"padding-top":$(n).data("pt"),"padding-bottom":$(n).data("pb"),},500,function(){
+							$(this).removeAttr("style");
+						});
+					});
+					$(".mo-header-btnType02").removeAttr("style");
+					$(this).text("등록").off("click");
+					/* 기존 해더 등록 이벤트 추가해 주세요 */
+				});
+			});
+			/* // 2021.02.24 : 스크립트 추가 */
+		});
+		/* 2021.02.24 : 수정 */
+		function openPictureCon(){
+			if($("#container").hasClass("changeBg")){
+				$("#container").removeClass("changeBg");
+				$(".mo-header-btnType02, .mo-header-btnType01").show();
+				$(".contents").children().not(".commentBoxAp").each(function(i,n){
+					if(i >= 5) $(n).show();
+				});
+				$("body").removeClass("changeBg");
+				$(".lmp_addpicBt.first").parent().removeClass("block_area");
+			}else{
+				$("#container").addClass("changeBg");
+				setTimeout(function(){
+					$(".mo-header-btnType02, .mo-header-btnType01").hide();
+				},50);
+				$(".contents").children().not(".commentBoxAp").each(function(i,n){
+					if(i >= 5) $(n).hide();
+				});
+				$("body").addClass("changeBg");
+				$(".lmp_addpicBt.first").parent().addClass("block_area");
+			};
+			$(".logCommentBox").off("popCloseEvent").bind("popCloseEvent",function(){
+				$("#container").removeClass("changeBg");
+				$(".mo-header-btnType02, .mo-header-btnType01").show();
+				$(".contents").children().not(".commentBoxAp").each(function(i,n){
+					if(i >= 5) $(n).show();
+				});
+				$("body").removeClass("changeBg");
+			})
+		};
+		/* // 2021.02.24 : 수정 */
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+		<!-- 2021.02.24 : 헤더 추가 -->
+		<!-- 헤더 -->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set10","tit":"<b class=e>펫로그 만들기</b>"}' data-btn-rname="등록"></include>
+		<!-- // 2021.02.24 : 헤더 추가 -->
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page" id="container">
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents log made" id="contents"><!-- 2021.01.18 : class 추가 -->
+					<!-- 2021.02.24 : 로그 헤더 삭제 -->
+					<!-- log head
+					<div class="log_hanBoxTop">
+						<a href="javascript:;" class="lhbt_btn l">취소</a>
+						<div class="tit">펫로그 만들기</div>
+						<a href="javascript:;" class="lhbt_btn r active_color">등록</a>파란색 color 'active_color' class 추가
+					</div>
+					//log head-->
+					<!-- // 2021.02.24 : 로그 헤더 삭제 -->
+                    <!-- picture -->
+                    <!-- // picture -->
+					<!-- bagic wrap-->
+					<div class="log_basicPw">
+						<div class="log_nBoxText">오늘은 어떤 추억이 있었나요?</div>
+					</div>
+					<!-- // bagic wrap-->
+					<!-- bagic wrap-->
+					<div class="log_basicPw">
+						<!-- tag -->
+						<div class="log_tagTextBox">
+							<!-- 2021-01-18 : 수정 -->
+							<!-- 등록화면 -->
+							<div class="lttbTextArea none">
+								공백포함100자입니다👍 #해시태그 는파란색으로표시됩니다. 일이삼사오육칠팔구십 <span class="tagColor">#태그택태그</span> <span class="tagColor">#태그로그로그로그로그로그로</span> <a href="javascript:;" class="tagColor">#산책</a>
+							</div>
+							<!-- 입력창 -->
+							<textarea name="" id="" cols="30" rows="10" style="height:105px; display:none;">
+								공백포함100자입니다👍 #해시태그 는파란색으로표시됩니다. 일이삼사오육칠팔구십 #태그택태그 #태그로그로그로그로그로그로#산책
+							</textarea>
+							<!-- tag 셀렉터 부분 -->
+							<div class="lttbTagArea" style="display:none;">
+								<ul>
+									<li>#태그</li>
+									<li>#태그</li>
+									<li>#태그</li>
+								</ul>
+							</div>
+							<!-- // tag 셀렉터 부분 -->
+							<!-- // 2021-01-18 : 수정 -->
+						</div>
+						<!-- // tag -->
+					</div>
+					<!-- // bagic wrap-->
+					<!-- top borader box-->
+					<div class="log_topBbox">
+						<div class="top_tit"><div class="tit">위치 등록</div><a href="javascript:;" class="log_arrIcon"></a></div>
+					</div>	
+					<!-- // top borader box-->
+					<!-- tag -->
+					<div class="logTagScrollBox">
+						<div class="log_tagBoxWrap">
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+							<a href="javascript:;" class="log_tagBox">역삼역</a>
+						</div>
+					</div>
+					<!-- // tag -->
+					<!-- top borader box-->
+					<div class="log_topBbox">
+						<div class="top_tit" style="padding-bottom:5px;"><div class="tit">위치 등록</div><a href="javascript:;" class="log_arrIcon"></a></div>
+					</div>	
+					<div class="pointTxtArea">
+						위치추천을 위해 위치서비스를 활성화 하세요.
+					</div>
+					<!-- // top borader box-->
+					<!-- // tag -->
+					<!-- 위치등록 리스트?? -->
+					<div class="log_pointEnterList mt16">
+						<ul>
+							<li>
+								<div class="tit">LG 아트센터</div>
+								<div class="con">534m 거리</div>
+								<a href="javascript:;" class="log_pelClose"></a>
+							</li>
+						</ul>
+					</div>
+					<!-- // 위치등록 리스트?? -->
+					<!-- top borader box-->
+					<div class="log_topBbox">
+						<div class="top_tit"><div class="tit">연관상품 추천받기</div></div>
+						<div class="con_input">
+							<label class="checkbox"><input type="checkbox"><span class="txt">등록한 이미지와 비슷한 상품이 자동 추천됩니다.</span></label>
+						</div>
+					</div>	
+					<!-- // top borader box-->
+					<!-- 사진선택 -->
+					<div class="commentBoxAp logCommentBox" data-priceh="100%">
+						<div class="head">
+							<div class="con">
+								<div class="tit cen">
+									사진선택
+								</div>
+								<a href="javascript:;" class="btn_left" onClick="ui.commentBox.close(this)">완료</a>
+								<a href="javascript:;" class="btn_right logColorBlue" onClick="ui.commentBox.close(this)" disabled>취소</a><!-- 'logColorBlue' 클래스 추가 시 파란색 글씨 //  'disabled' 제거 시 검정색 글씨 // 'disabled' attribute 있을 시 회식 글씨  -->
+							</div>
+						</div>
+						<div class="con">
+							<div class="box full">
+								<!-- content -->
+
+								<!-- // content -->
+							</div>
+						</div>
+					</div>
+					<!-- //사진선택 -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

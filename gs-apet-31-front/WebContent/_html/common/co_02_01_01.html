@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<include class="header cu" data-include-html="../inc/header_cu.html" data-include-opt='{"header":"set9","tit":"<b class=e>아이디 찾기</b>"}'></include>
+
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login srch" id="container">
+
+			<div class="inr">
+				<!-- 본문 -->
+				<div class="contents" id="contents">
+					<!-- PC 타이틀 모바일에서 제거  -->
+					<div class="pc-tit">
+						<h2>아이디 찾기</h2>
+					</div>
+					<!-- // PC 타이틀 모바일에서 제거  -->
+					<!-- 탭있을때만 (클래스 추가 top) -->
+					<div class="fake-pop top">
+						<div class="result">
+							<span class="blue">아이디</span>가 생각나지 않으세요?
+							<p class="sub">본인 인증 후 아이디 정보를 확인하세요.</p>
+						</div>
+					</div>
+					
+					<section class="sect petTabContent hmode_auto"><!-- 2021.02.15 : hmode_auto 클래스 추가 -->
+
+						<!-- 탭영역 -->
+						<ul class="uiTab a mt50">
+							<li class="active">
+								<a class="bt" href="javascript:;"><span>휴대폰 번호로 찾기</span></a>
+							</li>
+							<li>
+								<a class="bt" href="javascript:;"><span>이메일로 찾기</span></a>
+							</li>
+						</ul>
+						<!-- 탭내용 -->
+						
+						<div class="uiTab_content">
+							<ul>
+								<li class="active">
+									<!-- 휴대폰인증 -->
+									<div class="result">
+										<p class="sub pt30">본인인증을<br> 진행해주세요.</p>
+									</div>
+									<div class="pbt mt30">
+										<div class="btnSet">
+											<a href="javascript:;" class="btn lg a w164">휴대폰 인증하기</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<!-- 이메일인증 -->
+									<div class="member-input email">
+										<ul class="list">
+											<!-- 이름 부분 제거 2021.05.12 수정함 -->
+											<li>
+												<strong class="tit">이메일</strong>
+												<div class="input flex">
+													<input type="text" placeholder="이름을 입력해주세요">
+													<a href="javascript:alert_sample();" class="btn md">메일 전송</a>
+												</div>
+												<p class="validation-check">메일주소를 다시 확인해 주세요.</p>
+											</li>
+											<li>
+												<strong class="tit">인증번호</strong>
+												<div class="input flex" data-txt="주소검색">
+													<input type="text" placeholder="숫자 6자리를 입력해주세요">
+													<div class="inputInfoTxt time">00:00</div>
+													<a href="javascript:;" class="btn md">인증 확인</a>
+												</div>
+												<p class="validation-check">숫자 6자리를 입력해주세요.</p>
+											</li>
+											<!-- //이름 부분 제거 2021.05.12 수정함 -->
+										</ul>
+									</div>
+								</li>
+							</ul>	
+						</div>
+					</section>
+				</div>
+			</div>
+		</main>
+
+		<div class="layers">
+			<!-- 레이어팝업 넣을 자리 -->
+		</div>
+		<!-- 바디 - 여기 밑으로 템플릿 -->
+
+		<!-- 하단메뉴 -->
+		<!-- <include class="menubar" data-include-html="../inc/menubar.html"></include> -->
+		<!-- 푸터 -->
+		<!-- <include class="footer" data-include-html="../inc/footer.html"></include> -->
+		<script>
+			var confirm_sample = function(){
+				ui.confirm('<p>공통 컨펌창 입니다.</p>',{ // 컨펌 창 띄우기
+					ycb:function(){
+						console.log('컨펌확인결과');
+					},
+					ncb:function(){
+						console.log('컨펌취소결과');
+					},
+					ybt:'확인',
+					nbt:'취소'	
+				});
+			}
+			var alert_sample = function(){
+				// 알럿창 띄우기
+				ui.alert('<p>고객님의 이메일주소로 <br>인증번호를 전송하였습니다.</p>',{
+					ycb:function(){
+						console.log('알럿확인결과');
+					},
+					ybt:'확인'	
+				});
+			}
+		</script>
+
+		<script>
+			/*
+			NOTE: This code overrides the viewport settings, an improvement would be
+				to take the original value and only add or change the user-scalable value
+			*/
+
+			// optionally only activate for iOS (done because I havn't tested the effect under other OS/devices combinations such as Android)
+			var iOS = navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)
+			if (iOS)
+			preventZoomOnFocus();
+
+
+			function preventZoomOnFocus()
+			{
+			document.documentElement.addEventListener("touchstart", onTouchStart);
+			document.documentElement.addEventListener("focusin", onFocusIn);
+			}
+
+
+			let dont_disable_for = ["checkbox", "radio", "file", "button", "image", "submit", "reset", "hidden"];
+			//let disable_for = ["text", "search", "password", "email", "tel", "url", "number", "date", "datetime-local", "month", "year", "color"];
+
+
+			function onTouchStart(evt)
+			{
+			let tn = evt.target.tagName;
+
+			// No need to do anything if the initial target isn't a known element
+			// which will cause a zoom upon receiving focus
+			if (    tn != "SELECT"
+				&&  tn != "TEXTAREA"
+				&& (tn != "INPUT" || dont_disable_for.indexOf(evt.target.getAttribute("type")) > -1)
+				)
+				return;
+
+			// disable zoom
+			setViewport("width=device-width, initial-scale=1.0, user-scalable=0");
+			}
+
+			// NOTE: for now assuming this focusIn is caused by user interaction
+			function onFocusIn(evt)
+			{
+			// reenable zoom
+			setViewport("width=device-width, initial-scale=1.0, user-scalable=1");
+			}
+
+			// add or update the <meta name="viewport"> element
+			function setViewport(newvalue)
+			{
+			let vpnode = document.documentElement.querySelector('head meta[name="viewport"]');
+			if (vpnode)
+				vpnode.setAttribute("content",newvalue);
+			else
+			{
+				vpnode = document.createElement("meta");
+				vpnode.setAttribute("name", "viewport");
+				vpnode.setAttribute("content", newvalue);
+			}
+			}
+		</script>
+	</div>
+</body>
+</html>

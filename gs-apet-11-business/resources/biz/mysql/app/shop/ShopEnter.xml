@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	입점
+	작성자  	jangjy 
+	작성일자  	2016.04.19 
+-->
+
+<mapper namespace="shopEnter">
+	
+	<insert id="insertShopEnter">
+		<!--
+			Query Name : shopEnter.insertShopEnter
+			Description : 입점문의 등록
+		-->
+		INSERT INTO SHOP_ENTER
+		(
+			 SE_NO			/* 입점 번호 */
+			,COMP_NM		/* 업체 명 */
+			,CEO_NM			/* 대표자 명 */
+			,POST_NO_NEW	/* 우편 번호 신 */
+			,ROAD_ADDR		/* 도로 주소 */
+			,ROAD_DTL_ADDR	/* 도로 상세 주소 */
+			,PIC_NM			/* 담당자 명 */
+			,PIC_DPM		/* 담당자 부서 */
+			,PIC_EMAIL		/* 담당자 이메일 */
+			,PIC_MOBILE		/* 담당자 휴대폰 */
+			,WEB_ST			/* 웹 사이트 */
+			,SNS			/* SNS */
+			,BND_NM			/* 브랜드 명 */
+			,COMP_ITRDC		/* 업체 소개 */
+			,GOODS_ITRDC	/* 상품 소개 */
+			,GOODS_PRC_RNG	/* 상품 가격대 */
+			,STP_CUST		/* 주요 고객 */
+			,SE_GOODS_TP_CD	/* 입점 상품 유형 코드 */
+			,SE_SALE_TP_CD	/* 입점 판매 유형 코드 */
+			,SE_DSTB_TP_CD	/* 입점 물류 유형 코드 */
+			,FL_NO			/* 파일 번호 */
+			,SE_STAT_CD		/* 입점 상태 코드 */
+			,SE_HOPE_CTG_NO	/* 입점 희망 카테고리 번호 */
+			,SE_HOPE_CTG_NM	/* 입점 희망 카테고리 */
+			,BIZ_NO			/* 사업자 등록 번호 */
+			,SYS_REGR_NO	/* 시스템 등록자 번호 */
+			,SYS_REG_DTM	/* 시스템 등록 일시 */
+			,SYS_UPDR_NO	/* 시스템 수정자 번호 */
+			,SYS_UPD_DTM	/* 시스템 수정 일시 */
+		) 
+		VALUES
+		(
+			 #{seNo}
+			,#{compNm}
+			,#{ceoNm}
+			,#{postNoNew}
+			,#{roadAddr}
+			,#{roadDtlAddr}
+			,#{picNm}
+			,#{picDpm}
+			,#{picEmail}
+			,#{picMobile}
+			,#{webSt}
+			,#{sns}
+			,#{bndNm}
+			,#{compItrdc}
+			,#{goodsItrdc}
+			,#{goodsPrcRng}
+			,#{stpCust}
+			,#{seGoodsTpCd}
+			,#{seSaleTpCd}
+			,#{seDstbTpCd}
+			,#{flNo}
+			,#{seStatCd}
+			,#{seHopeCtgNo}
+			,#{seHopeCtgNm}
+			,#{bizNo}
+			,#{sysRegrNo}
+			,SYSDATE()
+			,NULL
+			,NULL
+		)
+	</insert>
+	
+	<select id="pageContectList" resultType="biz.app.shop.model.ShopEnterVO">
+		SELECT	/* QUERYID(shopEnter.pageContectList) */
+			  SE_NO				/* 입점 번호 */
+			, COMP_NM		/* 업체 명 */
+			, BND_NM				/* 브랜드 명 */
+			, SE_GOODS_TP_CD			/* 입점 상품 유형 코드 */
+			, SE_SALE_TP_CD				/* 입점 판매 유형 코드 */
+			, SE_DSTB_TP_CD				/* 입점 물류 유형 코드 */
+			, FN_GET_DISP_CTG_PATH(SE_HOPE_CTG_NO) AS CTG_NM				/* 입점 희망 카테고리 */
+		FROM	SHOP_ENTER
+		WHERE	1 = 1
+		<include refid="shopEnter.pageContectListWhere" />
+		ORDER BY SE_NO DESC
+	</select>
+	
+	<select id="pageContectListCount" resultType="java.lang.Integer">
+		SELECT	/* QUERYID(shopEnter.pageContectListCount) */
+				COUNT(*)
+		FROM	SHOP_ENTER
+		WHERE	1 = 1
+		<include refid="shopEnter.pageContectListWhere" />
+	</select>
+	
+	<sql id="pageContectListWhere">
+		<if test="compNm != null and compNm != ''">
+		AND	COMP_NM LIKE CONCAT('%', #{compNm }, '%')
+		</if>
+		<if test="seGoodsTpCd != null and seGoodsTpCd != ''">
+		AND	SE_GOODS_TP_CD = #{seGoodsTpCd }
+		</if>
+		<if test="seSaleTpCd != null and seSaleTpCd != ''">
+		AND	SE_SALE_TP_CD = #{seSaleTpCd }
+		</if>
+		<if test="seDstbTpCd != null and seDstbTpCd != ''">
+		AND	SE_DSTB_TP_CD = #{seDstbTpCd }
+		</if>
+		<if test="strtDtm != null and endDtm != null">
+		AND	SYS_REG_DTM BETWEEN #{strtDtm} AND #{endDtm}
+		</if>
+	</sql>
+	
+	<select id="listShopEnterDetail" resultType="biz.app.shop.model.ShopEnterVO">
+		<!--
+			Query Name : company.getShopEnterDetail
+			Description : 입점문의 첨부파일
+		-->
+		SELECT
+			SE_NO
+			,COMP_NM
+			,CEO_NM
+			,SYS_REGR_NO
+			,SYS_REG_DTM
+			,SYS_UPDR_NO
+			,SYS_UPD_DTM
+			,POST_NO_NEW
+			,ROAD_ADDR
+			,ROAD_DTL_ADDR
+			,PIC_NM
+			,PIC_DPM
+			,PIC_EMAIL
+			,PIC_MOBILE
+			,WEB_ST
+			,SNS
+			,BND_NM
+			,COMP_ITRDC
+			,GOODS_ITRDC
+			,GOODS_PRC_RNG
+			,STP_CUST
+			,SE_GOODS_TP_CD
+			,SE_SALE_TP_CD
+			,SE_DSTB_TP_CD
+			,FL_NO
+			,SE_STAT_CD
+			,FN_GET_DISP_CTG_PATH(SE_HOPE_CTG_NO)AS CTG_NM
+			,SE_HOPE_CTG_NM
+			,BIZ_NO
+		FROM
+			SHOP_ENTER
+		WHERE
+			SE_NO = #{seNo}
+	</select>
+
+	<select id="listShopEnterFile" resultType="biz.app.shop.model.ShopEnterFileVO">
+		<!--
+			Query Name : company.listShopEnterFile
+			Description : 입점문의 첨부파일
+		-->
+		SELECT
+			AF.FL_NO
+			,AF.PHY_PATH
+			,AF.ORG_FL_NM
+		FROM
+			ATTACH_FILE AF
+		WHERE AF.FL_NO = (SELECT FL_NO FROM SHOP_ENTER WHERE SE_NO = #{seNo})
+		ORDER BY SEQ DESC
+	</select>
+</mapper>

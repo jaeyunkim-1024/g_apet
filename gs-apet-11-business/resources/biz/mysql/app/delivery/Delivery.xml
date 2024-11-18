@@ -1,0 +1,1833 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="delivery">
+
+	<select id="getDelivery" resultType="biz.app.delivery.model.DeliveryVO" >
+		<!--
+			Query Name : delivery.getDelivery
+			Description : 배송 정보 조회
+		-->
+		SELECT	/* QUERYID(delivery.getDelivery) */
+					DLV.DLVR_NO					/* 배송 번호                */
+					, DLV.ORD_CLM_GB_CD			/* 주문 클레임 구분 코드    */
+	                ,FN_GET_ORDER_NO_OF_DLVR(DLV.DLVR_NO, DLV.ORD_CLM_GB_CD, 'Y') AS ORD_NO	/*주문번호*//* 변경 2021.03.03 by kek01 */
+	                ,CASE WHEN DLV.ORD_CLM_GB_CD = '10' THEN ''
+	                      ELSE FN_GET_ORDER_NO_OF_DLVR(DLV.DLVR_NO, DLV.ORD_CLM_GB_CD,'N') /* 변경 2021.03.03 by kek01 */
+	                 END AS CLM_NO              /*클레임번호*/
+					, DLV.DLVR_GB_CD			/* 배송 구분 코드	    */
+					, DLV.DLVR_TP_CD			/* 배송 유형 코드	    */
+					, DLV.DLVR_PRCS_TP_CD		/* 배송 처리 유형 코드	    */
+					, DLV.ORD_DLVRA_NO			/* 주문 배송지 번호	    */
+					, DLV.HDC_CD				/* 택배사 코드		    */
+					, DLV.INV_NO				/* 송장 번호		    */
+					, DLV.DLVR_CMD_DTM			/* 배송 지시 일시	    */
+					, DLV.OO_CPLT_DTM			/* 출고 완료 일시	    */
+					, DLV.DLVR_CPLT_DTM       	/*배송 완료 일시  */
+					, DLV.CIS_OO_YN				/* CIS 출고 여부 */
+					, DLV.CIS_OO_NO				/* CIS 출고 번호 */
+					, DLV.CIS_HDC_CD			/* CIS 택배사 코드 */
+					, DLV.CIS_INV_NO			/* CIS 송장 번호 */
+					, DLV.CIS_DLVR_CPLT_PIC_URL /* CIS 배송 완료 사진 URL */
+					, DLV.CIS_DLVR_CPLT_YN		/* CIS 배송 완료 여부 */
+					, DLV.CIS_DLVR_SMS			/* CIS 배송 SMS */		
+					, DLV.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, DLV.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, DLV.SYS_UPDR_NO			/* 시스템 수정자 번호 */
+					, DLV.SYS_UPD_DTM			/* 시스템 수정 일시 */
+	                , FN_GET_USER_NAME(DLV.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(DLV.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		DELIVERY DLV
+		WHERE   1 = 1
+		<!-- AND DLV.DLVR_NO = OD.DLVR_NO -->
+		<if test="dlvrNo != null and dlvrNo != ''">
+		AND		DLV.DLVR_NO		= #{dlvrNo}
+		</if>
+	</select>
+
+	<select id="listDelivery" resultType="biz.app.delivery.model.DeliveryVO" >
+		<!--
+			Query Name : delivery.listDelivery
+			Description : 배송 정보 조회 - KEK01 추가 2021.03.03
+		-->
+		SELECT	/* QUERYID(delivery.getDelivery) */
+					DLV.DLVR_NO				/* 배송 번호                */
+					, DLV.ORD_CLM_GB_CD		/* 주문 클레임 구분 코드    */
+					, DLV.DLVR_GB_CD		/* 배송 구분 코드	    */
+					, DLV.DLVR_TP_CD		/* 배송 유형 코드	    */
+					, DLV.DLVR_PRCS_TP_CD	/* 배송 처리 유형 코드	    */
+					, DLV.ORD_DLVRA_NO		/* 주문 배송지 번호	    */
+					, DLV.HDC_CD			/* 택배사 코드		    */
+					, DLV.INV_NO			/* 송장 번호		    */
+					, DLV.DLVR_CMD_DTM		/* 배송 지시 일시	    */
+					, DLV.OO_CPLT_DTM		/* 출고 완료 일시	    */
+					, DLV.DLVR_CPLT_DTM     /* 배송 완료 일시  */
+					, DLV.CIS_OO_YN				/* CIS 출고 여부 */
+					, DLV.CIS_OO_NO				/* CIS 출고 번호 */
+					, DLV.CIS_HDC_CD			/* CIS 택배사 코드 */
+					, DLV.CIS_INV_NO			/* CIS 송장 번호 */
+					, DLV.CIS_DLVR_CPLT_PIC_URL /* CIS 배송 완료 사진 URL */
+					, DLV.CIS_DLVR_CPLT_YN		/* CIS 배송 완료 여부 */
+					, DLV.CIS_DLVR_SMS			/* CIS 배송 SMS */		
+					, DLV.SYS_REGR_NO			/* 시스템 등록자 번호 */
+					, DLV.SYS_REG_DTM			/* 시스템 등록 일시 */
+					, DLV.SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, DLV.SYS_UPD_DTM		/* 시스템 수정 일시 */
+	                , FN_GET_USER_NAME(DLV.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(DLV.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		DELIVERY DLV
+		WHERE   1 = 1
+		<if test="ordNo != null and ordNo != ''">
+		AND		DLV.DLVR_NO IN (
+								/* 배송 번호*/
+					           SELECT T2.DLVR_NO  FROM ORD_DTL_CSTRT_DLVR_MAP T2  WHERE T2.ORD_DTL_CSTRT_NO IN (
+					                    /* 주문 상세 구성 번호*/
+					            		SELECT ODC.ORD_DTL_CSTRT_NO 
+					            		  FROM ORD_DTL_CSTRT ODC
+					            		       INNER JOIN ORDER_DETAIL OD ON ODC.ORD_NO = OD.ORD_NO
+					            		                                 AND ODC.ORD_DTL_SEQ = OD.ORD_DTL_SEQ
+										       <!-- INNER JOIN COMPANY_BASE CB ON CB.COMP_NO = OD.COMP_NO -->
+										       <!--                           AND CB.COMP_GB_CD = #{compGbCd}  /* 업체유형코드 */ -->
+					            		 WHERE ODC.ORD_NO = #{ordNo}
+					            		   <if test="ordDtlSeq != null and ordDtlSeq != ''">
+					            		   AND ODC.ORD_DTL_SEQ = #{ordDtlSeq}
+					            		   </if>
+					           )
+		        )
+		</if>
+		<if test="clmNo != null and clmNo != ''">
+		AND		DLV.DLVR_NO IN (
+							   /* 배송 번호*/
+					           SELECT T2.DLVR_NO  FROM CLM_DTL_CSTRT_DLVR_MAP T2  WHERE T2.CLM_DTL_CSTRT_NO IN (
+					                    /* 클레임 상세 구성 번호*/
+					            		SELECT CDC.CLM_DTL_CSTRT_NO 
+					            		  FROM CLM_DTL_CSTRT CDC
+											   INNER JOIN CLAIM_DETAIL CD ON CDC.CLM_NO = CD.CLM_NO 
+												                         AND CDC.CLM_DTL_SEQ = CD.CLM_DTL_SEQ
+												                         AND CD.CLM_DTL_TP_CD = '40' /* 교환배송 */
+										       <!-- INNER JOIN COMPANY_BASE CB ON CB.COMP_NO = CD.COMP_NO -->
+										       <!--                           AND CB.COMP_GB_CD = #{compGbCd}  /* 업체유형코드 */ -->
+					            		 WHERE CDC.CLM_NO = #{clmNo}
+					            		   <if test="clmDtlSeq != null and clmDtlSeq != ''">
+					            		   AND CD.CLM_DTL_SEQ = #{clmDtlSeq}
+					            		   </if>
+					           )
+		        )
+		</if>
+	</select>
+
+	<update id="updateDelivery" parameterType="biz.app.delivery.model.DeliveryPO">
+		<!--
+			Query Name : delivery.updateDelivery
+			Description : 배송 정보 수정
+		-->
+		UPDATE	DELIVERY
+		SET		SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				
+				<if test="dlvrTpCd != null and dlvrTpCd != ''">
+					, DLVR_TP_CD		= #{dlvrTpCd}		/* 배송 유형 코드 */
+				</if>
+				<if test="dlvrPrcsTpCd != null and dlvrPrcsTpCd != ''">
+					, DLVR_PRCS_TP_CD	= #{dlvrPrcsTpCd}	/* 배송 처리 유형 코드 */
+				</if>
+				<if test="hdcCd != null and hdcCd != ''">
+					, HDC_CD			= #{hdcCd}			/* 택배사 코드 */
+				</if>
+				<if test="invNo != null and invNo != ''">
+					, INV_NO			= #{invNo}			/* 송장 번호 */
+				</if>
+				<if test="dlvrCmd != null and dlvrCmd != ''">
+					, DLVR_CMD_DTM		= NOW()				/* 배송 지시 일시 */
+				</if>
+				<if test="dlvrCplt != null and dlvrCplt != ''">
+					, DLVR_CPLT_DTM		= (
+													SELECT
+													    IFNULL(MAX(t2.DLVR_PRCS_DTM), NOW())
+													FROM
+													    dlvr_goods_flow_map t1,
+													    goods_flow_delivery_result t2
+													WHERE
+													    t1.dlvr_no = #{dlvrNo}
+													        AND t1.ITEM_UNIQUE_CODE = t2.ITEM_UNIQUE_CODE
+													        AND dlvr_stat_cd = '${@framework.common.constants.CommonConstants@DLVR_STAT_70}'
+					)			/* 배송 완료 일시 */
+				</if>
+				<if test="ooCplt != null and ooCplt != ''">
+					, OO_CPLT_DTM		= NOW()				/* 출고 완료 일시 */
+				</if>
+				<if test="ooCpltDtm != null and ooCpltDtm != ''">
+					/* interface 에서 변경시 */
+					, OO_CPLT_DTM		= #{ooCpltDtm}		/* 출고 완료 일시 */
+				</if>
+				<!-- KEK01 추가 2021.03.03 START -->
+				<if test="cisOoYn != null and cisOoYn != ''">
+					, CIS_OO_YN = #{cisOoYn}				/* CIS 출고 여부 */
+				</if>
+				<if test="cisOoNo != null and cisOoNo != ''">
+					, CIS_OO_NO = #{cisOoNo}				/* CIS 출고 번호 */
+				</if>
+				<if test="cisHdcCd != null and cisHdcCd != ''">
+					, CIS_HDC_CD = #{cisHdcCd}				/* CIS 택배사 코드 */
+				</if>
+				<if test="cisInvNo != null and cisInvNo != ''">
+					, CIS_INV_NO = #{cisInvNo}				/* CIS 송장 번호 */
+				</if>
+				<if test="cisDlvrCpltPicUrl != null and cisDlvrCpltPicUrl != ''">
+					, CIS_DLVR_CPLT_PIC_URL = #{cisDlvrCpltPicUrl}				/* CIS 배송 완료 사진 URL */
+				</if>
+				<if test="cisDlvrCpltYn != null and cisDlvrCpltYn != ''">
+					, CIS_DLVR_CPLT_YN = #{cisDlvrCpltYn}	/* CIS 배송 완료 여부 */
+				</if>
+				<if test="cisDlvrSms != null and cisDlvrSms != ''">
+					, CIS_DLVR_SMS = #{cisDlvrSms}			/* CIS 배송 SMS */
+				</if>
+				<if test="ordDlvrCpltExe != null and ordDlvrCpltExe != ''">
+					, DLVR_CPLT_DTM = NOW()					/* 배송 완료 일시 */
+				</if>
+				<if test="clmDlvrCpltExe != null and clmDlvrCpltExe != ''">
+					, DLVR_CPLT_DTM = NOW()					/* 배송 완료 일시 */
+				</if>
+				<!-- KEK01 추가 2021.03.03 END -->
+		WHERE	1 = 1
+		<if test="dlvrNo != null and dlvrNo != ''">
+		AND		DLVR_NO		= #{dlvrNo}
+		</if>
+		<if test="ordClmGbCd != null and ordClmGbCd != ''">
+		AND		ORD_CLM_GB_CD = #{ordClmGbCd}
+		</if>
+		<if test="dlvrCplt != null and dlvrCplt != ''">
+		AND 	DLVR_CPLT_DTM IS NULL
+		</if>
+<!-- KEK01 추가 2021.03.03 START -->
+		<if test="ordDlvrCpltExe != null and ordDlvrCpltExe != ''">
+		AND		DLVR_NO IN (
+			           SELECT t2.DLVR_NO  /* 배송 번호*/
+			             FROM ORD_DTL_CSTRT_DLVR_MAP t2 
+			            WHERE t2.ORD_DTL_CSTRT_NO = #{ordDtlCstrtNo}
+			    )
+		AND     DLVR_CPLT_DTM IS NULL	    
+		</if>
+		<if test="clmDlvrCpltExe != null and clmDlvrCpltExe != ''">
+		AND		DLVR_NO IN (
+			           SELECT t2.DLVR_NO  /* 배송 번호*/
+			             FROM CLM_DTL_CSTRT_DLVR_MAP t2 
+			            WHERE t2.CLM_DTL_CSTRT_NO = #{clmDtlCstrtNo}
+			    )
+		AND     DLVR_CPLT_DTM IS NULL
+		</if>
+		<if test="searchInvNo != null and searchInvNo != ''">
+		AND		INV_NO = #{searchInvNo}
+		</if>
+<!-- KEK01 추가 2021.03.03 END -->
+	</update>
+
+	<insert id="insertDelivery" parameterType="biz.app.delivery.model.DeliveryPO">
+		<!--
+			Query Name : delivery.insertDelivery
+			Description : 배송 정보 등록
+		-->
+		INSERT INTO DELIVERY
+		(
+			  DLVR_NO		     /* 배송 번호               */
+			, ORD_CLM_GB_CD		 /* 주문 클레임 구분 코드   */
+			, DLVR_GB_CD		 /* 배송 구분 코드	    */
+			, DLVR_TP_CD		 /* 배송 유형 코드	    */
+			, DLVR_PRCS_TP_CD	 /* 배송 처리 유형 코드	*/
+			, ORD_DLVRA_NO		 /* 주문 배송지 번호	    */
+			, HDC_CD		     /* 택배사 코드		    */
+			, INV_NO		     /* 송장 번호		    */
+			, DLVR_CMD_DTM		 /* 배송 지시 일시	    */
+			, OO_CPLT_DTM		 /* 출고 완료 일시	    */
+			, DLVR_CPLT_DTM		 /* 배송 완료 일시	    */
+			, CIS_OO_YN				/* CIS 출고 여부 */
+			, CIS_OO_NO				/* CIS 출고 번호 */
+			, CIS_HDC_CD			/* CIS 택배사 코드 */
+			, CIS_INV_NO			/* CIS 송장 번호 */
+			, CIS_DLVR_CPLT_PIC_URL /* CIS 배송 완료 사진 URL */
+			, CIS_DLVR_CPLT_YN		/* CIS 배송 완료 여부 */
+			, CIS_DLVR_SMS			/* CIS 배송 SMS */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호	*/
+			, SYS_REG_DTM		 /* 시스템 등록 일시	    */
+			, SYS_UPDR_NO		 /* 시스템 수정자 번호	*/
+			, SYS_UPD_DTM		 /* 시스템 수정 일시	    */
+		) VALUES (
+			  #{dlvrNo}	         /* 배송 번호                */
+			, #{ordClmGbCd}	     /* 주문 클레임 구분 코드    */
+			, #{dlvrGbCd}	     /* 배송 구분 코드	    */
+			, #{dlvrTpCd}	     /* 배송 유형 코드	    */
+			, #{dlvrPrcsTpCd}	 /* 배송 처리 유형 코드	*/
+			, #{ordDlvraNo}	     /* 주문 배송지 번호	    */
+			, #{hdcCd}	         /* 택배사 코드		    */
+			, #{invNo}	         /* 송장 번호		    */
+			, #{dlvrCmdDtm}	     /* 배송 지시 일시	    */
+			, #{ooCpltDtm}	     /* 출고 완료 일시	    */
+			, #{dlvrCpltDtm}	 /* 배송 완료 일시	    */
+			, #{cisOoYn}		 /* CIS 출고 여부 */
+			, #{cisOoNo}		 /* CIS 출고 번호 */
+			, #{cisHdcCd}		 /* CIS 택배사 코드 */
+			, #{cisInvNo}		 /* CIS 송장 번호 */
+			, #{cisDlvrCpltPicUrl}	/* CIS 배송 완료 사진 URL */
+			, #{cisDlvrCpltYn}		/* CIS 배송 완료 여부 */
+			, #{cisDlvrSms}			/* CIS 배송 SMS */
+			, #{sysRegrNo}		 /* 시스템 등록자 번호      */
+			, NOW()			     /* 시스템 등록 일시        */
+			, #{sysUpdrNo}		 /* 시스템 수정자 번호      */
+			, NOW()			     /* 시스템 수정 일시        */
+		)
+	</insert>
+	
+	<insert id="insertDeliveryCopy" parameterType="biz.app.order.model.OrdDtlCstrtDlvrMapPO">
+		<!--
+			Query Name : delivery.insertDeliveryCopy
+			Description : 배송 정보 등록
+		-->
+		INSERT INTO DELIVERY
+		(
+			  DLVR_NO		     /* 배송 번호               */
+			, ORD_CLM_GB_CD		 /* 주문 클레임 구분 코드   */
+			, DLVR_GB_CD		 /* 배송 구분 코드	    */
+			, DLVR_TP_CD		 /* 배송 유형 코드	    */
+			, DLVR_PRCS_TP_CD	 /* 배송 처리 유형 코드	*/
+			, ORD_DLVRA_NO		 /* 주문 배송지 번호	    */
+			, DLVR_CMD_DTM		 /* 배송 지시 일시	    */
+			, OO_CPLT_DTM		 /* 출고 완료 일시	    */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호	*/
+			, SYS_REG_DTM		 /* 시스템 등록 일시	    */
+			, SYS_UPDR_NO		 /* 시스템 수정자 번호	*/
+			, SYS_UPD_DTM		 /* 시스템 수정 일시	    */
+		) 
+		SELECT
+			  #{newDlvrNo} as DLVR_NO	 /* 배송 번호  */
+			, ORD_CLM_GB_CD		 /* 주문 클레임 구분 코드   */
+			, DLVR_GB_CD		 /* 배송 구분 코드	    */
+			, DLVR_TP_CD		 /* 배송 유형 코드	    */
+			, DLVR_PRCS_TP_CD	 /* 배송 처리 유형 코드	*/
+			, ORD_DLVRA_NO		 /* 주문 배송지 번호	    */
+			, DLVR_CMD_DTM		 /* 배송 지시 일시	    */
+			, OO_CPLT_DTM		 /* 출고 완료 일시	    */
+			, SYS_REGR_NO		 /* 시스템 등록자 번호	*/
+			, SYS_REG_DTM		 /* 시스템 등록 일시	    */
+			, SYS_UPDR_NO		 /* 시스템 수정자 번호	*/
+			, SYS_UPD_DTM		 /* 시스템 수정 일시	    */
+		  FROM DELIVERY
+		 WHERE DLVR_NO = #{dlvrNo}	/* 배송 번호 */
+	</insert>
+
+	<select id="listDeliveryOrderClaim" resultType="biz.app.delivery.model.DeliveryVO" >
+		<!--
+			Query Name : delivery.listDeliveryOrderClaim
+			Description : 배송관련 주문/클레임 목록 조회
+		-->
+		SELECT	/* QUERYID(delivery.listDeliveryOrderClaim) */
+		        DISTINCT
+			         DV.DLVR_NO             /* 배송 번호 */
+	                ,DV.ORD_CLM_GB_CD       /* 주문 클레임 구분 코드*/
+	                ,DV.DLVR_GB_CD          /* 배송 구분 코드*/
+	                ,DV.DLVR_TP_CD          /* 배송 유형 코드*/
+	                ,DV.DLVR_PRCS_TP_CD     /* 배송 처리 유형 코드*/
+	                ,DV.HDC_CD              /* 택배사 코드*/
+	                ,DV.INV_NO              /*송장번호 */
+	                ,DV.DLVR_CMD_DTM        /*배송 지시 일시*/
+	                ,DV.DLVR_CPLT_DTM       /*배송 완료 일시*/
+	                ,DV.OO_CPLT_DTM         /*출고 완료 일시*/
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN OD.ORD_NO
+	                      ELSE CD.ORD_NO
+	                 END AS ORD_NO                 		/*주문번호*/
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN OD.ORD_DTL_SEQ
+	                      ELSE CD.ORD_DTL_SEQ
+	                 END AS ORD_DTL_SEQ           		/*주문상세번호 */
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN OD.ORD_DTL_STAT_CD
+	                      ELSE NULL
+	                 END AS ORD_DTL_STAT_CD        		/* 주문 상세 상태 코드 */
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN NULL
+	                      ELSE CD.CLM_NO
+	                 END AS CLM_NO                  	/* 클레임번호 */
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN NULL
+	                      ELSE CD.CLM_DTL_SEQ    		/* 클레임 상세 순번*/
+	                 END AS CLM_DTL_SEQ
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN NULL
+	                      ELSE CD.CLM_DTL_STAT_CD		/*클레임 상세 상태 코드*/
+	                 END AS CLM_DTL_STAT_CD
+	                ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN OD.RMN_ORD_QTY
+                      ELSE CD.CLM_QTY
+                 	 END AS ORD_QTY						/*배송 수량*/
+                    ,OD.OUTSIDE_ORD_DTL_NO				/* 외부주문상세번호 */
+                    ,OB.CHNL_ID
+                    ,CASE WHEN DV.ORD_CLM_GB_CD = '10' THEN (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = OD.COMP_NO) 
+                          ELSE (SELECT COMP_GB_CD FROM COMPANY_BASE CB WHERE CB.COMP_NO = CD.COMP_NO) 
+                     END AS COMP_GB_CD  /*회사구분코드 - kek01 2021.04.28*/                        
+			FROM    DELIVERY DV
+<!-- KEK01 주석처리 2021.03.03			
+			        	LEFT OUTER JOIN ORDER_DETAIL OD ON OD.DLVR_NO = DV.DLVR_NO
+			        	LEFT OUTER JOIN CLAIM_DETAIL CD ON CD.DLVR_NO = DV.DLVR_NO
+			        	LEFT OUTER JOIN ORDER_BASE OB ON OD.ORD_NO = OB.ORD_NO 
+--> 
+<!-- KEK01 추가 2021.03.03 START --> 
+					LEFT OUTER JOIN ORD_DTL_CSTRT_DLVR_MAP ODCDM 
+							INNER JOIN ORD_DTL_CSTRT ODC	ON (ODC.ORD_DTL_CSTRT_NO = ODCDM.ORD_DTL_CSTRT_NO)
+							INNER JOIN ORDER_DETAIL OD		ON (OD.ORD_NO = ODC.ORD_NO AND OD.ORD_DTL_SEQ = ODC.ORD_DTL_SEQ AND OD.RMN_ORD_QTY &gt; 0)
+							INNER JOIN ORDER_BASE OB		ON (OB.ORD_NO = OD.ORD_NO)
+						ON ( ODCDM.DLVR_NO = DV.DLVR_NO )
+					LEFT OUTER JOIN CLM_DTL_CSTRT_DLVR_MAP CDCDM 
+							INNER JOIN CLM_DTL_CSTRT CDC	ON (CDC.CLM_DTL_CSTRT_NO = CDCDM.CLM_DTL_CSTRT_NO)
+							INNER JOIN CLAIM_DETAIL CD		ON (CD.CLM_NO = CDC.CLM_NO AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ)
+						ON ( CDCDM.DLVR_NO = DV.DLVR_NO )
+<!-- KEK01 추가 2021.03.03 END --> 						
+			WHERE  	1 = 1
+			AND		DV.DLVR_NO = #{dlvrNo}
+			<if test="onlyOne == true">LIMIT 1</if>
+	</select>
+	
+	<select id="listDeliveryInDlvrCpltYFromOrderClaim" resultType="biz.app.delivery.model.DeliveryVO" >
+		SELECT /* QUERYID(delivery.listDeliveryInDlvrCpltYFromOrderClaim) */
+		       IF(E1.CLM_DTL_TP_CD IS NULL, E1.NO, NULL) AS ORD_NO
+		     , IF(E1.CLM_DTL_TP_CD IS NULL, E1.DTL_SEQ, NULL) AS ORD_DTL_SEQ
+		     , IF(E1.CLM_DTL_TP_CD IS NULL, E1.DTL_STAT_CD, NULL) AS ORD_DTL_STAT_CD
+		     , IF(E1.CLM_DTL_TP_CD IS NULL, NULL, E1.NO) AS CLM_NO
+		     , IF(E1.CLM_DTL_TP_CD IS NULL, NULL, E1.DTL_SEQ) AS CLM_DTL_SEQ
+		     , IF(E1.CLM_DTL_TP_CD IS NULL, NULL, E1.DTL_STAT_CD) AS CLM_DTL_STAT_CD
+		     , E1.ORD_CLM_GB_CD
+		     , E1.CLM_DTL_TP_CD
+		     , E1.DLVR_PRCS_TP_CD
+		     , IF(COUNT(*) = SUM(IF(E1.DLVR_CPLT_DTM IS NOT NULL, 1, 0)), 'Y', 'N') AS DLVR_CPLT_YN
+		     , E1.COMP_TP_CD AS COMP_GB_CD
+		  FROM (
+				SELECT DISTINCT 
+				       IF(B1.CLM_DTL_TP_CD IS NULL, B1.ORD_NO, B1.CLM_NO) AS NO
+				     , IF(B1.CLM_DTL_TP_CD IS NULL, B1.ORD_DTL_SEQ, B1.CLM_DTL_SEQ) AS DTL_SEQ
+				     , IF(B1.CLM_DTL_TP_CD IS NULL, B1.ORD_DTL_STAT_CD, B1.CLM_DTL_STAT_CD) AS DTL_STAT_CD
+				     , B1.CLM_DTL_TP_CD
+				     , IF(B1.CLM_DTL_TP_CD IS NULL, C3.DLVR_NO, D3.DLVR_NO) AS DLVR_NO
+				     , IF(B1.CLM_DTL_TP_CD IS NULL, C3.DLVR_CPLT_DTM, D3.DLVR_CPLT_DTM) AS DLVR_CPLT_DTM
+				     , B1.ORD_CLM_GB_CD
+				     , B1.DLVR_PRCS_TP_CD
+				     , B1.COMP_TP_CD
+				  FROM (
+						SELECT DISTINCT
+						       A4.ORD_NO
+						     , A4.ORD_DTL_SEQ
+						     , A7.CLM_NO
+						     , A7.CLM_DTL_SEQ
+						     , A7.CLM_DTL_TP_CD
+						     , A1.ORD_CLM_GB_CD
+						     , A4.ORD_DTL_STAT_CD
+						     , A7.CLM_DTL_STAT_CD
+						     , A1.DLVR_PRCS_TP_CD
+						     , CP.COMP_TP_CD
+						  FROM DELIVERY A1
+						  LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP A2 ON A2.DLVR_NO = A1.DLVR_NO
+						  LEFT JOIN ORD_DTL_CSTRT A3 ON A3.ORD_DTL_CSTRT_NO  = A2.ORD_DTL_CSTRT_NO 
+						  LEFT JOIN ORDER_DETAIL A4 ON A4.ORD_NO = A3.ORD_NO AND A4.ORD_DTL_SEQ = A3.ORD_DTL_SEQ AND A4.RMN_ORD_QTY &gt; 0
+						  LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP A5 ON A5.DLVR_NO = A1.DLVR_NO
+						  LEFT JOIN CLM_DTL_CSTRT A6 ON A6.CLM_DTL_CSTRT_NO = A5.CLM_DTL_CSTRT_NO
+						  LEFT JOIN CLAIM_DETAIL A7 ON A7.CLM_NO = A6.CLM_NO AND A7.CLM_DTL_SEQ = A6.CLM_DTL_SEQ
+						  LEFT JOIN COMPANY_BASE CP ON A4.COMP_NO = CP.COMP_NO
+						 WHERE A1.DLVR_NO = #{dlvrNo}
+						 LIMIT 1
+				       ) B1
+				  LEFT JOIN ORD_DTL_CSTRT C1 ON C1.ORD_NO = B1.ORD_NO AND C1.ORD_DTL_SEQ = B1.ORD_DTL_SEQ
+				  LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP C2 ON C2.ORD_DTl_CSTRT_NO = C1.ORD_DTL_CSTRT_NO 
+				  LEFT JOIN DELIVERY C3 ON C3.DLVR_NO = C2.DLVR_NO
+				  LEFT JOIN CLM_DTL_CSTRT D1 ON D1.CLM_NO = B1.CLM_NO AND D1.CLM_DTL_SEQ = B1.CLM_DTL_SEQ
+				  LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP D2 ON D2.CLM_DTL_CSTRT_NO = D1.CLM_DTL_CSTRT_NO 
+				  LEFT JOIN DELIVERY D3 ON D3.DLVR_NO = D2.DLVR_NO
+		       ) E1
+		 GROUP BY E1.NO, E1.DTL_SEQ, E1.ORD_CLM_GB_CD, E1.CLM_DTL_TP_CD, E1.COMP_TP_CD
+	</select>
+
+	<resultMap type="biz.app.delivery.model.DeliveryListVO" id="pageDeliveryListMap_bk20210611">
+		<result property="dlvrNo"				column="DLVR_NO"			/>	<!-- 배송 번호 -->
+		<result property="ordClmGbCd"			column="ORD_CLM_GB_CD"		/>	<!-- 주문 클레임 구분 코드 -->
+		<result property="dlvrTpCd"				column="DLVR_TP_CD"			/>	<!-- 배송 유형 코드 -->
+		<result property="dlvrCmdDtm"			column="DLVR_CMD_DTM"		/>	<!-- 배송 지시 일시 -->
+		<result property="ooCpltDtm"			column="OO_CPLT_DTM"		/>	<!-- 출고 완료 일시 -->
+		<result property="dlvrGbCd"				column="DLVR_GB_CD"			/>	<!-- 배송 구분 코드 -->
+		<result property="dlvrPrcsTpCd"			column="DLVR_PRCS_TP_CD"	/>	<!-- 배송 처리 유형 코드 -->
+		<result property="dlvrPrcsTpNm"			column="DLVR_PRCS_TP_NM"	/>	<!-- 배송 처리 유형 명 -->
+		<result property="hdcCd"				column="HDC_CD"				/>	<!-- 택배사 코드 -->
+		<result property="invNo"				column="INV_NO"				/>	<!-- 송장번호 -->
+		<result property="dlvrCpltDtm"			column="DLVR_CPLT_DTM"		/>	<!-- 배송 완료 일시 -->
+		<result property="ordCpltDtm"			column="ORD_CPLT_DTM"		/>	<!-- 주문 완료 일시 -->
+		<result property="adrsNm"				column="ADRS_NM"			/>	<!-- 수취인 명 -->
+		<result property="tel"					column="TEL"				/>	<!-- 전화 -->
+		<result property="mobile"				column="MOBILE"				/>	<!-- 휴대폰 -->
+		<result property="postNoOld"			column="POST_NO_OLD"		/>	<!-- 우편 번호 구 -->
+		<result property="prclAddr"				column="PRCL_ADDR"			/>	<!-- 지번 주소 -->
+		<result property="prclDtlAddr"			column="PRCL_DTL_ADDR"		/>	<!-- 지번 상세 주소 -->
+		<result property="postNoNew"			column="POST_NO_NEW"		/>	<!-- 우편 번호 신 -->
+		<result property="roadAddr"				column="ROAD_ADDR"			/>	<!-- 도로 주소 -->
+		<result property="roadDtlAddr"			column="ROAD_DTL_ADDR"		/>	<!-- 도로 상세 주소 -->
+		<result property="dlvrMemo"				column="DLVR_MEMO"			/>	<!-- 배송메모 -->
+		<collection property="deliveryDetailList" ofType="biz.app.delivery.model.DeliveryListVO">
+			<result property="ordNo"				column="ORD_NO"				/>	<!-- 주문번호 -->
+			<result property="ordDtlSeq"			column="ORD_DTL_SEQ"		/>	<!-- 주문상세번호 -->
+			<result property="ordDtlStatCd"			column="ORD_DTL_STAT_CD"	/>	<!-- 주문 상세 상태 코드 -->
+			<result property="clmNo"				column="CLM_NO"				/>	<!-- 클레임번호 -->
+			<result property="clmTpCd"				column="CLM_TP_CD"			/>	<!-- 클레임 유형 코드 -->
+			<result property="clmDtlSeq"			column="CLM_DTL_SEQ"		/>	<!-- 클레임 상세번호 -->
+			<result property="clmDtlStatCd"			column="CLM_DTL_STAT_CD"	/>	<!-- 클레임 상세코드 -->
+			<result property="compNo"				column="COMP_NO"			/>	<!-- 업체 번호 -->
+			<result property="compNm"				column="COMP_NM"			/>	<!-- 업체명 -->
+			<result property="compGbNm"			column="COMP_GB_NM"			/>	<!-- 업체 구분 -->
+			<result property="upCompNo"				column="UP_COMP_NO"			/>	<!-- 상위 업체 번호 -->
+			<result property="phsCompNm" 			column="PHS_COMP_NM"/> <!-- 매입 업체 명 -->
+			<result property="goodsNm"				column="GOODS_NM"			/>	<!-- 상품 명 -->
+			<result property="goodsId"				column="GOODS_ID"			/>	<!-- 상품 번호 -->
+			<result property="goodsCstrtTpNm" column="GOODS_CSTRT_TP_NM"/> <!-- 상품 구성 유형 -->
+			<result property="subGoodsNm" 		column="SUB_GOODS_NM"	/> <!-- 사은품 명 -->
+			<result property="itemNm"				column="ITEM_NM"			/>	<!-- 단품 명 -->
+			<result property="itemNo"				column="ITEM_NO"			/>	<!-- 단품 번호 -->
+			<result property="saleAmt"				column="SALE_AMT"			/>	<!-- 판매 금액 -->
+			<result property="payAmt"				column="PAY_AMT"			/>	<!-- 결제 금액 -->
+			<result property="ordQty"				column="ORD_QTY"			/>	<!-- 배송 수량 -->
+			<result property="clmQty"				column="CLM_QTY"			/>	<!-- 클레임 수량 -->
+			<result property="realDlvrAmt"			column="REAL_DLVR_AMT"		/>	<!-- 실배송비 -->
+			<result property="rtnRealDlvrAmt"		column="RTN_REAL_DLVR_AMT"	/>	<!-- 회수비 -->
+			<result property="mbrNo"			column="MBR_NO"/>			<!-- 회원 번호 -->
+			<result property="ordNm"				column="ORD_NM"				/>	<!-- 주문자명 -->
+			<result property="ordrId"				column="ORDR_ID"			/>	<!-- 주문자아이디 -->
+			<result property="ordrMobile"       column="ORDR_MOBILE"/>      <!-- 주문자 휴대폰 -->
+			<result property="dlvrDelayDays"		column="DLVR_DELAY_DAYS"	/> 	<!-- 배송지연일 -->
+			<result property="stId"					column="ST_ID"				/>	<!-- ST_ID -->
+			<result property="stNm"					column="ST_NM"				/>	<!-- ST_NM -->
+			<result property="dftHdcCd"				column="DFT_HDC_CD"			/>	<!-- 상품의 배송비정책.기본택배사 코드 -->
+			<result property="clmRsnNm"				column="CLM_RSN_NM"			/>	<!-- 상품의 배송비정책.기본택배사 코드 -->
+			<result property="clmRsnContent"				column="CLM_RSN_CONTENT"			/>	<!-- 상품의 배송비정책.기본택배사 코드 -->
+		</collection>
+	</resultMap>
+
+	<select id="pageDeliveryList" resultType="biz.app.delivery.model.DeliveryListVO">
+		<!--
+			Query Name : delivery.pageDeliveryList
+			Description : 배송 리스트(페이지) - 2021.06.11 by kek01 - 쿼리문 속도저하로 새로 작성
+		-->
+		<if test="ordClmGbCd == '10'">
+			<include refid="pageDeliveryListOrder" />
+		</if>
+		<if test="ordClmGbCd == '20'">
+			<include refid="pageDeliveryListClaim" />
+		</if>
+	</select>
+	
+	<sql id="pageDeliveryListOrder">
+      SELECT  /* QUERYID(delivery.pageDeliveryList) */
+              W.*
+		      ,FN_GET_CODE_NAME('GOODS_CSTRT_TP', W.GOODS_CSTRT_TP_CD,'') AS GOODS_CSTRT_TP_NM
+		      ,FN_GET_COMPANY_NAME(IFNULL( W.PHS_COMP_NO, W.COMP_NO))     AS PHS_COMP_NM
+			  ,FN_GET_COMPANY_NAME(W.COMP_NO) 		AS COMP_NM 	/*업체명 */ 
+			  ,FN_GET_SITE_NAME(W.ST_ID)			AS ST_NM
+			  ,FN_GET_CODE_NAME('DLVR_PRCS_TP', W.DLVR_PRCS_TP_CD, 'Y') AS DLVR_PRCS_TP_NM
+		FROM (
+			SELECT  Z.*
+					<include refid="pageDeliveryListCommonSelItems" />
+			FROM (
+				    SELECT  Z2.*
+				            ,OD.ORD_DTL_STAT_CD
+				            <!-- ,OD.GOODS_NM -->
+				            ,IF(OD.PAK_GOODS_ID IS NOT NULL, (SELECT GB.GOODS_NM FROM GOODS_BASE GB WHERE GB.GOODS_ID = OD.GOODS_ID), OD.GOODS_NM) AS GOODS_NM
+				            ,OD.ITEM_NM
+				            ,OD.COMP_NO
+				            ,OD.UP_COMP_NO
+				            ,OD.SALE_AMT
+							,OD.PAY_AMT
+							,OD.ITEM_NO
+							,OD.GOODS_ID
+							,OD.DLVRC_NO
+							,OB.ST_ID
+							,OD.RMN_ORD_QTY			AS ORD_QTY 
+							,OB.ORD_NM				
+							,OB.ORDR_ID			    
+							,OB.ORD_CPLT_DTM		
+							,OB.MBR_NO				
+							,OB.ORDR_MOBILE			
+					  FROM (
+							SELECT Z1.*
+							        ,(SELECT T2.ORD_NO 
+							            FROM ORD_DTL_CSTRT_DLVR_MAP T1 
+							                 INNER JOIN ORD_DTL_CSTRT T2 ON T1.ORD_DTL_CSTRT_NO = T2.ORD_DTL_CSTRT_NO 
+							           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS ORD_NO
+							        ,(SELECT T2.ORD_DTL_SEQ 
+							            FROM ORD_DTL_CSTRT_DLVR_MAP T1 
+							                 INNER JOIN ORD_DTL_CSTRT T2 ON T1.ORD_DTL_CSTRT_NO = T2.ORD_DTL_CSTRT_NO 
+							           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS ORD_DTL_SEQ
+							  FROM (
+									<include refid="pageDeliveryListInner" />
+								    ORDER BY DLVR_NO DESC
+									<if test="pagingY ==  true">
+										<include refid="bizCommon.pageSql" />
+									</if>
+							  ) Z1
+					       ) Z2,
+					       ORDER_DETAIL OD,
+					       ORDER_BASE OB
+					 WHERE OD.ORD_NO = Z2.ORD_NO
+					   AND OD.ORD_DTL_SEQ = Z2.ORD_DTL_SEQ 
+					   AND OD.ORD_NO = OB.ORD_NO
+				) Z
+				ORDER BY DLVR_NO DESC
+			) W		
+	</sql>
+	
+	<sql id="pageDeliveryListClaim">
+      SELECT  /* QUERYID(delivery.pageDeliveryListClaim) */
+              W.*
+		      ,FN_GET_CODE_NAME('GOODS_CSTRT_TP', W.GOODS_CSTRT_TP_CD,'') AS GOODS_CSTRT_TP_NM
+		      ,FN_GET_COMPANY_NAME(IFNULL( W.PHS_COMP_NO, W.COMP_NO))     AS PHS_COMP_NM
+			  ,FN_GET_COMPANY_NAME(W.COMP_NO) 		AS COMP_NM 	/*업체명 */ 
+			  ,FN_GET_SITE_NAME(W.ST_ID)			AS ST_NM
+			  ,FN_GET_CODE_NAME('DLVR_PRCS_TP', W.DLVR_PRCS_TP_CD, 'Y') AS DLVR_PRCS_TP_NM
+		FROM (
+			SELECT  Z.*
+					<include refid="pageDeliveryListCommonSelItems" />
+   					,(SELECT IFNULL(REAL_DLVR_AMT, 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO = z.RTN_DLVRC_NO )	AS RTN_REAL_DLVR_AMT
+   					,(SELECT ORD_NM  		FROM ORDER_BASE WHERE ORD_NO = z.ORD_NO)	AS ORD_NM
+   					,(SELECT ORDR_ID 		FROM ORDER_BASE WHERE ORD_NO = z.ORD_NO)	AS ORDR_ID
+   					,(SELECT ORD_CPLT_DTM 	FROM ORDER_BASE WHERE ORD_NO = z.ORD_NO)	AS ORD_CPLT_DTM
+   					,(SELECT MBR_NO 		FROM ORDER_BASE WHERE ORD_NO = z.ORD_NO )	AS MBR_NO
+   					,(SELECT ORDR_MOBILE 	FROM ORDER_BASE WHERE ORD_NO = z.ORD_NO)	AS ORDR_MOBILE
+   					,CONCAT((SELECT DTL_NM 	FROM CODE_DETAIL WHERE GRP_CD = 'CLM_RSN' AND DTL_CD =  z.CLM_RSN_CD AND SYS_DEL_YN = 'N'), 
+   				        '( 귀책 : ' , 
+   				        CASE WHEN (SELECT USR_DFN2_VAL FROM CODE_DETAIL WHERE GRP_CD = 'CLM_RSN' AND DTL_CD = z.CLM_RSN_CD)='20' THEN '업체' ELSE '고객' END, 
+   				        ')' ) AS CLM_RSN_NM
+   					,COUNT(DLVR_NO)OVER() AS TOTAL_CNT
+   					<!-- 대표클레임노출 YES -->
+   					,IF(IFNULL(z.CD_ORG_CLM_NO,'') = '',  CLM_QTY_ORG, CLM_QTY_SUM) as CLM_QTY /* 클레임수량 */
+   					,IF(IFNULL(z.CD_ORG_CLM_NO,'') = '',  CLM_QTY_ORG, CLM_QTY_SUM) as ORD_QTY /* 클레임수량 - 원본에서 ord_qty 수량을 clm_qty 수량과 동일하게 넣어주고 있어서 유지함 */
+   					<!-- 대표클레임노출 YES -->
+			FROM (
+				    SELECT  Z2.*
+   				            ,CD.ORD_NO
+   				            ,CD.ORD_DTL_SEQ
+   							<!-- ,CD.GOODS_NM -->
+   							,IF(CD.PAK_GOODS_ID IS NOT NULL, (SELECT GB.GOODS_NM FROM GOODS_BASE GB WHERE GB.GOODS_ID = CD.GOODS_ID), CD.GOODS_NM) AS GOODS_NM
+   							,CD.ITEM_NM
+   							,CD.COMP_NO
+   							,CD.UP_COMP_NO
+   							,CD.SALE_AMT
+   							,CD.PAY_AMT
+   							,CD.ITEM_NO
+   							,CD.GOODS_ID
+   							,CD.DLVRC_NO
+   							,CD.RTN_DLVRC_NO
+   							,CD.CLM_RSN_CD
+   							,CD.CLM_RSN_CONTENT
+   							,CD.CLM_DTL_TP_CD 
+   							,CB.ST_ID
+   							,CB.CLM_TP_CD
+   							<!-- 대표클레임노출 NO -->
+   							<!-- ,CD.CLM_QTY
+   							,CD.CLM_QTY AS ORD_QTY
+   							,CD.CLM_DTL_STAT_CD -->
+   							<!-- 대표클레임노출 NO -->
+   							<!-- 대표클레임노출 YES -->
+   							,MIN(CD.CLM_DTL_STAT_CD) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD)		AS CLM_DTL_STAT_CD
+   							,MIN(CD.CLM_DTL_SEQ) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD)			AS CD_CLM_DTL_SEQ
+   							,MAX(CD.ORG_CLM_NO) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD)			AS CD_ORG_CLM_NO
+   							,IFNULL(SUM(CD.CLM_QTY) OVER(PARTITION BY CD.CLM_NO, CD.ORD_NO, CD.ORD_DTL_SEQ, CD.CLM_DTL_TP_CD ),0)	AS CLM_QTY_SUM
+   							,CD.CLM_QTY AS CLM_QTY_ORG
+   							<!-- 대표클레임노출 YES -->
+					  FROM (
+							SELECT Z1.*
+							        ,(SELECT T2.CLM_NO 
+							            FROM CLM_DTL_CSTRT_DLVR_MAP T1 
+							                 INNER JOIN CLM_DTL_CSTRT T2 ON T1.CLM_DTL_CSTRT_NO = T2.CLM_DTL_CSTRT_NO 
+							           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS CLM_NO
+							        ,(SELECT T2.CLM_DTL_SEQ 
+							            FROM CLM_DTL_CSTRT_DLVR_MAP T1 
+							                 INNER JOIN CLM_DTL_CSTRT T2 ON T1.CLM_DTL_CSTRT_NO = T2.CLM_DTL_CSTRT_NO 
+							           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS CLM_DTL_SEQ
+							  FROM (
+									<include refid="pageDeliveryListInner" />
+							  ) Z1
+					       ) Z2,
+ 					       CLAIM_DETAIL CD,
+ 					       CLAIM_BASE CB
+ 					 WHERE CD.CLM_NO = Z2.CLM_NO
+ 					   AND CD.CLM_DTL_SEQ = Z2.CLM_DTL_SEQ 
+ 					   AND CD.CLM_NO = CB.CLM_NO
+			) Z
+			WHERE (CD_ORG_CLM_NO IS NULL OR (CD_ORG_CLM_NO IS NOT NULL AND Z.CLM_DTL_SEQ = Z.CD_CLM_DTL_SEQ)) <!-- 대표클레임노출 YES -->	 		
+		    ORDER BY DLVR_NO DESC
+			<if test="pagingY ==  true">
+				<include refid="bizCommon.pageSql" />
+			</if>
+			) W			
+	</sql>
+	
+	<sql id="pageDeliveryListCommonSelItems">
+					,COUNT(DLVR_NO) OVER (PARTITION BY DLVR_NO) AS ORD_DTL_CNT
+					,ROW_NUMBER() OVER (PARTITION BY DLVR_NO ORDER BY ORD_DTL_SEQ) AS ORD_DTL_ROW_NUM
+					<!-- ,FN_ORDER_DEFAULT_HDC_CD(z.DLVRC_NO)	AS DFT_HDC_CD //주석처리 기존 값이 이상함 - 2021.06.09 by kek01-->
+					,null	AS DFT_HDC_CD
+					,(SELECT CB2.COMP_GB_CD FROM COMPANY_BASE CB2 WHERE CB2.COMP_NO = Z.COMP_NO) AS COMP_GB_CD	/* 업체구분코드 */
+					,(SELECT CB2.COMP_TP_CD FROM COMPANY_BASE CB2 WHERE CB2.COMP_NO = Z.COMP_NO) AS COMP_TP_CD	/* 업체유형코드 */
+					,(SELECT IFNULL(REAL_DLVR_AMT, 0) FROM DELIVERY_CHARGE WHERE DLVRC_NO = z.DLVRC_NO )  AS REAL_DLVR_AMT
+					,(SELECT GB.GOODS_CSTRT_TP_CD FROM GOODS_BASE GB WHERE GOODS_ID = z.GOODS_ID)	AS GOODS_CSTRT_TP_CD
+					,IF (z.DLVR_CPLT_DTM IS NULL AND z.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(z.DLVR_CMD_DTM), 0) AS DLVR_DELAY_DAYS
+					,IF (z.DLVR_DEMAND_YN = 'Y' 
+			 		      ,CONCAT(FN_GET_CODE_NAME('GOODS_RCV_PST',z.GOODS_RCV_PST_CD,'')
+			 		              , IF(IFNULL(z.GOODS_RCV_PST_ETC,'') = '', '', CONCAT('(',z.GOODS_RCV_PST_ETC,')'))
+			 		              , ' / '
+			 		              , FN_GET_CODE_NAME('PBL_GATE_ENT_MTD',z.PBL_GATE_ENT_MTD_CD,'')
+			 		              , ' / '
+			 		              , z.DLVR_DEMAND 
+			 		              , IF(IFNULL(z.DLVR_MEMO_new,'') = '', '', CONCAT(' / ',z.DLVR_MEMO_new))
+			 		              )
+			 		      ,'')		AS DLVR_MEMO	/* 배송메모 */
+					,FN_GET_CODE_NAME('COMP_TP', (SELECT COMP_TP_CD FROM COMPANY_BASE CP WHERE CP.COMP_NO = z.COMP_NO), '')  AS COMP_TP_NM																								
+				   	,(SELECT group_concat( GB.GOODS_ID SEPARATOR ', ') 
+					    FROM GOODS_BASE GB    	
+					   WHERE GB.GOODS_ID IN  (  SELECT ODC.CSTRT_GOODS_ID 
+												  FROM ORD_DTL_CSTRT ODC	       
+												 WHERE ODC.ORD_NO  = z.ORD_NO 
+												   AND ODC.ORD_DTL_SEQ = z.ORD_DTL_SEQ
+												   AND ODC.CSTRT_GOODS_GB_CD = '30'								
+											 ) )	AS SUB_GOODS_NM		/*사은품명*/
+		       		,(SELECT S.PHS_COMP_NO 
+						FROM ITEM I LEFT JOIN SKU_BASE S ON I.SKU_CD  = S.SKU_CD 
+					   WHERE I.GOODS_ID = z.GOODS_ID )	AS PHS_COMP_NO	/* 매입 업체 이름 */	
+	</sql>
+
+	<sql id="pageDeliveryListInner">
+					                 SELECT /* pageDeliveryListInner */
+											 DV.DLVR_NO						/* 배송 번호 */
+											,DV.ORD_CLM_GB_CD				/* 주문 클레임 구분 코드 */
+											,DV.DLVR_GB_CD					/* 배송 구분 코드 */
+											,DV.DLVR_TP_CD					/* 배송 유형 코드 */
+											,DV.DLVR_PRCS_TP_CD				/* 배송 처리 유형 코드 */
+											,DV.HDC_CD						/* 택배사 코드 */
+											,DV.INV_NO						/* 송장번호 */
+											,DV.DLVR_CMD_DTM				/* 배송 지시 일시 */
+											,DV.DLVR_CPLT_DTM				/* 배송 완료 일시 */
+											,DV.OO_CPLT_DTM					/* 출고 완료 일시 */
+											,ODA.ADRS_NM					/* 수취인 명 */
+											,ODA.TEL						/* 전화 */
+											,ODA.MOBILE						/* 휴대폰 */
+											,ODA.POST_NO_OLD				/* 우편 번호 구 */
+											,ODA.PRCL_ADDR					/* 지번 주소 */
+											,ODA.PRCL_DTL_ADDR				/* 지번 상세 주소 */
+											,ODA.POST_NO_NEW				/* 우편 번호 신 */
+											,ODA.ROAD_ADDR					/* 도로 주소 */
+											,ODA.ROAD_DTL_ADDR				/* 도로 상세 주소 */
+											,ODA.DLVR_DEMAND_YN
+											,ODA.GOODS_RCV_PST_ETC
+											,ODA.PBL_GATE_ENT_MTD_CD
+											,ODA.DLVR_DEMAND
+											,ODA.DLVR_MEMO					AS DLVR_MEMO_NEW
+											,ODA.DLVR_MEMO					AS DLVR_MEMO_OLD	/* 배송메모 OLD - 미사용 */
+											,ODA.GOODS_RCV_PST_CD
+									  FROM DELIVERY DV 
+									       INNER JOIN ORDER_DLVRA ODA ON ( DV.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO )
+									 WHERE 1=1
+									<choose>
+									<when test="ordClmGbCd == '10'">					       
+									   <!-- /*주문배송관리*/ -->
+                                       AND EXISTS (SELECT 1 FROM ORD_DTL_CSTRT_DLVR_MAP ODCRM 
+                                                           WHERE ODCRM.DLVR_NO = DV.DLVR_NO 
+                                                             AND ODCRM.ORD_DTL_CSTRT_NO IN (SELECT ODC.ORD_DTL_CSTRT_NO 
+                                                                                              FROM ORD_DTL_CSTRT ODC 
+                                                                                             WHERE (ODC.ORD_NO,ODC.ORD_DTL_SEQ) IN (SELECT OD.ORD_NO, ORD_DTL_SEQ 
+                                                                                                                                      FROM ORDER_DETAIL OD 
+                                                                                                                                       <if test="arrDlvrPrcsTpCd != null and arrDlvrPrcsTpCd.length > 0">
+                                                                                                                                       JOIN ORDER_BASE OB ON OB.ORD_NO = OD.ORD_NO
+                                                                                                                                       </if>
+                                                                                                                                       <if test="arrCompTpCd != null and arrCompTpCd.length > 0">
+                                                                                                                                       JOIN COMPANY_BASE CP ON OD.COMP_NO = CP.COMP_NO
+                                                                                                                                       </if>
+                                                                                                                                     WHERE OD.RMN_ORD_QTY <![CDATA[ > ]]> 0 /*취소건제외*/
+                                                                        <if test="stId != null and stId != ''">
+                                                                            AND OD.ORD_NO IN (SELECT ORD_NO FROM ORDER_BASE OB2 WHERE ST_ID = #{stId})  /*조회조건 : 사이트아이디*/
+                                                                        </if>
+                                                                        <if test="compNo != null and compNo != ''">
+                                                                            AND OD.COMP_NO = #{compNo}                   /*조회조건 : 업체코드*/
+                                                                        </if>
+                                                                        <if test="ordDtlStatCd != null and ordDtlStatCd != '' and  excelDownY == false ">
+                                                                            AND OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}     /*조회조건 : 주문상태*/
+                                                                        </if>
+                                                                        <if test="ordNo != null and ordNo != ''">
+                                                                            AND OD.ORD_NO = #{ordNo}                     /*조회조건 : 주문번호*/
+                                                                        </if>
+                                                                        <if test="excelDownY ==  true  ">
+                                                                            <if test="arrOrdNo != null">
+                                                                            <foreach collection="arrOrdNo" item="item" separator="," open="AND OD.ORD_NO IN (" close=" ) " >
+                                                                                #{item }
+                                                                            </foreach>
+                                                                            </if>
+                                                                            <if test="ordDtlStatCd != null and ordDtlStatCd != ''  and arrOrdNo != null and arrOrdNo.length > 0"> <!-- 좀이상함 -->
+                                                                            AND OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+                                                                            </if>
+                                                                        </if>
+                                                                        <if test="goodsId != null and goodsId != ''">
+                                                                            AND OD.GOODS_ID = #{goodsId}                 /*조회조건 : 상품번호*/
+                                                                        </if>
+                                                                        <if test="arrDlvrPrcsTpCd != null and arrDlvrPrcsTpCd.length > 0">
+																			<foreach collection="arrDlvrPrcsTpCd" item="dlvrPrcsTpCd" separator="," open="AND OB.DLVR_PRCS_TP_CD IN (" close=" ) " >
+																			    #{dlvrPrcsTpCd}
+																		    </foreach>
+																		</if>
+                                                                        <if test="arrCompTpCd != null and arrCompTpCd.length > 0">
+																			<foreach collection="arrCompTpCd" item="compTpCd" separator="," open="AND	CP.COMP_TP_CD IN (" close=" ) " >
+																				#{compTpCd}
+																			</foreach>
+																		</if>
+									   )))
+									</when>
+									<when test="ordClmGbCd == '20'">
+									   <!-- /*클레임배송관리*/ -->
+                                       AND EXISTS (SELECT 1  FROM CLM_DTL_CSTRT_DLVR_MAP CDCRM 
+                                                            WHERE CDCRM.DLVR_NO = DV.DLVR_NO 
+                                                              AND CDCRM.CLM_DTL_CSTRT_NO IN (SELECT CDC.CLM_DTL_CSTRT_NO 
+                                                                                               FROM CLM_DTL_CSTRT CDC 
+                                                                                              WHERE (CDC.CLM_NO,CDC.CLM_DTL_SEQ) IN (SELECT CLM_NO, CLM_DTL_SEQ 
+                                                                                                                                       FROM CLAIM_DETAIL CD
+                                                                                                                                       <if test="arrCompTpCd != null and arrCompTpCd.length > 0">
+                                                                                                                                       JOIN COMPANY_BASE CP ON CD.COMP_NO = CP.COMP_NO
+                                                                                                                                       </if>
+                                                                                                                                      WHERE 1=1 
+                                                                        AND CD.CLM_NO IN (SELECT CLM_NO FROM CLAIM_BASE CB2 WHERE CB2.CLM_STAT_CD != '40' /*취소건제외*/
+                                                                        <if test="stId != null and stId != ''"> 
+                                                                            AND ST_ID = #{stId} /*조회조건 : 사이트아이디*/
+                                                                        </if>
+                                                                        )
+                                                                        <if test="compNo != null and compNo != ''">
+                                                                            AND CD.COMP_NO = #{compNo}                    /*조회조건 : 업체코드*/
+                                                                        </if>
+                                                                        <if test="clmDtlTpCd != null and clmDtlTpCd != ''">
+                                                                            AND CD.CLM_DTL_TP_CD = #{clmDtlTpCd}        /*조회조건 : 클레임상세유형*/
+                                                                        </if>
+                                                                        <if test="clmDtlStatCd != null and clmDtlStatCd != '' and  excelDownY ==  false ">
+                                                                            AND CD.CLM_DTL_STAT_CD = #{clmDtlStatCd}    /*조회조건 : 클레임상세상태*/
+                                                                        </if>
+                                                                        <if test="arrClmDtlStatCd != null and arrClmDtlStatCd.length > 0 and excelDownY !=  true">
+                                                                            <foreach collection="arrClmDtlStatCd" item="item" separator="," open="AND CD.CLM_DTL_STAT_CD IN (" close=")  " >
+                                                                                #{item }
+                                                                            </foreach>
+                                                                        </if>
+                                                                        <if test="clmNo != null and clmNo != ''">
+                                                                            AND CD.CLM_NO = #{clmNo}                    /*조회조건 : 클레임번호*/
+                                                                        </if>
+                                                                        <if test="excelDownY ==  true  ">
+                                                                            <if test="arrClmNo != null">
+                                                                                <foreach collection="arrClmNo" item="item" separator="," open="AND CD.CLM_NO IN (" close=" ) " >
+                                                                                    #{item }
+                                                                                </foreach>
+                                                                            </if>
+                                                                            <if test="arrClmDtlStatCd != null  and arrClmNo != null and arrClmNo.length > 0"> <!-- 좀이상함 -->
+                                                                                <foreach collection="arrClmDtlStatCd" item="item" separator="," open="AND CD.CLM_DTL_STAT_CD IN (" close=")  " >
+                                                                                    #{item }
+                                                                                </foreach>                                                                                                                                        
+                                                                            </if>
+                                                                        </if>
+                                                                        <if test="goodsId != null and goodsId != ''">
+                                                                            AND CD.GOODS_ID = #{goodsId}                /*조회조건 : 상품번호*/
+                                                                        </if>
+                                                                        <if test="ordNo != null and ordNo != ''">
+                                                                            AND CD.ORD_NO = #{ordNo}                    /*조회조건 : 주문번호*/
+                                                                        </if>
+                                                                        <if test="arrCompTpCd != null and arrCompTpCd.length > 0">
+																			<foreach collection="arrCompTpCd" item="compTpCd" separator="," open="AND	CP.COMP_TP_CD IN (" close=" ) " >
+																				#{compTpCd}
+																			</foreach>
+																		</if>
+									   )))
+									</when>
+									</choose>
+									   <if test="ordClmGbCd != null and ordClmGbCd != ''">
+									   AND DV.ORD_CLM_GB_CD = #{ordClmGbCd} /*조회조건 : 주문클레임구분코드 10:주문, 20:클레임*/
+									   </if>
+									   <if test="searchKeyOrder != null and searchKeyOrder != ''">
+										<choose>
+											<when test="searchKeyOrder == 'type01'">
+												AND DV.DLVR_CMD_DTM <![CDATA[ >= ]]> #{dtmStart }	/*조회조건 : 배송지시일자*/
+												AND DV.DLVR_CMD_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+											</when>
+											<when test="searchKeyOrder == 'type02'">
+												AND DV.DLVR_CPLT_DTM <![CDATA[ >= ]]> #{dtmStart }	/*조회조건 : 배송완료일자*/
+												AND DV.DLVR_CPLT_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+											</when>
+											<when test="searchKeyOrder == 'type03'">
+												AND DV.OO_CPLT_DTM <![CDATA[ >= ]]> #{dtmStart }	/*조회조건 : 출고완료일자*/
+												AND DV.OO_CPLT_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+											</when>
+										</choose>
+									   </if>
+ 									   <!-- AND DV.DLVR_NO = 572638  		/*조회조건 : 배송번호*/ -->
+									   <if test="hdcCd != null and hdcCd != ''">
+ 									   AND DV.HDC_CD = #{hdcCd}			/*조회조건 : 택배사코드*/
+ 									   </if>
+ 									   <if test="invNo != null and invNo != ''">
+ 									   AND DV.INV_NO = #{invNo}			/*조회조건 : 송장번호*/
+ 									   </if>
+ 									   <if test="dlvrDelayPrd != null and dlvrDelayPrd != ''">
+ 									   	<if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_30">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) = 3  /*조회조건 : 배송지연일 3일*/
+ 									   	</if>
+ 									   	<if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_40">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) = 4  /*조회조건 : 배송지연일 4일*/
+ 									    </if>
+ 									    <if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_50">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) = 5  /*조회조건 : 배송지연일 5일*/
+ 									   	</if>
+ 									   	<if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_60">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) = 6  /*조회조건 : 배송지연일 6일*/
+ 									   	</if>
+ 									   	<if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_70">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) = 7  /*조회조건 : 배송지연일 7일*/
+ 									   	</if>
+ 									   	<if test="dlvrDelayPrd == @framework.common.constants.CommonConstants@DLVR_DELAY_PRD_80">
+ 									   		AND IF (dv.DLVR_CPLT_DTM IS NULL AND dv.OO_CPLT_DTM IS NULL, TO_DAYS(NOW()) - TO_DAYS(dv.DLVR_CMD_DTM), 0) <![CDATA[ >= ]]> 8 /*조회조건 : 배송지연일 7일 초과*/
+ 									   	</if>	
+ 									   </if>
+ 									   <if test="ordDtlStatCd != null and ordDtlStatCd != '' and  excelDownY == false ">
+ 									   	<if test='ordDtlStatCd eq "150"'>
+ 									   		AND  DV.DLVR_CPLT_DTM IS NULL
+ 									   	</if>
+ 									   </if>
+ 									   <if test="arrDlvrPrcsTpCd != null and arrDlvrPrcsTpCd.length > 0">
+											<foreach collection="arrDlvrPrcsTpCd" item="dlvrPrcsTpCd" separator="," open="AND DV.DLVR_PRCS_TP_CD IN (" close=" ) " >
+											    #{dlvrPrcsTpCd}
+										    </foreach>
+										</if>
+									 /* END pageDeliveryListInner */
+	</sql>
+	
+	<select id="pageDeliveryListCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : tax.pageDeliveryListCount
+			Description : 배송목록 count
+		-->
+		<if test="ordClmGbCd == '10'">
+			SELECT COUNT(Z1.DLVR_NO) AS TOTAL_CNT
+			  FROM (
+					<include refid="pageDeliveryListInner" />
+			  ) Z1
+		</if>
+		<if test="ordClmGbCd == '20'">
+			SELECT	1 FROM DUAL /*구색만갖춤*/
+		</if>
+	</select>
+	
+	
+	<sql id="pageDeliveryListWhere_bk20210611">
+			<if test="stId != null and stId != ''">
+			AND (
+				EXISTS (
+					SELECT 1
+					FROM ORDER_BASE OB
+					WHERE OB.ORD_NO = ordinfo.ORD_NO
+						  AND OB.ST_ID = #{stId}
+				)
+				OR
+				EXISTS (
+					SELECT 1
+					FROM CLAIM_BASE CB
+					WHERE CB.CLM_NO = clminfo.CLM_NO
+						  AND CB.ST_ID = #{stId}
+				)
+			)
+			</if>
+			<!-- 클레임구분코드가 있을시  -->
+			<if test="ordClmGbCd != null and ordClmGbCd != ''">
+			AND DV.ORD_CLM_GB_CD = #{ordClmGbCd}
+<!-- 미사용	<if test="dlvrNo != null and ! dlvrNo.equals('')">
+				<choose>
+					<when test="ordClmGbCd == '10'">
+					AND ordinfo.DLVR_NO = #{dlvrNo}
+					</when>
+					<when test="ordClmGbCd == '20'">
+					AND clminfo.DLVR_NO = #{dlvrNo}
+					</when>
+				</choose>
+			</if> -->
+			<if test="compNo != null and compNo != ''">
+				<choose>
+					<when test="ordClmGbCd == '10'">
+						AND ordinfo.COMP_NO = #{compNo}
+<!-- 미사용			AND DV.DLVR_NO IN
+					(SELECT OD.DLVR_NO FROM ORDER_DETAIL OD JOIN COMPANY_BASE CB ON (OD.COMP_NO = CB.COMP_NO)
+					WHERE 1=1
+					<if test="lowCompNo != null and lowCompNo != ''">
+                       AND OD.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                       </if>
+                       <if test="lowCompNo == null or lowCompNo == ''">
+                           <if test="compNo != null and compNo != ''">
+                       AND OD.COMP_NO = #{compNo}
+                           </if>
+                       </if>
+                       ) -->
+					</when>
+					<when test="ordClmGbCd == '20'">
+						AND clminfo.COMP_NO = #{compNo}
+<!-- 미사용			AND DV.DLVR_NO IN
+					(SELECT CD.DLVR_NO FROM CLAIM_DETAIL CD JOIN COMPANY_BASE CB ON (CD.COMP_NO = CB.COMP_NO)
+					WHERE 1=1
+					<if test="lowCompNo != null and lowCompNo != ''">
+                       AND CD.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                       </if>
+                       <if test="lowCompNo == null or lowCompNo == ''">
+                           <if test="compNo != null and compNo != ''">
+                       AND CD.COMP_NO = #{compNo}
+                           </if>
+                       </if>
+                       ) -->
+					</when>
+				</choose>
+			</if>
+			</if>
+			<!-- 클레임구분코드가 없을시  -->
+			<if test="ordClmGbCd == null or ordClmGbCd == ''">
+				<if test="compNo != null and compNo != ''">
+				AND (
+					DV.DLVR_NO IN
+						(SELECT OD.DLVR_NO
+						 FROM ORDER_DETAIL OD JOIN COMPANY_BASE CB ON (OD.COMP_NO = CB.COMP_NO)
+						 WHERE 1=1
+							<if test="lowCompNo != null and lowCompNo != ''">
+							AND OD.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+	                        </if>
+	                        <if test="lowCompNo == null or lowCompNo == ''">
+	                            <if test="compNo != null and compNo != ''">
+	                        AND OD.COMP_NO = #{compNo}
+	                            </if>
+	                        </if>
+				        )
+				        OR
+					DV.DLVR_NO IN
+				        (SELECT CD.DLVR_NO
+				         FROM CLAIM_DETAIL CD JOIN COMPANY_BASE CB ON (CD.COMP_NO = CB.COMP_NO)
+				         WHERE 1=1
+					        <if test="lowCompNo != null and lowCompNo != ''">
+	                        AND CD.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+	                        </if>
+	                        <if test="lowCompNo == null or lowCompNo == ''">
+	                            <if test="compNo != null and compNo != ''">
+	                        AND CD.COMP_NO = #{compNo}
+	                            </if>
+	                        </if>
+						)
+				)
+				</if>
+			</if>
+			<if test="searchKeyOrder != null and searchKeyOrder != ''">
+				<choose>
+					<when test="searchKeyOrder == 'type01'">
+						AND DV.DLVR_CMD_DTM <![CDATA[ >= ]]> #{dtmStart }
+						AND DV.DLVR_CMD_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+					</when>
+					<when test="searchKeyOrder == 'type02'">
+						AND DV.DLVR_CPLT_DTM <![CDATA[ >= ]]> #{dtmStart }
+						AND DV.DLVR_CPLT_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+					</when>
+					<when test="searchKeyOrder == 'type03'">
+						AND DV.OO_CPLT_DTM <![CDATA[ >= ]]> #{dtmStart }
+						AND DV.OO_CPLT_DTM <![CDATA[ < ]]> DATE_ADD(#{dtmEnd}, INTERVAL 1 DAY)
+					</when>
+				</choose>
+			</if>
+			<if test="hdcCd != null and hdcCd != ''">
+			/* 택배사 코드 : hdcCd */
+			AND		DV.HDC_CD = #{hdcCd}
+			</if>
+			<if test="invNo != null and invNo != ''">
+			/* 송장 번호 : invNo */
+			AND		DV.INV_NO = #{invNo}
+			</if>
+			<if test="ordDtlStatCd != null and ordDtlStatCd != '' and  excelDownY ==  false  ">
+				<if test='ordDtlStatCd eq "150"'>
+				AND	 ordinfo.ORD_DTL_STAT_CD = #{ordDtlStatCd} AND  DV.DLVR_CPLT_DTM IS NULL 
+				</if>
+				<if test='ordDtlStatCd != "150"'>
+				AND	 ordinfo.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+				</if>
+			</if>
+			<if test="clmDtlTpCd != null and clmDtlTpCd != ''">
+			AND	 clminfo.CLM_DTL_TP_CD = #{clmDtlTpCd}
+			</if>
+			<if test="clmDtlStatCd != null and clmDtlStatCd != '' and  excelDownY ==  false ">
+			AND	 clminfo.CLM_DTL_STAT_CD = #{clmDtlStatCd}
+			</if>
+			<if test="arrClmDtlStatCd != null   and arrClmDtlStatCd.length > 0 and excelDownY !=  true">
+	            <foreach collection="arrClmDtlStatCd" item="item" separator="," open="AND clminfo.CLM_DTL_STAT_CD IN (" close=")  " >
+	                #{item }
+	            </foreach>
+            </if>
+
+			<if test="ordNo != null and ordNo != ''">
+			<if test="ordClmGbCd == @framework.common.constants.CommonConstants@ORD_CLM_GB_10">
+			AND	 ordinfo.ORD_NO = #{ordNo}
+			</if>
+			<if test="ordClmGbCd == @framework.common.constants.CommonConstants@ORD_CLM_GB_20">
+            AND  clminfo.ORD_NO = #{ordNo}
+            </if>
+			</if>
+			<!-- 상품번호 추가 -->
+			<if test="goodsId != null and goodsId != ''">
+				<if test="ordClmGbCd == @framework.common.constants.CommonConstants@ORD_CLM_GB_10">
+				AND	 ordinfo.GOODS_ID = #{goodsId}
+				</if>
+				<if test="ordClmGbCd == @framework.common.constants.CommonConstants@ORD_CLM_GB_20">
+	            AND  clminfo.GOODS_ID = #{goodsId}
+	            </if>
+			</if>
+			<if test="clmNo != null and clmNo != ''">
+			AND	 clminfo.CLM_NO = #{clmNo}
+			</if>
+            <if test="excelDownY ==  true  ">
+                <if test="arrOrdNo != null">
+                    <foreach collection="arrOrdNo" item="item" separator="," open="AND ordinfo.ORD_NO IN (" close=" ) " >
+                        #{item }
+                    </foreach>
+                </if>
+                <if test="arrClmNo != null">
+                    <foreach collection="arrClmNo" item="item" separator="," open="AND clminfo.CLM_NO IN (" close=" ) " >
+                        #{item }
+                    </foreach>
+                </if>
+                <if test="ordDtlStatCd != null and ordDtlStatCd != ''  and arrOrdNo != null and arrOrdNo.length > 0">
+                   AND     ordinfo.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+                </if>
+                <if test="arrClmDtlStatCd != null  and arrClmNo != null and arrClmNo.length > 0">
+
+                <foreach collection="arrClmDtlStatCd" item="item" separator="," open="AND clminfo.CLM_DTL_STAT_CD IN (" close=")  " >
+                    #{item }
+                </foreach>
+                </if>
+                /* AND IFNULL(DV.HDC_CD,0) =0  AND IFNULL(DV.INV_NO,0)  = 0  */
+            </if>
+			AND (   ordinfo.ORD_NO IS NOT NULL  OR clminfo.ORD_NO  IS NOT NULL  )
+			AND (   ordinfo.ORD_DTL_SEQ > 0     OR clminfo.ORD_DTL_SEQ > 0 )
+			AND DV.DLVR_NO > 0
+	 </sql>
+
+	<select id="getFlagGoodsFlowDelivery" resultType="string" >
+		<!--
+			Query Name : delivery.getFlagGoodsFlowDelivery
+			Description : 굿스플로 배송 연동 가능 여부 조회
+		-->
+		SELECT /* QUERYID(delivery.getFlagGoodsFlowDelivery) */
+		       CASE WHEN dtl_stat_cd IS NULL THEN 'N'
+		            ELSE 'Y'
+		       END flag
+		  FROM (SELECT DISTINCT (dtl_stat_cd) dtl_stat_cd
+		             , COUNT(ot2.item_unique_code) cnt
+		          FROM (SELECT DISTINCT t1.dlvr_no
+		                     , MAX(CASE WHEN t1.ord_clm_gb_cd = '10' THEN t4.ord_dtl_stat_cd
+		                                ELSE t7.clm_dtl_stat_cd
+		                           END) dtl_stat_cd
+		                  FROM delivery t1
+		                  LEFT OUTER JOIN ord_dtl_cstrt_dlvr_map t2 ON t2.dlvr_no = t1.dlvr_no
+		                  LEFT OUTER JOIN ord_dtl_cstrt t3 ON t3.ORD_DTL_CSTRT_NO = t2.ORD_DTL_CSTRT_NO 
+		                  LEFT OUTER JOIN order_detail t4 ON t4.ord_no = t3.ord_no AND t4.ord_dtl_seq = t3.ord_dtl_seq
+		                  LEFT OUTER JOIN clm_dtl_cstrt_dlvr_map t5 ON t5.DLVR_NO = t1.dlvr_no
+		                  LEFT OUTER JOIN clm_dtl_cstrt t6 ON t6.CLM_DTL_CSTRT_NO = t5.CLM_DTL_CSTRT_NO 
+		                  LEFT OUTER JOIN claim_detail t7 ON t7.clm_no = t6.CLM_NO AND t7.CLM_DTL_SEQ = t6.CLM_DTL_SEQ
+		                 WHERE t1.dlvr_no = #{dlvrNo}
+		                ) ot1
+		          LEFT OUTER JOIN dlvr_goods_flow_map OT2 ON ot2.DLVR_NO = ot1.dlvr_no
+		          LEFT OUTER JOIN goods_flow_delivery ot3 ON ot2.item_unique_code = ot3.item_unique_code AND ot3.lnk_rst_cd = '200'
+		         WHERE dtl_stat_cd IN (
+		                               '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+		                             , '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+		                             , '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_330}'
+		                             , '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_440}'
+		                              )
+		       ) oot
+	</select>
+
+	<select id="getGoodsFlowDelivery" resultType="biz.interfaces.goodsflow.model.request.data.DeliveryVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowDelivery
+			Description : 굿스플로 배송 정보 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowDelivery) */
+			'I' inputType,
+			CASE
+				WHEN dlvr_gb_cd = '${@framework.common.constants.CommonConstants@DLVR_GB_10}' THEN 'D'
+				ELSE 'R'
+			END dlvretType,
+			CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+			LPAD(FLOOR(RAND() * 999), 3, 0)) transUniqueCode,
+			dlvr_gb_cd dlvrGbCd,
+			od.comp_no sellerCode,
+			cb.comp_nm fromName,
+			dcp.rlsa_post_no_new fromZipCode,
+			dcp.rlsa_road_addr fromAddr1,
+			dcp.rlsa_road_dtl_addr fromAddr2,
+			cb.tel fromMobile,
+			NULL fromTelephone,
+			odl.adrs_nm toName,
+			odl.post_no_new toZipCode,
+			odl.road_addr toAddr1,
+			odl.road_dtl_addr toAddr2,
+			odl.mobile toMobile,
+			odl.tel toTelephone,
+			cd.usr_dfn1_val logisticsCode,
+			inv_no invoiceNo,
+			DATE_FORMAT(d.oo_cplt_dtm, '%Y%m%d%H%i%s') invoicePrintDate,
+			ob.ord_nm ordName
+		FROM
+			delivery d,
+			ORD_DTL_CSTRT_DLVR_MAP ODCDM,
+			ORD_DTL_CSTRT ODC,
+			order_detail od,
+			order_base ob,
+			code_detail cd,
+			order_dlvra odl,
+			delivery_charge dc,
+			delivery_charge_policy dcp,
+			company_base cb
+		WHERE 1=1
+		AND d.dlvr_no = #{dlvrNo}
+		AND d.DLVR_NO = ODCDM.DLVR_NO
+		AND ODCDM.ORD_DTL_CSTRT_NO = ODC.ORD_DTL_CSTRT_NO
+		AND ODC.ORD_NO = od.ORD_NO
+		AND ODC.ORD_DTL_SEQ = od.ORD_DTL_SEQ
+		AND od.ord_no = ob.ord_no
+		AND d.hdc_cd = cd.dtl_cd
+		AND cd.grp_cd = 'HDC'
+		AND od.ord_dlvra_no = odl.ord_dlvra_no
+		AND od.dlvrc_no = dc.dlvrc_no
+		AND dc.dlvrc_plc_no = dcp.dlvrc_plc_no
+		AND dcp.comp_no = cb.comp_no
+		LIMIT 1
+	</select>
+
+	<select id="getGoodsFlowDeliveryClaim" resultType="biz.interfaces.goodsflow.model.request.data.DeliveryVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowDeliveryClaim
+			Description : 굿스플로 배송 정보 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowDeliveryClaim) */
+			'I' inputType,
+			CASE
+				WHEN dlvr_gb_cd = '${@framework.common.constants.CommonConstants@DLVR_GB_10}' THEN 'D'
+				ELSE 'R'
+			END dlvretType,
+			CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+			LPAD(FLOOR(RAND() * 999), 3, 0)) transUniqueCode,
+			dlvr_gb_cd dlvrGbCd,
+			od.comp_no sellerCode,
+			cb.comp_nm fromName,
+			dcp.rlsa_post_no_new fromZipCode,
+			dcp.rlsa_road_addr fromAddr1,
+			dcp.rlsa_road_dtl_addr fromAddr2,
+			cb.tel fromMobile,
+			NULL fromTelephone,
+			odl.adrs_nm toName,
+			odl.post_no_new toZipCode,
+			odl.road_addr toAddr1,
+			odl.road_dtl_addr toAddr2,
+			odl.mobile toMobile,
+			odl.tel toTelephone,
+			cd.usr_dfn1_val logisticsCode,
+			inv_no invoiceNo,
+			DATE_FORMAT(d.oo_cplt_dtm, '%Y%m%d%H%i%s') invoicePrintDate,
+			(SELECT ORD_NM FROM ORDER_BASE WHERE ORD_NO = OD.ORD_NO) AS ordName
+		FROM
+			delivery d,
+			CLM_DTL_CSTRT_DLVR_MAP ODCDM,
+			CLM_DTL_CSTRT ODC,
+			claim_detail od,
+			claim_base ob,
+			code_detail cd,
+			order_dlvra odl,
+			delivery_charge dc,
+			delivery_charge_policy dcp,
+			company_base cb
+		WHERE 1=1
+		AND d.dlvr_no = #{dlvrNo}
+		AND d.DLVR_NO = ODCDM.DLVR_NO
+		AND ODCDM.CLM_DTL_CSTRT_NO = ODC.CLM_DTL_CSTRT_NO
+		AND ODC.clm_NO = od.clm_NO
+		AND ODC.clm_DTL_SEQ = od.clm_DTL_SEQ
+		AND od.clm_no = ob.clm_no
+		AND d.hdc_cd = cd.dtl_cd
+		AND cd.grp_cd = 'HDC'
+		AND od.dlvra_no = odl.ord_dlvra_no
+		AND od.dlvrc_no = dc.dlvrc_no
+		AND dc.dlvrc_plc_no = dcp.dlvrc_plc_no
+		AND dcp.comp_no = cb.comp_no
+		LIMIT 1
+	</select>
+
+	<select id="getGoodsFlowReturn" resultType="biz.interfaces.goodsflow.model.request.data.DeliveryVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowReturn
+			Description : 굿스플로 회수 정보 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowReturn) */
+		    'I' inputType,
+		    CASE
+		        WHEN dlvr_gb_cd = '${@framework.common.constants.CommonConstants@DLVR_GB_10}' THEN 'D'
+		        ELSE 'R'
+		    END dlvretType,
+		    CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+		            LPAD(FLOOR(RAND() * 999), 3, 0)) transUniqueCode,
+		    dlvr_gb_cd dlvrGbCd,
+		    t2.comp_no sellerCode,
+		    t6.adrs_nm fromName,
+		    t6.post_no_new fromZipCode,
+		    t6.road_addr fromAddr1,
+		    t6.road_dtl_addr fromAddr2,
+		    t6.mobile fromMobile,
+		    t6.tel fromTelephone,
+		    t5.adrs_nm toName,
+		    t5.post_no_new toZipCode,
+		    t5.road_addr toAddr1,
+		    t5.road_dtl_addr toAddr2,
+		    t5.mobile toMobile,
+		    t5.tel toTelephone,
+		    t4.usr_dfn1_val logisticsCode,
+		    inv_no invoiceNo,
+		    DATE_FORMAT(t1.oo_cplt_dtm, '%Y%m%d%H%i%s') invoicePrintDate,
+		    t3.ord_nm ordName
+		FROM
+		    delivery t1,
+		    CLM_DTL_CSTRT_DLVR_MAP CDCDM,
+		    CLM_DTL_CSTRT CDC,
+		    claim_detail t2,
+		    order_base t3,
+		    code_detail t4,
+		    order_dlvra t5,
+		    order_dlvra t6,
+		    company_base t7
+		WHERE
+		    t1.dlvr_no = #{dlvrNo}
+		    AND t1.DLVR_NO = CDCDM.DLVR_NO
+		    AND CDCDM.CLM_DTL_CSTRT_NO = CDC.CLM_DTL_CSTRT_NO
+		    AND CDC.CLM_NO = t2.CLM_NO
+		    AND CDC.CLM_DTL_SEQ = t2.CLM_DTL_SEQ
+		    AND t2.ord_no = t3.ord_no
+		    AND t1.hdc_cd = t4.dtl_cd
+		    AND t4.grp_cd = '${@framework.common.constants.CommonConstants@HDC}'
+		    AND t2.dlvra_no = t5.ord_dlvra_no
+		    AND t2.rtrna_no = t6.ord_dlvra_no
+		    AND t2.comp_no = t7.comp_no
+		LIMIT 1
+	</select>
+
+	<select id="getGoodsFlowDeliveryGoods" resultType="biz.interfaces.goodsflow.model.request.data.DeliveryGoodsVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowDeliveryGoods
+			Description : 굿스플로 배송 상품 정보 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowDeliveryGoods) */
+		    CONCAT(#{transUniqueCode},
+		            '-',
+		            LPAD(@SEQ:=@SEQ + 1, 4, 0)) itemUniqueCode,
+		    t1.ord_no ordNo,
+		    t1.ord_dtl_seq ordLineNo,
+		    goods_id itemCode,
+		    goods_nm itemName,
+		    item_nm itemOption,
+		    rmn_ord_qty itemQty,
+		    sale_amt itemPrice,
+		    DATE_FORMAT(ord_acpt_dtm, '%Y%m%d%H%i%s') ordDate,
+		    DATE_FORMAT(ord_cplt_dtm, '%Y%m%d%H%i%s') paymentDate
+		FROM
+		    order_detail t1,
+		    order_base t2,
+		    (SELECT @SEQ:=0) VAR
+		WHERE
+		    t1.dlvr_no = #{dlvrNo}
+		        AND t1.ord_no = t2.ord_no
+		        AND rmn_ord_qty > 0
+	</select>
+
+	<select id="getGoodsFlowReturnGoods" resultType="biz.interfaces.goodsflow.model.request.data.DeliveryGoodsVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowReturnGoods
+			Description : 굿스플로 배송 상품 정보 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowDeliveryGoods) */
+		    CONCAT(#{transUniqueCode},
+		            '-',
+		            LPAD(@SEQ:=@SEQ + 1, 4, 0)) itemUniqueCode,
+		    t1.ord_no ordNo,
+		    t1.clm_dtl_seq ordLineNo,
+		    goods_id itemCode,
+		    goods_nm itemName,
+		    item_nm itemOption,
+		    clm_qty itemQty,
+		    sale_amt itemPrice,
+		    DATE_FORMAT(ord_acpt_dtm, '%Y%m%d%H%i%s') ordDate,
+		    DATE_FORMAT(ord_cplt_dtm, '%Y%m%d%H%i%s') paymentDate
+		FROM
+		    claim_detail t1,
+		    order_base t2,
+		    (SELECT @SEQ:=0) VAR
+		WHERE
+		    t1.dlvr_no = #{dlvrNo}
+		        AND t1.ord_no = t2.ord_no
+	</select>
+	
+<select id="getGoodsFlowRequestTraceList" resultType="biz.app.delivery.model.DeliveryVO">
+		<!--
+			Query Name : delivery.getGoodsFlowRequestTraceList
+			Description : 굿스플로 배송 연동 등록 대상 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowRequestTraceList) */ DE.DLVR_NO
+		     , DE.HDC_CD
+		     , DE.INV_NO
+		  FROM DELIVERY DE
+		 INNER JOIN ORDER_DETAIL OD
+		    ON OD.ORD_DTL_STAT_CD = '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_150}'
+		 INNER JOIN ord_dtl_cstrt ODC
+		    ON OD.ORD_NO = ODC.ORD_NO
+		   AND OD.ORD_DTL_SEQ = ODC.ORD_DTL_SEQ
+		 INNER JOIN ord_dtl_cstrt_dlvr_map ODCDM
+		    ON ODCDM.ORD_DTL_CSTRT_NO = ODC.ORD_DTL_CSTRT_NO
+		   AND DE.DLVR_NO = ODCDM.DLVR_NO
+		 WHERE DE.DLVR_PRCS_TP_CD = '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}'
+		   AND DE.HDC_CD IS NOT NULL
+		   AND DE.INV_NO IS NOT NULL
+		   AND DE.SYS_REG_DTM >= DATE_FORMAT('20210301000000', '%Y%m%d%H%i%s')
+		   AND NOT EXISTS (SELECT 1
+		                     FROM DLVR_GOODS_FLOW_MAP
+		                    WHERE DE.DLVR_NO = DLVR_NO
+		                  )
+		 UNION ALL
+		SELECT DE.DLVR_NO
+		     , DE.HDC_CD
+		     , DE.INV_NO
+		  FROM DELIVERY DE
+		 INNER JOIN CLAIM_DETAIL CD
+		    ON CD.CLM_DTL_STAT_CD IN (
+		                              '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_230}'
+		                            , '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_330}'
+		                            , '${@framework.common.constants.CommonConstants@CLM_DTL_STAT_440}'
+		                             )
+		 INNER JOIN clm_dtl_cstrt CDC
+		    ON CD.CLM_NO = CDC.CLM_NO
+		   AND CD.CLM_DTL_SEQ = CDC.CLM_DTL_SEQ
+		 INNER JOIN clm_dtl_cstrt_dlvr_map CDCDM
+		    ON CDC.CLM_DTL_CSTRT_NO = CDCDM.CLM_DTL_CSTRT_NO
+		   AND DE.DLVR_NO = CDCDM.DLVR_NO
+		 WHERE DE.DLVR_PRCS_TP_CD = '${@framework.common.constants.CommonConstants@DLVR_PRCS_TP_10}'
+		   AND DE.HDC_CD IS NOT NULL
+		   AND DE.INV_NO IS NOT NULL
+		   AND DE.SYS_REG_DTM >= DATE_FORMAT('20210301000000', '%Y%m%d%H%i%s')
+		   AND NOT EXISTS (SELECT 1
+		                     FROM DLVR_GOODS_FLOW_MAP
+		                    WHERE DE.DLVR_NO = DLVR_NO
+		                  )
+	</select>
+
+	<insert id="insertGoodsFlowDelivery" parameterType="biz.interfaces.goodsflow.model.response.data.GoodsFlowDeliveryPO">
+		<!--
+			Query Name : delivery.insertGoodsFlowDelivery
+			Description : 굿스플로 배송 정보 등록
+		-->
+		INSERT INTO goods_flow_delivery
+			(
+			ITEM_UNIQUE_CODE,
+			DLVR_NO,
+			DTL_SEQ,
+			LNK_DTM,
+			LNK_RST_CD,
+			LNK_RST_MSG,
+			SYS_REGR_NO,
+			SYS_REG_DTM,
+			SYS_UPDR_NO,
+			SYS_UPD_DTM)
+		VALUES
+			(
+			#{itemUniqueCode},
+			#{dlvrNo},
+			#{dtlSeq},
+			NOW(),
+			#{lnkRstCd},
+			#{lnkRstMsg},
+			#{sysRegrNo},
+			NOW()	,
+			#{sysUpdrNo},
+			NOW()
+			)
+	</insert>
+	
+	<insert id="saveGoodsFlowDelivery" parameterType="biz.interfaces.goodsflow.model.response.data.GoodsFlowDeliveryPO">
+		<!--
+			Query Name : delivery.saveGoodsFlowDelivery
+			Description : 굿스플로 배송 정보 저장
+		-->
+		INSERT INTO goods_flow_delivery
+			(
+			ITEM_UNIQUE_CODE,
+			DLVR_NO,
+			DTL_SEQ,
+			LNK_DTM,
+			LNK_RST_CD,
+			LNK_RST_MSG,
+			SYS_REGR_NO,
+			SYS_REG_DTM,
+			SYS_UPDR_NO,
+			SYS_UPD_DTM)
+		VALUES
+			(
+			#{itemUniqueCode},
+			#{dlvrNo},
+			#{dtlSeq},
+			NOW(),
+			#{lnkRstCd},
+			#{lnkRstMsg},
+			#{sysRegrNo},
+			NOW()	,
+			#{sysUpdrNo},
+			NOW()
+			)
+		ON DUPLICATE KEY UPDATE
+			LNK_DTM = NOW(),
+			LNK_RST_CD = #{lnkRstCd},
+			LNK_RST_MSG = #{lnkRstMsg},
+			SYS_UPDR_NO = #{sysUpdrNo},
+			SYS_UPD_DTM = NOW() 
+	</insert>
+	
+	<insert id="saveDlvrGoodsFlowMap" parameterType="biz.interfaces.goodsflow.model.response.data.DlvrGoodsFlowMapPO">
+		<!--
+			Query Name : delivery.saveDlvrGoodsFlowMap
+			Description : 배송 굿스플로 매핑 저장
+		-->
+		INSERT INTO DLVR_GOODS_FLOW_MAP
+			(
+			ITEM_UNIQUE_CODE,
+			DLVR_NO,
+			SYS_REGR_NO,
+			SYS_REG_DTM
+			)
+		VALUES
+			(
+			#{itemUniqueCode},
+			#{dlvrNo},
+			#{sysRegrNo},
+			NOW()
+			)
+		ON DUPLICATE KEY UPDATE
+			SYS_REGR_NO = SYS_REGR_NO,
+			SYS_REG_DTM = SYS_REG_DTM
+	</insert>
+
+	<insert id="insertGoodsFlowDeliveryResult" parameterType="biz.interfaces.goodsflow.model.response.data.GoodsFlowDeliveryResultPO">
+		<!--
+			Query Name : delivery.insertGoodsFlowDeliveryResult
+			Description : 굿스플로 배송 결과 등록
+		-->
+		INSERT INTO goods_flow_delivery_result
+			(
+			ITEM_UNIQUE_CODE,
+			PRCS_SRL_NO,
+			DLVR_STAT_CD,
+			DLVR_PRCS_DTM,
+			LNK_DTM,
+			LNK_RST_CD,
+			LNK_RST_MSG,
+			SYS_REGR_NO,
+			SYS_REG_DTM,
+			SYS_UPDR_NO,
+			SYS_UPD_DTM
+			)
+		VALUES
+			(
+			#{itemUniqueCode},
+			#{prcsSrlNo},
+			#{dlvrStatCd},
+			STR_TO_DATE(#{dlvrPrcsDtm}, '%Y%m%d%H%i%s'),
+			#{lnkDtm},
+			#{lnkRstCd},
+			#{lnkRstMsg},
+			#{sysRegrNo},
+			NOW(),
+			#{sysUpdrNo},
+			NOW()
+			)
+	</insert>
+
+	<select id="getDeliveryNoByItemUniqueCode" resultType="long" >
+		<!--
+			Query Name : delivery.getDeliveryNoByItemUniqueCode
+			Description : 배송 번호 조회
+		-->
+		SELECT A3.DLVR_NO
+		  FROM GOODS_FLOW_DELIVERY A1
+		  JOIN DLVR_GOODS_FLOW_MAP A2 ON A2.ITEM_UNIQUE_CODE = A1.ITEM_UNIQUE_CODE 
+		  JOIN DELIVERY A3 ON A3.DLVR_NO = A2.DLVR_NO 
+		 WHERE A1.ITEM_UNIQUE_CODE = #{itemUniqueCode}
+		   AND A3.DLVR_CPLT_DTM IS NULL
+		 LIMIT 1
+	</select>
+	
+	<select id="getDeliveryNoByItemUniqueCodeList" resultType="long" >
+		<!--
+			Query Name : delivery.getDeliveryNoByItemUniqueCode
+			Description : 배송 번호 조회
+		-->
+		SELECT A3.DLVR_NO
+		  FROM GOODS_FLOW_DELIVERY A1
+		  JOIN DLVR_GOODS_FLOW_MAP A2 ON A2.ITEM_UNIQUE_CODE = A1.ITEM_UNIQUE_CODE 
+		  JOIN DELIVERY A3 ON A3.DLVR_NO = A2.DLVR_NO 
+		 WHERE A1.ITEM_UNIQUE_CODE = #{itemUniqueCode}
+		   AND A3.DLVR_CPLT_DTM IS NULL
+	</select>
+
+	<select id="getGoodsFlowCode" resultType="biz.app.delivery.model.DeliveryVO" >
+		<!--
+			Query Name : delivery.getGoodsFlowCode
+			Description : 굿스플로 배송 조회 링크를 위한 고유번호 조회 (FO,MO 사용)
+		-->
+		SELECT DLV.HDC_CD, DLV.INV_NO, GFD.ITEM_UNIQUE_CODE
+		  FROM DELIVERY DLV
+		       , GOODS_FLOW_DELIVERY GFD
+		<if test='ordClmGbCd != null and ordClmGbCd == "10"'>
+			   , ORDER_DETAIL OD
+		</if>
+		<if test='ordClmGbCd != null and ordClmGbCd == "20"'>
+			   , CLAIM_DETAIL CD
+		</if>
+		  <where>
+		<if test='ordClmGbCd != null and ordClmGbCd == "10"'>
+		    AND OD.ORD_NO = #{ordNo}
+		    AND OD.ORD_DTL_SEQ = #{ordDtlSeq}
+		    AND OD.DLVR_NO = DLV.DLVR_NO
+		    AND GFD.DTL_SEQ = OD.ORD_DTL_SEQ
+		</if>
+		<if test='ordClmGbCd != null and ordClmGbCd == "20"'>
+		    AND CD.CLM_NO = #{clmNo}
+		    AND CD.CLM_DTL_SEQ = #{clmDtlSeq}
+		    AND CD.DLVR_NO = DLV.DLVR_NO
+		    AND GFD.DTL_SEQ = CD.CLM_DTL_SEQ
+		</if>
+		    AND GFD.DLVR_NO = DLV.DLVR_NO
+		    AND GFD.LNK_RST_CD = '200'
+		   </where>
+		  LIMIT 1
+	</select>
+	
+	
+	<update id="updateDeliveryOrder" parameterType="biz.app.delivery.model.DeliveryPO">
+		<!--
+			Query Name : delivery.updateDeliveryOrder
+			Description : 배송 정보 수정 - 주문
+		-->
+		UPDATE	DELIVERY DV
+		SET		SYS_UPDR_NO			= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+				<if test="dlvrPrcsTpCd != null and dlvrPrcsTpCd != ''">
+				, DLVR_PRCS_TP_CD 		= #{dlvrPrcsTpCd}				/* 배송 처리 유형 코드 */
+				</if>
+				<if test="ordDlvraNo != null and ordDlvraNo != ''">
+				, ORD_DLVRA_NO 		= #{ordDlvraNo}				/* 배송 처리 유형 코드 */
+				</if>
+	    WHERE   1=1
+	      AND   DV.DLVR_NO IN (SELECT DV_MAP.DLVR_NO FROM ORD_DTL_CSTRT_DLVR_MAP DV_MAP
+	      				  INNER JOIN ORD_DTL_CSTRT ODC
+	      				  		  ON ODC.ORD_DTL_CSTRT_NO =  DV_MAP.ORD_DTL_CSTRT_NO
+	      					   WHERE ODC.ORD_NO = #{ordNo}
+      					   	 <if test="ordDtlSeq != null">
+								 AND ODC.ORD_DTL_SEQ	= #{ordDtlSeq}
+							</if>
+   		  )
+	</update>
+	
+	<select id="getDlvrNoForGoodsFlowTraceList" resultType="Integer">
+		<!--
+			Query Name : delivery.getDlvrNoForGoodsFlowTraceList
+			Description : 굿스플로 연동을 위한 배송 번호 조회, 배치용
+		-->	
+		SELECT /* QUERYID(delivery.getDlvrNoForGoodsFlowTraceList) */
+		       DISTINCT A1.DLVR_NO
+		  FROM DELIVERY A1
+		  LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP A2 ON A2.DLVR_NO = A1.DLVR_NO
+		  LEFT JOIN ORD_DTL_CSTRT A3 ON A3.ORD_DTL_CSTRT_NO  = A2.ORD_DTL_CSTRT_NO 
+		  LEFT JOIN ORDER_DETAIL A4 ON A4.ORD_NO = A3.ORD_NO AND A4.ORD_DTL_SEQ = A3.ORD_DTL_SEQ
+		  LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP A5 ON A5.DLVR_NO = A1.DLVR_NO
+		  LEFT JOIN CLM_DTL_CSTRT A6 ON A6.CLM_DTL_CSTRT_NO = A5.CLM_DTL_CSTRT_NO
+		  LEFT JOIN CLAIM_DETAIL A7 ON A7.CLM_NO = A6.CLM_NO AND A7.CLM_DTL_SEQ = A6.CLM_DTL_SEQ
+		  JOIN CODE_DETAIL A8 ON A8.GRP_CD = 'HDC' AND A8.DTL_CD = A1.HDC_CD
+		 WHERE NOT EXISTS (SELECT 1 FROM DLVR_GOODS_FLOW_MAP WHERE DLVR_NO = A1.DLVR_NO)
+		   AND (A1.HDC_CD IS NOT NULL OR A1.HDC_CD != '36' /* GS 제외 */ ) 
+		   AND A1.DLVR_PRCS_TP_CD = '10'
+		   AND A1.INV_NO IS NOT NULL
+		   AND A1.DLVR_CPLT_DTM IS NULL
+		   AND A1.OO_CPLT_DTM IS NOT NULL
+		   AND ((A4.ORD_NO IS NOT NULL AND A4.ORD_DTL_STAT_CD = '150') OR (A7.CLM_NO IS NOT NULL AND A7.CLM_DTL_STAT_CD IN ('230', '330', '440')))	
+	</select>
+	
+	<resultMap type="biz.interfaces.goodsflow.model.request.data.DeliveryVO" id="getGoodsFlowForTraceListMap" autoMapping="true">
+		<id property="transUniqueCode" column="TRANS_UNIQUE_CODE" />
+		<result property="fromName" column="FROM_NAME" />
+		<result property="toName" column="TO_NAME" />
+		<result property="fromName" column="FROM_NAME" />
+		<result property="logisticsCode" column="LOGISTICS_CODE" />
+		<result property="invoiceNo" column="INVOICE_NO" />
+		<result property="dlvretType" column="DLVRET_TYPE" />
+		<result property="invoicePrintDate" column="INVOICE_PRINT_DATE" />
+		<collection property="requestDetails" ofType="biz.interfaces.goodsflow.model.request.data.DeliveryGoodsVO" autoMapping="true">
+			<id property="dlvrNo" column="DLVR_NO" />
+			<result property="orderNo" column="ORDER_NO" />
+			<result property="orderLine" column="ORDER_LINE" />
+			<result property="itemCode" column="ITEM_CODE" />
+			<result property="itemName" column="ITEM_NAME" />
+			<result property="itemQty" column="ITEM_QTY" />
+			<result property="ordDate" column="ORDER_DATE" />
+			<result property="paymentDate" column="PAYMENT_DATE" />
+			<result property="defCode1" column="DEF_CODE1" />
+			<result property="defCode2" column="DEF_CODE2" />
+		</collection>
+	</resultMap>
+	<select id="getGoodsFlowForTraceList" parameterType="Integer" resultMap="getGoodsFlowForTraceListMap">
+		<!--
+			Query Name : delivery.getGoodsFlowForTraceList
+			Description : 굿스플로 연동 데이타 조회
+		-->
+		SELECT /* QUERYID(delivery.getGoodsFlowForTraceList) */
+		       X.*
+		  FROM (SELECT DISTINCT
+				       IF (B1.CLM_NO IS NULL, C5.DLVR_NO, D5.DLVR_NO) AS DLVR_NO
+				     /*
+				     , IF (B1.CLM_NO IS NULL, IF(C6.ITEM_UNIQUE_CODE IS NULL, 'N', 'Y'), IF(D6.ITEM_UNIQUE_CODE IS NULL, 'N', 'Y')) AS FLOW_MAP_YN
+				     , CASE WHEN B1.CLM_NO IS NULL THEN 
+				                 IF (MAX(C7.ITEM_UNIQUE_CODE) OVER (PARTITION BY B1.ORD_NO) IS NULL, 'N', 'Y')
+				            ELSE IF (MAX(D7.ITEM_UNIQUE_CODE) OVER (PARTITION BY B1.CLM_NO) IS NULL, 'N', 'Y') 
+				       END AS FLOW_YN
+				     */
+				     , COALESCE((CASE WHEN B1.CLM_NO IS NULL THEN 
+				                           MAX(C7.ITEM_UNIQUE_CODE) OVER (PARTITION BY B1.ORD_NO)
+				                      ELSE MAX(D7.ITEM_UNIQUE_CODE) OVER (PARTITION BY B1.CLM_NO)
+				                 END), DATE_FORMAT(NOW(6), '%Y%m%d%H%i%s-%f')) AS TRANS_UNIQUE_CODE  
+				     , CASE WHEN B1.CLM_NO IS NULL THEN C9.COMP_NM
+				            ELSE IF (B1.DLVR_GB_CD = '10', D11.COMP_NM, IF(D2.CLM_DTL_TP_CD = '40', D11.COMP_NM, D8.ADRS_NM))
+				       END AS FROM_NAME
+				     , IF (B1.CLM_NO IS NULL, C8.ADRS_NM, D9.ADRS_NM) AS TO_NAME
+				     , B1.USR_DFN1_VAL AS LOGISTICS_CODE
+				     , B1.INV_NO AS INVOICE_NO
+				     , IF (B1.DLVR_GB_CD = '10', 'D', IF(D2.CLM_DTL_TP_CD = '40', 'D', 'R')) AS DLVRET_TYPE
+				     , DATE_FORMAT(B1.OO_CPLT_DTM, '%Y%m%d%H%i%s') AS INVOICE_PRINT_DATE
+				     , IF (B1.CLM_NO IS NULL, C1.ORD_NO, D1.CLM_NO) AS ORDER_NO
+				     , IF (B1.CLM_NO IS NULL, C2.ORD_DTL_SEQ, D2.CLM_DTL_SEQ) AS ORDER_LINE
+				     , IF (B1.CLM_NO IS NULL, C10.GOODS_ID, D10.GOODS_ID) AS ITEM_CODE
+				     , IF (B1.CLM_NO IS NULL, C10.GOODS_NM, D10.GOODS_NM) AS ITEM_NAME
+				     , IF (B1.CLM_NO IS NULL, C2.RMN_ORD_QTY, D2.CLM_QTY) AS ITEM_QTY
+				     , DATE_FORMAT(IF (B1.CLM_NO IS NULL, C1.ORD_ACPT_DTM, D1.ACPT_DTM), '%Y%m%d%H%i%s') AS ORDER_DATE
+				     , DATE_FORMAT(IF (B1.CLM_NO IS NULL, C1.ORD_CPLT_DTM, D1.ACPT_DTM), '%Y%m%d%H%i%s') AS PAYMENT_DATE
+				     , NULL AS DEF_CODE1
+				     , NULL AS DEF_CODE2
+		          FROM (SELECT DISTINCT
+		                       A1.HDC_CD
+		                     , A1.DLVR_NO
+		                     , A8.DTL_SHT_NM 
+		                     , A1.INV_NO
+		                     , A1.DLVR_GB_CD
+		                     , A4.ORD_NO
+		                     , A7.CLM_NO
+		                     , A4.COMP_NO
+		                     , A7.COMP_NO AS CLM_COMP_NO
+		                     , A8.USR_DFN1_VAL
+		                     , A1.OO_CPLT_DTM 
+		                  FROM DELIVERY A1
+		                  LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP A2 ON A2.DLVR_NO = A1.DLVR_NO
+		                  LEFT JOIN ORD_DTL_CSTRT A3 ON A3.ORD_DTL_CSTRT_NO  = A2.ORD_DTL_CSTRT_NO 
+		                  LEFT JOIN ORDER_DETAIL A4 ON A4.ORD_NO = A3.ORD_NO AND A4.ORD_DTL_SEQ = A3.ORD_DTL_SEQ AND A4.RMN_ORD_QTY &gt; 0
+		                  LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP A5 ON A5.DLVR_NO = A1.DLVR_NO
+		                  LEFT JOIN CLM_DTL_CSTRT A6 ON A6.CLM_DTL_CSTRT_NO = A5.CLM_DTL_CSTRT_NO
+		                  LEFT JOIN CLAIM_DETAIL A7 ON A7.CLM_NO = A6.CLM_NO AND A7.CLM_DTL_SEQ = A6.CLM_DTL_SEQ
+		                  JOIN CODE_DETAIL A8 ON A8.GRP_CD = 'HDC' AND A8.DTL_CD = A1.HDC_CD
+		                 WHERE NOT EXISTS (SELECT 1 FROM DLVR_GOODS_FLOW_MAP WHERE DLVR_NO = A1.DLVR_NO)
+		                   AND (A1.HDC_CD IS NOT NULL OR A1.HDC_CD != '36' /* GS 제외 */ ) 
+		                   AND A1.DLVR_PRCS_TP_CD = '10'
+		                   AND A1.INV_NO IS NOT NULL
+		                   AND A1.DLVR_CPLT_DTM IS NULL
+		                   AND A1.OO_CPLT_DTM IS NOT NULL
+		                   AND A1.DLVR_NO = #{dlvrNo}
+		                  LIMIT 1
+		                ) B1
+		          LEFT JOIN ORDER_BASE C1 ON C1.ORD_NO = B1.ORD_NO
+		          LEFT JOIN ORDER_DETAIL C2 ON C2.ORD_NO = C1.ORD_NO AND C2.COMP_NO = B1.COMP_NO
+		          LEFT JOIN ORD_DTL_CSTRT C3 ON C3.ORD_NO = C2.ORD_NO AND C3.ORD_DTL_SEQ = C2.ORD_DTL_SEQ
+		          LEFT JOIN ORD_DTL_CSTRT_DLVR_MAP C4 ON C4.ORD_DTL_CSTRT_NO = C3.ORD_DTL_CSTRT_NO
+		          LEFT JOIN DELIVERY C5 ON C5.DLVR_NO = C4.DLVR_NO AND C5.HDC_CD = B1.HDC_CD AND C5.INV_NO = B1.INV_NO
+		          LEFT JOIN DLVR_GOODS_FLOW_MAP C6 ON C6.DLVR_NO = C5.DLVR_NO
+		          LEFT JOIN GOODS_FLOW_DELIVERY C7 ON C7.ITEM_UNIQUE_CODE = C6.ITEM_UNIQUE_CODE
+		          LEFT JOIN ORDER_DLVRA C8 ON C8.ORD_DLVRA_NO = C2.ORD_DLVRA_NO
+		          LEFT JOIN COMPANY_BASE C9 ON C9.COMP_NO = B1.COMP_NO
+		          LEFT JOIN GOODS_BASE C10 ON C10.GOODS_ID = C2.GOODS_ID
+		          LEFT JOIN CLAIM_BASE D1 ON D1.CLM_NO = B1.CLM_NO
+		          LEFT JOIN CLAIM_DETAIL D2 ON D2.CLM_NO = D1.CLM_NO AND D2.COMP_NO = B1.CLM_COMP_NO
+		          LEFT JOIN CLM_DTL_CSTRT D3 ON D3.CLM_NO = D2.CLM_NO AND D3.CLM_DTL_SEQ = D2.CLM_DTL_SEQ
+		          LEFT JOIN CLM_DTL_CSTRT_DLVR_MAP D4 ON D4.CLM_DTL_CSTRT_NO = D3.CLM_DTL_CSTRT_NO
+		          LEFT JOIN DELIVERY D5 ON D5.DLVR_NO = D4.DLVR_NO AND D5.HDC_CD = B1.HDC_CD AND D5.INV_NO = B1.INV_NO
+		          LEFT JOIN DLVR_GOODS_FLOW_MAP D6 ON D6.DLVR_NO = D5.DLVR_NO
+		          LEFT JOIN GOODS_FLOW_DELIVERY D7 ON D7.ITEM_UNIQUE_CODE = D6.ITEM_UNIQUE_CODE 
+		          LEFT JOIN ORDER_DLVRA D8 ON D8.ORD_DLVRA_NO = D2.RTRNA_NO 
+		          LEFT JOIN ORDER_DLVRA D9 ON D9.ORD_DLVRA_NO = D2.DLVRA_NO
+		          LEFT JOIN GOODS_BASE D10 ON D10.GOODS_ID = D2.GOODS_ID
+		          LEFT JOIN COMPANY_BASE D11 ON D11.COMP_NO = B1.CLM_COMP_NO
+		       ) X
+		 WHERE X.DLVR_NO IS NOT NULL
+	</select>
+	
+	
+	<select id="listDeliveryConsignComp" resultType="biz.app.delivery.model.DeliveryVO">
+		<!--
+			Query Name : delivery.listConsignCompIng
+			Description : 위탁업체 배송 안내 알림톡 발송 대상 조회
+		-->
+		SELECT  
+			Z2.INV_NO
+			, OD.ORD_NO
+			, GROUP_CONCAT(OD.ORD_DTL_SEQ) AS ORD_DTL_SEQS
+		FROM (
+				SELECT Z1.*
+				        ,(SELECT T2.ORD_NO 
+				            FROM ORD_DTL_CSTRT_DLVR_MAP T1 
+				                 INNER JOIN ORD_DTL_CSTRT T2 ON T1.ORD_DTL_CSTRT_NO = T2.ORD_DTL_CSTRT_NO 
+				           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS ORD_NO
+				        ,(SELECT T2.ORD_DTL_SEQ 
+				            FROM ORD_DTL_CSTRT_DLVR_MAP T1 
+				                 INNER JOIN ORD_DTL_CSTRT T2 ON T1.ORD_DTL_CSTRT_NO = T2.ORD_DTL_CSTRT_NO 
+				           WHERE T1.DLVR_NO = Z1.DLVR_NO LIMIT 1) AS ORD_DTL_SEQ
+				FROM (
+						SELECT
+							DV.DLVR_NO						/* 배송 번호 */
+							,DV.ORD_CLM_GB_CD				/* 주문 클레임 구분 코드 */
+							,DV.DLVR_GB_CD					/* 배송 구분 코드 */
+							,DV.DLVR_TP_CD					/* 배송 유형 코드 */
+							,DV.DLVR_PRCS_TP_CD				/* 배송 처리 유형 코드 */
+							,DV.HDC_CD						/* 택배사 코드 */
+							,DV.INV_NO						/* 송장번호 */
+						FROM DELIVERY DV 
+						INNER JOIN ORDER_DLVRA ODA ON ( DV.ORD_DLVRA_NO = ODA.ORD_DLVRA_NO )
+						WHERE 1=1
+						AND DV.ORD_CLM_GB_CD = '10'
+						<if test='ordDtlStatCd != null and ordDtlStatCd == "150"'>
+							AND DV.OO_CPLT_DTM BETWEEN DATE_ADD(NOW(), INTERVAL -1 HOUR) AND NOW()
+							AND DV.DLVR_CPLT_DTM IS NULL
+						</if>
+						<if test='ordDtlStatCd != null and ordDtlStatCd == "160"'>
+							AND DV.DLVR_CPLT_DTM BETWEEN DATE_ADD(NOW(), INTERVAL -1 HOUR) AND NOW()
+						</if>
+						AND EXISTS (
+									SELECT 1 FROM ORD_DTL_CSTRT_DLVR_MAP ODCRM 
+									WHERE ODCRM.DLVR_NO = DV.DLVR_NO 
+									AND ODCRM.ORD_DTL_CSTRT_NO IN (
+									           SELECT ODC.ORD_DTL_CSTRT_NO 
+									           FROM ORD_DTL_CSTRT ODC 
+									           WHERE (ODC.ORD_NO,ODC.ORD_DTL_SEQ) IN (
+									                     SELECT OD.ORD_NO, ORD_DTL_SEQ 
+									                     FROM ORDER_DETAIL OD
+									                     JOIN COMPANY_BASE CP ON OD.COMP_NO = CP.COMP_NO
+									                     WHERE 1=1
+									                     AND OD.ORD_DTL_STAT_CD = #{ordDtlStatCd}
+									                     AND CP.COMP_TP_CD = '20'
+									                     )))
+						) Z1
+				) Z2,
+				ORDER_DETAIL OD,
+				ORDER_BASE OB
+		WHERE OD.ORD_NO = Z2.ORD_NO
+		AND OD.ORD_DTL_SEQ = Z2.ORD_DTL_SEQ 
+		AND OD.ORD_NO = OB.ORD_NO
+		AND Z2.INV_NO IS NOT NULL
+		GROUP BY Z2.INV_NO, OD.ORD_NO
+	</select>
+</mapper>

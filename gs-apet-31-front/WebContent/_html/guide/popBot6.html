@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	<script>
+		$(function(){
+			/* 버튼 클릭 시  */
+			$(".btn").click(function(){
+				ui.commentBox.open('.tvcommentBox');
+			});
+		});
+	</script>
+</head>
+<body>
+	<div class="btnSet">
+		<a href="javascript:;" class="btn lg a">팝업 OPEN</a>
+	</div>
+	<!-- 댓글 -->
+	<div class="commentBoxAp tvcommentBox type01">
+		<div class="head">
+			<div class="con">
+				<div class="tit"></div>
+				<a href="javascript:;" class="close" onClick="ui.commentBox.close(this)"></a>
+			</div>
+		</div>
+		<div class="con">
+		<!-- content -->
+			<!-- tab -->
+			<section class="sect petTabContent">
+				<ul class="uiTab a line">
+					<li class="active">
+						<a class="bt" href="javascript:;"><span>0 </span>팔로워</a>
+					</li>
+					<li class="">
+						<a class="bt active" href="javascript:;"><span>392</span>팔로잉</a>
+					</li>
+				</ul>
+				<div class="uiTab_content">
+					<ul>
+						<li>
+							<div class="noneBoxPoint p3">
+								<div>
+									<span class="noneBoxPoint_img2"></span>
+									<div class="noneBoxPoint_infoTxt" style="color:#666;">
+										회원님을 아직<br />
+										팔로우하는 사람이 없어요.
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="noneBoxPoint p3">
+								<div>
+									<span class="noneBoxPoint_img2"></span>
+									<div class="noneBoxPoint_infoTxt" style="color:#666;">
+										회원님이 아직<br />
+										팔로우하는 사람이 없어요.
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</section>
+			<!-- // tab -->
+		<!-- // content -->
+		</div>
+	</div>
+	<!-- //댓글 -->
+</body>
+</html>

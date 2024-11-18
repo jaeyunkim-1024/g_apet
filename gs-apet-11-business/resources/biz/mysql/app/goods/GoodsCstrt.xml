@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	상품 설명
+	작성자  	valueFactory
+	작성일자  	2017.03.03
+-->
+
+<mapper namespace="goodsCstrt">
+
+	<insert id="insertGoodsCstrtInfo" parameterType="biz.app.goods.model.GoodsCstrtInfoPO" >
+		<!--
+			Query Name : goodsCstrt.insertGoodsCstrtInfo
+			Description : 상품 구성품 등록
+		-->
+		INSERT INTO GOODS_CSTRT_INFO (
+			  GOODS_ID				/* 상품 아이디 */
+			, GOODS_CSTRT_GB_CD		/* 상품 구성 구분 코드 */
+			, CSTRT_GOODS_ID		/* 구성 상품 아이디 */
+			, USE_YN				/* 사용 여부 */
+			, DISP_PRIOR_RANK		/* 전시 순서 */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			  #{goodsId }			/* 상품 아이디 */
+			, #{goodsCstrtGbCd }	/* 상품 구성 구분 코드 */
+			, #{cstrtGoodsId }		/* 구성 상품 아이디 */
+			, #{useYn }				/* 사용 여부 */
+			, #{dispPriorRank }		/* 전시 순서 */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo }			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<delete id="deleteGoodsCstrtInfo" >
+		<!--
+			Query Name : goodsCstrt.deleteGoodsCstrtInfo
+			Description : 상품 구성품 삭제
+		-->
+		DELETE FROM GOODS_CSTRT_INFO
+		 WHERE 1 = 1
+		   AND GOODS_ID = #{goodsId }
+	</delete>
+	
+	<resultMap id="GoodsCstrtInfoMap"	type="biz.app.goods.model.GoodsCstrtInfoVO">
+		<id column="GOODS_ID"					property="goodsId"/>
+		<result column="CSTRT_GOODS_ID"			property="cstrtGoodsId"/>
+		<result column="GOODS_NM"				property="goodsNm"/>
+		<result column="GOODS_STAT_CD"			property="goodsStatCd"/>
+		<result column="MDL_NM"					property="mdlNm"/>
+		<result column="COMP_NO"				property="compNo"/>
+		<result column="MMFT"					property="mmft"/>
+		<result column="SALE_STRT_DTM"			property="saleStrtDtm"/>
+		<result column="SALE_END_DTM"			property="saleEndDtm"/>
+		<result column="SHOW_YN"				property="showYn"/>
+		<result column="GOODS_TP_CD"			property="goodsTpCd"/>
+		<result column="BIGO"					property="bigo"/>
+		<result column="BND_NO"					property="bndNo"/>
+		<result column="COMP_NM"				property="compNm"/>
+		<result column="BND_NM_KO"				property="bndNmKo"/>
+		<result column="SALE_AMT"				property="saleAmt"/>
+		<result column="GOODS_CSTRT_GB_CD"		property="goodsCstrtGbCd"/>
+		<result column="USE_YN"					property="useYn"/>
+		<result column="DISP_PRIOR_RANK"		property="dispPriorRank"/>
+		<result column="SOLD_OUT_YN"			property="soldOutYn"/>
+		<result column="INTEREST_YN"			property="interestYn"/>
+		<result column="IMG_PATH"				property="imgPath"/>
+		<result column="IMG_SEQ"				property="imgSeq"/>
+
+		<collection property="stStdList" column="{goodsId=GOODS_ID, stUseYn=ST_USE_YN}" javaType="java.util.ArrayList" ofType="biz.app.st.model.StStdInfoVO" select="inline.getStStdInfoGoodsById"/>
+    </resultMap>
+
+	<select id="listGoodsCstrtInfo"	resultType="biz.app.goods.model.GoodsCstrtInfoVO">
+		<!--
+			Query Name : goodsCstrt.listGoodsCstrtInfo
+			Description : 구성 상품(연관, 딜) 조회
+		-->
+		SELECT /* goodsCstrt.listGoodsCstrtInfo */
+			F.GOODS_ID
+			, GB.GOODS_ID  as CSTRT_GOODS_ID
+			, GB.GOODS_NM
+			, GB.GOODS_STAT_CD
+			, GB.MDL_NM
+			, GB.COMP_NO
+			, GB.MMFT
+			, GB.SALE_STRT_DTM
+			, GB.SALE_END_DTM
+			, GB.SHOW_YN
+			, GB.GOODS_TP_CD
+			, GB.BIGO
+			, GB.BND_NO
+			, GB.STK_MNG_YN
+			, B.COMP_NM
+			, C.BND_NM_KO
+			, F.GOODS_CSTRT_GB_CD
+			, F.USE_YN
+			, F.DISP_PRIOR_RANK
+			, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+			, GI.IMG_SEQ
+			, GI.IMG_PATH /* 이미지 경로 */
+			, (CASE WHEN WEB_GOODS_STOCK <![CDATA[>]]> 0 THEN '${@framework.common.constants.CommonConstants@COMM_YN_N}' else '${@framework.common.constants.CommonConstants@COMM_YN_Y}' end) AS SOLD_OUT_YN /* 품절 여부 */
+			, ifnull((SELECT '${@framework.common.constants.CommonConstants@COMM_YN_Y}' FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID =  GB.GOODS_ID AND MBR_NO = #{mbrNo}),  '${@framework.common.constants.CommonConstants@COMM_YN_N}') AS INTEREST_YN /* 찜 여부 */
+			, FN.PRICES
+			, GB.GOODS_STAT_CD_SYS_YN
+			, CAST(FN_SPLIT(PRICES, '|', 1) AS UNSIGNED) as SALE_AMT
+			, CAST(FN_SPLIT(PRICES, '|', 6) AS UNSIGNED) as GOODS_AMT_TP_CD
+			, CAST(FN_SPLIT(PRICES, '|', 7) AS UNSIGNED) as ORG_SALE_AMT
+			, CAST(FN_SPLIT(PRICES, '|', 8) AS UNSIGNED) as SPL_AMT
+			, CASE    	
+				WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND GB.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                	THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( GB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */    			   
+			    WHEN GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+			        THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'	/* 상품 판매 종료 : 판매종료 */
+			    WHEN GB.SALE_STRT_DTM <![CDATA[>]]>  SYSDATE() OR GB.SALE_END_DTM <![CDATA[<]]> SYSDATE() THEN
+			        CASE WHEN GB.GOODS_STAT_CD_SYS_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			                      AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+			            THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'
+			            ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_20}' END /* 상품 판매 기간 : 판매종료 */
+			    WHEN GB.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			        THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'	/* 기타 상품 상태 : 판매 종료 */
+			    WHEN GB.STK_MNG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' AND FN_GET_GOODS_STOCK(GB.GOODS_ID,NULL) = 0 THEN
+			        CASE WHEN GB.GOODS_STAT_CD_SYS_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' AND GB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+						THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'
+						ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_30}'
+					END /* 품절 */
+				ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' /* 정상 */
+		    END AS SALE_PSB_CD						/* 판매가능상태코드 */
+		FROM         GOODS_CSTRT_INFO F
+		INNER JOIN   GOODS_BASE      GB ON (GB.GOODS_ID = F.CSTRT_GOODS_ID)
+		INNER JOIN   ST_GOODS_MAP    SG ON (SG.GOODS_ID = F.CSTRT_GOODS_ID AND SG.ST_ID=1)
+		INNER JOIN LATERAL(
+			SELECT
+				FN_GET_GOODS_STOCK(F.CSTRT_GOODS_ID , NULL) AS WEB_GOODS_STOCK
+				, FN_GET_GOODS_PRICE(GB.GOODS_ID, 1   ,  #{webMobileGbCd}) AS PRICES
+			FROM DUAL
+		) FN ON (true)
+		LEFT OUTER JOIN COMPANY_BASE B ON (GB.COMP_NO = B.COMP_NO)
+		LEFT OUTER JOIN BRAND_BASE C ON (GB.BND_NO = C.BND_NO)
+		LEFT OUTER JOIN lateral(
+			SELECT IMG_SEQ , IMG_PATH
+			FROM GOODS_IMG S
+			WHERE  S.GOODS_ID = F.CSTRT_GOODS_ID AND S.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			LIMIT 1
+		) GI on(true)
+		WHERE F.GOODS_ID = #{goodsId }
+		<if test="frontYn eq @framework.common.constants.CommonConstants@COMM_YN_Y">
+			AND NOW() between GB.SALE_STRT_DTM and GB.SALE_END_DTM
+			AND GB.GOODS_STAT_CD IN ('${@framework.common.constants.CommonConstants@GOODS_STAT_40}')
+			AND (WEB_GOODS_STOCK <![CDATA[>]]> 0 or (WEB_GOODS_STOCK = 0 and GB.OSTK_GOODS_SHOW_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'))
+		</if>
+		AND	F.GOODS_CSTRT_GB_CD = #{goodsCstrtGbCd }
+		AND F.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		<if test="stStdList != null and stStdList.size() != 0">
+			AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = GB.GOODS_ID
+			<foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+				#{st.stId}
+			</foreach>
+			)
+		</if>
+		ORDER BY DISP_PRIOR_RANK
+	</select>
+
+	<select id="listGoodsCstrtInfoX"	resultType="biz.app.goods.model.GoodsCstrtInfoVO">
+		<!--
+			Query Name : goodsCstrt.listGoodsCstrtInfo
+			Description : 구성 상품(연관, 딜) 조회
+		-->
+
+		SELECT /* goodsCstrt.listGoodsCstrtInfo */ TB.*
+			, CAST(FN_SPLIT(PRICES, '|', 1) AS UNSIGNED) as SALE_AMT
+			, CAST(FN_SPLIT(PRICES, '|', 6) AS UNSIGNED) as GOODS_AMT_TP_CD
+			, CAST(FN_SPLIT(PRICES, '|', 7) AS UNSIGNED) as ORG_SALE_AMT
+			, CAST(FN_SPLIT(PRICES, '|', 8) AS UNSIGNED) as SPL_AMT
+			, CASE 				
+				WHEN TB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( TB.SALE_STRT_DTM <![CDATA[<=]]> SYSDATE() AND TB.SALE_END_DTM <![CDATA[>=]]> SYSDATE() )
+                	THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'               /* 상품판매중지(50), 판매기간중이면 '10'(판매중지) */ 
+                WHEN TB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}' AND ( TB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR TB.SALE_END_DTM <![CDATA[<]]> SYSDATE() )
+                    THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}' 			  /* 상품판매중지(50), 판매기간이 아니면 '20'(판매종료) */    
+				WHEN TB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_60}'
+				THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 종료 : 판매종료 */
+				WHEN TB.SALE_STRT_DTM <![CDATA[>]]> SYSDATE() OR TB.SALE_END_DTM <![CDATA[<]]> SYSDATE() THEN
+			CASE WHEN TB.GOODS_STAT_CD_SYS_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND TB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+				THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'
+				ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 상품 판매 기간 : 판매종료 */
+				END
+			WHEN TB.GOODS_STAT_CD != '${@framework.common.constants.CommonConstants@GOODS_STAT_40}'
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_20}'		/* 기타 상품 상태 : 판매 종료 */
+			WHEN TB.STK_MNG_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' AND FN_GET_GOODS_STOCK(TB.GOODS_ID,NULL) = 0 THEN
+			CASE WHEN TB.GOODS_STAT_CD_SYS_YN = '${@framework.common.constants.CommonConstants@DEL_YN_Y}' AND TB.GOODS_STAT_CD = '${@framework.common.constants.CommonConstants@GOODS_STAT_50}'
+			THEN '${@framework.common.constants.CommonConstants@SALE_PSB_10}'
+			ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_30}'
+			END /* 품절 */
+			ELSE '${@framework.common.constants.CommonConstants@SALE_PSB_00}' /* 정상 */
+			END AS SALE_PSB_CD						/* 판매가능상태코드 */
+			, TB.GOODS_STAT_CD_SYS_YN
+		FROM ( SELECT F.GOODS_ID
+				, F.CSTRT_GOODS_ID
+				, GB.GOODS_NM
+				, GB.GOODS_STAT_CD
+				, GB.MDL_NM
+				, GB.COMP_NO
+				, GB.MMFT
+				, GB.SALE_STRT_DTM
+				, GB.SALE_END_DTM
+				, GB.SHOW_YN
+				, GB.GOODS_TP_CD
+				, GB.BIGO
+				, GB.BND_NO
+		        , GB.STK_MNG_YN
+				, B.COMP_NM
+				, C.BND_NM_KO
+				, F.GOODS_CSTRT_GB_CD
+				, F.USE_YN
+				, F.DISP_PRIOR_RANK
+				, '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ST_USE_YN
+				, GI.IMG_SEQ
+				, GI.IMG_PATH /* 이미지 경로 */
+				, (CASE WHEN FN_GET_GOODS_STOCK(GB.GOODS_ID , NULL) <![CDATA[>]]> 0
+					THEN '${@framework.front.constants.FrontConstants@COMM_YN_N}'
+					ELSE '${@framework.front.constants.FrontConstants@COMM_YN_Y}' END
+				) AS SOLD_OUT_YN /* 품절 여부 */
+			<if test="mbrNo != null and mbrNo != ''">, IF((SELECT COUNT(1) FROM MEMBER_INTEREST_GOODS WHERE GOODS_ID =
+				GB.GOODS_ID AND MBR_NO = #{mbrNo}) > 0
+				,
+				'${@framework.front.constants.FrontConstants@COMM_YN_Y}'
+				, '${@framework.front.constants.FrontConstants@COMM_YN_N}'
+				) AS INTEREST_YN /* 찜 여부 */
+			</if>
+				, FN_GET_GOODS_PRICE(GB.GOODS_ID, 1, #{webMobileGbCd}) AS PRICES
+				, GB.GOODS_STAT_CD_SYS_YN
+			FROM GOODS_BASE GB
+			    INNER JOIN GOODS_CSTRT_INFO F ON GB.GOODS_ID = F.CSTRT_GOODS_ID
+				LEFT OUTER JOIN GOODS_IMG GI
+				ON GI.GOODS_ID = GB.GOODS_ID AND GI.DLGT_YN = '${@framework.front.constants.FrontConstants@COMM_YN_Y}'
+				LEFT OUTER JOIN COMPANY_BASE B ON (GB.COMP_NO = B.COMP_NO)
+				LEFT OUTER JOIN BRAND_BASE C ON (GB.BND_NO = C.BND_NO)
+			WHERE
+				F.GOODS_ID = #{goodsId }
+				AND	F.GOODS_CSTRT_GB_CD = #{goodsCstrtGbCd }
+				AND F.USE_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+			<if test="stStdList != null and stStdList.size() != 0">
+			    AND EXISTS (SELECT 1 FROM ST_GOODS_MAP SG WHERE SG.GOODS_ID = GB.GOODS_ID
+			    <foreach collection="stStdList" item="st" separator="," open="AND SG.ST_ID IN (" close=")">
+			    #{st.stId}
+			    </foreach>
+			    )
+			</if>
+		) TB
+		ORDER BY DISP_PRIOR_RANK
+	</select>
+	
+	<insert id="insertGoodsCstrtHist" parameterType="biz.app.goods.model.GoodsCstrtHistPO" >
+		<!--
+			Query Name : goodsCstrt.insertGoodsCstrtHist
+			Description : 상품 구성품 히스토리 등록
+		-->
+		<selectKey keyProperty="cstrtHistSeq" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_GOODS_CSTRT_HIST_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO GOODS_CSTRT_HIST (
+			GOODS_ID				/* 상품 아이디 */
+			, GOODS_CSTRT_TP_CD		/* 상품 구성 유형 코드 */
+			, CSTRT_HIST_SEQ		/* 구성 이력 순번 */
+			, CSTRT_JSON			/* 구성 JSON */
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+		) VALUES (
+			  #{goodsId}			/* 상품 아이디 */
+			, #{goodsCstrtTpCd}		/* 상품 구성 유형 코드 */
+			, #{cstrtHistSeq}		/* 구성 이력 순번 */
+			, #{cstrtJson}			/* 구성 JSON */
+			, #{sysRegrNo }			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+		)
+	</insert>
+</mapper>

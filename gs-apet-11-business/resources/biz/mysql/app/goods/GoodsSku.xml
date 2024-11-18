@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	단품 재고
+	작성자  	valueFactory
+	작성일자  2021.01.26
+-->
+
+<mapper namespace="GoodsSku">
+
+	<insert id="insertSkuBase" parameterType="biz.app.goods.model.GoodsSkuBasePO">
+		INSERT /* QUERYID(goodsSku.insert) */ INTO sku_base ( SKU_CD
+             , SKU_NM
+             , PHS_COMP_NO
+             , MDL_NM
+             , BND_NO
+             , CTR_ORG
+             , MMFT
+             , IMPORTER
+             , STK_QTY
+             , SYS_REGR_NO
+             , SYS_REG_DTM
+		) VALUES(#{skuCd}
+			, #{skuNm}
+			, #{phsCompNo}
+			, #{mdlNm}
+			, #{bndNo}
+			, #{ctrOrg}
+			, #{mmft}
+			, #{importer}
+			, #{stkQty}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+
+	<update id="updateSkuBase" parameterType="biz.app.goods.model.GoodsSkuBasePO">
+		<selectKey keyProperty="ioTargetYn" resultType="string" order="AFTER">
+			SELECT CASE WHEN COUNT(1) > 0 THEN '${@framework.common.constants.CommonConstants@COMM_YN_Y}' ELSE '${@framework.common.constants.CommonConstants@COMM_YN_N}' END ioTargetYn FROM IO_ALM_TG_GOODS WHERE GOODS_ID = #{goodsId}
+		</selectKey>
+		UPDATE /* QUERYID(goodsSku.updateSkuBase) */ SKU_BASE SET
+			STK_QTY = #{stkQty}
+			, SYS_UPDR_NO = #{sysUpdrNo}
+		    , SYS_UPD_DTM = NOW()
+		WHERE SKU_CD = ( SELECT SKU_CD FROM ITEM WHERE GOODS_ID = #{goodsId} )
+	</update>
+
+	<update id="updateSkuBaseFo" parameterType="biz.app.goods.model.GoodsSkuBasePO">
+		UPDATE /* QUERYID(goodsSku.updateSkuBaseFo) */ SKU_BASE SET
+			STK_QTY = STK_QTY + #{stkQty}
+			, SYS_UPDR_NO = 100000001
+		WHERE 1=1
+		<if test="goodsId != null">
+			AND SKU_CD = ( SELECT SKU_CD FROM ITEM WHERE GOODS_ID = #{goodsId} )
+		</if>
+		<if test="skuCd != null">
+			AND	SKU_CD = #{skuCd}
+		</if>
+		<if test="stkQty &lt; 0"> AND STK_QTY + #{stkQty} &gt;= 0</if>
+	</update>
+
+	<update id="mergeSkuBase" parameterType="biz.app.goods.model.GoodsSkuBasePO">
+		INSERT /* QUERYID(goodsSku.merge) */ INTO sku_base ( SKU_CD
+             , SKU_NM
+             , PHS_COMP_NO
+             , MDL_NM
+             , BND_NO
+             , CTR_ORG
+             , MMFT
+             , IMPORTER
+             , STK_QTY
+             , SYS_REGR_NO
+             , SYS_REG_DTM
+         ) VALUES(#{skuCd}
+	        , #{skuNm}
+	        , #{phsCompNo}
+	        , #{mdlNm}
+	        , #{bndNo}
+	        , #{ctrOrg}
+	        , #{mmft}
+	        , #{importer}
+	        , #{stkQty}
+	        , #{sysRegrNo}
+	        , NOW()
+        )
+		ON DUPLICATE KEY UPDATE
+			, STK_QTY=VALUES(STK_QTY)
+			, SYS_UPDR_NO=VALUES(SYS_REGR_NO)
+			, SYS_UPD_DTM=NOW()
+	</update>
+
+	<!--
+		단품 CIS 수정 연동 목록
+		작성자  	valueFactory
+		작성일자  2021.01.26
+	-->
+
+	<resultMap id="skuInfoUpdateMap" type="biz.app.goods.model.SkuInfoVO">
+		<collection property="ntfcList" column="GOODS_ID"
+		            javaType="java.util.ArrayList" ofType="biz.app.goods.model.SkuInfoVO$Ntfc"
+		            select="selectSkuInfoNtfcById" />
+	</resultMap>
+
+	<select id="selectSkuInfoNtfcById" resultType="biz.app.goods.model.SkuInfoVO$Ntfc">
+		SELECT NI.CIS_NTF_DTL_CD AS NTFC_NO
+			 , ITEM_VAL AS NTFC_TXT
+		FROM GOODS_NOTIFY GN
+			     JOIN NOTIFY_ITEM NI
+			          ON (GN.NTF_ITEM_ID = NI.NTF_ITEM_ID)
+		WHERE GOODS_ID = #{GOODS_ID}
+	</select>
+
+	<select id="selectStuInfoListForSend" resultMap="skuInfoUpdateMap">
+		SELECT GOODS_ID
+			, DATE_FORMAT(CIS_DTM, '%i') AS CIS_MINUTE
+			, DATE_FORMAT(CIS_DTM,'%Y%m%d%H%i') AS CIS_DTM
+			, GOODS_ID AS SKU_CD		/** 단품 코드 */
+			, GOODS_NM AS SKU_NM		/** 단품 이름 */
+			, GOODS_STAT_CD AS STAT_CD	/**	상태코드 */
+			, GOODS_ID AS STRD_CD 		/** 표준코드 무시 */
+			, COMP_NO AS COMP_CD		/** 자체코드 */
+			, CAT_CDS
+			, CAT_CDS_IDX
+			, CASE WHEN CAT_CDS_IDX IS NOT NULL THEN SUBSTRING_INDEX(CAT_CDS, ';', 1) ELSE '' END AS CATE_CD_L
+			, CASE WHEN CAT_CDS_IDX IS NOT NULL THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(CAT_CDS, ';', 1)) ELSE '' END AS CATE_NM_L
+			, CASE WHEN CAT_CDS_IDX > 0 THEN SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 2), ';', -1) ELSE '' END AS CATE_CD_M
+			, CASE WHEN CAT_CDS_IDX > 0 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 2), ';', -1)) ELSE '' END AS CATE_NM_M
+			, CASE WHEN CAT_CDS_IDX > 1 THEN SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 3), ';', -1) ELSE '' END AS CATE_CD_S
+			, CASE WHEN CAT_CDS_IDX > 1 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 3), ';', -1)) ELSE '' END AS CATE_NM_S
+			, '' AS CATE_CD_D
+			, '' AS CATE_NM_D
+			, EXP_MNG_YN AS EXP_DD_CTR_YN	/** 유통기한 관리여부 */
+			, EXP_DD 						/**	유통기간(월) */
+			, 'EA' AS UNIT_NM 				/**	단위 */
+			, '' AS SPCFNM 					/**	규격 */
+			, SALE_AMT AS PRICE 			/** 판매가격 */
+			, ORG_SALE_AMT AS CONSUMER_PRICE /** 정상가격 */
+			, SPL_AMT AS SUPPLY_PRICE 		/** 공급가격 */
+			, PHS_COMP_NO AS VNDR_CD 		/** 매입사코드  */
+			, 'PB' AS OWNR_CD				/**  화주코드 */
+			, 'WH01' AS WARE_CD				/** 물류코드  */
+			, MMFT AS MNFT_NM				/** 제조사 */
+			, IMPORTER AS IMPT_NM			/** 수입사 */
+			, CTR_ORG AS ORGN_NM			/** 원산지 */
+			, BRND_NM						/**	브랜드명 */
+			, MDL_NM as MODL_NM				/** 모델 */
+			, '008' AS DLV_CHRG_TP_CD		/** TODO 배송비 유형 */
+			, DLV_CHRG 						/**	배송비 */
+			, TAX_GB_CD AS TAX_TP_CD		/** 과세 유형 코드 */
+			, PET_TP_NM 					/**	반려동물 유형 */
+			, IMG_SRC						/** 대표 이미지 경로 */
+			, (SELECT CONTENT FROM GOODS_DESC WHERE GOODS_ID= T.GOODS_ID AND SVC_GB_CD= T.SVC_GB_CD ) AS DTL_TXT  /** 상세내용 */
+			, CIS_NTF_CLSF_CD as NTFC_CD		/** 정보고시 분류코드 */
+			, SHOPLINKER_SND_YN AS CLLT_SEND_YN	/** 수집처 전송 여부 */
+			, TWC_SND_YN AS TWC_SEND_YN			/** TWC 전송 여부 */
+		FROM (
+			SELECT B.GOODS_ID
+				, B.CIS_DTM
+				, B.GOODS_NM
+				, B.GOODS_STAT_CD
+				, B.COMP_NO
+				, FN_GET_DISP_CTG_NO_PATH(DG.DISP_CLSF_NO) AS CAT_CDS
+				, LENGTH(FN_GET_DISP_CTG_NO_PATH(DISP_CLSF_NO)) - LENGTH(REPLACE(FN_GET_DISP_CTG_NO_PATH(DISP_CLSF_NO), ';', '')) AS CAT_CDS_IDX
+				, CASE WHEN B.EXP_MNG_YN IS NULL THEN 'N' ELSE B.EXP_MNG_YN END EXP_MNG_YN
+				, CASE WHEN B.EXP_MNG_YN  = 'Y' THEN B.EXP_MONTH ELSE '' END AS EXP_DD
+				, B.SALE_AMT
+				, B.ORG_SALE_AMT
+				, B.SPL_AMT
+				, SB.PHS_COMP_NO
+				, B.MMFT
+				, B.IMPORTER
+				, B.CTR_ORG
+				, B.BND_NO
+				, (SELECT BND_NM_KO FROM BRAND_BASE BB WHERE BND_NO = B.BND_NO ) AS BRND_NM
+				, B.MDL_NM
+				, CASE WHEN B.DLVR_MTD_CD IS NOT NULL THEN B.DLVR_MTD_CD ELSE '003' END DLV_CHRG_TP_CD
+				, P.DLVR_AMT AS DLV_CHRG
+				, B.TAX_GB_CD
+				, (SELECT DTL_NM FROM CODE_DETAIL WHERE GRP_CD = 'PET_GB' AND USR_DFN2_VAL = 'Y' AND DTL_CD = B.PET_GB_CD) AS PET_TP_NM
+				, (SELECT IMG_PATH FROM GOODS_IMG I WHERE GOODS_ID = B.GOODS_ID AND DLGT_YN = 'Y' ) AS IMG_SRC
+				, CASE WHEN B.WEB_MOBILE_GB_CD = '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'
+				         THEN '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_20}'
+				     ELSE '${@framework.common.constants.CommonConstants@WEB_MOBILE_GB_10}'
+				END SVC_GB_CD
+				, (SELECT CIS_NTF_CLSF_CD FROM NOTIFY_INFO WHERE NTF_ID = B.NTF_ID) AS CIS_NTF_CLSF_CD
+				, B.SHOPLINKER_SND_YN
+				, B.TWC_SND_YN
+			FROM (
+				SELECT A.SALE_AMT
+					, A.ORG_SALE_AMT
+					, A.SPL_AMT
+					, A.SALE_STRT_DTM AS CIS_DTM
+					, B.*
+				FROM GOODS_BASE B
+				LEFT OUTER JOIN GOODS_PRICE A
+				ON (A.GOODS_ID = B.GOODS_ID)
+				WHERE B.GOODS_CSTRT_TP_CD = '${@framework.common.constants.CommonConstants@GOODS_CSTRT_TP_ITEM}'
+				AND A.SALE_STRT_DTM BETWEEN TIMESTAMPADD(MINUTE, 1, NOW()) AND TIMESTAMPADD(MINUTE, 30, NOW())
+			) B
+			JOIN ITEM I
+			ON (B.GOODS_ID = I.GOODS_ID)
+			LEFT OUTER JOIN SKU_BASE SB
+			ON (I.SKU_CD = SB.SKU_CD)
+			LEFT OUTER JOIN DELIVERY_CHARGE_POLICY P
+			ON (B.COMP_NO = P.COMP_NO AND B.DLVRC_PLC_NO = P.DLVRC_PLC_NO )
+			LEFT OUTER JOIN DISPLAY_GOODS DG
+			ON B.GOODS_ID = DG.GOODS_ID
+		    AND DG.DLGT_DISP_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'
+		) T
+	</select>
+
+	<select id="getSkuBase" parameterType="biz.app.goods.model.GoodsSkuBasePO" resultType="biz.app.goods.model.GoodsSkuBaseVO">
+		SELECT *
+		FROM SKU_BASE
+		WHERE 1=1
+		<if test="goodsId != null">
+			AND SKU_CD = ( SELECT SKU_CD FROM ITEM WHERE GOODS_ID = #{goodsId} )
+		</if>
+		<if test="skuCd != null">
+			AND	SKU_CD = #{skuCd}
+		</if>
+	</select>
+
+	<update id="updatePhsCompNo">
+		UPDATE SKU_BASE SET PHS_COMP_NO = #{phsCompNo}
+		WHERE SKU_CD = (SELECT SKU_CD FROM ITEM WHERE GOODS_ID = #{goodsId})
+	</update>
+</mapper>

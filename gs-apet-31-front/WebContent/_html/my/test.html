@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<!-- <script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script> -->
+	<!-- <script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script> -->
+	<!-- <script src="../../_script/ui.mo.js"></script> -->
+	<!-- <script src="../../_html/guide/html.js"></script>개발페이지에서는 html.js 임포트 하지말아주세요. -->
+	
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+
+		<!-- 헤더 MO-->
+		<header class="header mo" id="header_mo">
+			<div class="hdr">
+				<div class="inr back">
+					<div class="hdt">
+						<button type="button" class="btnPop-back">닫기</button>
+						<h1 class="tit">상품후기</h1>
+					</div>
+					<div class="mdt">
+						<button class="bt schs" type="button">검색</button>
+						<button class="bt cart" type="button">장바구니</button>
+						<button class="bt alim" type="button">알림</button>
+						<button class="bt gnbs btnGnb" type="button">메뉴</button>
+						<!-- <a href="javascript:;" class="golist">시리즈목록</a> -->
+					</div>
+				</div>
+			</div>
+		</header>
+		<!-- 헤더 PC-->
+		<include class="header pc" data-include-html="../inc/header_pc.html"></include>
+		<!-- GNB -->
+		<include class="gnb" data-include-html="../inc/gnb.html"></include>
+		<include class="lnb" data-include-html="../inc/lnb.html"></include>
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container lnb page" id="container">
+			<div class="inr">
+				
+			</div>
+			<!-- <input id='name' onkeyup='printName()'/>
+			<div id='result'></div> -->
+		</main>
+
+	</div>
+	<script>
+		
+	</script>
+</body>
+</html>

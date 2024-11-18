@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="apetContentsGoodsMap">
+	<insert id="insertApetContentsGoodsMap" parameterType="biz.app.contents.model.ApetContentsGoodsMapPO">
+		<!--
+			Query Name	: apetContentsGoodsMap.insertApetContentsGoodsMap
+			Description	: Apet 컨텐츠 상품 매핑 등록
+		-->
+		INSERT INTO APET_CONTENTS_GOODS_MAP (	/* QUERYID(apetContentsGoodsMap.insertApetContentsGoodsMap) */
+			  VD_ID				/* 영상 ID */
+			, GOODS_ID			/* 상품 아이디 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{vdId}
+			, #{goodsId}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<delete id="deleteApetContentsGoodsMap" parameterType="biz.app.contents.model.ApetContentsGoodsMapPO">
+		<!--
+			Query Name : apetContentsGoodsMap.deleteApetContentsGoodsMap
+			Description : Apet 첨부파일 삭제
+		-->	
+		DELETE /* QUERYID(apetContentsGoodsMap.deleteApetContentsGoodsMap */
+		FROM	APET_CONTENTS_GOODS_MAP
+		WHERE	VD_ID = #{vdId}
+	</delete>
+	
+	<select id="listApetContentsGoodsMap" resultType="biz.app.contents.model.ApetContentsGoodsMapVO" >
+		<!--
+			Query Name : apetContentsGoodsMap.listApetContentsGoodsMap
+			Description : Apet 상품 매핑 리스트
+		-->	
+		SELECT /* QUERYID(apetContentsGoodsMap.listGoodsContentsBO) */
+			ACGM.VD_ID				/* 영상ID		*/
+			, ACGM.GOODS_ID			/* 상품ID		*/
+			, AAF.PHY_PATH			/* apet 첨부파일 경로 */
+			, AAF.CONTS_TP_CD		/* apet 컨텐츠 유형 코드 */
+		FROM APET_CONTENTS_GOODS_MAP ACGM
+		LEFT JOIN APET_CONTENTS AC ON ACGM.VD_ID = AC.VD_ID
+		LEFT JOIN APET_ATTACH_FILE AAF ON AC.FL_NO = AAF.FL_NO
+		WHERE 1 = 1
+			<if test="vdId != null and vdId != ''">
+				AND ACGM.VD_ID = #{vdId}
+			</if>
+			<if test="goodsId != null and goodsId != ''">
+				AND ACGM.GOODS_ID = #{goodsId}
+			</if>
+			<if test="vdGbCd != null and vdGbCd != ''">
+				AND AC.VD_GB_CD = #{vdGbCd}
+			</if>
+			<if test="dispYn != null and dispYn != ''">
+				AND AC.DISP_YN = #{dispYn}
+			</if>
+			<if test="contsTpCd != null and contsTpCd != ''">
+				AND AAF.CONTS_TP_CD = #{contsTpCd}
+			</if>
+	</select>
+	
+	<insert id="insertApetContentsGoodsMapHist" parameterType="biz.app.contents.model.ApetContentsGoodsMapVO">
+		<!--
+			Query Name	: apetContentsGoodsMap.insertApetContentsGoodsMapHist
+			Description	: Apet 컨텐츠 상품 매핑 이력 등록
+		-->
+		INSERT INTO APET_CONTENTS_GOODS_MAP_HIST (	/* QUERYID(apetContentsGoodsMap.insertApetContentsGoodsMapHist) */
+			HIST_NO				/* 이력 번호 */
+			, VD_ID				/* 영상 ID */
+			, GOODS_ID			/* 상품 아이디 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			#{histNo}
+			, #{vdId}
+			, #{goodsId}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+</mapper>

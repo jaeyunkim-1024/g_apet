@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adjustment">
+
+	<select id="listCompAdjustment" resultType="biz.app.adjustment.model.AdjustmentVO" >
+		<!--
+			Query Name : adjustment.listCompAdjustment
+			Description : 업체정산 상세 내역
+		-->
+		SELECT	  A.COMP_NO
+				, A.COMP_NM
+				, SUM(A.GUBUN * A.SALE_AMT) AS SALE_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_10}' THEN A.PAY_AMT ELSE 0 END) AS PAY_10_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_20}' THEN A.PAY_AMT ELSE 0 END) AS PAY_20_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_30}' THEN A.PAY_AMT ELSE 0 END) AS PAY_30_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_40}' THEN A.PAY_AMT ELSE 0 END) AS PAY_40_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_50}' THEN A.PAY_AMT ELSE 0 END) AS PAY_50_AMT
+				, SUM(A.GUBUN * CASE WHEN A.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_90}' THEN A.PAY_AMT ELSE 0 END) AS PAY_90_AMT
+				, SUM(A.GUBUN * A.PAY_AMT) AS PAY_AMT
+				, SUM(A.GUBUN * A.GOODS_CP_DC_AMT) AS GOODS_CP_DC_AMT /* 상품쿠폰 */
+				, SUM(A.GUBUN * A.DLVRC_CP_DC_AMT) AS DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+				, SUM(A.GUBUN * A.ASBC_CP_DC_AMT) AS ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+				, SUM(A.GUBUN * A.CART_CP_DC_AMT) AS CART_CP_DC_AMT /* 장바구니 쿠폰 */
+				, SUM(A.GUBUN * A.SVMN_DC_AMT) AS SVMN_DC_AMT /* 적립금 사용 */
+				, SUM(A.GUBUN * A.REAL_ASB_AMT) AS REAL_ASB_AMT /* 실 조립비 */
+				, SUM(A.GUBUN * A.REAL_DLVR_AMT) AS REAL_DLVR_AMT /* 실 배송비 */
+				, SUM(ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) AS CMS_AMT
+				, SUM(A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) AS ADJT_AMT
+				, SUM(ROUND( (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) * 0.1, 0)) AS ADJT_TAX
+		FROM (
+				/* 정산 기간중  */
+				SELECT 1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					<if test="sysRegDtmStart != null">
+					AND A.ORD_ACPT_DTM &gt;= #{sysRegDtmStart }
+					</if>
+					<if test="sysRegDtmEnd != null">
+					AND A.ORD_ACPT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+					</if>
+					AND A.ORD_NO = B.ORD_NO
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+			        <if test='"Y" == showAllLowCompany'>
+			        AND CB.UP_COMP_NO = #{compNo}
+			        </if>
+			        <if test='"Y" != showAllLowCompany'>
+			            <if test="lowCompNo != null and lowCompNo != ''">
+			            AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+			            </if>
+			            <if test="lowCompNo == null or lowCompNo == ''">
+			                <if test="compNo != null and compNo != ''">
+			            AND B.COMP_NO = #{compNo}
+			                </if>
+			            </if>
+			        </if>
+					AND NOT EXISTS (
+						/* 같은 기간에 취소나 반품이 진행이 되지 않은 건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+				UNION ALL
+				/* 정산 대상 기간중에 이전 주문건에 대한 취소, 반품 완료건 추출 */
+				SELECT -1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT AS PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					AND A.ORD_NO = B.ORD_NO
+					/* 이전 주문건중 정산 기간에 취소 되거나 반품된것을 찾기 위해 */
+					AND A.ORD_ACPT_DTM BETWEEN DATE_ADD(#{sysRegDtmStart }, INTERVAL -90 DAY) AND #{sysRegDtmStart }
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+                    <if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND EXISTS (
+					/* 같은 기간에 취소나 반품이 진행이 된건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+		) A
+		GROUP BY A.COMP_NO, A.COMP_NM
+		ORDER BY A.COMP_NO
+	</select>
+
+
+	<select id="listCompAdjustmentDtl" resultType="biz.app.adjustment.model.AdjustmentVO" >
+		<!--
+			Query Name : adjustment.listCompAdjustmentDtl
+			Description : 업체정산 상세 내역
+		-->
+		SELECT	  A.GUBUN
+				, A.ORD_NO
+				, A.ORD_DTL_SEQ
+				, A.COMP_NO
+				, A.COMP_NM
+				, A.GOODS_ID
+				, A.GOODS_NM
+				, A.ITEM_NO
+				, A.ITEM_NM
+				, A.PAY_MEANS_CD
+				, A.GUBUN * A.SALE_AMT AS SALE_AMT
+				, A.GUBUN * A.ORD_QTY AS ORD_QTY
+				, A.GUBUN * A.PAY_AMT AS PAY_AMT
+				, A.GUBUN * A.GOODS_CP_DC_AMT AS GOODS_CP_DC_AMT /* 상품쿠폰 */
+				, A.GUBUN * A.DLVRC_CP_DC_AMT AS DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+				, A.GUBUN * A.ASBC_CP_DC_AMT AS ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+				, A.GUBUN * A.CART_CP_DC_AMT AS CART_CP_DC_AMT /* 장바구니 쿠폰 */
+				, A.GUBUN * A.SVMN_DC_AMT AS SVMN_DC_AMT /* 적립금 사용 */
+				, A.GUBUN * A.REAL_ASB_AMT AS REAL_ASB_AMT /* 실 조립비 */
+				, A.GUBUN * A.REAL_DLVR_AMT AS REAL_DLVR_AMT /* 실 배송비 */
+				, A.CMS_RATE /* 상품 수수료율 */
+				, ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0) AS CMS_AMT
+				, (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) AS ADJT_AMT
+				, ROUND( (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) * 0.1, 0) AS ADJT_TAX
+		FROM (
+				/* 정산 기간중  */
+				SELECT 1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					<if test="sysRegDtmStart != null">
+					AND A.ORD_ACPT_DTM &gt;= #{sysRegDtmStart }
+					</if>
+					<if test="sysRegDtmEnd != null">
+					AND A.ORD_ACPT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+					</if>
+					AND A.ORD_NO = B.ORD_NO
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+                    <if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND NOT EXISTS (
+						/* 같은 기간에 취소나 반품이 진행이 되지 않은 건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+				UNION ALL
+				/* 정산 대상 기간중에 이전 주문건에 대한 취소, 반품 완료건 추출 */
+				SELECT -1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT AS PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					AND A.ORD_NO = B.ORD_NO
+					/* 이전 주문건중 정산 기간에 취소 되거나 반품된것을 찾기 위해 */
+					AND A.ORD_ACPT_DTM BETWEEN DATE_ADD(#{sysRegDtmStart }, INTERVAL -90 DAY) AND #{sysRegDtmStart }
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+                    <if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND EXISTS (
+					/* 같은 기간에 취소나 반품이 진행이 된건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+		) A
+		ORDER BY A.GUBUN, A.ORD_NO, A.ORD_DTL_SEQ
+	</select>
+
+
+	<select id="listPageAdjustment" resultType="biz.app.adjustment.model.AdjustmentVO" >
+		<!--
+			Query Name : adjustment.listPageAdjustment
+			Description : 판매구분 상세 내역
+		-->
+		SELECT	  A.PAGE_GB_CD
+				, SUM(A.GUBUN * A.SALE_AMT) AS SALE_AMT
+				, SUM(A.GUBUN * A.PAY_AMT) AS PAY_AMT
+				, SUM(A.GUBUN * ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) AS CMS_AMT
+				, SUM(A.GUBUN * (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0))) AS ADJT_AMT
+				, SUM(A.GUBUN * ROUND( (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) * 0.1, 0)) AS ADJT_TAX
+		FROM (
+				/* 정산 기간중  */
+				SELECT 1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, BASE.PAGE_GB_CD
+						, OD.COMP_NO
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ, A.PAGE_GB_CD
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					<if test="sysRegDtmStart != null">
+					AND A.ORD_ACPT_DTM &gt;= #{sysRegDtmStart }
+					</if>
+					<if test="sysRegDtmEnd != null">
+					AND A.ORD_ACPT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+					</if>
+					AND A.ORD_NO = B.ORD_NO
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+                    <if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					<if test="pageGbCd != null and pageGbCd != '' ">
+					AND A.PAGE_GB_CD = #{pageGbCd }
+					</if>
+					AND A.PAGE_GB_CD NOT IN (
+						'${@framework.common.constants.CommonConstants@PAGE_GB_SHOP9999 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_02 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_03 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_01 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_05 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_06 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_07 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_08 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_09 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_10 }'
+					)
+					AND NOT EXISTS (
+						/* 같은 기간에 취소나 반품이 진행이 되지 않은 건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+				UNION ALL
+				/* 정산 대상 기간중에 이전 주문건에 대한 취소, 반품 완료건 추출 */
+				SELECT -1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, BASE.PAGE_GB_CD
+						, OD.COMP_NO
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT AS PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ, A.PAGE_GB_CD
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					AND A.ORD_NO = B.ORD_NO
+					/* 이전 주문건중 정산 기간에 취소 되거나 반품된것을 찾기 위해 */
+					AND A.ORD_ACPT_DTM BETWEEN DATE_ADD(#{sysRegDtmStart }, INTERVAL -90 DAY) AND #{sysRegDtmStart }
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+					<if test="pageGbCd != null and pageGbCd != '' ">
+					AND A.PAGE_GB_CD = #{pageGbCd }
+					</if>
+					<if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND A.PAGE_GB_CD NOT IN (
+						'${@framework.common.constants.CommonConstants@PAGE_GB_SHOP9999 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_02 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_03 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_01 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_05 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_06 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_07 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_08 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_09 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_10 }'
+					)
+					AND EXISTS (
+					/* 같은 기간에 취소나 반품이 진행이 된건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+		) A
+		GROUP BY A.PAGE_GB_CD
+		ORDER BY A.PAGE_GB_CD
+	</select>
+
+
+	<select id="listPageAdjustmentDtl" resultType="biz.app.adjustment.model.AdjustmentVO" >
+		<!--
+			Query Name : adjustment.listPageAdjustmentDtl
+			Description : 업체정산 상세 내역
+		-->
+		SELECT	  A.GUBUN
+				, A.ORD_NO
+				, A.ORD_DTL_SEQ
+				, A.COMP_NO
+				, A.COMP_NM
+				, A.GOODS_ID
+				, A.GOODS_NM
+				, A.ITEM_NO
+				, A.ITEM_NM
+				, A.PAY_MEANS_CD
+				, A.GUBUN * A.SALE_AMT AS SALE_AMT
+				, A.GUBUN * A.ORD_QTY AS ORD_QTY
+				, A.GUBUN * A.PAY_AMT AS PAY_AMT
+				, A.GUBUN * A.GOODS_CP_DC_AMT AS GOODS_CP_DC_AMT /* 상품쿠폰 */
+				, A.GUBUN * A.DLVRC_CP_DC_AMT AS DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+				, A.GUBUN * A.ASBC_CP_DC_AMT AS ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+				, A.GUBUN * A.CART_CP_DC_AMT AS CART_CP_DC_AMT /* 장바구니 쿠폰 */
+				, A.GUBUN * A.SVMN_DC_AMT AS SVMN_DC_AMT /* 적립금 사용 */
+				, A.GUBUN * A.REAL_ASB_AMT AS REAL_ASB_AMT /* 실 조립비 */
+				, A.GUBUN * A.REAL_DLVR_AMT AS REAL_DLVR_AMT /* 실 배송비 */
+				, A.CMS_RATE /* 상품 수수료율 */
+				, ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0) AS CMS_AMT
+				, (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) AS ADJT_AMT
+				,ROUND( (A.PAY_AMT - ROUND(A.PAY_AMT * A.CMS_RATE / 100, 0)) * 0.1, 0) AS ADJT_TAX
+		FROM (
+				/* 정산 기간중  */
+				SELECT 1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					<if test="sysRegDtmStart != null">
+					AND A.ORD_ACPT_DTM &gt;= #{sysRegDtmStart }
+					</if>
+					<if test="sysRegDtmEnd != null">
+					AND A.ORD_ACPT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+					</if>
+					AND A.ORD_NO = B.ORD_NO
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+					<if test="pageGbCd != null and pageGbCd != '' ">
+					AND A.PAGE_GB_CD = #{pageGbCd }
+					</if>
+					<if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND A.PAGE_GB_CD NOT IN (
+						'${@framework.common.constants.CommonConstants@PAGE_GB_SHOP9999 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_02 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_03 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_01 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_05 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_06 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_07 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_08 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_09 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_10 }'
+					)
+					AND NOT EXISTS (
+						/* 같은 기간에 취소나 반품이 진행이 되지 않은 건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+				UNION ALL
+				/* 정산 대상 기간중에 이전 주문건에 대한 취소, 반품 완료건 추출 */
+				SELECT -1 AS GUBUN
+						, OD.ORD_NO
+						, OD.ORD_DTL_SEQ
+						, OD.COMP_NO
+						, COMP.COMP_NM
+						, OD.GOODS_ID
+						, OD.GOODS_NM
+						, OD.ITEM_NO
+						, OD.ITEM_NM
+						, OD.SALE_AMT
+						, OD.ORD_QTY
+						, OD.PAY_AMT AS PAY_AMT
+						, OD.GOODS_CP_DC_AMT /* 상품쿠폰 */
+						, OD.DLVRC_CP_DC_AMT /* 배송비 쿠폰 */
+						, OD.ASBC_CP_DC_AMT /* 조립비 쿠폰 */
+						, OD.CART_CP_DC_AMT /* 장바구니 쿠폰 */
+						, OD.SVMN_DC_AMT /* 적립금 사용 */
+						, OD.ASBC_NO /* 조립비 번호 */
+						, IFNULL(ASSE.REAL_ASB_AMT, 0) AS REAL_ASB_AMT /* 실 조립비 */
+						, OD.DLVRC_NO /* 배송비 번호 */
+						, IFNULL(DELI.REAL_DLVR_AMT, 0) AS REAL_DLVR_AMT /* 실 배송비 */
+						, IFNULL(CCL.CMS_RATE, 10) AS CMS_RATE /* 상품 수수료율 */
+						, PB.PAY_MEANS_CD
+				FROM (
+					SELECT A.ORD_NO, B.ORD_DTL_SEQ
+					FROM ORDER_BASE A, ORDER_DETAIL B JOIN COMPANY_BASE CB ON (B.COMP_NO = CB.COMP_NO)
+					WHERE 1 = 1
+					AND A.DATA_STAT_CD = '${@framework.common.constants.CommonConstants@DATA_STAT_01}' /* 활성건 기준 */
+					AND A.ORD_NO = B.ORD_NO
+					/* 이전 주문건중 정산 기간에 취소 되거나 반품된것을 찾기 위해 */
+					AND A.ORD_ACPT_DTM BETWEEN DATE_ADD(#{sysRegDtmStart }, INTERVAL -90 DAY) AND #{sysRegDtmStart }
+					AND B.ORD_DTL_STAT_CD &gt; '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_110}' /* 접수 이상으로 진행이 된 것.. */
+					<if test="pageGbCd != null and pageGbCd != '' ">
+					AND A.PAGE_GB_CD = #{pageGbCd }
+					</if>
+					<if test='"Y" != showAllLowCompany'>
+                        <if test="lowCompNo != null and lowCompNo != ''">
+                        AND B.COMP_NO = #{lowCompNo} AND CB.UP_COMP_NO = #{compNo}
+                        </if>
+                        <if test="lowCompNo == null or lowCompNo == ''">
+                            <if test="compNo != null and compNo != ''">
+                        AND B.COMP_NO = #{compNo}
+                            </if>
+                        </if>
+                    </if>
+					AND A.PAGE_GB_CD NOT IN (
+						'${@framework.common.constants.CommonConstants@PAGE_GB_SHOP9999 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_02 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_03 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_01 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_05 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_06 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_07 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_08 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_09 }'
+						, '${@framework.common.constants.CommonConstants@PAGE_GB_10 }'
+					)
+					AND EXISTS (
+					/* 같은 기간에 취소나 반품이 진행이 된건 */
+						SELECT 1 FROM ORDER_DETAIL_STATUS_HIST C
+						WHERE 1 = 1
+						AND C.ORD_NO = B.ORD_NO
+						AND C.ORD_DTL_SEQ = B.ORD_DTL_SEQ
+						AND C.ORD_DTL_STAT_CD IN ('${@framework.common.constants.CommonConstants@ORD_DTL_STAT_03}', '${@framework.common.constants.CommonConstants@ORD_DTL_STAT_18}') /* 취소, 반품완료인 경우만 제외. */
+						<if test="sysRegDtmStart != null">
+						AND C.HIST_STRT_DTM &gt;= #{sysRegDtmStart }
+						</if>
+						<if test="sysRegDtmEnd != null">
+						AND C.HIST_STRT_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+						</if>
+					)
+				) BASE, ORDER_DETAIL OD
+				JOIN COMPANY_BASE COMP ON (OD.COMP_NO = COMP.COMP_NO)
+				LEFT OUTER JOIN ASSEMBLEY_COSTS ASSE ON (OD.ASBC_NO = ASSE.ASBC_NO)
+				LEFT OUTER JOIN DELIVERY_CHARGE DELI ON (OD.DLVRC_NO = DELI.DLVRC_NO)
+				LEFT OUTER JOIN COMPANY_CCL CCL ON(OD.COMP_NO = CCL.COMP_NO AND CCL.CCL_STRT_DTM &lt;= OD.SYS_REG_DTM AND CCL.CCL_END_DTM &gt; OD.SYS_REG_DTM )
+				LEFT OUTER JOIN PAY_BASE PB ON (OD.ORD_NO = PB.ORD_NO AND PB.ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_10}' AND PB.ORG_PAY_NO IS NULL)
+				WHERE 1 = 1
+				AND OD.ORD_NO = BASE.ORD_NO
+				AND OD.ORD_DTL_SEQ = BASE.ORD_DTL_SEQ
+		) A
+		ORDER BY A.GUBUN, A.ORD_NO, A.ORD_DTL_SEQ
+	</select>
+
+
+
+</mapper>

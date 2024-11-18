@@ -1,0 +1,166 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=utf-8" %>
+<%-- 	<t:putAttribute name="script">
+		<script type="text/javascript">
+
+			$(document).ready(function(){
+				//createMenuTree();
+			});
+			
+
+			
+
+			// 그룹 코드 리스트
+			function createAuthGrid(){
+				var options = {
+					url : "<spring:url value='/system/authListGrid.do' />"
+					, height : 550
+					, searchParam : $("#authSearchForm").serializeJson()
+					, colModels : [
+						{name:"authNo", label:'<spring:message code="column.auth_no" />', width:"70", align:"center", sortable:false}
+						, {name:"authNm", label:'<b><u><tt><spring:message code="column.auth_nm" /></tt></u></b>', width:"120", align:"center", sortable:false, classes:'pointer fontbold'}
+						, _GRID_COLUMNS.useYn
+						, _GRID_COLUMNS.sysRegrNm
+						, _GRID_COLUMNS.sysRegDtm
+						, _GRID_COLUMNS.sysUpdrNm
+						, _GRID_COLUMNS.sysUpdDtm
+					]
+					, onSelectRow : function(ids) {
+						var rowdata = $("#authList").getRowData(ids);
+						authView(rowdata.authNo);
+					}
+				};
+
+				grid.create("authList", options);
+			}
+
+			function reloadAuthGrid(){
+				var options = {
+					searchParam : $("#authSearchForm").serializeJson()
+				};
+
+				grid.reload("authList", options);
+			}
+
+			function authMenuList(authNo) {
+				var options = {
+					url : "<spring:url value='/system/authMenuList.do' />"
+					, data : {
+						authNo : authNo
+					}
+					, callBack : function(data){
+						$("#menuTree").jstree().deselect_all();
+						$(data.authMenu).each(function(e){
+							$("#menuTree").jstree().select_node(this.menuNo);
+						});
+					}
+				};
+				ajax.call(options);
+			}
+
+			function authView(authNo){
+				var options = {
+					url : "<spring:url value='/system/authView.do' />"
+					, data : {
+						authNo : authNo
+					}
+					, dataType : "html"
+					, callBack : function(data){
+						$("#authView").html(data);
+						authMenuList(authNo);
+					}
+				};
+
+				ajax.call(options);
+			}
+
+			function authSave() {
+				if(validate.check("authForm")) {
+					var message = '<spring:message code="column.common.confirm.insert" />';
+
+					if(!validation.isNull($("#authForm #authNo").val())) {
+						message = '<spring:message code="column.common.confirm.update" />';
+					}
+
+					var data = $("#authForm").serializeJson();
+
+					var treeData = $("#menuTree").jstree().get_selected(true);
+					var arrAllMenuNo = new Array();
+					for(var i in treeData) {
+						if(treeData[i].children == null || treeData[i].children.length == 0){
+							arrAllMenuNo.push(treeData[i].id);
+							for(var j in treeData[i].parents) {
+								if(treeData[i].parents[j] != '0' && treeData[i].parents[j] != '#') {
+									arrAllMenuNo.push(treeData[i].parents[j]);
+								}
+							}
+						}
+					}
+					var arrMenuNo = new Array();
+					$.each(arrAllMenuNo, function(index, element) {
+						if ($.inArray(element, arrMenuNo) == -1) {
+							arrMenuNo.push(element);
+						}
+					});
+
+					$.extend(data, {
+						arrMenuNo : arrMenuNo
+					});
+
+					messager.confirm(message, function(r){
+						if(r){
+							var options = {
+								url : "<spring:url value='/system/authSave.do' />"
+								, data : data
+								, callBack : function(data){
+									reloadAuthGrid();
+									authView(data.auth.authNo);
+								}
+							};
+
+							ajax.call(options);							
+						}
+					})
+				}
+			}
+
+			function authDelete(authNo) {
+				messager.confirm('<spring:message code="column.common.confirm.delete" />', function(r){
+					if(r){
+						var options = {
+							url : "<spring:url value='/system/authDelete.do' />"
+							, data : { authNo : authNo }
+							, callBack : function(data){
+								reloadAuthGrid();
+								authView('');
+							}
+						};
+
+						ajax.call(options);
+					}
+				})
+			}
+
+// 			function createMenuTree() {
+// 				alert("111111");
+// 				$("#menuTree").jstree({//tree 생성
+// 					core : {
+// 						multiple : true
+// 						, data : {
+// 							type : "POST"
+// 							, url : function (node) {
+// 								return "/tag/tagGroupTree.do";
+// 							}
+// 						}
+// 					}
+// 					, plugins : [ "themes" , "checkbox" ]
+// 				})
+// 				.bind("ready.jstree", function (event, data) {
+// 					$("#menuTree").jstree("open_all");
+// 				});
+// 			}
+		</script>
+	</t:putAttribute>
+ --%>
+		<div class="tree-menu" style="border-top:none;">
+				<div class="gridTree" id="menuTree" style="height:700px;"></div>
+			</div>

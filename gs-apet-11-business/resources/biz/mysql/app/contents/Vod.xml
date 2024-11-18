@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vod">
+
+	<select id="pageVod" resultType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: vod.pageVod
+			Description	: 영상 목록 페이지
+		-->
+		SELECT
+			T1.*
+		FROM
+			(
+			SELECT	/* QUERYID(vod.pageVod) */
+					VD_ID 									/* 영상 ID */
+					, VD_GB_CD 								/* 영상 구분 코드 */
+					, AC.TP_CD 								/* 타입 코드 */
+					, AC.SRIS_NO 							/* 시리즈 번호 */
+					, AC.SESN_NO 							/* 시즌 번호 */
+					, TTL 									/* 제목 */
+					, AC.DISP_YN							/* 전시 여부 */
+					, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE AC.VD_ID = ACI.VD_ID AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT	/* 좋아요 */
+					, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+					, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+					, HITS									/* 조회수 */
+					, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 썸네일 이미지 */
+					, ACS.SRIS_NM							/* 시리즈 명 */
+					, ASS.SESN_NM							/* 시즌 명 */
+					, AC.SYS_REG_DTM						/* 시스템 등록 일시 */
+					, AC.SYS_REGR_NO						/* 시스템 등록자 번호 */
+					, AC.SYS_UPD_DTM						/* 시스템 수정 일시  */
+					, AC.SYS_UPDR_NO						/* 시스템 수정자 번호 */
+					, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+					, (SELECT ORG_FL_NM FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '60' ORDER BY SEQ DESC LIMIT 1) AS VOD_NM /* 영상 파일명*/
+					, (SELECT ORG_FL_NM FROM APET_ATTACH_FILE FILE WHERE FILE.FL_NO = AC.FL_NO AND CONTS_TP_CD = '10' ORDER BY SEQ DESC LIMIT 1) AS THUM_NM /* 영상 썸네일명*/
+					, CASE WHEN AC.VD_TP_CD = '10' THEN '일반' ELSE 'V-커머스' END TP_NM /* 영상 타입명*/
+					, CASE WHEN ACS.TP_CD = '10' THEN 'SBS 영상' WHEN ACS.TP_CD = '20' THEN '오리지널' ELSE '펫 뉴스' END SRIS_TP_NM /* 시리즈 타입 명*/
+				FROM APET_CONTENTS AC 
+			LEFT OUTER JOIN APET_CONTENTS_SERIES ACS ON ACS.SRIS_NO = AC.SRIS_NO
+			LEFT OUTER JOIN APET_CONTENTS_SEASON ASS ON ASS.SESN_NO = AC.SESN_NO AND ASS.SRIS_NO = ACS.SRIS_NO
+			WHERE	1 = 1
+			<if test='vdGbCd != null and vdGbCd != ""'>
+				AND AC.VD_GB_CD = #{vdGbCd}
+			</if>
+			<if test='"Y".equals(srisYn)'>
+			    AND AC.SRIS_NO IS NOT NULL
+			</if>
+			<if test='"N".equals(srisYn)'>
+			    AND AC.SRIS_NO IS NULL
+			</if>
+			<if test='srisNo != null and srisNo != ""'>
+				AND AC.SRIS_NO = #{srisNo}
+			</if>
+			<if test='sesnNo != null and sesnNo != ""'>
+				AND AC.SESN_NO = #{sesnNo}
+			</if>
+			<if test='vdTpCd != null and vdTpCd != ""'>
+				AND AC.VD_TP_CD = #{vdTpCd}
+			</if>
+			<if test='dispYn != null and dispYn != ""'>
+				AND AC.DISP_YN = #{dispYn}
+			</if>
+			<if test='vdId != null and vdId != ""'>
+				AND AC.VD_ID LIKE CONCAT('%', #{vdId}, '%')
+			</if>
+			<if test='ttl != null and ttl != ""'>
+				AND AC.TTL LIKE CONCAT('%', #{ttl}, '%')
+			</if>
+			<if test='petGbCd != null and petGbCd != ""'>
+				AND AC.PET_GB_CD = #{petGbCd}
+			</if>
+			<if test='lodCd != null and lodCd != ""'>
+				AND AC.LOD_CD = #{lodCd}
+			</if>
+			<if test='prpmCd != null and prpmCd != ""'>
+				AND AC.PRPM_CD = #{prpmCd}
+			</if>
+			<if test="sysRegDtmStart != null">
+				AND AC.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+				AND AC.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>
+		) T1
+		WHERE 1=1
+		<if test='shareFrom != null and shareFrom != ""'>
+			AND T1.SHARE_CNT &gt;= #{shareFrom}
+		</if>
+		<if test='shareTo != null and shareTo != ""'>
+			AND T1.SHARE_CNT &lt;= #{shareTo}
+		</if>
+		<if test='likeFrom != null and likeFrom != ""'>
+			AND T1.LIKE_CNT &gt;= #{likeFrom}
+		</if>
+		<if test='likeTo != null and likeTo != ""'>
+			AND T1.LIKE_CNT &lt;= #{likeTo}
+		</if>
+
+		<if test='excelMode == null or excelMode == ""'>
+			<include refid="bizCommon.sortSql" />
+			<include refid="bizCommon.pageSql" />
+		</if>
+
+	</select>
+
+	<select id="pageVodCount" resultType="java.lang.Integer">
+		<!--
+			Query Name	: vod.pageVodCount
+			Description	: 영상 목록 카운트
+		-->
+		SELECT 
+			COUNT(T1.VD_ID)
+		FROM
+			(
+			SELECT	/* QUERYID(vod.pageVodCount) */
+				AC.VD_ID
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND ACI.VD_ID = AC.VD_ID ) AS LIKE_CNT
+			FROM
+				APET_CONTENTS AC
+			, (SELECT @ROWNUM:=0) TMP
+			WHERE	1 = 1
+			<if test='vdGbCd != null and vdGbCd != ""'>
+				AND AC.VD_GB_CD = #{vdGbCd}
+			</if>
+			<if test='"Y".equals(srisYn)'>
+			    AND AC.SRIS_NO IS NOT NULL
+			</if>
+			<if test='"N".equals(srisYn)'>
+			    AND AC.SRIS_NO IS NULL
+			</if>
+			<if test='srisNo != null and srisNo != ""'>
+				AND AC.SRIS_NO = #{srisNo}
+			</if>
+			<if test='sesnNo != null and sesnNo != ""'>
+				AND AC.SESN_NO = #{sesnNo}
+			</if>
+			<if test='vdTpCd != null and vdTpCd != ""'>
+				AND AC.VD_TP_CD = #{vdTpCd}
+			</if>
+			<if test='dispYn != null and dispYn != ""'>
+				AND AC.DISP_YN = #{dispYn}
+			</if>
+			<if test='vdId != null and vdId != ""'>
+				AND AC.VD_ID LIKE CONCAT('%', #{vdId}, '%')
+			</if>
+			<if test='ttl != null and ttl != ""'>
+				AND AC.TTL LIKE CONCAT('%', #{ttl}, '%')
+			</if>
+			<if test='petGbCd != null and petGbCd != ""'>
+				AND AC.PET_GB_CD = #{petGbCd}
+			</if>
+			<if test='lodCd != null and lodCd != ""'>
+				AND AC.LOD_CD = #{lodCd}
+			</if>
+			<if test='prpmCd != null and prpmCd != ""'>
+				AND AC.PRPM_CD = #{prpmCd}
+			</if>
+			<if test="sysRegDtmStart != null">
+				AND AC.SYS_REG_DTM &gt;= #{sysRegDtmStart }
+			</if>
+			<if test="sysRegDtmEnd != null">
+				AND AC.SYS_REG_DTM &lt; DATE_ADD(#{sysRegDtmEnd }, INTERVAL 1 DAY)
+			</if>
+		) T1
+		WHERE 1=1
+		<if test='shareFrom != null and shareFrom != ""'>
+			AND T1.SHARE_CNT &gt;= #{shareFrom}
+		</if>
+		<if test='shareTo != null and shareTo != ""'>
+			AND T1.SHARE_CNT &lt;= #{shareTo}
+		</if>
+		<if test='likeFrom != null and likeFrom != ""'>
+			AND T1.LIKE_CNT &gt;= #{likeFrom}
+		</if>
+		<if test='likeTo != null and likeTo != ""'>
+			AND T1.LIKE_CNT &lt;= #{likeTo}
+		</if>
+	</select>
+
+	<update id="batchUpdateDisp" parameterType="biz.app.contents.model.VodPO">
+		<!-- Query Name : vod.batchUpdateDisp
+			Description : 영상 전시상태 일괄수정
+		 -->
+		UPDATE APET_CONTENTS SET /* QUERYID(vod.batchUpdateDisp) */
+		DISP_YN 		= #{dispYn } 			/* 전시상태 */
+		, SYS_UPDR_NO	= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+		, SYS_UPD_DTM	= NOW()					/* 시스템 수정 일시 */
+		WHERE
+			VD_ID = #{vdId}
+	</update>
+
+	<select id="getVod" resultType="biz.app.contents.model.VodVO">
+	<!-- Query Name : vod.getVod
+		Description : 영상 상세
+	 -->
+	 SELECT	/* QUERYID(vod.getVod) */
+			AC.VD_ID 								/* 영상 ID */
+			, AC.SRIS_NO 							/* 시리즈 번호 */
+			, SRIS.SRIS_NM
+			, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH /* 시리즈 이미지 경로 */
+			, AC.SESN_NO 							/* 시즌 번호 */
+			, AC.TP_CD 								/* 타입 코드 */
+			, AC.FL_NO 								/* 파일 번호 */
+			, AC.THUM_AUTO_YN						/* 썸네일 자동추출 여부 */
+			, AC.DISP_YN 							/* 전시 여부 */
+			, AC.TTL 								/* 제목 */
+			, AC.CONTENT 							/* 내용 */
+			, AC.CRIT 								/* 음악 저작권 */
+			, AC.VD_TP_CD 							/* 영상 타입 코드 */
+			, AC.HITS 								/* 조회수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE AC.VD_ID = ACI.VD_ID AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT	/* 좋아요 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_SHARE ACS WHERE AC.VD_ID = ACS.VD_ID) AS SHARE_CNT /* 공유수 */
+			, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_REPLY ACR WHERE AC.VD_ID = ACR.VD_ID) AS REPLY_CNT /* 댓글수 */
+			, TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '60')), '%i:%s') AS TOT_LNTH /* 영상 길이*/
+			, AC.SYS_REG_DTM 						/* 시스템 등록 일시 */
+			, AC.SYS_REGR_NO 						/* 시스템 등록자 번호 */
+			, AC.SYS_UPD_DTM 						/* 시스템 수정 일시 */
+			, AC.SYS_UPDR_NO 						/* 시스템 수정자 번호 */
+			, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+			, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			, T2.OUTSIDE_VD_ID
+			, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+			  	FROM APET_CONTENTS_INTEREST ACI 
+				WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS LIKE_YN
+			, (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS CHK
+			  	FROM APET_CONTENTS_INTEREST ACI 
+				WHERE INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_20}' AND AC.VD_ID = ACI.VD_ID AND ACI.MBR_NO = #{mbrNo}) AS ZZIM_YN
+			, AC.SRT_URL			
+		FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+			LEFT JOIN (SELECT OUTSIDE_VD_ID, FL_NO
+						FROM APET_ATTACH_FILE AAF 
+						WHERE 1=1 
+						AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}'
+                        ) T2 ON ( T2.FL_NO = AC.FL_NO)
+		WHERE VD_ID = #{vdId}
+	</select>
+	
+	<select id="getSeriesAll" resultType="biz.app.contents.model.SeriesVO">
+	<!--
+		Query Name	: vod.getSeriesAll
+		Description	: 영상 상세 - 시리즈
+	-->
+	SELECT	/* QUERYID(vod.getSeriesAll) */
+		SRIS_NO
+		, SRIS_ID
+		, SRIS_NM
+		, DISP_YN
+		, TP_CD
+	  FROM APET_CONTENTS_SERIES ACS
+	ORDER BY TP_CD, SRIS_NM
+	</select>
+	
+	<select id="getSeasonBySrisNo" resultType="biz.app.contents.model.SeriesVO">
+	<!--
+		Query Name	: vod.getSeasonBySrisNo
+		Description	: 영상 상세 - 시즌
+	-->
+	SELECT	/* QUERYID(vod.getSeasonBySrisNo) */
+		SESN_NO
+		, SRIS_NO
+		, SESN_NM
+		, DISP_YN
+	  FROM APET_CONTENTS_SEASON ACS
+	 WHERE SRIS_NO = #{srisNo}
+	ORDER BY SESN_NM
+	</select>
+	
+	<select id="getTagsByVdId" resultType="biz.app.contents.model.VodVO">
+	<!--
+		Query Name	: vod.getTagsByVdId
+		Description	: 영상l 상세 - 태그
+	-->
+	SELECT	/* QUERYID(vod.getTagsByVdId) */
+		ACTM.TAG_NO
+		, TB.TAG_NM
+	  FROM APET_CONTENTS_TAG_MAP ACTM
+	INNER JOIN TAG_BASE TB ON ACTM.TAG_NO = TB.TAG_NO
+	 WHERE VD_ID = #{vdId}
+	ORDER BY ACTM.SYS_REG_DTM
+	</select>
+	
+	<select id="getGoodsByVdId" resultType="biz.app.contents.model.VodGoodsVO">
+	<!--
+		Query Name	: vod.getGoodsByVdId
+		Description	: 영상 상세 - 연동상품
+	-->
+	SELECT	/* QUERYID(vod.getGoodsByVdId) */
+		ACGM.GOODS_ID
+		, ACGM.VD_ID
+	  FROM APET_CONTENTS_GOODS_MAP ACGM
+	 WHERE VD_ID = #{vdId}
+	ORDER BY ACGM.SYS_REG_DTM
+	</select>
+	
+	<update id="updateVod" parameterType="biz.app.contents.model.VodPO">
+		<!--
+			Query Name	: vod.updateVod
+			Description	: 영상 수정
+		-->
+		UPDATE	/* QUERYID(vod.updateVod) */
+		APET_CONTENTS SET
+			SRIS_NO 			= #{srisNo}				/* 시리즈 번호 */
+			, TP_CD 			= #{tpCd}				/* 타입 코드 */
+			, THUM_AUTO_YN 		= #{thumAutoYn}			/* 썸네일 자동추출 여부 */
+			, DISP_YN 			= #{dispYn}				/* 전시 여부 */
+			, TTL				= #{ttl}				/* 제목 */
+			, CONTENT			= #{content}			/* 내용 */
+			, CRIT				= #{crit}				/* 음악 저작권 */
+			, SESN_NO			= #{sesnNo}				/* 시즌 번호 */
+			, VD_TP_CD			= #{vdTpCd}				/* 컨텐츠 타입 코드 */
+			, SYS_UPDR_NO		= #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		= NOW()					/* 시스템 수정 일시 */
+		WHERE VD_ID = #{vdId}
+	</update>
+	
+	<select id="getAttachFiles" resultType="biz.app.contents.model.ApetAttachFileVO">
+	<!--
+		Query Name	: vod.getAttachFiles
+		Description	: 영상 상세 - 파일
+	-->
+	SELECT	/* QUERYID(vod.getAttachFiles) */
+		FL_NO
+		, SEQ
+		, CONTS_TP_CD
+		, PHY_PATH
+		, ORG_FL_NM
+		, FL_SZ
+		, VD_LNTH
+		, OUTSIDE_VD_ID
+	  FROM APET_ATTACH_FILE AAF
+	 WHERE FL_NO = #{flNo}
+	</select>
+	
+	<select id="listVodGoods" resultType="biz.app.contents.model.VodGoodsVO">
+		<!--
+			Query Name	: vod.listVodGoods
+			Description	: 연동 상품 목록
+		-->
+		SELECT	/* QUERYID(vod.listVodGoods) */
+			ACGM.GOODS_ID		/* 상품 ID */
+			, GB.GOODS_NM		/* 상품 명 */
+			, GB.GOODS_STAT_CD	/* 상품 상태 코드 */
+			, GI.IMG_PATH		/* 상품 대표이미지 경로 */
+			, GI.IMG_SEQ		/* 상품 이미지 순번 */
+		  FROM APET_CONTENTS_GOODS_MAP ACGM 
+		INNER JOIN GOODS_BASE GB ON ACGM.GOODS_ID = GB.GOODS_ID
+		LEFT OUTER JOIN GOODS_IMG GI ON (GI.GOODS_ID = ACGM.GOODS_ID AND GI.DLGT_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}' )
+		WHERE	VD_ID = #{vdId}
+	</select>
+
+	<insert id="insertVod" parameterType="biz.app.contents.model.VodPO">
+		<!--
+			Query Name	: vod.insertVod
+			Description	: 영상 등록
+		-->
+		INSERT INTO APET_CONTENTS (	/* QUERYID(vod.insertVod) */
+			  VD_ID				/* 영상 ID */
+			, VD_GB_CD			/* 영상 구분 코드 */
+			, TP_CD				/* 타입 코드 */
+			, SRIS_NO			/* 시리즈 번호 */
+			, SESN_NO			/* 시즌 번호 */
+			, FL_NO				/* 파일 번호 */
+			, THUM_AUTO_YN		/* 썸네일 자동추출 여부 */
+			, DISP_YN			/* 전시 여부 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, CRIT				/* 저작권 */
+			, VD_TP_CD			/* 컨텐츠 타입 코드 */
+			, HITS				/* 조회수 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{vdId}
+			, #{vdGbCd}
+			, #{tpCd}
+			, #{srisNo}
+			, #{sesnNo}
+			, #{flNo}
+			, #{thumAutoYn}
+			, #{dispYn}
+			, #{ttl}
+			, #{content}
+			, #{crit}
+			, #{vdTpCd}
+			, #{hits}
+			, #{sysRegrNo}
+			, NOW()
+			, #{sysUpdrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<insert id="insertVodHist" parameterType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: vod.insertVodHist
+			Description	: 영상 이력 등록
+		-->
+		INSERT INTO APET_CONTENTS_HIST (	/* QUERYID(vod.insertVodHist) */
+			  HIST_NO			/* 이력 번호 */
+			,VD_ID				/* 영상 ID */
+			, VD_GB_CD			/* 영상 구분 코드 */
+			, TP_CD				/* 타입 코드 */
+			, SRIS_NO			/* 시리즈 번호 */
+			, SESN_NO			/* 시즌 번호 */
+			, FL_NO				/* 파일 번호 */
+			, THUM_AUTO_YN		/* 썸네일 자동추출 여부 */
+			, DISP_YN			/* 전시 여부 */
+			, TTL				/* 제목 */
+			, CONTENT			/* 내용 */
+			, CRIT				/* 저작권 */
+			, VD_TP_CD			/* 컨텐츠 타입 코드 */
+			, HITS				/* 조회수 */
+			, SRT_URL			/* Short Url */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{histNo}
+			, #{vdId}
+			, #{vdGbCd}
+			, #{tpCd}
+			, #{srisNo}
+			, #{sesnNo}
+			, #{flNo}
+			, #{thumAutoYn}
+			, #{dispYn}
+			, #{ttl}
+			, #{content}
+			, #{crit}
+			, #{vdTpCd}
+			, #{hits}
+			, #{srtUrl}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+
+	<insert id="insertTagsMap" parameterType="biz.app.contents.model.VodTagPO">
+		<!--
+			Query Name	: vod.insertTagsMap
+			Description	: 태그 등록
+		-->
+		INSERT INTO APET_CONTENTS_TAG_MAP (	/* QUERYID(vod.insertTagsMap) */
+			  VD_ID				/* 영상 ID */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{vdId}
+			, #{tagNo}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<insert id="insertTagsMapHist" parameterType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: vod.insertTagsMapHist
+			Description	: 태그 이력 등록
+		-->
+		INSERT INTO APET_CONTENTS_TAG_MAP_HIST (	/* QUERYID(vod.insertTagsMapHist) */
+			  HIST_NO			/* 이력 번호 */
+			, VD_ID				/* 영상 ID */
+			, TAG_NO			/* 태그 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{histNo}
+			, #{vdId}
+			, #{tagNo}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+
+	<insert id="insertGoodsMap" parameterType="biz.app.contents.model.VodGoodsPO">
+		<!--
+			Query Name	: vod.insertGoodsMap
+			Description	: 연동 상품 등록
+		-->
+		INSERT INTO APET_CONTENTS_GOODS_MAP (	/* QUERYID(vod.insertGoodsMap) */
+			  VD_ID				/* 영상 ID */
+			, GOODS_ID			/* 상품 ID */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{vdId}
+			, #{goodsId}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+	
+	<insert id="insertGoodsMapHist" parameterType="biz.app.contents.model.VodGoodsPO">
+		<!--
+			Query Name	: vod.insertGoodsMapHist
+			Description	: 연동 상품 이력 등록
+		-->
+		INSERT INTO APET_CONTENTS_GOODS_MAP_HIST (	/* QUERYID(vod.insertGoodsMapHist) */
+			  HIST_NO			/* 이력 번호 */
+			, VD_ID				/* 영상 ID */
+			, GOODS_ID			/* 상품 ID */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{histNo}
+			, #{vdId}
+			, #{goodsId}
+			, #{sysRegrNo}
+			, NOW()
+		)
+	</insert>
+
+	<delete id="deleteTagMap" parameterType="biz.app.contents.model.VodPO" >
+		<!--
+			Query Name	: vod.deleteTagMap
+			Description	: 연관 태그 삭제
+		-->
+		DELETE /* QUERYID(vod.deleteTagMap) */
+		FROM	APET_CONTENTS_TAG_MAP
+		WHERE	VD_ID = #{vdId}
+	</delete>
+
+	<delete id="deleteGoodsMap" parameterType="biz.app.contents.model.VodPO" >
+		<!--
+			Query Name	: vod.deleteGoodsMap
+			Description	: 연관 태그 삭제
+		-->
+		DELETE /* QUERYID(vod.deleteGoodsMap) */
+		FROM	APET_CONTENTS_GOODS_MAP
+		WHERE	VD_ID = #{vdId}
+	</delete>
+	
+		<insert id="insertApetAttachFile" parameterType="biz.app.contents.model.ApetAttachFilePO">
+		<!-- Query Name : vod.insertApetAttachFile Description : 첨부파일등록 -->		
+		<selectKey keyProperty="seq" resultType="java.lang.Long" order="BEFORE">			
+			SELECT IFNULL(MAX(SEQ),0)+1 FROM APET_ATTACH_FILE WHERE FL_NO = #{flNo }
+		</selectKey>
+		INSERT INTO APET_ATTACH_FILE /* QUERYID(vod.insertApetAttachFile) */
+		(
+		  FL_NO					/* 파일 번호 */
+		, SEQ					/* 순번 */
+		, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+		, PHY_PATH				/* 물리경로 */
+		, ORG_FL_NM				/* 원 파일 명 */
+		, FL_SZ					/* 파일 크기 */
+		, VD_LNTH				/* 영상 길이 */
+		, OUTSIDE_VD_ID			/* SGR 영상 ID */
+		, SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+		)
+		VALUES
+		(
+		  #{flNo }
+		, #{seq }
+		, #{contsTpCd }
+		, #{phyPath }
+		, #{orgFlNm }
+		, #{flSz }  
+		, #{vdLnth }
+		, #{outsideVdId }
+		, #{sysRegrNo }
+		, NOW() 
+		)		
+	</insert>
+	
+	<insert id="insertApetAttachFileHist" parameterType="biz.app.contents.model.ApetAttachFileVO">
+		<!-- Query Name : vod.insertApetAttachFile Description : 첨부파일등록 -->		
+		INSERT INTO APET_ATTACH_FILE_HIST  /* QUERYID(vod.insertApetAttachFileHist) */
+		(
+		  HIST_NO				/* 이력 번호 */
+		, FL_NO					/* 파일 번호 */
+		, SEQ					/* 순번 */
+		, CONTS_TP_CD			/* 컨텐츠 유형 코드 */	
+		, PHY_PATH				/* 물리경로 */
+		, ORG_FL_NM				/* 원 파일 명 */
+		, FL_SZ					/* 파일 크기 */
+		, VD_LNTH				/* 영상 길이 */
+		, OUTSIDE_VD_ID			/* SGR 영상 ID */
+		, SYS_REGR_NO			/* 시스템 등록자 번호 */
+	    , SYS_REG_DTM			/* 시스템 등록자 일시 */
+		)
+		VALUES
+		(
+		  #{histNo}
+		, #{flNo }
+		, #{seq }
+		, #{contsTpCd }
+		, #{phyPath }
+		, #{orgFlNm }
+		, #{flSz }  
+		, #{vdLnth }
+		, #{outsideVdId }
+		, #{sysRegrNo }
+		, NOW() 
+		)		
+	</insert>
+	
+	<select id="foSesnVodList" resultType="biz.app.contents.model.VodVO">
+		<!--
+			Query Name	: vod.foSesnVodList
+			Description	: FO시리즈 영상목록 조회
+		-->	
+		SELECT	/* QUERYID(vod.foSesnVodList) */
+				AC.VD_ID 								/* 영상 ID */
+				, AC.VD_GB_CD 								/* 영상 구분 코드 */
+				, AC.TP_CD 								/* 타입 코드 */
+                , AC.FL_NO 	
+				, AC.SRIS_NO 							/* 시리즈 번호 */
+				, AC.SESN_NO 							/* 시즌 번호 */
+				, AC.TTL 									/* 제목 */
+				, AC.DISP_YN							/* 전시 여부 */
+				, (SELECT COUNT(VD_ID) FROM APET_CONTENTS_INTEREST ACI WHERE AC.VD_ID = ACI.VD_ID AND INTR_GB_CD = '${@framework.common.constants.CommonConstants@INTR_GB_10}') AS LIKE_CNT	/* 좋아요 */
+				, AC.HITS									/* 조회수 */
+				, (SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}')	AS THUM_PATH	/* 영상 썸네일 이미지 */
+                , (SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')	AS TOTAL_LNTH	/* 영상길이 */
+                , (SELECT VD_LNTH FROM APET_CONTENTS_WATCH_HIST WH WHERE WH.VD_ID = AC.VD_ID AND WH.MBR_NO = #{mbrNo}) AS HIST_LNTH /* 시청한 영상길이 */
+                , TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')), '%i:%s') AS TOT_LNTH
+                , CASE WHEN AC.SYS_REG_DTM >= DATE_SUB(NOW(), INTERVAL 1 DAY) THEN 'Y' ELSE 'N' END AS NEW_YN /*NEW여부*/
+				, SRIS.SRIS_NM							/* 시리즈 명 */
+				, SESN.SESN_NM							/* 시즌 명 */
+				, AC.SYS_REG_DTM						/* 시스템 등록 일시 */
+				, AC.SYS_REGR_NO						/* 시스템 등록자 번호 */
+				, AC.SYS_UPD_DTM						/* 시스템 수정 일시  */
+				, AC.SYS_UPDR_NO						/* 시스템 수정자 번호 */
+				, FN_GET_USER_NAME(AC.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(AC.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+			FROM APET_CONTENTS AC 
+		LEFT OUTER JOIN APET_CONTENTS_SERIES SRIS ON SRIS.SRIS_NO = AC.SRIS_NO
+		LEFT OUTER JOIN APET_CONTENTS_SEASON SESN ON (SESN.SESN_NO = AC.SESN_NO AND SESN.SRIS_NO = SRIS.SRIS_NO)
+		WHERE	1 = 1
+            AND SRIS.SRIS_NO = #{srisNo}
+            AND SESN.SESN_NO = #{sesnNo}
+            AND AC.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+   		<if test='sortCd == "20"'>
+			ORDER BY AC.HITS DESC, LIKE_CNT DESC, AC.SYS_REG_DTM DESC
+		</if>
+		<if test="sortCd == null or sortCd == ''">
+			ORDER BY AC.SYS_REG_DTM DESC
+		</if>
+	</select>
+	
+	<select id="srisRandom" resultMap="getSrisRandom">
+		<!--
+			Query Name	: vod.srisRandom
+			Description	: 랜덤으로 시리즈 하나 가져오기
+		-->		
+		SELECT  /* QUERYID(vod.srisRandom) */
+			SRIS.SRIS_NO
+            ,SRIS.SRIS_NM
+			,(SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = SRIS.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}' ORDER BY SEQ DESC LIMIT 1) AS SRIS_PRFL_IMG_PATH /* 시리즈 썸네일 */
+		  FROM APET_CONTENTS_SERIES SRIS
+		 WHERE 1=1
+		   AND SRIS.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+		ORDER BY RAND() 
+		LIMIT 1
+	</select>
+	
+	<resultMap type="biz.app.contents.model.VodVO" id="getSrisRandom">
+		<collection property="srisRandomList" column="srisNo=SRIS_NO" javaType="java.util.ArrayList" ofType="biz.app.contents.model.VodVO" select="vod.srisRandomList" />
+	</resultMap>
+	
+	<select id="srisRandomList" resultType="biz.app.contents.model.VodVO">
+		SELECT  /* QUERYID(vod.srisRandomList) */
+			AC.VD_ID
+		   	,AC.VD_GB_CD
+		   	,AC.TP_CD
+		   	,AC.SRIS_NO
+		   	,AC.SESN_NO
+		   	,AC.FL_NO
+		   	,AC.DISP_YN
+		   	,AC.TTL
+		   	,AC.CONTENT
+		   	,AC.HITS
+			,TIME_FORMAT(SEC_TO_TIME((SELECT VD_LNTH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_60}')), '%i:%s') AS TOT_LNTH
+			,(SELECT PHY_PATH FROM APET_ATTACH_FILE AAF WHERE AAF.FL_NO = AC.FL_NO AND AAF.CONTS_TP_CD = '${@framework.common.constants.CommonConstants@CONTS_TP_10}') AS THUM_PATH /* 영상 썸네일 */
+		  FROM APET_CONTENTS AC
+			JOIN APET_CONTENTS_SERIES SRIS ON (SRIS.SRIS_NO = AC.SRIS_NO)
+		 WHERE 1 = 1
+		   AND AC.SRIS_NO = #{srisNo}
+		   AND AC.DISP_YN = '${@framework.front.constants.FrontConstants@DISP_YN_Y}'
+		   AND CURRENT_DATE() - INTERVAL 1 DAY	
+		ORDER BY HITS DESC
+		LIMIT 10
+	</select>
+	
+	<delete id="deleteApetAttachFile">
+		<!--
+			Query Name : vod.deleteApetAttachFile
+			Description : 첨부파일 삭제
+			Date : 2021.02.08.
+ 		-->
+		DELETE /* QUERYID(vod."deleteApetAttachFile") */ 
+		FROM APET_ATTACH_FILE
+		WHERE FL_NO = #{flNo}
+		AND CONTS_TP_CD = #{contsTpCd}
+	</delete>
+	
+	<select id="listGetTag" resultType="biz.app.contents.model.VodVO">
+		SELECT	/* QUERYID(vod.getTagsByVdId) */
+		ACTM.TAG_NO
+		, TB.TAG_NM
+		, TB.STAT_CD
+		FROM APET_CONTENTS_TAG_MAP ACTM
+		INNER JOIN TAG_BASE TB ON ACTM.TAG_NO = TB.TAG_NO
+		WHERE VD_ID = #{vdId}
+		ORDER BY ACTM.SYS_REG_DTM
+		LIMIT 3
+	</select>
+</mapper>

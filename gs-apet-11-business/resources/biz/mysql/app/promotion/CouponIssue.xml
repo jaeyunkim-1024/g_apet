@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	회원 Mapper 
+	작성자  	snw 
+	작성일자  	2016.02.16 
+-->
+
+<mapper namespace="couponIssue">
+    <!-- 등록 쿠폰 체크-->
+	 <select id="getCouponIssue" resultType="biz.app.promotion.model.CouponIssueVO">
+	    SELECT A.CP_NO
+	         , A.ISU_SRL_NO
+	         , A.SYS_REGR_NO
+	         , A.SYS_REG_DTM
+	         , A.MBR_CP_NO
+	      FROM COUPON_ISSUE A
+	INNER JOIN COUPON_BASE B ON (A.CP_NO = B.CP_NO)
+	     WHERE A.ISU_SRL_NO = #{isuSrlNo}
+	       AND B.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+	       AND B.APL_END_DTM <![CDATA[>=]]> NOW()
+	</select>
+	
+	<!-- 유효 쿠폰 체크-->
+	 <select id="checkCouponCnt" resultType="Integer"> 
+	  SELECT count(*)
+	    FROM COUPON_BASE
+	   WHERE CP_NO = #{cpNo}
+	     AND CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+	     AND VLD_PRD_END_DTM &gt;= SYSDATE()
+	</select>
+	 
+	<update id="updateCoupon">
+		<!--
+			Query Name : memberCoupon.updateCouponIssueMbrCpNo
+			Description :  회원 난수 쿠폰(=시리얼 쿠폰) 발급
+			Writter 	: 김재윤
+		-->
+		UPDATE COUPON_ISSUE
+		   SET MBR_CP_NO = #{mbrCpNo}  
+		 WHERE CP_NO      = #{cpNo}
+		   AND ISU_SRL_NO = #{isuSrlNo} 
+	</update>
+	
+	<delete id="deleteCouponIssueStb" parameterType="biz.app.promotion.model.CouponIssueVO">
+		<!--
+			Query Name : coupon.deleteCouponIssueStb
+			Description : 쿠폰 발급 대기 대상 데이터 삭제 
+		-->
+		DELETE
+		FROM	COUPON_ISU_STB
+		WHERE	CP_NO = #{cpNo}
+		AND     MBR_NO = #{mbrNo}
+	</delete>
+	
+	<!-- 쿠폰 발급 대기 체크-->
+	<select id="getMemberCouponStbCnt" resultType="Integer">
+	SELECT	count(*)
+	FROM COUPON_ISU_STB
+	WHERE CP_NO  = #{cpNo} AND MBR_NO = #{mbrNo}
+	<if test='useYn != null and useYn == "Y"'>
+		AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</if>
+	<if test='useYn != null and useYn == "N"'>
+		AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_N}'
+	</if>
+	</select>
+	
+	<!-- 회원 쿠폰 발급 대기 -->
+	<insert id="insertMemberCouponIssueStb">
+		<!--
+			Query Name : coupon.insertMemberCouponIssueStb
+			Description :  회원 쿠폰 발급 대기
+			Writter 	: 김세영
+		-->
+		INSERT /* QUERYID(coupon.insertMemberCouponIssueStb) */ INTO COUPON_ISU_STB
+			(
+				CP_NO
+				,MBR_NO
+				,USE_YN
+				,SYS_REGR_NO
+				,SYS_REG_DTM
+				,SYS_UPDR_NO
+				,SYS_UPD_DTM
+			)
+			VALUES
+			(
+				#{cpNo}
+				,#{mbrNo}
+				,'${@framework.common.constants.CommonConstants@USE_YN_N}'
+				,#{sysRegrNo}
+				,sysdate()
+				,#{sysUpdrNo}
+				,sysdate()
+			)
+	</insert>
+	
+	<!-- 쿠폰코드 등록 체크-->
+	<select id="getCouponIssueCnt" resultType="Integer">
+		SELECT count(*)
+		  FROM COUPON_ISSUE A
+		 WHERE A.ISU_SRL_NO = #{isuSrlNo}
+		   <if test='cpNo != null and cpNo != ""'>
+		   AND A.CP_NO <![CDATA[!=]]> #{cpNo}
+		   </if>
+		   AND EXISTS (SELECT CP_NO FROM COUPON_BASE X
+		                WHERE X.CP_STAT_CD = '${@framework.common.constants.CommonConstants@CP_STAT_20}'
+		                  AND X.APL_END_DTM <![CDATA[>=]]> NOW()
+		                  AND X.CP_NO = A.CP_NO
+		              )
+	</select>
+	 
+	<update id="updateCouponCode">
+		<!--
+			Query Name : CouponIssue.updateCouponCode
+			Description :  쿠폰코드 수정
+			Writter 	: cjw01
+		-->
+		UPDATE COUPON_ISSUE
+		   SET ISU_SRL_NO = #{isuSrlNo}  
+		 WHERE CP_NO      = #{cpNo}
+	</update>
+	 
+	<update id="deleteCouponCode">
+		<!--
+			Query Name : CouponIssue.deleteCouponCode
+			Description :  쿠폰코드 삭제
+			Writter 	: cjw01
+		-->
+		DELETE FROM COUPON_ISSUE 
+		WHERE CP_NO      = #{cpNo}
+		<if test="decreaseCnt != null and decreaseCnt != 0">
+			LIMIT #{decreaseCnt}
+		</if>
+	</update>
+</mapper>

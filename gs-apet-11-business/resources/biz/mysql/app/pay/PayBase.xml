@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	일자 : 2017. 01. 09.
+	작성자 : snw
+-->
+
+<mapper namespace="payBase">
+
+	<insert id="insertPayBase">
+		<!--
+			Query Name : payBase.insertPayBase
+			Description : 결제 기본 등록
+		-->
+		INSERT INTO PAY_BASE (
+			PAY_NO					/* 결제 번호 */
+			, ORD_CLM_GB_CD		/* 주문 클레임 구분 코드 */
+			, ORD_NO				/* 주문 번호 */
+			, CLM_NO				/* 클레임 번호 */
+			, PAY_GB_CD				/* 결제 구분 코드 */
+			, PAY_MEANS_CD		/* 결제 수단 코드 */
+			, PAY_STAT_CD			/* 결제 상태 코드 */
+			, ORG_PAY_NO			/* 원 결제 번호 */
+			, PAY_CPLT_DTM			/* 결제 완료 일시 */
+			, PAY_AMT				/* 결제 금액 */
+			, STR_ID					/* 상점아이디 */
+			, DEAL_NO				/* 거래 번호 */
+			, CFM_NO				/* 승인 번호 */
+			, CFM_DTM				/* 승인 일시 */
+			, CFM_RST_CD			/* 승인 결과 코드 */
+			, CFM_RST_MSG			/* 승인 결과 메세지 */
+			, CARDC_CD				/* 카드사 코드 */
+			, CARD_NO				/* 카드번호 */
+			, INSTMNT_INFO			/* 할부 */
+			, FINTR_YN				/* 무이자여부 */
+			, BANK_CD				/* 은행 코드 */
+			, ACCT_NO				/* 계좌 번호 */
+			, OOA_NM				/* 예금주 명 */
+			, DPSTR_NM				/* 입금자 명 */
+			, DPST_SCHD_DT			/* 입금 예정 일자 */
+			, DPST_SCHD_AMT			/* 입금 예정 금액 */
+			, DPST_CHECK_MSG		/* 입금 확인 메세지 */
+			, CNC_YN				/* 취소 여부 */
+			, MNGR_REG_YN			/* 관리자 등록 여부 */
+			, MNGR_CHECK_YN			/* 관리자 확인 여부 */
+			, LNK_RSPS_RST			/* 연동 응답 결과*/
+			, SYS_REGR_NO			/* 시스템 등록자 번호 */
+			, SYS_REG_DTM			/* 시스템 등록 일시 */
+			, SYS_UPDR_NO			/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM			/* 시스템 수정 일시 */
+		) VALUES (
+			#{payNo}					/* 결제 번호 */
+			, #{ordClmGbCd}		/* 주문 클레임 구분 코드 */
+			, #{ordNo}				/* 주문 번호 */
+			, #{clmNo}				/* 클레임 번호 */
+			, #{payGbCd}				/* 결제 구분 코드 */
+			, #{payMeansCd}		/* 결제 수단 코드 */
+			, #{payStatCd}			/* 결제 상태 코드 */
+			, #{orgPayNo}			/* 원 결제 번호 */
+			, #{payCpltDtm}			/* 결제 완료 일시 */
+			, #{payAmt}				/* 결제 금액 */
+			, #{strId}					/* 상점아이디 */
+			, #{dealNo}				/* 거래 번호 */
+			, #{cfmNo}				/* 승인 번호 */
+			, #{cfmDtm}				/* 승인 일시 */
+			, #{cfmRstCd}				/* 승인 결과 코드 */
+			, #{cfmRstMsg}			/* 승인 결과 메세지 */
+			, #{cardcCd}				/* 카드사 코드 */
+			, #{cardNo}				/* 카드사 코드 */
+			, #{halbu}				/* 할부개월 */
+			, #{fintrYn}				/* 무이자여부 */
+			, #{bankCd}				/* 은행 코드 */
+			, #{acctNo, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 계좌 번호 */
+			, #{ooaNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}				/* 예금주 명 */
+			, #{dpstrNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler}	/* 입금자 명 */
+			, #{dpstSchdDt}			/* 입금 예정 일자 */
+			, #{dpstSchdAmt}		/* 입금 예정 금액 */
+			, #{dpstCheckMsg}		/* 입금 확인 메세지 */
+			, #{cncYn}				/* 취소 여부 */
+			, #{mngrRegYn}		/* 관리자 등록 여부 */
+			, #{mngrCheckYn}		/* 관리자 확인 여부 */
+			, #{lnkRspsRst}			/* 연동 응답 결과*/
+			, #{sysRegrNo}			/* 시스템 등록자 번호 */
+			, NOW()					/* 시스템 등록 일시 */
+			, #{sysUpdrNo}			/* 시스템 수정자 번호 */
+			, NOW()					/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updatePayBaseApproval">
+		UPDATE PAY_BASE
+		SET
+			ORD_CLM_GB_CD		= #{ordClmGbCd},			/* 주문 클레임 구분 코드 */  
+			ORD_NO				= #{ordNo},				/* 주문 번호 */              
+			CLM_NO				= #{clmNo},				/* 클레임 번호 */            
+			PAY_GB_CD			= #{payGbCd},				/* 결제 구분 코드 */     
+			PAY_MEANS_CD		= #{payMeansCd},			/* 결제 수단 코드 */         
+			PAY_STAT_CD			= #{payStatCd},			/* 결제 상태 코드 */         
+			ORG_PAY_NO			= #{orgPayNo},			/* 원 결제 번호 */           
+			PAY_CPLT_DTM		= #{payCpltDtm},			/* 결제 완료 일시 */         
+			PAY_AMT				= #{payAmt},				/* 결제 금액 */              
+			STR_ID				= #{strId},				/* 상점아이디 */             
+			DEAL_NO				= #{dealNo},				/* 거래 번호 */              
+			CFM_NO				= #{cfmNo},				/* 승인 번호 */              
+			CFM_DTM				= #{cfmDtm},				/* 승인 일시 */              
+			CFM_RST_CD			= #{cfmRstCd},			/* 승인 결과 코드 */         
+			CFM_RST_MSG			= #{cfmRstMsg},			/* 승인 결과 메세지 */       
+			CARDC_CD			= #{cardcCd},				/* 카드사 코드 */        
+			CARD_NO				= #{cardNo},				/* 카드사 코드 */            
+			<if test="halbu !=null and halbu !=''">
+			INSTMNT_INFO		= #{halbu},				/* 할부개월 */               
+			</if>
+			<if test="fintrYn !=null and fintrYn !=''">
+			FINTR_YN			= #{fintrYn},			/* 무이자여부 */             
+			</if>
+			BANK_CD				= #{bankCd},				/* 은행 코드 */              
+			ACCT_NO				= #{acctNo, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler},				/* 계좌 번호 */              
+			OOA_NM				= #{ooaNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler},				/* 예금주 명 */              
+			DPSTR_NM			= #{dpstrNm, jdbcType=VARCHAR, typeHandler=biz.common.typehandler.CryptoTypeHandler},			/* 입금자 명 */              
+			DPST_SCHD_DT		= #{dpstSchdDt},			/* 입금 예정 일자 */         
+			DPST_SCHD_AMT		= #{dpstSchdAmt},		/* 입금 예정 금액 */         
+			DPST_CHECK_MSG		= #{dpstCheckMsg},		/* 입금 확인 메세지 */       
+			CNC_YN				= #{cncYn},				/* 취소 여부 */              
+			MNGR_REG_YN			= #{mngrRegYn},			/* 관리자 등록 여부 */          
+			MNGR_CHECK_YN		= #{mngrCheckYn},		/* 관리자 확인 여부 */       
+			LNK_RSPS_RST		= #{lnkRspsRst},			/* 연동 응답 결과*/          
+			SYS_UPDR_NO			= #{sysUpdrNo},			/* 시스템 수정자 번호 */     
+			SYS_UPD_DTM			= NOW()					/* 시스템 수정 일시 */       
+		WHERE
+			PAY_NO = #{payNo}
+	</update>
+
+	<select id="listPayBase" resultType="biz.app.pay.model.PayBaseVO" >
+		<!--
+			Query Name : payBase.listPayBase
+			Description : 결제 기본 목록 조회
+		-->
+		SELECT	/* QUERYID(payBase.listPayBase) */
+					PAY_NO				/* 결제 번호 */
+					, ORD_CLM_GB_CD	/* 주문 클레임 구분 코드 */
+					, ORD_NO			/* 주문 번호 */
+					, CLM_NO			/* 클레임 번호 */
+					, PAY_GB_CD			/* 결제 구분 코드 */
+					, PAY_MEANS_CD	/* 결제 수단 코드 */
+					, PAY_STAT_CD		/* 결제 상태 코드 */
+					, ORG_PAY_NO		/* 원 결제 번호 */
+					, PAY_CPLT_DTM		/* 결제 완료 일시 */
+					, PAY_AMT			/* 결제 금액 */
+					, FN_GET_PAY_REFUND_AMT(PAY_NO) AS REFUND_AMT /*환불금액 */
+					, PAY_AMT - FN_GET_PAY_RMN_AMT(PB.PAY_NO) AS PAY_RMN_AMT /* 잔여 결제 금액 */
+					, STR_ID			/* 상점아이디 */
+					, DEAL_NO			/* 거래 번호 */
+					, CFM_NO			/* 승인 번호 */
+					, CFM_DTM			/* 승인 일시 */
+					, CFM_RST_CD		/* 승인 결과 코드 */
+					, CFM_RST_MSG		/* 승인 결과 메세지 */
+					, CASE WHEN PB.ORG_PAY_NO IS NULL THEN PB.CARDC_CD ELSE (SELECT PB2.CARDC_CD FROM PAY_BASE PB2 WHERE PB2.PAY_NO = PB.ORG_PAY_NO ) END AS CARDC_CD			/* 카드사 코드 */
+					, CASE WHEN PB.ORG_PAY_NO IS NULL THEN PB.CARD_NO ELSE (SELECT PB2.CARD_NO FROM PAY_BASE PB2 WHERE PB2.PAY_NO = PB.ORG_PAY_NO ) END AS CARD_NO
+					, CASE WHEN PB.BANK_CD IS NOT NULL THEN PB.BANK_CD ELSE (SELECT PB2.BANK_CD FROM PAY_BASE PB2 WHERE PB2.PAY_NO = PB.ORG_PAY_NO ) END AS BANK_CD			/* 은행 코드 */
+					, ACCT_NO			/* 계좌 번호 */
+					, OOA_NM			/* 예금주 명 */
+					, DPSTR_NM			/* 입금자 명 */
+					, DPST_SCHD_DT		/* 입금 예정 일자 */
+					, DPST_SCHD_AMT	    /* 입금 예정 금액 */
+					, DPST_CHECK_MSG	/* 입금 확인 메세지 */
+					, CNC_YN				/* 취소 여부 */
+					, MNGR_REG_YN			/* 관리자 등록 여부 */
+					, MNGR_CHECK_YN			/* 관리자 확인 여부 */
+					, (CASE
+				           WHEN (SELECT ORD_STAT_CD
+				                 FROM ORDER_BASE
+				                 WHERE ORD_NO = PB.ORD_NO) =  '${@framework.common.constants.CommonConstants@ORD_STAT_10}'   /* 주문접수 */
+				              THEN
+				              (  IFNULL(PB.DPST_SCHD_AMT, 0)  - IFNULL((SELECT SUM(PAY_AMT)
+				                         FROM PAY_BASE
+				                         WHERE ORD_NO = PB.ORD_NO AND ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_20}'),
+				                        0))
+				           ELSE
+				              (  CASE
+									WHEN PB.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_80}' THEN PB.PAY_AMT
+				                  	WHEN PB.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_20}' OR PB.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_30}' OR PB.PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_40}'
+				                        THEN
+				                           IFNULL(PB.DPST_SCHD_AMT,0)
+				                          - IFNULL((SELECT SUM(PAY_AMT)
+				                                    FROM PAY_BASE
+				                                    WHERE ORD_NO = PB.ORD_NO AND ORD_CLM_GB_CD =  '${@framework.common.constants.CommonConstants@ORD_CLM_GB_20}' 
+				                                    AND CNC_YN='${@framework.common.constants.CommonConstants@COMM_YN_N}' )  , /* 클레임 */
+				                            0)
+				                 ELSE
+				                   IFNULL(PB.PAY_AMT,0) - IFNULL(
+				                         (SELECT SUM(PAY_AMT)
+				                          FROM PAY_BASE
+				                          WHERE ORD_NO = PB.ORD_NO AND ORD_CLM_GB_CD = '${@framework.common.constants.CommonConstants@ORD_CLM_GB_20}' 
+				                          AND CNC_YN='${@framework.common.constants.CommonConstants@COMM_YN_N}'
+		                                  AND PAY_STAT_CD='${@framework.common.constants.CommonConstants@PAY_STAT_01}')  , /* 클레임 */
+				                         0)
+				                  END
+				               )
+				        END) AS PAY_AMT_TOTAL /* 사용안함 */
+					, SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		PAY_BASE PB
+		WHERE	1 = 1
+		<if test="ordClmGbCd != null and ordClmGbCd != ''">
+		AND		ORD_CLM_GB_CD = #{ordClmGbCd}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND		ORD_NO = #{ordNo}
+		</if>
+		<if test="clmNo != null and clmNo != ''">
+		AND		CLM_NO = #{clmNo}
+		</if>
+		<if test="payMeansCd != null and payMeansCd != ''">
+		AND		PAY_MEANS_CD = #{payMeansCd}
+		</if>
+		<if test="payGbCd != null and payGbCd != ''">
+		AND		PAY_GB_CD = #{payGbCd}
+		</if>
+		<if test="payGbCds != null and payGbCds != ''">
+	         <foreach collection="payGbCds" item="item" separator="," open="AND PAY_GB_CD IN (" close=")">
+                #{item }
+            </foreach>
+		</if>
+		<if test="payStatCd != null and payStatCd != ''">
+		AND		PAY_STAT_CD = #{payStatCd}
+		</if>
+		<if test="cncYn != null and cncYn != ''">
+		AND		CNC_YN = #{cncYn}
+		</if>
+		<choose>
+			<when test="cardReceiptSortYn ==  true">
+				ORDER BY ORD_NO, PAY_NO ASC
+			</when>
+			<when test="order == 'payNo'">
+				ORDER BY ORD_NO, ORD_CLM_GB_CD, PAY_NO
+			</when>
+			<otherwise>
+				ORDER BY ORD_NO, ORD_CLM_GB_CD, PAY_NO DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<update id="updatePayBaseComplete">
+		<!--
+			Query Name : payBase.updatePayBaseComplete
+			Description : 결제 완료
+		-->
+		UPDATE	PAY_BASE
+		SET		SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+				, PAY_STAT_CD  = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'		/* 결제 상태 코드 */
+				, PAY_CPLT_DTM  = NOW()			/* 결제 완료 일시 */
+				<if test="dealNo != null and dealNo != ''">
+				, DEAL_NO  = #{dealNo}			/* 거래 번호 */
+				</if>
+				<if test="cfmNo != null and cfmNo != ''">
+				, CFM_NO  = #{cfmNo}			/* 승인 번호 */
+				</if>
+				<if test="cfmDtm != null">
+				, CFM_DTM  = #{cfmDtm}			/* 승인 일시 */
+				</if>
+				<if test="cfmRstCd != null and cfmRstCd != ''">
+				, CFM_RST_CD	= #{cfmRstCd}		/* 승인 결과 코드 */
+				</if>
+				<if test="cfmRstMsg != null and cfmRstMsg != ''">
+				, CFM_RST_MSG  = #{cfmRstMsg}	/* 승인 결과 메세지 */
+				</if>
+		WHERE	PAY_NO = #{payNo}
+	</update>
+
+	<update id="updatePayBaseRefundComplete">
+		<!--
+			Query Name : payBase.updatePayBaseRefundComplete
+			Description : 결제 환불 완료
+		-->
+		UPDATE	PAY_BASE
+		SET		SYS_UPDR_NO	= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()				/* 시스템 수정 일시 */
+					, DEAL_NO		= #{dealNo}			/* 거래 번호 */
+					, CFM_NO		= #{cfmNo}			/* 승인 번호 */
+					, CFM_DTM		= #{cfmDtm}			/* 승인 일시 */
+					, CFM_RST_CD	= #{cfmRstCd}		/* 승인 결과 코드 */
+					, CFM_RST_MSG	= #{cfmRstMsg}		/* 승인 결과 메세지 */
+					, LNK_RSPS_RST	= #{lnkRspsRst}		/* 연동 응답 결과 */
+					, PAY_STAT_CD  = '${@framework.common.constants.CommonConstants@PAY_STAT_01}'		/* 결제 상태 코드 */
+					, PAY_CPLT_DTM  = NOW()			/* 결제 완료 일시 */
+		WHERE	PAY_NO = #{payNo}
+	</update>
+
+	<update id="updatePayBaseCancel">
+		<!--
+			Query Name : payBase.updatePayBaseCancel
+			Description : 결제 취소 처리
+		-->
+		UPDATE	PAY_BASE
+		SET		SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+					, CNC_YN  = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'		/* 취소여부 */
+		WHERE	PAY_NO = #{payNo}
+	</update>
+
+
+	<select id="getPayBase" resultType="biz.app.pay.model.PayBaseVO" >
+		<!--
+			Query Name : payBase.getPayBase
+			Description : 결제 기본 조회
+		-->
+		SELECT	/* QUERYID(payBase.getPayBase) */
+					PAY_NO				/* 결제 번호 */
+					, ORD_CLM_GB_CD	/* 주문 클레임 구분 코드 */
+					, ORD_NO			/* 주문 번호 */
+					, CLM_NO			/* 클레임 번호 */
+					, PAY_GB_CD			/* 결제 구분 코드 */
+					, PAY_MEANS_CD	/* 결제 수단 코드 */
+					, PAY_STAT_CD		/* 결제 상태 코드 */
+					, ORG_PAY_NO		/* 원 결제 번호 */
+					, PAY_CPLT_DTM		/* 결제 완료 일시 */
+					, PAY_AMT			/* 결제 금액 */
+					, FN_GET_PAY_REFUND_AMT(PB.PAY_NO) AS REFUND_AMT /*환불금액 */
+					, PAY_AMT - FN_GET_PAY_RMN_AMT(PB.PAY_NO) AS PAY_RMN_AMT /* 잔여 결제 금액 */
+					, STR_ID				/* 상점아이디 */
+					, DEAL_NO			/* 거래 번호 */
+					, CFM_NO			/* 승인 번호 */
+					, CFM_DTM			/* 승인 일시 */
+					, CFM_RST_CD		/* 승인 결과 코드 */
+					, CFM_RST_MSG		/* 승인 결과 메세지 */
+					, CARDC_CD			/* 카드사 코드 */
+					, BANK_CD			/* 은행 코드 */
+					, ACCT_NO			/* 계좌 번호 */
+					, OOA_NM			/* 예금주 명 */
+					, DPSTR_NM			/* 입금자 명 */
+					, DPST_SCHD_DT		/* 입금 예정 일자 */
+					, DPST_SCHD_AMT	    /* 입금 예정 금액 */
+					, DPST_CHECK_MSG	/* 입금 확인 메세지 */
+					, CNC_YN			/* 취소 여부 */
+					, MNGR_REG_YN		/* 관리자 등록 여부 */
+					, MNGR_CHECK_YN		/* 관리자 확인 여부 */
+					, SYS_REGR_NO		/* 시스템 등록자 번호 */
+					, SYS_REG_DTM		/* 시스템 등록 일시 */
+					, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+					, SYS_UPD_DTM		/* 시스템 수정 일시 */
+					, FN_GET_USER_NAME(PB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+					, FN_GET_USER_NAME(PB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM		PAY_BASE PB
+		WHERE	1=1
+		<if test="payNo != null">
+		AND		PB.PAY_NO = #{payNo}
+		</if>
+		<if test="ordNo != null and ordNo != ''">
+		AND		PB.ORD_NO = #{ordNo}
+		</if>
+		<if test="clmNo != null and clmNo != ''">
+		AND		PB.CLM_NO = #{clmNo}
+		</if>
+		<if test="dealNo != null and dealNo != ''">
+		AND		PB.DEAL_NO = #{dealNo}
+		</if>
+		<if test="acctNo != null and acctNo != ''">
+		AND		PB.ACCT_NO = #{acctNo}
+		</if>
+		<if test="payMeansCd != null and payMeansCd != ''">
+		AND		PB.PAY_MEANS_CD = #{payMeansCd}
+		</if>
+		<if test="ordClmGbCd != null and ordClmGbCd != ''">
+		AND		PB.ORD_CLM_GB_CD = #{ordClmGbCd}
+		</if>
+		<if test="payGbCd != null and payGbCd != ''">
+		AND		PB.PAY_GB_CD = #{payGbCd}
+		</if>
+	</select>
+	
+	<update id="updatePayBaseRefundError">
+		<!--
+			Query Name : payBase.updatePayBaseRefundError
+			Description : 환불 시 에러
+		-->
+		UPDATE	PAY_BASE
+		SET		SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+				, DEAL_NO		= #{dealNo}			/* 거래 번호 */
+				, CFM_NO		= #{cfmNo}			/* 승인 번호 */
+				, CFM_DTM		= #{cfmDtm}			/* 승인 일시 */
+				, CFM_RST_CD	= #{cfmRstCd}		/* 승인 결과 코드 */
+				, CFM_RST_MSG	= #{cfmRstMsg}		/* 승인 결과 메세지 */
+				, LNK_RSPS_RST	= #{lnkRspsRst}		/* 연동 응답 결과 */
+		WHERE	PAY_NO = #{payNo}
+	</update>
+	
+	<update id="confirmDepositInfo">
+		<!--
+			Query Name : payBase.confirmDepositInfo
+			Description : 입금 확인 완료
+		-->
+		UPDATE	PAY_BASE
+		SET		SYS_UPDR_NO		= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM	= NOW()			/* 시스템 수정 일시 */
+				, MNGR_CHECK_YN = 'Y'			/* 관리자 확인 여부 */
+		WHERE	PAY_NO = #{payNo}
+	</update>
+	
+	
+	<select id="pagePayBase" resultType="biz.app.pay.model.PayBaseVO">
+		<!--
+			Query Name : payBase.pagePayBase
+			Description : 결제 페이지 조회
+		-->
+		SELECT	/* QUERYID(payBase.pagePayBase) */
+				PAY_NO				/* 결제 번호 */
+				, ORD_CLM_GB_CD	/* 주문 클레임 구분 코드 */
+				, ORD_NO			/* 주문 번호 */
+				, CLM_NO			/* 클레임 번호 */
+				, PAY_GB_CD			/* 결제 구분 코드 */
+				, PAY_MEANS_CD	/* 결제 수단 코드 */
+				, PAY_STAT_CD		/* 결제 상태 코드 */
+				, ORG_PAY_NO		/* 원 결제 번호 */
+				, PAY_CPLT_DTM		/* 결제 완료 일시 */
+				, PAY_AMT			/* 결제 금액 */
+				, FN_GET_PAY_REFUND_AMT(PB.PAY_NO) AS REFUND_AMT /*환불금액 */
+				, PAY_AMT - FN_GET_PAY_RMN_AMT(PB.PAY_NO) AS PAY_RMN_AMT /* 잔여 결제 금액 */
+				, STR_ID			/* 상점아이디 */
+				, DEAL_NO			/* 거래 번호 */
+				, CFM_NO			/* 승인 번호 */
+				, CFM_DTM			/* 승인 일시 */
+				, CFM_RST_CD		/* 승인 결과 코드 */
+				, CFM_RST_MSG		/* 승인 결과 메세지 */
+				, CARDC_CD			/* 카드사 코드 */
+				, BANK_CD			/* 은행 코드 */
+				, ACCT_NO			/* 계좌 번호 */
+				, OOA_NM			/* 예금주 명 */
+				, DPSTR_NM			/* 입금자 명 */
+				, DPST_SCHD_DT		/* 입금 예정 일자 */
+				, DPST_SCHD_AMT	    /* 입금 예정 금액 */
+				, DPST_CHECK_MSG	/* 입금 확인 메세지 */
+				, CNC_YN			/* 취소 여부 */
+				, MNGR_REG_YN		/* 관리자 등록 여부 */
+				, MNGR_CHECK_YN		/* 관리자 확인 여부 */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(PB.SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(PB.SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	PAY_BASE PB
+		WHERE	1 = 1
+		<include refid="payBase.pagePayBaseWhere" />
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pagePayBaseCount" resultType="java.lang.Integer">
+		SELECT	/* QUERYID(payBase.pagePayBaseCount) */
+				COUNT(*)
+		FROM	PAY_BASE PB
+		WHERE	1 = 1
+		<include refid="payBase.pagePayBaseWhere" />
+	</select>
+
+	<sql id="pagePayBaseWhere">
+	
+		<if test="depositStartDtm != null">
+			AND PB.PAY_CPLT_DTM <![CDATA[>=]]> #{depositStartDtm }
+		</if>
+		<if test="depositEndDtm != null">
+			AND PB.PAY_CPLT_DTM <![CDATA[<]]> DATE_ADD(#{depositEndDtm }, INTERVAL 1 DAY)
+		</if>
+				
+		<if test="acctNo != null and acctNo != ''">
+			AND	PB.ACCT_NO = #{acctNo}
+		</if>
+		<if test='searchValue != null and searchValue != ""'>
+			<choose>
+				<when test='searchKey == "type00"'>
+					/* 클레임 번호 */
+					AND PB.CLM_NO = #{searchValue}
+				</when>
+				<when test='searchKey == "type01"'>
+					/* 입금자 명 */
+					AND PB.OOA_NM = #{searchValue}
+				</when>
+			</choose>
+		</if>		
+	</sql>
+	
+	<select id="checkOrgPayBase" resultType="biz.app.pay.model.PayBaseVO">
+		<!--
+			Query Name : payBase.checkOrgPayBase
+			Description : 원 결제 조회
+		-->
+		SELECT	/* QUERYID(payBase.checkOrgPayBase) */
+			CASE 
+				WHEN COUNT(1) <![CDATA[<]]> 3 
+					 AND PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_80}' 
+					 AND PAY_MEANS_CD = '${@framework.common.constants.CommonConstants@PAY_MEANS_81}'   
+				THEN TRUE
+                ELSE FALSE
+			END AS IS_POINT_FULL_PAY
+			, PAY_GB_CD
+			, PAY_MEANS_CD
+		FROM PAY_BASE PB
+		WHERE 1=1
+		<if test="ordNo != null and ordNo != ''">
+			AND		PB.ORD_NO = #{ordNo}
+		</if>
+		<if test="payGbCd != null and payGbCd != ''">
+			AND		PB.PAY_GB_CD = #{payGbCd}
+		</if>
+		ORDER BY PAY_MEANS_CD 
+		LIMIT 1
+	</select>
+	
+	<insert id="insertPayIfLog" parameterType="biz.app.pay.model.PayIfLogVO">
+		<!--
+			Query Name : payBase.insertPayIfLog
+			Description : 결제 로그 등록
+		-->
+		INSERT INTO PAY_IF_LOG ( 
+			ORD_NO,
+			TID,
+			RES_CD,
+			RES_MSG,
+			REQ_JSON,
+			RES_JSON,
+			SYS_REG_DTM,
+			SYS_REGR_NO,
+			SYS_REQ_DTM,
+			SYS_RES_DTM
+		) VALUES (
+			#{ordNo,		  jdbcType=VARCHAR},
+			#{tid,			  jdbcType=VARCHAR},
+			#{resCd,		  jdbcType=VARCHAR},
+			#{resMsg,		  jdbcType=VARCHAR},
+			#{reqJson,		  jdbcType=VARCHAR},
+			#{resJson,		  jdbcType=VARCHAR},
+			now(),
+			#{sysRegrNo,	  jdbcType=VARCHAR},
+			#{sysReqDtm,	  jdbcType=TIMESTAMP},
+			#{sysResDtm,	  jdbcType=TIMESTAMP}
+		)
+	</insert>
+	
+	<update id="updatePayBaseNdpstMsgSendYn" parameterType="biz.app.pay.model.PayBasePO">
+		UPDATE PAY_BASE SET
+			SYS_UPDR_NO	= #{sysUpdrNo}	/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM = NOW()/* 시스템 수정 일시 */
+			, NDPST_MSG_SND_YN = '${@framework.common.constants.CommonConstants@COMM_YN_Y}'	/* 미입금 메세지 전송 여부 */
+		WHERE 1 = 1
+			AND PAY_NO = #{payNo}
+	</update>
+	
+</mapper>

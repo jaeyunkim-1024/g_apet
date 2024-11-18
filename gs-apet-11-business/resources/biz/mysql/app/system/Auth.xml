@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="auth">
+
+	<select id="pageAuth" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : auth.pageAuth
+			Description : 관리자 페이지 목록
+		-->
+		SELECT	/* QUERYID(auth.pageAuth) */
+				  AUTH_NO			/* 권한 번호 */
+				, AUTH_NM			/* 권한 명 */
+				, USE_YN			/* 사용 여부 */
+				, MN_URL			/* 메인 URL */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	AUTHORITY
+		WHERE	1 = 1
+		<if test="useYn != null and useYn != ''">
+		AND		USE_YN = #{useYn}
+		</if>
+		<if test="authNm != null and authNm != ''">
+		AND		AUTH_NM LIKE CONCAT('%', #{authNm}, '%')
+		</if>
+		<include refid="bizCommon.sortSql" />
+		<include refid="bizCommon.pageSql" />
+	</select>
+
+	<select id="pageAuthCount" resultType="java.lang.Integer">
+		<!--
+			Query Name : auth.pageUserCount
+			Description : 관리자 페이지 목록 카운트
+		-->
+		SELECT	/* QUERYID(auth.pageAuth) */
+				COUNT(*)
+		FROM	AUTHORITY
+		WHERE	1 = 1
+		<if test="useYn != null and useYn != ''">
+		AND		USE_YN = #{useYn}
+		</if>
+		<if test="authNm != null and authNm != ''">
+		AND		AUTH_NM LIKE CONCAT('%', #{authNm}, '%')
+		</if>
+	</select>
+
+	<select id="listAuth" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : auth.pageAuth
+			Description : 관리자 페이지 목록
+		-->
+		SELECT	/* QUERYID(auth.pageAuth) */
+				  AUTH_NO			/* 권한 번호 */
+				, AUTH_NM			/* 권한 명 */
+				, USE_YN			/* 사용 여부 */
+				, MN_URL			/* 메인 URL */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	AUTHORITY
+		WHERE	USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+	</select>
+
+	<select id="getAuth" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : auth.pageAuth
+			Description : 관리자 페이지 목록
+		-->
+		SELECT	/* QUERYID(auth.pageAuth) */
+				  AUTH_NO			/* 권한 번호 */
+				, AUTH_NM			/* 권한 명 */
+				, USE_YN			/* 사용 여부 */
+				, MN_URL			/* 메인 URL */
+				, SYS_REGR_NO		/* 시스템 등록자 번호 */
+				, SYS_REG_DTM		/* 시스템 등록 일시 */
+				, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		/* 시스템 수정 일시 */
+				, FN_GET_USER_NAME(SYS_REGR_NO) AS SYS_REGR_NM	/* 시스템 등록자 */
+				, FN_GET_USER_NAME(SYS_UPDR_NO) AS SYS_UPDR_NM	/* 시스템 수정자 */
+		FROM	AUTHORITY
+		WHERE	AUTH_NO = #{authNo}
+	</select>
+
+	<insert id="insertAuth" parameterType="biz.app.system.model.AuthorityPO">
+		<!--
+			Query Name : auth.insertAuth
+			Description : 권한 등록
+		-->
+		<selectKey keyProperty="authNo" resultType="Long" order="BEFORE">
+			SELECT FN_GET_SEQ('${@framework.common.constants.CommonConstants@SEQUENCE_AUTHORITY_SEQ}') FROM DUAL
+		</selectKey>
+		INSERT INTO AUTHORITY (
+			  AUTH_NO			/* 권한 번호 */
+			, AUTH_NM			/* 권한 명 */
+			, USE_YN			/* 사용 여부 */
+			, MN_URL			/* 메인 URL */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+			, SYS_UPDR_NO		/* 시스템 수정자 번호 */
+			, SYS_UPD_DTM		/* 시스템 수정 일시 */
+		) VALUES (
+			  #{authNo}			/* 권한 번호 */
+			, #{authNm}			/* 권한 명 */
+			, #{useYn}			/* 사용 여부 */
+			, #{mnUrl}
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+			, #{sysUpdrNo}		/* 시스템 수정자 번호 */
+			, NOW()				/* 시스템 수정 일시 */
+		)
+	</insert>
+
+	<update id="updateAuth" parameterType="biz.app.system.model.AuthorityPO">
+		<!--
+			Query Name : auth.updateAuth
+			Description : 권한 수정
+		-->
+		UPDATE	AUTHORITY SET
+				  AUTH_NM			= #{authNm}			/* 권한 명 */
+				, USE_YN			= #{useYn}			/* 사용 여부 */
+				, MN_URL			= #{mnUrl}			/* 메인 URL */
+				, SYS_UPDR_NO		= #{sysUpdrNo}		/* 시스템 수정자 번호 */
+				, SYS_UPD_DTM		= NOW()				/* 시스템 수정 일시 */
+		WHERE	AUTH_NO			= #{authNo}
+	</update>
+
+	<delete id="deleteAuth" parameterType="biz.app.system.model.AuthorityPO">
+		<!--
+			Query Name : auth.insertMenuAuth
+			Description : 권한 등록
+		-->
+		DELETE
+		FROM	AUTHORITY
+		WHERE	AUTH_NO = #{authNo}
+	</delete>
+
+	<select id="getCheckAuthDelete" resultType="java.lang.Integer">
+		<!--
+			Query Name : auth.getCheckAuthDelete
+			Description : 권한 등록
+		-->
+		SELECT	COUNT(*)
+		FROM	USER_AUTH_MAP
+		WHERE	AUTH_NO = #{authNo}
+	</select>
+
+	<insert id="insertMenuAuth" parameterType="biz.app.system.model.AuthorityPO">
+		<!--
+			Query Name : auth.insertMenuAuth
+			Description : 권한 등록
+		-->
+		INSERT INTO MENU_AUTHORITY (
+			  MENU_NO			/* 메뉴 번호 */
+			, AUTH_NO			/* 권한 번호 */
+			, SYS_REGR_NO		/* 시스템 등록자 번호 */
+			, SYS_REG_DTM		/* 시스템 등록 일시 */
+		) VALUES (
+			  #{menuNo}			/* 메뉴 번호 */
+			, #{authNo}			/* 권한 번호 */
+			, #{sysRegrNo}		/* 시스템 등록자 번호 */
+			, NOW()				/* 시스템 등록 일시 */
+		)
+	</insert>
+
+	<delete id="deleteMenuAuth" parameterType="biz.app.system.model.AuthorityPO">
+		<!--
+			Query Name : auth.insertMenuAuth
+			Description : 권한 등록
+		-->
+		DELETE
+		FROM	MENU_AUTHORITY
+		WHERE	AUTH_NO = #{authNo}
+	</delete>
+
+	<select id="listAuthMenu" resultType="biz.app.system.model.AuthorityVO">
+		<!--
+			Query Name : auth.listAuthMenu
+			Description : 관리자 페이지 목록
+		-->
+		SELECT	*
+		FROM	(
+				SELECT	A.MENU_NO
+						, (
+							SELECT	IF(COUNT(*) > 0, 'TRUE', 'FALSE')
+							FROM	MENU_BASE C
+							WHERE	C.UP_MENU_NO = A.MENU_NO
+						) AS CHECKED
+				FROM	MENU_AUTHORITY A
+					,	MENU_BASE B
+				WHERE	AUTH_NO = #{authNo}
+				AND		A.MENU_NO = B.MENU_NO
+		) A
+		WHERE	A.CHECKED = 'FALSE'
+	</select>
+	
+	<select id="listUserAuth" resultType="biz.app.system.model.AuthorityVO">
+		  SELECT AUTH_NO
+		  		,AUTH_NM
+		  FROM 	AUTHORITY
+          WHERE AUTH_NO IN (SELECT AUTH_NO 
+          					FROM USER_AUTH_MAP
+          					WHERE USR_NO = #{usrNo}
+          					)
+          AND USE_YN = '${@framework.common.constants.CommonConstants@USE_YN_Y}'
+          
+	</select>
+
+</mapper>

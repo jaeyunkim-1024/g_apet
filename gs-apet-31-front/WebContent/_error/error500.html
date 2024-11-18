@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>aboutPet</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <link href="/_images/common/favicon.ico" rel="shrtcut icon">
+    <link href="/_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+    <link rel="stylesheet" href="/_css/style.mo.css" class="errorStyleMo">
+
+    <script src="/_script/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/_script/jquery/jquery-ui.min.js"></script>
+    <script src="/_script/swiper.min.js"></script>
+    <script src="/_script/ui.js"></script>
+    <script src="/_script/ui.mo.js"></script>
+    
+    <style>
+    html{overflow-y:hidden}
+    </style>
+    <script>
+	if(checkPlatform(window.navigator.userAgent) == "pc"){
+		if ($("link").is(".errorStyleMo")) {
+			$('link.errorStyleMo').removeClass();
+		}
+		$('head').append('<link rel="stylesheet" href="/_css/style.pc.css" class="errorStylePc">');
+	} else {
+		if ($("link").is(".errorStylePc")) {
+			$('link.errorStylePc').removeClass();
+		}
+		$('head').append('<link rel="stylesheet" href="/_css/style.mo.css" class="errorStyleMo">');
+	}
+	function checkPlatform(ua) {
+		if(ua === undefined) {
+			ua = window.navigator.userAgent;
+		}
+
+		ua = ua.toLowerCase();
+		var platform = {};
+		var matched = {};
+		var userPlatform = "pc";
+		var platform_match = /(ipad)/.exec(ua) || /(ipod)/.exec(ua)
+				|| /(windows phone)/.exec(ua) || /(iphone)/.exec(ua)
+				|| /(kindle)/.exec(ua) || /(silk)/.exec(ua) || /(android)/.exec(ua)
+				|| /(win)/.exec(ua) || /(mac)/.exec(ua) || /(linux)/.exec(ua)
+				|| /(cros)/.exec(ua) || /(playbook)/.exec(ua)
+				|| /(bb)/.exec(ua) || /(blackberry)/.exec(ua)
+				|| [];
+
+		matched.platform = platform_match[0] || "";
+
+		if(matched.platform) {
+			platform[matched.platform] = true;
+		}
+
+		if(platform.android || platform.bb || platform.blackberry
+				|| platform.ipad || platform.iphone
+				|| platform.ipod || platform.kindle
+				|| platform.playbook || platform.silk
+				|| platform["windows phone"]) {
+			userPlatform = "mobile";
+		}
+
+		if(platform.cros || platform.mac || platform.linux || platform.win) {
+			userPlatform = "pc";
+		}
+
+		return userPlatform;
+	}
+	</script>
+</head>
+<body class="body">
+	<div class="wrap" id="wrap">
+	
+		<!-- 바디 - 여기위로 템플릿 -->
+		<main class="container page login srch agree" id="container">
+			<!-- <div class="inr"> -->
+			<div>
+				<!-- 본문 -->
+				<div class="contents error-wrap-area er500" id="contents">
+					
+					<!-- 500 에러 -->
+					<div class="error-area">
+						<div class="error">
+							<p class="txt">더 나은 서비스를 위해서<br>시스템 업그레이드 작업이 진행됩니다.</p>
+							<p class="time" style="font-size: 18px; font-weight: bold;">진행 시간 : 08:50 ~ 09:20</p>
+							<p class="txt-s">
+								해당 시간 이외에 주문 부탁드립니다.<br/>
+								불편을 드려 죄송합니다.
+								 
+								<span class='from'>어바웃펫 드림</span>
+							</p>
+							
+						</div>
+					</div>
+					<!-- // 500 에러  -->
+					
+				</div>
+			</div>
+		</main>
+		
+	</div>
+
+</body>
+</html>

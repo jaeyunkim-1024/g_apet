@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head> 
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Layout</title>
+	<meta name="format-detection" content="telephone=no">
+	<meta name="theme-color" content="#ffffff">
+	<link href="../../_images/common/favicon.ico" rel="shrtcut icon">
+	<link href="../../_images/common/favicon.png" rel="apple-touch-icon-precomposed">
+	<link rel="stylesheet" href="../../_css/style.mo.css">
+	
+	<script src="../../_script/jquery/jquery-3.3.1.min.js"></script>
+	<script src="../../_script/jquery/jquery-ui.min.js"></script>
+	<script src="../../_script/swiper.min.js"></script>
+	<script src="../../_script/ui.js"></script>
+	<script src="../../_script/ui.mo.js"></script>
+	<script src="../../_html/guide/html.js"></script><!-- 개발페이지에서는 html.js 임포트 하지말아주세요. -->
+</head>
+<body class="body">
+	
+	<article class="popLayer a popCardinput" id="popCardinput">
+		<div class="pbd">
+			<div class="phd">
+				<div class="in">
+					<h1 class="tit">카드 정보 입력</h1>
+					<button type="button" class="btnPopClose">닫기</button>
+				</div>
+			</div>
+			<div class="pct">
+				<main class="poptents">
+
+					<div class="uicardinput">
+						<ul class="list">
+							<!-- <li>
+								<div class="hdt">카드 선택</div>
+								<div class="cdt">
+									<span class="select">
+										<select >
+											<option>카드를 선택해주세요</option>
+											<option>카드를 선택해주세요</option>
+											<option>카드를 선택해주세요</option>
+											<option>카드를 선택해주세요</option>
+										</select>
+									</span>
+								</div>
+							</li> -->
+							<li>
+								<div class="hdt">카드 번호</div>
+								<div class="cdt">
+									<div class="cardnums">
+										<div class="input"><input type="password" placeholder="****" title="1,2,3,4번째카드번호"></div>  
+										<div class="input"><input type="password" placeholder="****" title="5,6,7,8번째카드번호"></div> 
+										<div class="input"><input type="password" placeholder="****" title="9,10,11,12번째카드번호"></div> 
+										<div class="input"><input type="password" placeholder="****" title="13,14,15,16번째카드번호"></div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="hdt">유효기간</div>
+								<div class="cdt">
+									<div class="cardrange">
+										<div class="input"><input type="number" placeholder="MM" title="유효기간 월"></div>  
+										<div class="input"><input type="number" placeholder="YY" title="유효기간 년"></div>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="hdt">비밀번호</div>
+								<div class="cdt">
+									<div class="input"><input type="password" placeholder="카드 비밀번호 앞자리 2자리" title="카드 비밀번호 앞자리 2자리"></div>  
+								</div>
+							</li>
+						</ul>
+
+						<ul class="agreeset">
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">NICE페이먼츠 전자금융거래 이용약관</a></span>
+								</span>
+							</li>
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">NICE페이먼츠 정기과금 이용약관</a></span>
+								</span>
+							</li>
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">NICE페이먼츠 정기과금 이용약관</a></span>
+								</span>
+							</li>
+							<li>
+								<span class="checkbox">
+									<input type="checkbox">
+									<span class="txt"><a href="javascript:;" class="tt lk">NICE페이먼츠 개인정보 제3자 제공에 대한 동의</a></span>
+								</span>
+							</li>
+						</ul>
+
+						<div class="btnSet bot">
+							<button type="button" class="btn lg d cancel">취소</button>
+							<button type="button" class="btn lg a save">저장</button>
+						</div>
+					</div>
+					
+				</main>
+			</div>
+			
+		</div>
+	</article>
+
+	<script>
+		ui.popLayer.open("popCardinput");
+	</script>
+
+</body>
+</html>

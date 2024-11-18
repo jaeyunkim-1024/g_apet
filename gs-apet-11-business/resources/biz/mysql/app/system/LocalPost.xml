@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="localPost">
+
+	<select id="getLocalPostYn" resultType="String">
+		<!--
+			Query Name : localPost.getLocalPostYn
+			Description : 도서/산간지역 여부
+		-->
+		SELECT	/* QUERYID(localPost.getLocalPostYn) */
+			FN_GET_ADD_DLVR_AMT_YN(#{postNoNew}, #{postNoOld}) 
+		FROM	DUAL
+	</select>
+
+</mapper>

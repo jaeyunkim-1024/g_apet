@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	네이버 EP
+	작성자 		valfac
+	작성일자  	2021. 03. 02.
+-->
+
+<mapper namespace="naverEp">
+	<select id="selectNaverEpInfo" resultType="biz.interfaces.naver.model.NaverEpVO">
+		SELECT T1.GOODS_ID AS ID /* 상품 ID */
+			, T1.GOODS_NM AS TITLE /* 상품 ID */
+			, CASE WHEN CAT_CDS_IDX IS NOT NULL THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(CAT_CDS, ';', 1)) ELSE '' END AS CATEGORY_NAME1 /* 제휴사 카테고리명(대분류) */
+			, CASE WHEN CAT_CDS_IDX > 0 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 2), ';', -1)) ELSE '' END AS CATEGORY_NAME2 /* 제휴사 카테고리명(중분류) */
+			, CASE WHEN CAT_CDS_IDX > 1 THEN FN_GET_DISP_CTG_NM(SUBSTRING_INDEX(SUBSTRING_INDEX(CAT_CDS, ';', 3), ';', -1)) ELSE '' END AS CATEGORY_NAME3 /* 제휴사 카테고리명(소분류) */
+			, NAVER_CTG_ID AS NAVER_CATEGORY /* 네이버 카테고리 ID */
+			, PRC_CMPR_PAGE_ID AS NAVER_PRODUCT_ID /* 가격비교 ID */
+			, CASE WHEN GOODS_SRC_CD = '10' THEN 'Y' ELSE NULL END AS IMPORT_FLAG /* 해외구매대행 여부 */
+			, CASE WHEN GOODS_SRC_CD = '20' THEN 'Y' ELSE NULL END AS PARALLEL_IMPORT /* 병행수입 여부 */
+			, CASE WHEN GOODS_SRC_CD = '30' THEN 'Y' ELSE NULL END AS ORDER_MADE /* 주문제작 여부 */
+			, CASE WHEN FREE_DLVR_YN = 'Y' THEN 0 ELSE DLVR_AMT END AS SHIPPING /* 배송료 */
+			, BND_NM AS BRAND /* 브랜드 */
+			, CTR_ORG AS ORIGIN /* 원산지 */
+			, MMFT AS MAKER /* 제조사 */
+			, PRICE_PC as pricePc
+			, NORMAL_PRICE
+			, LINK
+			, MOBILE_LINK
+			, MIN_ORD_QTY AS MINIMUM_PURCHASE_QUANTITY /* 최소 구매수량 */
+			, SALE_TP_CD AS PRODUCT_FLAG  /* 판매방식 여부 */
+			, SRCH_TAG AS SEARCH_TAG /* 검색태그 */
+			, STP_USE_AGE_CD AS AGE_GROUP /* 주 이용 고객층 */
+			, STP_USE_GD_CD AS GENDER /* 성별 */
+			, IMAGE_LINK /* [필수]이미지 URL */
+			, ADD_IMAGE_LINK /* 추가 이미지 URL */
+		FROM (
+			SELECT DISTINCT GB.GOODS_ID
+				, GB.GOODS_NM
+				, GB.COMP_NO
+				, GB.MMFT
+				, GB.CTR_ORG
+				, GB.MIN_ORD_QTY
+				, DG.DISP_CLSF_NO
+				, FN_GET_DISP_CTG_NO_PATH(DG.DISP_CLSF_NO) AS CAT_CDS
+				, LENGTH(FN_GET_DISP_CTG_NO_PATH(DG.DISP_CLSF_NO)) - LENGTH(REPLACE(FN_GET_DISP_CTG_NO_PATH(DG.DISP_CLSF_NO), ';', '')) AS CAT_CDS_IDX
+				, '0' AS PRICE_PC /* 상품 가격 - 쿠폰 적용가 */
+				, null AS NORMAL_PRICE /* 모바일 상품 가격 */
+				, 'http://' AS LINK /* [필수]상품 URL */
+				, null AS MOBILE_LINK /* 상품 모바일 URL */
+				, CASE WHEN GB.FREE_DLVR_YN = 'Y' THEN 'Y'
+				WHEN DC.DLVRC_STD_CD = '10' THEN 'Y'
+				ELSE 'N'
+				END AS FREE_DLVR_YN 	/* 무료 배송 여부 */
+				, FN_GET_BRAND_NAME(GB.BND_NO) AS BND_NM
+				, DC.DLVR_AMT
+				, NE.NAVER_CTG_ID
+				, NE.GOODS_SRC_CD
+				, NE.SALE_TP_CD
+				, NE.SRCH_TAG
+				, NE.PRC_CMPR_PAGE_ID
+				, NE.STP_USE_AGE_CD
+				, NE.STP_USE_GD_CD
+				, MAX(CASE WHEN GI.DLGT_YN = 'Y' THEN IMG_PATH ELSE '' END) OVER(PARTITION BY GB.GOODS_ID) image_link /* [필수]이미지 URL */
+				, (SELECT GROUP_CONCAT(DISTINCT IMG_PATH ORDER BY IMG_SEQ ASC SEPARATOR '|') FROM GOODS_IMG WHERE GOODS_ID = GB.GOODS_ID AND IMG_TP_CD='10' AND DLGT_YN = 'N' GROUP BY GOODS_ID) AS ADD_IMAGE_LINK /* 추가 이미지 URL */
+			FROM GOODS_BASE GB JOIN GOODS_NAVER_EP_INFO NE
+			ON GB.GOODS_ID = NE.GOODS_ID
+			LEFT OUTER JOIN DELIVERY_CHARGE_POLICY DC
+			    ON GB.COMP_NO = DC.COMP_NO
+			        AND GB.DLVRC_PLC_NO = DC.DLVRC_PLC_NO
+			        AND DC.DEL_YN != 'Y'
+			JOIN DISPLAY_GOODS DG
+			ON GB.GOODS_ID = DG.GOODS_ID
+			AND DG.DLGT_DISP_YN = 'Y'
+			LEFT OUTER JOIN GOODS_IMG GI
+			ON GB.GOODS_ID = GI.GOODS_ID
+			AND GI.IMG_TP_CD = '10'
+			WHERE NE.SND_YN= 'Y'
+		) T1
+	</select>
+</mapper>
